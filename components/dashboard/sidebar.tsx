@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { signOut } from '@/app/(auth)/actions'
+import { SignOutButton } from "@clerk/nextjs";
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { 
@@ -90,14 +90,13 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* User Profile & Logout */}
-      <div 
+{/* User Profile & Logout */}
+<div 
         className="px-4 py-4"
         style={{ borderTop: `1px solid ${ALI.ui.border}` }}
       >
-        <form action={signOut}>
+        <SignOutButton>
           <Button
-            type="submit"
             variant="ghost"
             className="w-full justify-start gap-3 hover:bg-gray-50"
             style={{ color: '#64748b' }}
@@ -106,13 +105,13 @@ export function Sidebar() {
               className="w-8 h-8 rounded-full flex items-center justify-center"
               style={{ backgroundColor: ALI.accent.slate }}
             >
-              <span className="text-white text-sm font-medium">N</span>
+              <LogOut className="w-4 h-4 text-white" />
             </div>
             <span className="font-medium">Çıkış Yap</span>
           </Button>
-        </form>
+        </SignOutButton>
       </div>
-    </div>
-  )
-}
+      </div>
+      )
+    }
 
