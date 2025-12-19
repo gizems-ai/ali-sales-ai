@@ -21,18 +21,21 @@ export function LoginForm() {
     setIsLoading(true)
 
     try {
-      const result = await signIn(formData)
+      const result = await signIn(formData) as any; // 'as any' ekleyerek tipi esnetiyoruz
+
       if (result?.error) {
         // Translate common errors to Turkish
-        const errorMessage = result.error.toLowerCase()
+        const errorMessage = result.error.toLowerCase();
         if (errorMessage.includes('invalid') || errorMessage.includes('credentials')) {
-          setError('E-posta veya şifre hatalı')
+          setError('E-posta veya şifre hatalı');
         } else if (errorMessage.includes('email')) {
-          setError('Geçersiz bir e-posta gir')
+          setError('Geçersiz bir e-posta gir');
         } else if (errorMessage.includes('user') || errorMessage.includes('not found')) {
-          setError('Bu hesap bulunamadı')
+          setError('Bu hesap bulunamadı');
         } else {
-          setError(result.error)
+          setError(result.error);
+        }
+      }
         }
       }
     } catch (err) {
