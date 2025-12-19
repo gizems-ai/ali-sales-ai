@@ -1,5 +1,3 @@
-import { auth } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/dashboard/sidebar'
 import { MobileNav } from '@/components/dashboard/mobile-nav'
 
@@ -8,11 +6,7 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-  const { userId } = await auth()
-  
-  if (!userId) {
-    redirect('/login')
-  }
+  // AUTH KONTROLÜ YOK - CLERK MIDDLEWARE HALLEDECEK
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F6F7FB' }}>
