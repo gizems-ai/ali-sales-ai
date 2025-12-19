@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 import { signIn } from '@/app/(auth)/actions'
 import { Input } from '@/components/ui/input'
@@ -19,10 +18,8 @@ export function LoginForm() {
   async function handleSubmit(formData: FormData) {
     setError(null);
     setIsLoading(true);
-
     try {
       const response = await signIn(formData) as any;
-      
       if (response?.error) {
         const errMsg = String(response.error).toLowerCase();
         if (errMsg.includes('invalid') || errMsg.includes('credentials')) {
@@ -36,6 +33,7 @@ export function LoginForm() {
     } finally {
       setIsLoading(false);
     }
+  }
 
   return (
     <form action={handleSubmit} className="space-y-5">
@@ -85,5 +83,3 @@ export function LoginForm() {
     </form>
   )
 }
-
-
