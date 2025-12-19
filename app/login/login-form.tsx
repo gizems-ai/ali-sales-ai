@@ -17,33 +17,26 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
 
   async function handleSubmit(formData: FormData) {
-    setError(null)
-    setIsLoading(true)
+    setError(null);
+    setIsLoading(true);
 
     try {
       const response = await signIn(formData) as any;
-
+      
       if (response?.error) {
         const errMsg = String(response.error).toLowerCase();
         if (errMsg.includes('invalid') || errMsg.includes('credentials')) {
           setError('E-posta veya şifre hatalı');
-        } else if (errMsg.includes('email')) {
-          setError('Geçersiz bir e-posta gir');
-        } else if (errMsg.includes('user') || errMsg.includes('not found')) {
-          setError('Bu hesap bulunamadı');
         } else {
-          setError(String(response.error));
+          setError('Giriş yapılamadı, lütfen bilgilerinizi kontrol edin');
         }
       }
-    } else {
-      setError(String(response.error));
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsLoading(false);
     }
   }
-} catch (err) {
-  // Hata durumunda buraya düşer
-} finally {
-  setIsLoading(false);
-}
 
   return (
     <form action={handleSubmit} className="space-y-5">
