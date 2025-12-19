@@ -1,5 +1,6 @@
 'use client'
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { signIn } from '@/app/(auth)/actions'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -12,31 +13,41 @@ const ALI = {
 }
 
 export function LoginForm() {
+  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  async function handleSubmit(formData: FormData) {
-    setError(null);
-    setIsLoading(true);
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setError(null)
+    setIsLoading(true)
+
     try {
-      const response = await signIn(formData) as any;
+      const formData = new FormData(e.currentTarget)
+      const response = await signIn(formData) as any
+
       if (response?.error) {
-        const errMsg = String(response.error).toLowerCase();
+        const errMsg = String(response.error).toLowerCase()
         if (errMsg.includes('invalid') || errMsg.includes('credentials')) {
-          setError('E-posta veya şifre hatalı');
+          setError('E-posta veya şifre hatalı')
         } else {
-          setError('Giriş yapılamadı, lütfen bilgilerinizi kontrol edin');
+          setError('Giriş yapılamadı, lütfen bilgilerinizi kontrol edin')
         }
+        setIsLoading(false)
+      } else {
+        // Başarılı login - dashboard'a yönlendir
+        router.push('/dashboard')
+        router.refresh()
       }
     } catch (err) {
-      console.error(err);
-    } finally {
-      setIsLoading(false);
+      console.error(err)
+      setError('Bir hata oluştu')
+      setIsLoading(false)
     }
   }
 
   return (
-    <form action={handleSubmit} className="space-y-5">
+    <form onSubmit={handleSubmit} className="space-y-5">
       {error && (
         <div 
           className="rounded-xl p-3 text-sm text-red-600 bg-red-50 border border-red-100"
