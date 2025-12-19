@@ -35,16 +35,15 @@ export function LoginForm() {
           setError(String(response.error));
         }
       }
-      }
-        }
-      }
-    } catch (err) {
-      // Redirect throws, so this is expected
-      // The redirect will happen automatically
-    } finally {
-      setIsLoading(false)
+    } else {
+      setError(String(response.error));
     }
   }
+} catch (err) {
+  // Hata durumunda buraya düşer
+} finally {
+  setIsLoading(false);
+}
 
   return (
     <form action={handleSubmit} className="space-y-5">
