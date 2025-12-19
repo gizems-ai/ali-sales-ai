@@ -1,18 +1,8 @@
-import { auth } from '@clerk/nextjs/server'
-import { redirect } from 'next/navigation'
-
-export default async function DashboardPage() {
-  const { userId } = await auth()
-  
-  // Eğer kullanıcı yoksa Clerk zaten korur ama biz de güvenliğe alalım
-  if (!userId) {
-    redirect('/login')
-  }
-
+export default function DashboardPage() {
   return (
-    <div className="p-20 text-center">
-      <h1 className="text-2xl font-bold text-green-600">Döngü Kırıldı! 🎉</h1>
-      <p className="mt-2 text-gray-600">Dashboard şu an sabit duruyor olmalı.</p>
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <h1 className="text-3xl font-bold text-green-600">Döngü Nihayet Kırıldı! 🎉</h1>
+      <p className="text-gray-500 mt-2">Dashboard şu an sabit duruyor.</p>
     </div>
-  )
+  );
 }
