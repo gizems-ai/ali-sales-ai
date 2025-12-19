@@ -36,7 +36,6 @@ export function LoginForm() {
     } finally {
       setIsLoading(false);
     }
-  }
 
   return (
     <form action={handleSubmit} className="space-y-5">
