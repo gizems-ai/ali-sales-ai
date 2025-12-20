@@ -2,12 +2,6 @@
 
 import { UserButton } from "@clerk/nextjs"
 import { useEffect, useState } from 'react'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-)
 
 interface Message {
   id: string
@@ -30,12 +24,8 @@ export default function MessagesPage() {
 
   async function fetchMessages() {
     try {
-      const { data, error } = await supabase
-        .from('messages')
-        .select('*')
-        .order('created_at', { ascending: false })
-
-      if (error) throw error
+      const response = await fetch('/api/messages')
+      const data = await response.json()
       setMessages(data || [])
     } catch (error) {
       console.error('Mesajlar yüklenemedi:', error)
@@ -55,7 +45,6 @@ export default function MessagesPage() {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] lg:pl-64 flex flex-col relative font-sans">
-      {/* Üst Bar */}
       <header className="h-20 bg-white border-b border-slate-100 px-8 flex items-center justify-between sticky top-0 z-30">
         <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] italic">Mesaj Merkezi</h2>
         <div className="flex items-center gap-4">
