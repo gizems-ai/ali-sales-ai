@@ -96,3 +96,4 @@ export function StageColumn({ stage, customers, count, totalValue }: StageColumn
 }
 
 
+
