@@ -92,7 +92,7 @@ export function Sidebar() {
           <img
             src={cfg.branding.logoImage}
             alt={cfg.branding.logo}
-            className="h-[36px] w-auto object-contain"
+            className="w-full h-auto object-contain"
           />
         ) : (
           <div className="leading-none">
