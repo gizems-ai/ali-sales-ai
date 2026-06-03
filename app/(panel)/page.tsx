@@ -679,7 +679,7 @@ export default async function DashboardPage() {
             <div className="absolute right-[-64px] bottom-[-76px] h-[210px] w-[210px] rounded-full border border-white/18 pointer-events-none" />
             <div className="relative">
               <div className="text-[22px] font-[900] tracking-[-0.045em] leading-none text-white">
-                sigortan<span style={{ color: C.pink }}>.ai</span>
+                alisales<span style={{ color: C.pink }}>.ai</span>
               </div>
               <div
                 className="mt-[2px] h-[3px] rounded-full"
