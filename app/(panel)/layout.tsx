@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import { auth } from '@clerk/nextjs/server'
 import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/panel/sidebar'
@@ -5,6 +6,17 @@ import { Topbar } from '@/components/panel/topbar'
 import { MobileNav } from '@/components/panel/mobile-nav'
 import { TenantProvider } from '@/lib/tenant-context'
 import { getTenantConfigFromRequest } from '@/lib/yetki'
+
+export async function generateMetadata(): Promise<Metadata> {
+  const cfg = await getTenantConfigFromRequest()
+  const favicon = cfg?.branding.logoImage
+    ? { icon: cfg.branding.logoImage }
+    : { icon: '/favicon.svg' }
+  return {
+    title: cfg?.name ?? 'CRM Panel',
+    icons: favicon,
+  }
+}
 
 export default async function PanelLayout({ children }: { children: React.ReactNode }) {
   const { userId } = await auth()

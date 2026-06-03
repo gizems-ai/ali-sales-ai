@@ -72,10 +72,9 @@ export function Sidebar() {
   const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Kullanıcı'
   const initials = ((user?.firstName?.[0] ?? '') + (user?.lastName?.[0] ?? '')).toUpperCase() || '?'
 
-  // Logo: cfg.branding.logo örn. "alisales.ai" → ["alisales", ".ai"]
   const logoDotIdx = cfg.branding.logo.lastIndexOf('.')
   const logoBase   = cfg.branding.logo.slice(0, logoDotIdx)
-  const logoSuffix = cfg.branding.logo.slice(logoDotIdx) // ".ai"
+  const logoSuffix = cfg.branding.logo.slice(logoDotIdx)
 
   // raporlar / ali section'larının en az bir görünür öğesi var mı?
   const showRapor = raporNav.some(n => moduleOn(n.moduleKey))
@@ -88,19 +87,28 @@ export function Sidebar() {
     >
       {/* Logo */}
       <div className="px-5 pt-5 pb-2">
-        <div className="leading-none">
-          <div className="text-[22px] font-[900] tracking-[-0.045em]" style={{ color: C.navy }}>
-            {logoBase}<span style={{ color: C.bordo }}>{logoSuffix}</span>
-          </div>
-          <div
-            className="mt-[2px] h-[3px] rounded-full"
-            style={{
-              marginLeft: `${logoBase.length * 12}px`,
-              width: '28px',
-              background: `linear-gradient(90deg, ${C.violet}, ${C.pink})`,
-            }}
+        {cfg.branding.logoImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={cfg.branding.logoImage}
+            alt={cfg.branding.logo}
+            className="h-[36px] w-auto object-contain"
           />
-        </div>
+        ) : (
+          <div className="leading-none">
+            <div className="text-[22px] font-[900] tracking-[-0.045em]" style={{ color: C.navy }}>
+              {logoBase}<span style={{ color: C.bordo }}>{logoSuffix}</span>
+            </div>
+            <div
+              className="mt-[2px] h-[3px] rounded-full"
+              style={{
+                marginLeft: `${logoBase.length * 12}px`,
+                width: '28px',
+                background: `linear-gradient(90deg, ${C.violet}, ${C.pink})`,
+              }}
+            />
+          </div>
+        )}
         <p className="text-[12px] font-medium text-slate-400 mt-2">CRM Paneli</p>
       </div>
 

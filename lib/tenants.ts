@@ -13,7 +13,8 @@ export interface TenantFields {
 // ─── Branding ─────────────────────────────────────────────────────────────────
 
 export interface TenantBranding {
-  logo: string  // Örn: 'alisales.ai', 'sigortan.ai'
+  logo: string        // text fallback: 'alisales.ai', 'sigortan.ai'
+  logoImage?: string  // /public path: '/ali-logo.png'
 }
 
 // ─── Tenant types ─────────────────────────────────────────────────────────────
@@ -214,7 +215,7 @@ export const TENANTS: Record<string, TenantConfig> = {
       aksamBrifing: false,
       portfoy: false,
     },
-    branding: { logo: 'alisales.ai' },
+    branding: { logo: 'alisales.ai', logoImage: '/ali-logo.png' },
   },
 }
 
