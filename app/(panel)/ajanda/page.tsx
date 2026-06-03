@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { getKullanicıProfili, getTenantConfig } from '@/lib/yetki'
+import { getKullanicıProfili, getTenantConfigFromRequest } from '@/lib/yetki'
 import { AjandaAdminView } from './_components/ajanda-admin-view'
 
 export const dynamic = 'force-dynamic'
@@ -60,7 +60,8 @@ export default async function AjandaPage() {
   const profil = await getKullanicıProfili()
   if (!profil) redirect('/login')
 
-  const cfg = getTenantConfig(profil)
+  const cfg = (await getTenantConfigFromRequest()) ?? undefined
+  if (!cfg) redirect('/login')
   const n8nSlug = cfg.n8nSlug
 
   const slugMap: Record<string, string> = Object.fromEntries(

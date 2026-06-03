@@ -21,6 +21,7 @@ import { type MusterilerIzin } from '@/lib/musteriler-izin'
 import { TEMSILCI_RENK, TEMSILCI_RENK_FALLBACK } from '@/lib/temsilciler'
 import { FirmaModal } from '../../musteriler/_components/firma-modal'
 import { useRouter } from 'next/navigation'
+import { useTenant } from '@/lib/tenant-context'
 
 /* ─── Renkler ─────────────────────────────────────────────────────── */
 const C = {
@@ -76,6 +77,7 @@ export interface InitialColumn {
 function CardContent({
   record, asama = '', overlay = false,
 }: { record: AirtableRecord<FirmaKart>; asama?: string; overlay?: boolean }) {
+  const { airtable: { sistemAdi } } = useTenant()
   const f = record.fields
   const isYuksek  = f['Öncelik'] === 'Yüksek'
   const temsilci  = f['Atanan Temsilci']
@@ -138,7 +140,7 @@ function CardContent({
       </div>
 
       {/* Temsilci */}
-      {temsilci && temsilci !== 'SIGORTAN BIZ' && (
+      {temsilci && (!sistemAdi || temsilci !== sistemAdi) && (
         <div className="mt-[8px] flex items-center gap-[5px]">
           <span className="h-[16px] w-[16px] rounded-full grid place-items-center text-[8px] font-black text-white"
             style={{ background: temRenk }}>
@@ -278,6 +280,7 @@ export function KanbanBoard({
   initialModalId?: string
   isAdmin?: boolean
 }) {
+  const { airtable: { sistemAdi } } = useTenant()
   const [cols, setCols] = useState<Record<string, ColState>>(() => {
     const map: Record<string, ColState> = {}
     for (const c of initialColumns) map[c.value] = { records: c.records, offset: c.offset }
@@ -316,7 +319,7 @@ export function KanbanBoard({
     for (const col of initialColumns) {
       for (const r of col.records) {
         const t = r.fields['Atanan Temsilci']
-        if (t && t !== 'SIGORTAN BIZ') set.add(t)
+        if (t && (!sistemAdi || t !== sistemAdi)) set.add(t)
       }
     }
     return [...set].sort()

@@ -2,7 +2,7 @@ import { type NextRequest } from 'next/server'
 import { currentUser } from '@clerk/nextjs/server'
 import { getMusterilerIzni } from '@/lib/musteriler-izin'
 import { getTenantConfigFromRequest } from '@/lib/yetki'
-import { atTableUrl } from '@/lib/tenants'
+import { atTableUrl, translatePatch } from '@/lib/tenants'
 
 const EDITILEBILIR = new Set([
   'Firma Adı', 'Sektör', 'İl / İlçe', 'Adres', 'Genel Telefon', 'Genel Mail',
@@ -24,6 +24,7 @@ export async function PATCH(req: NextRequest) {
     getTenantConfigFromRequest(),
   ])
   if (izin.tip === 'yok') return Response.json({ error: 'Yetkisiz' }, { status: 403 })
+  if (!cfg) return Response.json({ error: 'Tenant bulunamıyor' }, { status: 403 })
 
   let body: { recordId?: string; fields?: Record<string, unknown>; notEkle?: string }
   try { body = await req.json() }
@@ -130,12 +131,14 @@ export async function PATCH(req: NextRequest) {
     return Response.json({ ok: true, changed: 0 })
   }
 
+  const actualPatchFields = translatePatch(cfg, 'firmalar', patchFields)
+
   let patchRes: Response
   try {
     patchRes = await fetch(`${BASE_URL}/${recordId}`, {
       method: 'PATCH',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({ fields: patchFields }),
+      body: JSON.stringify({ fields: actualPatchFields }),
       cache: 'no-store',
     })
   } catch {

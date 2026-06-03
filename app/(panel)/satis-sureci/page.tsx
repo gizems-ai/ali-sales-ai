@@ -1,5 +1,5 @@
 import { PIPELINE_ASAMALARI, getPipelineKolonu } from '@/lib/airtable'
-import { getKullanicıProfili, izolasyonBelirle, getTenantConfig } from '@/lib/yetki'
+import { getKullanicıProfili, izolasyonBelirle, getTenantConfigFromRequest } from '@/lib/yetki'
 import { getMusterilerIzni } from '@/lib/musteriler-izin'
 import { redirect } from 'next/navigation'
 import { KanbanBoard } from './_components/kanban-board'
@@ -23,7 +23,7 @@ export default async function SatisSureciPage({
   const izolasyon = izolasyonBelirle(profil)
   const temsilciFilter = izolasyon.tip === 'temsilci' ? izolasyon.ad : undefined
 
-  const cfg = getTenantConfig(profil)
+  const cfg = (await getTenantConfigFromRequest()) ?? undefined
   const [results, izin] = await Promise.all([
     Promise.all(PIPELINE_ASAMALARI.map(col => getPipelineKolonu(col.value, undefined, temsilciFilter, cfg))),
     getMusterilerIzni(),

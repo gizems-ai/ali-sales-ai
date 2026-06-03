@@ -21,7 +21,7 @@ export async function GET(
   const token = process.env.AIRTABLE_TOKEN
   if (!token) return Response.json({ error: 'Token eksik' }, { status: 500 })
 
-  const cfg = await getTenantConfigFromRequest()
+  const cfg = await getTenantConfigFromRequest(); if (!cfg) return Response.json({ error: "Tenant bulunamıyor" }, { status: 403 })
   const BASE_URL = atTableUrl(cfg, 'firmalar')
 
   let res: Response

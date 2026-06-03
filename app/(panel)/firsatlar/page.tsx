@@ -1,5 +1,5 @@
 import { getFiresatlar } from '@/lib/airtable'
-import { getKullanicıProfili, getTenantConfig } from '@/lib/yetki'
+import { getKullanicıProfili, getTenantConfigFromRequest } from '@/lib/yetki'
 import { redirect } from 'next/navigation'
 import { FirsatlarList } from './_components/firsatlar-list'
 
@@ -9,7 +9,7 @@ export default async function FirsatlarPage() {
   const profil = await getKullanicıProfili()
   if (!profil) redirect('/login')
 
-  const cfg = getTenantConfig(profil)
+  const cfg = (await getTenantConfigFromRequest()) ?? undefined
   let records = []
   try {
     records = await getFiresatlar(cfg)

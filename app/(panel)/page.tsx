@@ -1,6 +1,6 @@
 import { getBrifing } from '@/lib/brifing'
 import { getDashboardCounts } from '@/lib/airtable'
-import { getKullanicıProfili, izolasyonBelirle, getTenantConfig } from '@/lib/yetki'
+import { getKullanicıProfili, izolasyonBelirle, getTenantConfigFromRequest } from '@/lib/yetki'
 import { type TenantConfig } from '@/lib/tenants'
 import { redirect } from 'next/navigation'
 import {
@@ -313,10 +313,13 @@ function HizliYolCard({
 //  SAYFA
 // ══════════════════════════════════════════════════════════════════
 export default async function DashboardPage() {
-  const profil = await getKullanicıProfili()
+  const [profil, cfg] = await Promise.all([
+    getKullanicıProfili(),
+    getTenantConfigFromRequest(),
+  ])
   if (!profil) redirect('/login')
+  if (!cfg) redirect('/login')
 
-  const cfg = getTenantConfig(profil)
   const izolasyon = izolasyonBelirle(profil)
   const temsilciFilter = izolasyon.tip === 'temsilci' ? izolasyon.ad : undefined
   const showTeam = izolasyon.tip !== 'temsilci'
@@ -537,8 +540,8 @@ export default async function DashboardPage() {
             </section>
           </div>
 
-          {/* Portföy + Vade */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-[14px]">
+          {/* Portföy + Vade (sigorta-özel) */}
+          {cfg.modules.portfoy && <div className="grid grid-cols-1 sm:grid-cols-2 gap-[14px]">
             <DonutChart
               saglik={d?.brans_dagilimi.saglik ?? 0}
               elementer={d?.brans_dagilimi.elementer ?? 0}
@@ -560,7 +563,7 @@ export default async function DashboardPage() {
                 <p className="text-[13px] text-gray-400 py-6 text-center">Veri alınamadı</p>
               )}
             </div>
-          </div>
+          </div>}
 
           {/* Sıcak Fırsatlar */}
           {filtrelenmis.length > 0 && (

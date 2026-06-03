@@ -1,7 +1,7 @@
 import { type NextRequest } from 'next/server'
 import { getMusterilerIzni } from '@/lib/musteriler-izin'
 import { getTenantConfigFromRequest } from '@/lib/yetki'
-import { atTableUrl } from '@/lib/tenants'
+import { atTableUrl, translatePatch } from '@/lib/tenants'
 
 export async function POST(req: NextRequest) {
   const izin = await getMusterilerIzni()
@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   const token = process.env.AIRTABLE_TOKEN
   if (!token) return Response.json({ error: 'Token eksik' }, { status: 500 })
 
-  const cfg = await getTenantConfigFromRequest()
+  const cfg = await getTenantConfigFromRequest(); if (!cfg) return Response.json({ error: "Tenant bulunamıyor" }, { status: 403 })
   const AT_URL = atTableUrl(cfg, 'aktiviteler')
 
   let body: {
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ fields }),
+      body: JSON.stringify({ fields: translatePatch(cfg, 'aktiviteler', fields) }),
     })
   } catch {
     return Response.json({ error: 'Airtable bağlantı hatası' }, { status: 503 })

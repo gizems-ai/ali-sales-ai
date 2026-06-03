@@ -1,7 +1,7 @@
 import { getMusterilerIzni, buildMusterilerFormula } from '@/lib/musteriler-izin'
 import { getFirmalarSayfasi, getDashboardCounts } from '@/lib/airtable'
 import { getBrifing, type BrifingData } from '@/lib/brifing'
-import { getKullanicıProfili, getTenantConfig } from '@/lib/yetki'
+import { getKullanicıProfili, getTenantConfigFromRequest } from '@/lib/yetki'
 import { type TenantConfig } from '@/lib/tenants'
 import { MusterilerClient } from './_components/musteriler-client'
 
@@ -35,10 +35,12 @@ export default async function MusterilerPage({
     asama:   sp.asama && GECERLI_ASAMA.includes(sp.asama) ? sp.asama : undefined,
   }
 
-  const [izin, profil] = await Promise.all([
+  const [izin, profil, cfg] = await Promise.all([
     getMusterilerIzni(),
     getKullanicıProfili(),
+    getTenantConfigFromRequest(),
   ])
+  if (!cfg) return null
 
   if (izin.tip === 'yok') {
     return (
@@ -52,7 +54,6 @@ export default async function MusterilerPage({
     )
   }
 
-  const cfg = getTenantConfig(profil)
   const temsilciFilter = izin.tip === 'temsilci' ? izin.temsilci : undefined
   const formula = buildMusterilerFormula(izin, {}, cfg)
 

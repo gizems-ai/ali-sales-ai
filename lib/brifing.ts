@@ -19,17 +19,15 @@ export interface BrifingData {
     vade_60: { sayi: number; hot: number } & Record<string, number>
     vade_90: { sayi: number; hot: number } & Record<string, number>
   }
-  // slug → { toplam_portfoy, hot } — n8n döner, key'ler tenant temsilci slug'ları
   temsilci: Record<string, { toplam_portfoy: number; hot: number }>
 }
 
 export async function getBrifing(cfg: TenantConfig = resolveTenant()): Promise<BrifingData | null> {
+  if (!cfg.modules.aksamBrifing) return null
   try {
     const url = `${cfg.n8nBaseUrl}/${cfg.n8nSlug}/aksam-brifing?format=json`
     const res = await fetch(url, {
-      headers: {
-        Authorization: `Basic ${process.env.BRIFING_BASIC}`,
-      },
+      headers: { Authorization: `Basic ${process.env.BRIFING_BASIC}` },
       next: { revalidate: 300 },
     })
     if (!res.ok) return null

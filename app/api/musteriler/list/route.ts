@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
   if (izin.tip === 'yok') {
     return Response.json({ error: 'Yetkisiz' }, { status: 403 })
   }
+  if (!cfg) return Response.json({ error: 'Tenant bulunamıyor' }, { status: 403 })
 
   const sp = req.nextUrl.searchParams
   const formula = buildMusterilerFormula(izin, {

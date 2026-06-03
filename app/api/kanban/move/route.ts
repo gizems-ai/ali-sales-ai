@@ -1,7 +1,7 @@
 import { type NextRequest } from 'next/server'
 import { getKullanicıProfili, yetkiVar, getTenantConfig } from '@/lib/yetki'
 import { PIPELINE_ASAMALARI } from '@/lib/airtable'
-import { atTableUrl } from '@/lib/tenants'
+import { atTableUrl, fieldActual } from '@/lib/tenants'
 
 const VALID_ASAMA = new Set(PIPELINE_ASAMALARI.map(a => a.value))
 
@@ -66,7 +66,7 @@ export async function PATCH(req: NextRequest) {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ fields: { 'Pipeline Aşaması': asama } }),
+      body: JSON.stringify({ fields: { [fieldActual(cfg, 'firmalar', 'Pipeline Aşaması')]: asama } }),
       cache: 'no-store',
     })
   } catch {

@@ -12,6 +12,7 @@ export async function GET() {
     getTenantConfigFromRequest(),
   ])
   if (izin.tip === 'yok') return Response.json({ error: 'Yetkisiz' }, { status: 403 })
+  if (!cfg) return Response.json({ error: 'Tenant bulunamıyor' }, { status: 403 })
 
   const token = process.env.AIRTABLE_TOKEN
   if (!token) return Response.json({ error: 'Token eksik' }, { status: 500 })
