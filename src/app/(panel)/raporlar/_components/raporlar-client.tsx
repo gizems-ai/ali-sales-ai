@@ -1,0 +1,298 @@
+'use client'
+
+import { useEffect, useState } from 'react'
+import {
+  BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell,
+} from 'recharts'
+import { FileText, ExternalLink } from 'lucide-react'
+import { type MusterilerIzin } from '@/lib/musteriler-izin'
+import { RaporModal } from './rapor-modal'
+
+// ── Renk paleti — sadece mor tonları ──────────────────────────────────────
+const C_PRIMARY   = '#5B47E0'
+const C_MID       = '#7C6CE0'
+const C_LIGHT     = '#9D8CE0'
+const C_PALE      = '#C4BBEF'
+
+const BRANS_COLORS = [C_PRIMARY, C_LIGHT, C_PALE]
+
+// ── Tip tanımları ─────────────────────────────────────────────────────────
+interface PipelineItem { asama: string; sayi: number }
+interface VadeItem     { ay: string;   sayi: number }
+interface BransItem    { ad: string;   sayi: number }
+interface TemsilciItem { temsilci: string; toplam: number; sicak: number }
+
+interface GrafikData {
+  pipeline:  PipelineItem[]
+  vade:      VadeItem[]
+  brans:     BransItem[]
+  temsilci?: TemsilciItem[]
+}
+
+interface ArsivRecord {
+  id: string
+  fields: {
+    Başlık?: string
+    Tarih?: string
+    Tip?: string
+    Kullanıcı?: string
+  }
+}
+
+// ── Türkçe ay etiketi kısaltması ──────────────────────────────────────────
+const AY_KISA: Record<string, string> = {
+  Ocak:'Oca', Şubat:'Şub', Mart:'Mar', Nisan:'Nis', Mayıs:'May', Haziran:'Haz',
+  Temmuz:'Tem', Ağustos:'Ağu', Eylül:'Eyl', Ekim:'Eki', Kasım:'Kas', Aralık:'Ara',
+}
+
+// Bugünün ayından önceki aylar → soluk renk
+const BUGUN_AY = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık']
+  [(new Date()).getMonth()]
+
+function vadeColor(ay: string) {
+  const simdi = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'].indexOf(BUGUN_AY)
+  const hedef = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'].indexOf(ay)
+  return hedef < simdi ? C_PALE : C_PRIMARY
+}
+
+// ── Yükleniyor placeholder ────────────────────────────────────────────────
+function GrafikSkeleton() {
+  return (
+    <div className="h-40 rounded-xl border border-gray-100 bg-gray-50 animate-pulse" />
+  )
+}
+
+// ── Section wrapper ───────────────────────────────────────────────────────
+function GrafikKart({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white p-4">
+      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">{title}</h3>
+      {children}
+    </div>
+  )
+}
+
+// ── Ana bileşen ───────────────────────────────────────────────────────────
+export function RaporlarClient({ izin }: { izin: Exclude<MusterilerIzin, { tip: 'yok' }> }) {
+  const [grafik, setGrafik] = useState<GrafikData | null>(null)
+  const [grafikLoading, setGrafikLoading] = useState(true)
+  const [grafikError, setGrafikError] = useState<string | null>(null)
+
+  const [arsiv, setArsiv] = useState<ArsivRecord[]>([])
+  const [arsivLoading, setArsivLoading] = useState(true)
+  const [arsivError, setArsivError] = useState<string | null>(null)
+
+  const [modalId, setModalId] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => { setMounted(true) }, [])
+
+  useEffect(() => {
+    fetch('/api/raporlar/grafik')
+      .then(r => r.json())
+      .then(d => {
+        if (d.error) { setGrafikError('Grafikler yüklenemedi'); return }
+        setGrafik(d)
+      })
+      .catch(() => setGrafikError('Grafikler yüklenemedi'))
+      .finally(() => setGrafikLoading(false))
+  }, [])
+
+  useEffect(() => {
+    fetch('/api/raporlar/arsiv')
+      .then(r => r.json())
+      .then(d => {
+        if (d.error) { setArsivError('Arşiv yüklenemedi'); return }
+        setArsiv(d.records ?? [])
+      })
+      .catch(() => setArsivError('Arşiv yüklenemedi'))
+      .finally(() => setArsivLoading(false))
+  }, [])
+
+  const showTemsilci = izin.tip === 'yönetici'
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-6">
+      <h1 className="text-lg font-semibold text-gray-900">Raporlar</h1>
+
+      {/* ── Canlı Grafikler ───────────────────────────────────────────── */}
+      <section className="space-y-4">
+        <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Canlı Görünüm</h2>
+
+        {grafikError && (
+          <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-500">
+            {grafikError}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          {/* a) Temsilci karşılaştırma — SADECE YÖNETİCİ */}
+          {showTemsilci && (
+            <GrafikKart title="Rüya vs Sude">
+              {grafikLoading || !mounted ? <GrafikSkeleton /> : !grafik?.temsilci?.length ? (
+                <p className="text-xs text-gray-400 py-10 text-center">Veri yok</p>
+              ) : (
+                <ResponsiveContainer width="100%" height={160}>
+                  <BarChart data={grafik.temsilci} barCategoryGap="35%">
+                    <XAxis dataKey="temsilci" tick={{ fontSize: 12, fill: '#6B7280' }} axisLine={false} tickLine={false} />
+                    <YAxis hide />
+                    <Tooltip
+                      contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #E5E7EB' }}
+                      formatter={(v, name) => [v, name === 'toplam' ? 'Toplam Firma' : 'Sıcak']}
+                    />
+                    <Bar dataKey="toplam" name="toplam" fill={C_PALE}  radius={[4,4,0,0]} />
+                    <Bar dataKey="sicak"  name="sicak"  fill={C_PRIMARY} radius={[4,4,0,0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </GrafikKart>
+          )}
+
+          {/* b) Pipeline dağılımı */}
+          <GrafikKart title="Pipeline Aşamaları">
+            {grafikLoading || !mounted ? <GrafikSkeleton /> : !grafik?.pipeline?.length ? (
+              <p className="text-xs text-gray-400 py-10 text-center">Veri yok</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={showTemsilci ? 160 : 220}>
+                <BarChart
+                  data={grafik.pipeline.filter(p => p.sayi > 0)}
+                  layout="vertical"
+                  margin={{ left: 80, right: 20 }}
+                >
+                  <XAxis type="number" hide />
+                  <YAxis
+                    dataKey="asama" type="category"
+                    tick={{ fontSize: 11, fill: '#6B7280' }}
+                    axisLine={false} tickLine={false} width={76}
+                  />
+                  <Tooltip
+                    contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #E5E7EB' }}
+                    formatter={(v) => [v, 'Firma']}
+                  />
+                  <Bar dataKey="sayi" fill={C_PRIMARY} radius={[0,4,4,0]}>
+                    {grafik.pipeline.map(p => (
+                      <Cell
+                        key={p.asama}
+                        fill={p.asama === 'Kazanıldı' ? '#22C55E' : p.asama === 'Kaybedildi' ? C_PALE : C_PRIMARY}
+                      />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </GrafikKart>
+
+          {/* c) Vade takvimi */}
+          <GrafikKart title="Vade Takvimi (Ay)">
+            {grafikLoading || !mounted ? <GrafikSkeleton /> : !grafik?.vade?.length ? (
+              <p className="text-xs text-gray-400 py-10 text-center">Veri yok</p>
+            ) : (
+              <ResponsiveContainer width="100%" height={160}>
+                <BarChart data={grafik.vade.map(v => ({ ...v, ay: AY_KISA[v.ay] ?? v.ay, _ay: v.ay }))}>
+                  <XAxis dataKey="ay" tick={{ fontSize: 10, fill: '#6B7280' }} axisLine={false} tickLine={false} />
+                  <YAxis hide />
+                  <Tooltip
+                    contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #E5E7EB' }}
+                    formatter={(v) => [v, 'Firma']}
+                    labelFormatter={(_, payload) => payload?.[0]?.payload?._ay ?? ''}
+                  />
+                  <Bar dataKey="sayi" radius={[4,4,0,0]}>
+                    {grafik.vade.map(v => (
+                      <Cell key={v.ay} fill={vadeColor(v.ay)} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            )}
+          </GrafikKart>
+
+          {/* d) Branş dağılımı */}
+          <GrafikKart title="Branş Dağılımı">
+            {grafikLoading || !mounted ? <GrafikSkeleton /> : !grafik?.brans?.length ? (
+              <p className="text-xs text-gray-400 py-10 text-center">Veri yok</p>
+            ) : (
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <ResponsiveContainer width="100%" height={160}>
+                    <PieChart>
+                      <Pie
+                        data={grafik.brans}
+                        dataKey="sayi"
+                        nameKey="ad"
+                        cx="50%" cy="50%"
+                        innerRadius={42} outerRadius={68}
+                      >
+                        {grafik.brans.map((_, i) => (
+                          <Cell key={i} fill={BRANS_COLORS[i % BRANS_COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip
+                        contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #E5E7EB' }}
+                        formatter={(v) => [v, 'Firma']}
+                      />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+                <div className="space-y-2 shrink-0">
+                  {grafik.brans.map((b, i) => (
+                    <div key={b.ad} className="flex items-center gap-1.5">
+                      <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ backgroundColor: BRANS_COLORS[i % BRANS_COLORS.length] }} />
+                      <span className="text-xs text-gray-600">{b.ad}</span>
+                      <span className="text-xs font-medium text-gray-800 ml-1">{b.sayi}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </GrafikKart>
+
+        </div>
+      </section>
+
+      {/* ── Arşiv ─────────────────────────────────────────────────────── */}
+      <section>
+        <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">Rapor Arşivi</h2>
+
+        <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
+          {arsivLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <div className="w-5 h-5 rounded-full border-2 border-[#5B47E0] border-t-transparent animate-spin" />
+            </div>
+          ) : arsivError ? (
+            <div className="py-12 text-center text-sm text-red-500">{arsivError}</div>
+          ) : arsiv.length === 0 ? (
+            <div className="py-16 text-center">
+              <p className="text-sm text-gray-400">Henüz rapor yok</p>
+            </div>
+          ) : (
+            arsiv.map((r, i) => (
+              <button
+                key={r.id}
+                onClick={() => setModalId(r.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-[#F5F3FF] transition-colors group ${
+                  i > 0 ? 'border-t border-gray-100' : ''
+                }`}
+              >
+                <div className="w-7 h-7 rounded-lg bg-[#EDE9FE] flex items-center justify-center shrink-0">
+                  <FileText size={13} className="text-[#5B47E0]" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-gray-800 truncate">{r.fields.Başlık ?? '—'}</p>
+                  <p className="text-xs text-gray-400 mt-0.5">
+                    {r.fields.Tarih ?? ''}{r.fields.Kullanıcı ? ` · ${r.fields.Kullanıcı === 'R眉ya' ? 'Rüya' : r.fields.Kullanıcı}` : ''}
+                    {r.fields.Tip ? ` · ${r.fields.Tip}` : ''}
+                  </p>
+                </div>
+                <ExternalLink size={13} className="text-gray-300 group-hover:text-[#5B47E0] shrink-0 transition-colors" />
+              </button>
+            ))
+          )}
+        </div>
+      </section>
+
+      <RaporModal recordId={modalId} onClose={() => setModalId(null)} />
+    </div>
+  )
+}

@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ali Sales AI — WhatsApp'tan Satışa, Otomatik</title>
+  <meta name="description" content="Satışın yüklerinden kurtulup özgürce işinize odaklanmak ister misiniz? Ali, tüm mesajları yanıtlayan AI satış asistanınız.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { heading: ['Poppins','sans-serif'], body: ['Inter','sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <style>
+    :root {
+      --cp: #7C3AED; --cpl: #A855F7; --cbg: #0F0A1E;
+      --cbgc: #1A1035; --cm: #9CA3AF; --ca: #F59E0B;
+      --cb: rgba(124,58,237,0.3);
+    }
+    *{box-sizing:border-box}
+    body{background:var(--cbg);color:#fff;font-family:'Inter',sans-serif;overflow-x:hidden}
+    h1,h2,h3,h4{font-family:'Poppins',sans-serif}
+    ::-webkit-scrollbar{width:5px}
+    ::-webkit-scrollbar-thumb{background:var(--cp);border-radius:3px}
+
+    /* NAVBAR */
+    .navbar{position:fixed;top:0;width:100%;z-index:100;transition:all .3s}
+    .navbar.scrolled{background:rgba(15,10,30,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--cb)}
+
+    /* TYPOGRAPHY */
+    .g-text{background:linear-gradient(135deg,#A855F7,#7C3AED,#3B82F6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .g-text-amber{background:linear-gradient(135deg,#F59E0B,#FCD34D);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+    /* BADGE */
+    .badge{background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);color:#F59E0B;padding:.35rem 1rem;border-radius:2rem;font-size:.75rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;display:inline-flex;align-items:center;gap:.5rem}
+    .badge-purple{background:rgba(124,58,237,.12);border:1px solid var(--cb);color:#C4B5FD}
+
+    /* BUTTONS */
+    .btn{background:linear-gradient(135deg,#7C3AED,#A855F7);color:#fff;padding:.875rem 2rem;border-radius:.75rem;font-weight:600;font-family:'Poppins',sans-serif;transition:all .3s;display:inline-flex;align-items:center;gap:.5rem;text-decoration:none;cursor:pointer}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 20px 40px rgba(124,58,237,.4)}
+    .btn-outline{background:transparent;border:1px solid rgba(124,58,237,.5);color:#C4B5FD;padding:.875rem 2rem;border-radius:.75rem;font-weight:600;font-family:'Poppins',sans-serif;transition:all .3s;display:inline-flex;align-items:center;gap:.5rem;text-decoration:none}
+    .btn-outline:hover{background:rgba(124,58,237,.12);transform:translateY(-2px)}
+
+    @keyframes pulse-ring{0%{box-shadow:0 0 0 0 rgba(124,58,237,.7)}70%{box-shadow:0 0 0 20px rgba(124,58,237,0)}100%{box-shadow:0 0 0 0 rgba(124,58,237,0)}}
+    .btn-pulse{animation:pulse-ring 2.2s infinite}
+
+    /* HERO */
+    .hero-vid{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;z-index:0}
+    .hero-ov{position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(180deg,rgba(15,10,30,.72) 0%,rgba(15,10,30,.85) 60%,rgba(15,10,30,1) 100%);z-index:1}
+
+    /* CARDS */
+    .card{background:var(--cbgc);border:1px solid var(--cb);border-radius:1.25rem;transition:all .3s}
+    .card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(124,58,237,.18);border-color:rgba(124,58,237,.5)}
+
+    /* MARQUEE */
+    @keyframes mq{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+    .mq-track{display:flex;animation:mq 28s linear infinite;width:max-content}
+    .mq-track:hover{animation-play-state:paused}
+    @keyframes mqs{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+    .testi-track{display:flex;gap:1.5rem;animation:mqs 30s linear infinite;width:max-content}
+    .testi-track:hover{animation-play-state:paused}
+
+    /* TABS */
+    .tab-btn{text-align:left;padding:.9rem 1.25rem;border-radius:.75rem;cursor:pointer;transition:all .3s;border:1px solid transparent;background:transparent;color:var(--cm);font-family:'Inter',sans-serif;width:100%}
+    .tab-btn:hover{color:#fff;background:rgba(124,58,237,.1)}
+    .tab-btn.active{background:rgba(124,58,237,.15);border-color:var(--cb);color:#fff}
+    .tab-num{display:inline-flex;width:1.4rem;height:1.4rem;border-radius:50%;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;background:rgba(124,58,237,.2);color:#C4B5FD;margin-right:.6rem;flex-shrink:0}
+    .tab-btn.active .tab-num{background:var(--cp);color:#fff}
+    .tab-content{display:none}
+    .tab-content.active{display:block;animation:fadeUp .4s ease}
+
+    /* FAQ */
+    .faq-ans{max-height:0;overflow:hidden;transition:max-height .4s ease}
+    .faq-ans.open{max-height:400px}
+    .faq-icon{transition:transform .3s}
+    .faq-icon.open{transform:rotate(45deg)}
+
+    /* REVEAL */
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+
+    /* HEADLINE CYCLE */
+    .hl{display:none;animation:fadeUp .8s ease}
+    .hl.active{display:block}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+    /* MOBILE MENU */
+    .mob-menu{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(15,10,30,.98);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:2rem}
+    .mob-menu.open{display:flex}
+
+    /* PRICING */
+    .plan-pop{border-color:rgba(124,58,237,.7)!important;background:linear-gradient(180deg,rgba(124,58,237,.15) 0%,var(--cbgc) 100%)!important;box-shadow:0 0 60px rgba(124,58,237,.2)}
+
+    /* COMPARE */
+    .ali-col{background:linear-gradient(180deg,rgba(124,58,237,.18) 0%,rgba(124,58,237,.04) 100%);border-left:2px solid rgba(124,58,237,.45);border-right:2px solid rgba(124,58,237,.45)}
+    .ali-col-top{border-top:2px solid rgba(124,58,237,.45);border-radius:.75rem .75rem 0 0}
+    .ali-col-bot{border-bottom:2px solid rgba(124,58,237,.45);border-radius:0 0 .75rem .75rem}
+
+    /* STATS */
+    .stat-n{font-family:'Poppins',sans-serif;font-weight:800;font-size:clamp(2.5rem,5vw,4rem);background:linear-gradient(135deg,#A855F7,#7C3AED);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+    /* NUMBERED */
+    .num-badge{position:absolute;top:-1rem;left:1.5rem;width:2rem;height:2rem;background:var(--cp);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Poppins',sans-serif;font-weight:700;font-size:.875rem}
+
+    /* CHATBOT */
+    .cw{position:fixed;bottom:2rem;right:2rem;z-index:999}
+
+    @media(max-width:768px){.desk-nav,.desk-cta{display:none!important}.ham{display:flex!important}}
+    @media(min-width:769px){.ham{display:none!important}}
+  </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar" id="navbar">
+  <div class="max-w-7xl mx-auto px-5 py-4 flex items-center justify-between">
+    <a href="#"><img src="assets/img/ali-logo.png" alt="Ali Sales AI" class="h-9 w-auto"></a>
+    <div class="desk-nav flex items-center gap-7 text-sm font-medium">
+      <a href="#satin-al" class="text-gray-300 hover:text-white transition">Satın Al</a>
+      <a href="#cozumler" class="text-gray-300 hover:text-white transition">Çözümler</a>
+      <a href="#ozellikler" class="text-gray-300 hover:text-white transition">Özellikler</a>
+      <a href="#fiyatlandirma" class="text-gray-300 hover:text-white transition">Fiyatlandırma</a>
+      <a href="#iletisim" class="text-gray-300 hover:text-white transition">İletişim</a>
+    </div>
+    <a href="https://www.alisales.ai/checkout" class="desk-cta btn py-2.5 px-5 text-sm">Giriş</a>
+    <button class="ham flex-col gap-1.5 cursor-pointer" id="hamBtn">
+      <span class="block w-6 h-0.5 bg-white rounded"></span>
+      <span class="block w-6 h-0.5 bg-white rounded"></span>
+      <span class="block w-6 h-0.5 bg-white rounded"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mob-menu" id="mobMenu">
+  <button id="mobClose" class="absolute top-6 right-6 text-white text-3xl">✕</button>
+  <a href="#satin-al" class="mob-lnk text-2xl font-heading font-semibold">Satın Al</a>
+  <a href="#cozumler" class="mob-lnk text-2xl font-heading font-semibold">Çözümler</a>
+  <a href="#ozellikler" class="mob-lnk text-2xl font-heading font-semibold">Özellikler</a>
+  <a href="#fiyatlandirma" class="mob-lnk text-2xl font-heading font-semibold">Fiyatlandırma</a>
+  <a href="#iletisim" class="mob-lnk text-2xl font-heading font-semibold">İletişim</a>
+  <a href="https://www.alisales.ai/checkout" class="btn mt-4">Giriş Yap</a>
+</div>
+
+<!-- ===== HERO ===== -->
+<section id="hero" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+  <video class="hero-vid" autoplay muted loop playsinline>
+    <source src="assets/video/hero.mp4" type="video/mp4">
+  </video>
+  <div class="hero-ov"></div>
+  <div class="relative z-10 max-w-7xl mx-auto px-5 py-32 text-center">
+    <div class="flex justify-center mb-6">
+      <span class="badge">⏳ İLK 10 İŞLETMEYE ÖZEL</span>
+    </div>
+    <div style="min-height:8rem" class="mb-6">
+      <h1 class="hl active text-4xl md:text-6xl lg:text-7xl font-heading font-extrabold leading-tight">
+        Ali ile <span class="g-text">Satış Yapmak</span><br>Çok Kolay!
+      </h1>
+      <h1 class="hl text-4xl md:text-6xl lg:text-7xl font-heading font-extrabold leading-tight">
+        Ali ile <span class="g-text">Satış</span><br>Çok Kolay!
+      </h1>
+      <h1 class="hl text-4xl md:text-6xl lg:text-7xl font-heading font-extrabold leading-tight">
+        Ali ile <span class="g-text">Satış Yapmak</span><br>Çok Kolay!
+      </h1>
+    </div>
+    <p class="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+      Satışın yüklerinden kurtulup özgürce işinize odaklanmak ister misiniz?
+    </p>
+    <div class="flex justify-center mb-14">
+      <a href="https://airtable.com/appIaO89GctqKcQIi/pagC1j26ZJswZL904/form" class="btn btn-pulse text-lg px-9 py-4">
+        🚀 Sınırlı Kontenjanı Kaçırma!
+      </a>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto text-left">
+      <div class="flex items-start gap-2 text-sm text-gray-200"><span class="text-green-400 flex-shrink-0">✅</span><span>Tüm satış verileri tek ekranda</span></div>
+      <div class="flex items-start gap-2 text-sm text-gray-200"><span class="text-green-400 flex-shrink-0">✅</span><span>Türk kültürü + satış zekası</span></div>
+      <div class="flex items-start gap-2 text-sm text-gray-200"><span class="text-green-400 flex-shrink-0">✅</span><span>Sektörünüze özelleştirilir</span></div>
+      <div class="flex items-start gap-2 text-sm text-gray-200"><span class="text-green-400 flex-shrink-0">✅</span><span>Tüm mesajları cevaplar</span></div>
+      <div class="flex items-start gap-2 text-sm text-gray-200"><span class="text-green-400 flex-shrink-0">✅</span><span>Anlar, raporlar, aksiyon alır</span></div>
+      <div class="flex items-start gap-2 text-sm text-gray-200"><span class="text-green-400 flex-shrink-0">✅</span><span>7/24 Aktif Satış Botu</span></div>
+      <div class="flex items-start gap-2 text-sm text-gray-200"><span class="text-green-400 flex-shrink-0">✅</span><span>Her zaman uygun fiyatlı</span></div>
+      <div class="flex items-start gap-2 text-sm text-gray-200"><span class="text-green-400 flex-shrink-0">✅</span><span>Satışlarınızı arttırır</span></div>
+    </div>
+  </div>
+  <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+    <svg width="24" height="24" fill="none" class="text-gray-400"><path d="M12 5v14m0 0-5-5m5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+</section>
+
+<!-- ===== ARTIK ALİ VAR ===== -->
+<section id="cozumler" class="py-24 px-5">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-14 reveal">
+      <span class="badge">ARTIK ALİ VAR</span>
+      <h2 class="text-4xl md:text-5xl font-heading font-extrabold mt-4">Satışta <span class="g-text">sağ kolunuz!</span></h2>
+    </div>
+    <div class="grid lg:grid-cols-2 gap-12 items-center mb-16">
+      <div class="space-y-4 reveal">
+        <div class="card p-6"><p class="text-base leading-relaxed text-gray-200">📩 <strong class="text-white">Mesajlar Ali'ye düşer</strong> — WhatsApp, Instagram ve Facebook DM'leriniz artık boşta kalmaz. Her biri anında karşılık bulur.</p></div>
+        <div class="card p-6"><p class="text-base leading-relaxed text-gray-200">🧠 <strong class="text-white">Ali müşteriyi anlar</strong> — Ne istediğini, ne zaman hazır olduğunu, hangi fiyat noktasına yakın durduğunu.</p></div>
+        <div class="card p-6"><p class="text-base leading-relaxed text-gray-200">🚀 <strong class="text-white">Doğru cevap, doğru an</strong> — Türk satış kültürüne uygun, samimi ve ikna edici yanıtlar üretir.</p></div>
+        <div class="card p-6"><p class="text-base leading-relaxed text-gray-200">⏱️ <strong class="text-white">Sen zaman kazanırsın</strong> — Günde 2+ saat; işine, ailenle geçirdiğin zamana, büyüme stratejine harca.</p></div>
+      </div>
+      <div class="flex justify-center reveal">
+        <img src="assets/img/ali-character-1.png" alt="Ali" class="w-full max-w-md drop-shadow-2xl">
+      </div>
+    </div>
+    <div class="grid md:grid-cols-3 gap-8 reveal">
+      <div class="card p-8 pt-10 relative" style="margin-top:1rem">
+        <div class="num-badge">1</div>
+        <div class="text-3xl mb-3">🤖</div>
+        <h3 class="text-xl font-heading font-bold mb-2">Türk satış kültürü AI ile birleşti!</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">Satış Asistanı — Türkiye'nin işletme dinamiklerine göre eğitilmiş yapay zeka.</p>
+      </div>
+      <div class="card p-8 pt-10 relative" style="margin-top:1rem">
+        <div class="num-badge">2</div>
+        <div class="text-3xl mb-3">📊</div>
+        <h3 class="text-xl font-heading font-bold mb-2">Artık hiçbir müşteri kaçmayacak</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">CRM — Her müşteri takibe alınır, hiçbir fırsat göz ardı edilmez.</p>
+      </div>
+      <div class="card p-8 pt-10 relative" style="margin-top:1rem">
+        <div class="num-badge">3</div>
+        <div class="text-3xl mb-3">⚡</div>
+        <h3 class="text-xl font-heading font-bold mb-2">Ali ile satışları 5 dakikada arttır</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">Satış Zekası — Kurulum süresi 5 dakika, fark ise ilk günden görünür.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== STATS ===== -->
+<section class="py-20 px-5 bg-[#1A1035]">
+  <div class="max-w-5xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+      <div class="reveal">
+        <div class="stat-n" data-target="2" data-suffix="+ Saat">0</div>
+        <p class="text-gray-300 mt-2 font-medium">Günlük Kazanım</p>
+        <p class="text-gray-500 text-sm">otomasyonla geri kazanılan süre</p>
+      </div>
+      <div class="reveal">
+        <div class="stat-n" data-target="25" data-suffix="%">0</div>
+        <p class="text-gray-300 mt-2 font-medium">Ortalama Satış Artışı</p>
+        <p class="text-gray-500 text-sm">ilk 30 günde elde edilen kazanım</p>
+      </div>
+      <div class="reveal">
+        <div class="stat-n" data-target="0" data-suffix=" Kayıp Fırsat">∞→</div>
+        <p class="text-gray-300 mt-2 font-medium">Kaçan Müşteri</p>
+        <p class="text-gray-500 text-sm">7/24 aktif sistemle sıfır kayıp</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ARTIK YALNIZ DEĞİLSİN ===== -->
+<section id="ozellikler" class="py-24 px-5">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid lg:grid-cols-2 gap-14 items-center mb-16">
+      <div class="reveal">
+        <span class="badge-purple badge text-xs mb-4">20 Yıllık Satış Deneyimi + AI</span>
+        <h2 class="text-4xl md:text-5xl font-heading font-extrabold mt-4 mb-5">Artık <span class="g-text">yalnız değilsin.</span></h2>
+        <p class="text-gray-300 text-base leading-relaxed mb-6">Ali, tüm müşteri taleplerini tek sistemde toplar. Mesajları okur, satış durumunu analiz eder ve siz yokken bile potansiyel müşterilere yanıt verir.</p>
+        <div class="inline-flex items-center gap-3 bg-[#1A1035] border border-[rgba(124,58,237,0.3)] rounded-xl px-4 py-3">
+          <span class="text-2xl">🏆</span>
+          <span class="text-sm text-gray-300">20 yıllık B2B satış ve teknoloji tecrübesiyle geliştirildi</span>
+        </div>
+      </div>
+      <div class="flex justify-center reveal">
+        <img src="assets/img/ali-character-2.png" alt="Ali Asistan" class="w-full max-w-sm drop-shadow-2xl">
+      </div>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 reveal">
+      <div class="card p-6">
+        <div class="text-3xl mb-3">👔</div>
+        <div class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">SEKRETERİN ALİ</div>
+        <h3 class="font-heading font-bold text-base mb-2">Mesajları organize et</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">"İlk günde 30+ DM'i organize ettim, hiçbirini cevapsız bırakmadım."</p>
+      </div>
+      <div class="card p-6">
+        <div class="text-3xl mb-3">💼</div>
+        <div class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">SATIŞCIN ALİ</div>
+        <h3 class="font-heading font-bold text-base mb-2">Her kanaldan satış</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">WhatsApp, Instagram, Facebook'tan gelen müşteriyi satışa dönüştürür.</p>
+      </div>
+      <div class="card p-6">
+        <div class="text-3xl mb-3">📅</div>
+        <div class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">ASİSTANIN ALİ</div>
+        <h3 class="font-heading font-bold text-base mb-2">Ajandanı yönetir</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">Randevuları ayarlar, takip hatırlatmaları oluşturur, günlük özet gönderir.</p>
+      </div>
+      <div class="card p-6">
+        <div class="text-3xl mb-3">🖥️</div>
+        <div class="text-xs font-semibold text-purple-400 uppercase tracking-wider mb-2">SİSTEMİN ALİ</div>
+        <h3 class="font-heading font-bold text-base mb-2">CRM artık kolay</h3>
+        <p class="text-gray-400 text-sm leading-relaxed">"CRM'ler hep karmaşıktı, Ali ile tek ekranda her şeyi görüyorum."</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== ALİ'NİN SIRRI — TABS ===== -->
+<section class="py-24 px-5 bg-[#0D0820]">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-10 reveal">
+      <h2 class="text-4xl md:text-5xl font-heading font-extrabold mb-4">Ali'nin Sırrı: <span class="g-text">hem basit hem derin</span></h2>
+      <p class="text-gray-400 text-lg max-w-2xl mx-auto">Tek arayüzde tüm satış altyapınız. Entegrasyon yok, karmaşa yok.</p>
+    </div>
+    <!-- Integration logo band -->
+    <div class="overflow-hidden mb-14 reveal">
+      <div class="mq-track">
+        <img src="assets/img/integrations-band.png" alt="Entegrasyonlar" class="h-10 w-auto opacity-75 mr-16">
+        <img src="assets/img/integrations-band.png" alt="Entegrasyonlar" class="h-10 w-auto opacity-75 mr-16">
+      </div>
+    </div>
+    <!-- Tabs -->
+    <div class="grid lg:grid-cols-5 gap-8 reveal">
+      <div class="lg:col-span-2 flex flex-col gap-1.5">
+        <button class="tab-btn active" data-tab="1"><span class="flex items-center"><span class="tab-num">1</span>Tüm Mesajlar Tek Yerde</span></button>
+        <button class="tab-btn" data-tab="2"><span class="flex items-center"><span class="tab-num">2</span>Chatbot Her Kanaldan 7/24</span></button>
+        <button class="tab-btn" data-tab="3"><span class="flex items-center"><span class="tab-num">3</span>Sizin Gördüğünüz</span></button>
+        <button class="tab-btn" data-tab="4"><span class="flex items-center"><span class="tab-num">4</span>Raporla Bütün Resmi Göster</span></button>
+        <button class="tab-btn" data-tab="5"><span class="flex items-center"><span class="tab-num">5</span>Günlük Satış Ajandan Hazır</span></button>
+        <button class="tab-btn" data-tab="6"><span class="flex items-center"><span class="tab-num">6</span>Ali Raporlarıyla Bütün Resim</span></button>
+      </div>
+      <div class="lg:col-span-3">
+        <div class="tab-content active" data-content="1">
+          <div class="card overflow-hidden"><img src="assets/img/dashboard.png" alt="Dashboard" class="w-full rounded-t-xl"><div class="p-5"><h3 class="font-heading font-bold text-lg mb-1">Tüm Mesajlar Tek Yerde</h3><p class="text-gray-400 text-sm">WhatsApp, Instagram, Facebook — tüm kanallar tek panelde. Kanal kanal geçiş yok.</p></div></div>
+        </div>
+        <div class="tab-content" data-content="2">
+          <div class="card overflow-hidden"><img src="assets/img/crm-screen.png" alt="Chatbot" class="w-full rounded-t-xl"><div class="p-5"><h3 class="font-heading font-bold text-lg mb-1">Chatbot Her Kanaldan 7/24 Fırsat Yakalar</h3><p class="text-gray-400 text-sm">Ali uyurken bile müşteri yanıtlar, fırsatları kaçırmaz, sıcak lead'leri anında işaretler.</p></div></div>
+        </div>
+        <div class="tab-content" data-content="3">
+          <div class="card overflow-hidden"><img src="assets/img/tab-screen.png" alt="CRM" class="w-full rounded-t-xl"><div class="p-5"><h3 class="font-heading font-bold text-lg mb-1">Sizin Gördüğünüz</h3><p class="text-gray-400 text-sm">Temiz CRM arayüzü. Müşteri durumları, sohbet geçmişi ve satış aşamaları tek bakışta.</p></div></div>
+        </div>
+        <div class="tab-content" data-content="4">
+          <div class="card overflow-hidden"><img src="assets/img/dashboard.png" alt="Raporlar" class="w-full rounded-t-xl"><div class="p-5"><h3 class="font-heading font-bold text-lg mb-1">Raporla Bütün Resmi Göster</h3><p class="text-gray-400 text-sm">Günlük, haftalık, aylık satış raporları. Hangi kanal kazandırıyor? Hangi mesaj tipi dönüşüm sağlıyor?</p></div></div>
+        </div>
+        <div class="tab-content" data-content="5">
+          <div class="card overflow-hidden"><img src="assets/img/agenda-screen.png" alt="Ajanda" class="w-full rounded-t-xl"><div class="p-5"><h3 class="font-heading font-bold text-lg mb-1">Günlük Satış Ajandan Hazır</h3><p class="text-gray-400 text-sm">Her sabah günlük takip listesi otomatik oluşur. Bugün kimi aramalısın? Kim sıcak?</p></div></div>
+        </div>
+        <div class="tab-content" data-content="6">
+          <div class="card overflow-hidden"><img src="assets/img/tab-screen.png" alt="Raporlar" class="w-full rounded-t-xl"><div class="p-5"><h3 class="font-heading font-bold text-lg mb-1">Ali Raporlarıyla Bütün Resmi Gör</h3><p class="text-gray-400 text-sm">Satış hunisinin her aşamasını görmek artık dakikalar içinde. Ali işletmenize ayna tutar.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TESTİMONİALS ===== -->
+<section class="py-24 px-5 overflow-hidden">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-12 reveal">
+      <h2 class="text-4xl md:text-5xl font-heading font-extrabold">💜 Ali'yi <span class="g-text">Neden Seviyorlar?</span></h2>
+    </div>
+    <div class="overflow-hidden">
+      <div class="testi-track">
+        <div class="card p-6 w-80 flex-shrink-0"><div class="flex items-center gap-3 mb-4"><img src="assets/img/avatar-1.png" alt="Ahmet" class="w-12 h-12 rounded-full object-cover"><div><div class="font-heading font-bold text-white text-sm">Ahmet Candar</div><div class="text-xs text-gray-500">Ticaret · Tekstil</div></div></div><div class="text-yellow-400 text-sm mb-3">★★★★★</div><p class="text-gray-300 text-sm leading-relaxed">"İlk günde 30+ DM'i organize ettim. Ali hiçbir müşteriyi bende bekletmedi. Satışlarım ciddi artı."</p></div>
+        <div class="card p-6 w-80 flex-shrink-0"><div class="flex items-center gap-3 mb-4"><img src="assets/img/avatar-2.png" alt="Selin" class="w-12 h-12 rounded-full object-cover"><div><div class="font-heading font-bold text-white text-sm">Selin Korkmaz</div><div class="text-xs text-gray-500">Moda Butik · İstanbul</div></div></div><div class="text-yellow-400 text-sm mb-3">★★★★★</div><p class="text-gray-300 text-sm leading-relaxed">"Günde 50+ DM geliyordu ve tükenmişlik hissediyordum. Ali bu yükü benden aldı. Şimdi büyümeye odaklanıyorum."</p></div>
+        <div class="card p-6 w-80 flex-shrink-0"><div class="flex items-center gap-3 mb-4"><img src="assets/img/avatar-3.png" alt="Ayşe" class="w-12 h-12 rounded-full object-cover"><div><div class="font-heading font-bold text-white text-sm">Ayşe Yılmaz</div><div class="text-xs text-gray-500">Freelance · Danışmanlık</div></div></div><div class="text-yellow-400 text-sm mb-3">★★★★★</div><p class="text-gray-300 text-sm leading-relaxed">"CRM'ler hep karmaşıktı. Ali ile her şey tek yerde, sade ve anlaşılır. Müşterilerimi hiç bu kadar iyi takip etmemiştim."</p></div>
+        <div class="card p-6 w-80 flex-shrink-0"><div class="flex items-center gap-3 mb-4"><img src="assets/img/avatar-4.png" alt="Elif" class="w-12 h-12 rounded-full object-cover"><div><div class="font-heading font-bold text-white text-sm">Elif Türk</div><div class="text-xs text-gray-500">Dijital Pazarlama</div></div></div><div class="text-yellow-400 text-sm mb-3">★★★★★</div><p class="text-gray-300 text-sm leading-relaxed">"Sistemler ve botlar hep karmaşık gelirdi. Ali gerçekten sade. 5 dakikada kurdum ve hemen çalışmaya başladı."</p></div>
+        <!-- duplicate set for seamless loop -->
+        <div class="card p-6 w-80 flex-shrink-0"><div class="flex items-center gap-3 mb-4"><img src="assets/img/avatar-1.png" alt="Ahmet" class="w-12 h-12 rounded-full object-cover"><div><div class="font-heading font-bold text-white text-sm">Ahmet Candar</div><div class="text-xs text-gray-500">Ticaret · Tekstil</div></div></div><div class="text-yellow-400 text-sm mb-3">★★★★★</div><p class="text-gray-300 text-sm leading-relaxed">"İlk günde 30+ DM'i organize ettim. Ali hiçbir müşteriyi bende bekletmedi."</p></div>
+        <div class="card p-6 w-80 flex-shrink-0"><div class="flex items-center gap-3 mb-4"><img src="assets/img/avatar-2.png" alt="Selin" class="w-12 h-12 rounded-full object-cover"><div><div class="font-heading font-bold text-white text-sm">Selin Korkmaz</div><div class="text-xs text-gray-500">Moda Butik · İstanbul</div></div></div><div class="text-yellow-400 text-sm mb-3">★★★★★</div><p class="text-gray-300 text-sm leading-relaxed">"Günde 50+ DM geliyordu. Ali bu yükü benden aldı."</p></div>
+        <div class="card p-6 w-80 flex-shrink-0"><div class="flex items-center gap-3 mb-4"><img src="assets/img/avatar-3.png" alt="Ayşe" class="w-12 h-12 rounded-full object-cover"><div><div class="font-heading font-bold text-white text-sm">Ayşe Yılmaz</div><div class="text-xs text-gray-500">Freelance · Danışmanlık</div></div></div><div class="text-yellow-400 text-sm mb-3">★★★★★</div><p class="text-gray-300 text-sm leading-relaxed">"CRM'ler hep karmaşıktı. Ali ile her şey tek yerde."</p></div>
+        <div class="card p-6 w-80 flex-shrink-0"><div class="flex items-center gap-3 mb-4"><img src="assets/img/avatar-4.png" alt="Elif" class="w-12 h-12 rounded-full object-cover"><div><div class="font-heading font-bold text-white text-sm">Elif Türk</div><div class="text-xs text-gray-500">Dijital Pazarlama</div></div></div><div class="text-yellow-400 text-sm mb-3">★★★★★</div><p class="text-gray-300 text-sm leading-relaxed">"5 dakikada kurdum ve hemen çalışmaya başladı."</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== KARŞILAŞTIRMA ===== -->
+<section class="py-24 px-5 bg-[#0D0820]">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-12 reveal">
+      <h2 class="text-4xl md:text-5xl font-heading font-extrabold">Ali Bir <span class="g-text">Chatbot Değil</span></h2>
+    </div>
+    <div class="overflow-x-auto reveal">
+      <table class="w-full text-sm min-w-[640px]">
+        <thead>
+          <tr>
+            <th class="text-left p-4 text-gray-400 font-medium" style="width:22%">Özellik</th>
+            <th class="p-4 text-center ali-col ali-col-top"><div class="font-heading font-bold text-base g-text">Ali ✅</div></th>
+            <th class="p-4 text-center text-gray-500 font-medium">Kurumsal CRM</th>
+            <th class="p-4 text-center text-gray-500 font-medium">Chatbot</th>
+            <th class="p-4 text-center text-gray-500 font-medium">Geleneksel Satış</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-t border-[rgba(124,58,237,0.1)]">
+            <td class="p-4 text-gray-300">WhatsApp/Email Otomasyonu</td>
+            <td class="p-4 text-center ali-col text-green-400 font-bold text-lg">✓</td>
+            <td class="p-4 text-center text-red-400">✗</td>
+            <td class="p-4 text-center text-yellow-400 text-xs">Kısmen</td>
+            <td class="p-4 text-center text-red-400">✗</td>
+          </tr>
+          <tr class="border-t border-[rgba(124,58,237,0.1)]">
+            <td class="p-4 text-gray-300">CRM Dahili & Veri İşleme</td>
+            <td class="p-4 text-center ali-col text-green-400 font-bold text-lg">✓</td>
+            <td class="p-4 text-center text-green-400 font-bold text-lg">✓</td>
+            <td class="p-4 text-center text-red-400">✗</td>
+            <td class="p-4 text-center text-red-400">✗</td>
+          </tr>
+          <tr class="border-t border-[rgba(124,58,237,0.1)]">
+            <td class="p-4 text-gray-300">AI Destekli Satış Zekası</td>
+            <td class="p-4 text-center ali-col text-green-400 font-bold text-lg">✓</td>
+            <td class="p-4 text-center text-red-400">✗</td>
+            <td class="p-4 text-center text-red-400">✗</td>
+            <td class="p-4 text-center text-red-400">✗</td>
+          </tr>
+          <tr class="border-t border-[rgba(124,58,237,0.1)]">
+            <td class="p-4 text-gray-300">Türk Satış Kültürü</td>
+            <td class="p-4 text-center ali-col text-green-400 font-bold text-lg">✓</td>
+            <td class="p-4 text-center text-red-400">✗</td>
+            <td class="p-4 text-center text-red-400">✗</td>
+            <td class="p-4 text-center text-yellow-400 text-xs">Kısmen</td>
+          </tr>
+          <tr class="border-t border-[rgba(124,58,237,0.1)]">
+            <td class="p-4 text-gray-300">Fırsat Tespiti</td>
+            <td class="p-4 text-center ali-col text-green-400 font-bold text-lg">✓</td>
+            <td class="p-4 text-center text-red-400">✗</td>
+            <td class="p-4 text-center text-red-400">✗</td>
+            <td class="p-4 text-center text-yellow-400 text-xs">Deneyime bağlı</td>
+          </tr>
+          <tr class="border-t border-[rgba(124,58,237,0.1)]">
+            <td class="p-4 text-gray-300">Kurulum Süresi</td>
+            <td class="p-4 text-center ali-col ali-col-bot"><span class="text-purple-300 font-bold">3 Dakika</span></td>
+            <td class="p-4 text-center text-gray-400 text-xs">Haftalarca</td>
+            <td class="p-4 text-center text-gray-400 text-xs">Günler</td>
+            <td class="p-4 text-center text-gray-400 text-xs">İşe alım gerekli</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FİYATLANDIRMA ===== -->
+<section id="fiyatlandirma" class="py-24 px-5">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-12 reveal">
+      <span class="badge mb-4">⚡ Sınırlı Süre</span>
+      <h2 class="text-4xl md:text-5xl font-heading font-extrabold mt-4">Lansmana Özel <span class="g-text">Fırsatlar</span></h2>
+      <div class="flex items-center justify-center gap-4 mt-8">
+        <span class="text-gray-300 font-medium">Aylık</span>
+        <button id="pricingToggle" onclick="togglePricing()" class="relative w-14 h-7 rounded-full bg-[#1A1035] border border-[rgba(124,58,237,0.4)] flex items-center">
+          <span id="toggleDot" class="absolute left-1 w-5 h-5 bg-purple-500 rounded-full transition-all duration-300"></span>
+        </button>
+        <span class="text-gray-300 font-medium">Yıllık <span class="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full ml-1">%50 indirim</span></span>
+      </div>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6 reveal">
+      <!-- Başlangıç -->
+      <div class="card p-7">
+        <div class="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">Başlangıç</div>
+        <div class="text-4xl font-heading font-extrabold mb-1">
+          <span class="pm">₺1.490</span><span class="py hidden">₺745</span><span class="text-base text-gray-500 font-normal">/ay</span>
+        </div>
+        <p class="text-gray-500 text-sm mb-6">Yeni başlayanlar için ideal</p>
+        <ul class="space-y-2.5 mb-8 text-sm text-gray-300">
+          <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 1 WhatsApp hattı</li>
+          <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 500 AI görüşme/ay</li>
+          <li class="flex items-center gap-2"><span class="text-green-400">✓</span> CRM panosu</li>
+          <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Temel raporlar</li>
+          <li class="flex items-center gap-2"><span class="text-green-400">✓</span> E-posta desteği</li>
+        </ul>
+        <a href="https://cal.eu/ali-sales-ai/demo" class="btn-outline block text-center py-3 justify-center">Demo talep edin</a>
+      </div>
+      <!-- Büyüme -->
+      <div class="card plan-pop p-7 relative">
+        <div class="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap">
+          <span class="bg-purple-600 text-white text-xs font-bold px-4 py-1.5 rounded-full">⭐ POPÜLER</span>
+        </div>
+        <div class="text-purple-300 text-xs font-semibold uppercase tracking-wider mb-2">Büyüme</div>
+        <div class="text-4xl font-heading font-extrabold mb-1">
+          <span class="pm">₺4.990</span><span class="py hidden">₺2.495</span><span class="text-base text-gray-500 font-normal">/ay</span>
+        </div>
+        <p class="text-gray-500 text-sm mb-6">Aktif satış yapan işletmeler için</p>
+        <ul class="space-y-2.5 mb-8 text-sm text-gray-300">
+          <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 3 platform (WA + IG + FB)</li>
+          <li class="flex items-center gap-2"><span class="text-green-400">✓</span> 2.000 AI görüşme/ay</li>
+          <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Gelişmiş CRM + pipeline</li>
+          <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Günlük satış ajandası</li>
+          <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Öncelikli destek</li>
+          <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Özel sistem prompt</li>
+        </ul>
+        <a href="https://cal.eu/ali-sales-ai/demo" class="btn block text-center py-3 justify-center">Demo talep edin</a>
+      </div>
+      <!-- İşletme -->
+      <div class="card p-7">
+        <div class="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">İşletme</div>
+        <div class="text-4xl font-heading font-extrabold mb-1">
+          <span class="pm">₺9.990</span><span class="py hidden">₺4.995</span><span class="text-base text-gray-500 font-normal">/ay</span>
+        </div>
+        <p class="text-gray-500 text-sm mb-6">Büyük ekipler ve çok mağazalılar</p>
+        <ul class="space-y-2.5 mb-8 text-sm text-gray-300">
+          <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Sınırsız platform</li>
+          <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Sınırsız AI görüşme</li>
+          <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Multi-tenant yönetimi</li>
+          <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Özel entegrasyon</li>
+          <li class="flex items-center gap-2"><span class="text-green-400">✓</span> Dedicated hesap yöneticisi</li>
+        </ul>
+        <a href="https://cal.eu/ali-sales-ai/demo" class="btn-outline block text-center py-3 justify-center">Demo talep edin</a>
+      </div>
+    </div>
+    <div class="flex justify-center mt-8 reveal">
+      <div class="inline-flex items-center gap-2 bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 px-6 py-3 rounded-xl text-sm font-semibold">
+        🏆 İlk 10 işletmeye özel — ÜCRETSİZ kurulum desteği
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== KURUCUDAN MESAJ ===== -->
+<section class="py-24 px-5 bg-[#1A1035]">
+  <div class="max-w-5xl mx-auto">
+    <div class="grid lg:grid-cols-5 gap-12 items-center reveal">
+      <div class="lg:col-span-3">
+        <div class="text-6xl mb-4 text-purple-400 opacity-30 font-serif leading-none">"</div>
+        <blockquote class="text-xl md:text-2xl font-heading font-medium leading-relaxed text-gray-100 mb-8">
+          Ali, Türkiye'de satış yapan işletmelerin gerçek ihtiyaçlarına göre tasarlandı. Fazladan personel, karmaşık sistemler veya sonsuz eğitim almanıza gerek yok. Sadece Ali ile başlayın.
+        </blockquote>
+        <div>
+          <div class="font-heading font-bold text-white text-lg">Gizem Burteçin</div>
+          <div class="text-purple-400 text-sm">Ali'nin Kurucusu</div>
+        </div>
+      </div>
+      <div class="lg:col-span-2 flex justify-center">
+        <div class="relative">
+          <div class="absolute inset-0 bg-gradient-to-br from-purple-600/30 to-blue-600/20 rounded-3xl blur-2xl"></div>
+          <img src="assets/img/gizem.webp" alt="Gizem Burteçin" class="relative w-full max-w-xs rounded-3xl object-cover shadow-2xl">
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== LANSMAN AVANTAJI + GARANTİ ===== -->
+<section class="py-24 px-5">
+  <div class="max-w-5xl mx-auto">
+    <div class="grid md:grid-cols-2 gap-6 reveal">
+      <div class="card p-8">
+        <div class="text-3xl mb-4">🚀</div>
+        <h3 class="font-heading font-bold text-xl mb-4 g-text">Lansmana Özel Ayrıcalık</h3>
+        <ul class="space-y-3 text-gray-300 text-sm">
+          <li class="flex items-start gap-3"><span class="text-yellow-400 text-lg flex-shrink-0">⭐</span><span>Ücretsiz kurulum desteği (ilk 10 işletme)</span></li>
+          <li class="flex items-start gap-3"><span class="text-yellow-400 text-lg flex-shrink-0">⭐</span><span>Özel onboarding — sizi 1:1 tanıtıyoruz</span></li>
+          <li class="flex items-start gap-3"><span class="text-yellow-400 text-lg flex-shrink-0">⭐</span><span>İlk ay %50 lansman indirimi</span></li>
+          <li class="flex items-start gap-3"><span class="text-yellow-400 text-lg flex-shrink-0">⭐</span><span>Sistem prompt kişiselleştirmesi hediye</span></li>
+          <li class="flex items-start gap-3"><span class="text-yellow-400 text-lg flex-shrink-0">⭐</span><span>7 gün ücretsiz deneme, kart gerekmez</span></li>
+        </ul>
+      </div>
+      <div class="card p-8">
+        <div class="text-3xl mb-4">🛡️</div>
+        <h3 class="font-heading font-bold text-xl mb-4">Ali, Sözünün Eri</h3>
+        <p class="text-gray-300 text-sm mb-6 leading-relaxed">Eğer ilk 14 gün içinde memnun kalmazsanız, paranın tamamını iade ediyoruz. Soru yok, itiraz yok.</p>
+        <div class="space-y-3">
+          <div class="inline-flex items-center gap-2 bg-green-500/10 border border-green-500/30 text-green-300 px-4 py-2 rounded-lg text-sm font-semibold">✓ 14 Gün Para İade Garantisi</div><br>
+          <div class="inline-flex items-center gap-2 bg-blue-500/10 border border-blue-500/30 text-blue-300 px-4 py-2 rounded-lg text-sm font-semibold mt-2">💳 PayTR ile güvenli ödeme</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SSS ===== -->
+<section id="sss" class="py-24 px-5 bg-[#0D0820]">
+  <div class="max-w-3xl mx-auto">
+    <div class="text-center mb-12 reveal">
+      <h2 class="text-4xl font-heading font-extrabold">Sıkça Sorulan <span class="g-text">Sorular</span></h2>
+    </div>
+    <div class="space-y-3 reveal" id="faqList">
+      <div class="card overflow-hidden"><button class="faq-btn w-full text-left p-5 flex items-center justify-between font-medium text-white hover:text-purple-300 transition" onclick="toggleFaq(this)"><span>Ali sadece bir yapay zeka asistanı, bir chatbot mu?</span><span class="faq-icon text-purple-400 text-xl ml-4 flex-shrink-0">+</span></button><div class="faq-ans"><div class="px-5 pb-5 text-gray-400 text-sm leading-relaxed">Hayır. Ali bir chatbot değil; CRM, satış asistanı ve iş zekası sistemi bir arada. Sıradan chatbot sadece mesajlara yanıt verir. Ali ise müşteriyi tanır, satış aşamasını takip eder, fırsatları tespit eder ve sizin adınıza aksiyon alır.</div></div></div>
+      <div class="card overflow-hidden"><button class="faq-btn w-full text-left p-5 flex items-center justify-between font-medium text-white hover:text-purple-300 transition" onclick="toggleFaq(this)"><span>Kurulum zor mu? Teknik bilgi gerekiyor mu?</span><span class="faq-icon text-purple-400 text-xl ml-4 flex-shrink-0">+</span></button><div class="faq-ans"><div class="px-5 pb-5 text-gray-400 text-sm leading-relaxed">Hayır, teknik bilgi gerekmez. WhatsApp numaranızı bağlayıp işletme bilgilerinizi girmeniz yeterli. Ortalama kurulum 5 dakika. İlk 10 işletmeye 1:1 kurulum desteği sunuyoruz.</div></div></div>
+      <div class="card overflow-hidden"><button class="faq-btn w-full text-left p-5 flex items-center justify-between font-medium text-white hover:text-purple-300 transition" onclick="toggleFaq(this)"><span>Verilerim güvende mi?</span><span class="faq-icon text-purple-400 text-xl ml-4 flex-shrink-0">+</span></button><div class="faq-ans"><div class="px-5 pb-5 text-gray-400 text-sm leading-relaxed">Kesinlikle. Müşteri verileriniz şifrelenmiş sunucularda saklanır. KVKK kapsamında işlem yapılır. Verilerinizi üçüncü taraflarla paylaşmıyoruz.</div></div></div>
+      <div class="card overflow-hidden"><button class="faq-btn w-full text-left p-5 flex items-center justify-between font-medium text-white hover:text-purple-300 transition" onclick="toggleFaq(this)"><span>İptal edersem ne olur?</span><span class="faq-icon text-purple-400 text-xl ml-4 flex-shrink-0">+</span></button><div class="faq-ans"><div class="px-5 pb-5 text-gray-400 text-sm leading-relaxed">İstediğiniz zaman iptal edebilirsiniz. Dönem sonuna kadar aktif kalır. 14 gün içinde iptal ederseniz para iadesi yapılır.</div></div></div>
+      <div class="card overflow-hidden"><button class="faq-btn w-full text-left p-5 flex items-center justify-between font-medium text-white hover:text-purple-300 transition" onclick="toggleFaq(this)"><span>Hangi paket bana uygun?</span><span class="faq-icon text-purple-400 text-xl ml-4 flex-shrink-0">+</span></button><div class="faq-ans"><div class="px-5 pb-5 text-gray-400 text-sm leading-relaxed">Tek WhatsApp hattınız varsa Başlangıç paketi yeterli. Birden fazla kanal kullanıyorsanız Büyüme paketi idealdir. 5+ mağaza için İşletme paketini öneririz.</div></div></div>
+      <div class="card overflow-hidden"><button class="faq-btn w-full text-left p-5 flex items-center justify-between font-medium text-white hover:text-purple-300 transition" onclick="toggleFaq(this)"><span>AI Türkçe konuşur mu?</span><span class="faq-icon text-purple-400 text-xl ml-4 flex-shrink-0">+</span></button><div class="faq-ans"><div class="px-5 pb-5 text-gray-400 text-sm leading-relaxed">Evet, Ali doğal ve akıcı Türkçe konuşur. Robot gibi değil, gerçek bir satışçı gibi. "Merhaba hocam" gibi doğal Türk satış ifadelerini kullanır.</div></div></div>
+      <div class="card overflow-hidden"><button class="faq-btn w-full text-left p-5 flex items-center justify-between font-medium text-white hover:text-purple-300 transition" onclick="toggleFaq(this)"><span>WhatsApp'ı nasıl bağlayacağım?</span><span class="faq-icon text-purple-400 text-xl ml-4 flex-shrink-0">+</span></button><div class="faq-ans"><div class="px-5 pb-5 text-gray-400 text-sm leading-relaxed">Meta Business API üzerinden yapılır. Kayıt sonrası adım adım rehber gönderiyoruz. Ortalama 15 dakika. Takılırsanız destek ekibimiz anında yardım eder.</div></div></div>
+      <div class="card overflow-hidden"><button class="faq-btn w-full text-left p-5 flex items-center justify-between font-medium text-white hover:text-purple-300 transition" onclick="toggleFaq(this)"><span>Müşteri Görüşmesi nedir?</span><span class="faq-icon text-purple-400 text-xl ml-4 flex-shrink-0">+</span></button><div class="faq-ans"><div class="px-5 pb-5 text-gray-400 text-sm leading-relaxed">Bir müşteriyle yapılan konuşma bloğudur. Aynı müşteriyle birden fazla mesajlaşma bir görüşme sayılır. Mesaj sayısı değil, konuşma başına fiyatlandırma yapılır.</div></div></div>
+      <div class="card overflow-hidden"><button class="faq-btn w-full text-left p-5 flex items-center justify-between font-medium text-white hover:text-purple-300 transition" onclick="toggleFaq(this)"><span>Görüşme limitim biterse ne olur?</span><span class="faq-icon text-purple-400 text-xl ml-4 flex-shrink-0">+</span></button><div class="faq-ans"><div class="px-5 pb-5 text-gray-400 text-sm leading-relaxed">Limit dolmadan 5 gün öncesinde e-posta ile bildirilirsiniz. Paketi yükseltebilir veya ek görüşme kredisi satın alabilirsiniz.</div></div></div>
+      <div class="card overflow-hidden"><button class="faq-btn w-full text-left p-5 flex items-center justify-between font-medium text-white hover:text-purple-300 transition" onclick="toggleFaq(this)"><span>Ek maliyet olur mu? Gizli ücret var mı?</span><span class="faq-icon text-purple-400 text-xl ml-4 flex-shrink-0">+</span></button><div class="faq-ans"><div class="px-5 pb-5 text-gray-400 text-sm leading-relaxed">Hayır. Aylık abonelik dışında gizli ücret yoktur. Meta'nın WhatsApp Business API maliyetleri ayrıdır ama bunlar Meta'ya ödenir, Ali'ye değil.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SON CTA ===== -->
+<section id="iletisim" class="py-32 px-5 relative overflow-hidden">
+  <div class="absolute inset-0 bg-gradient-to-br from-purple-900/25 via-transparent to-blue-900/15"></div>
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[500px] bg-purple-600/10 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="relative max-w-3xl mx-auto text-center reveal">
+    <div class="flex justify-center mb-6"><span class="badge">⏳ İLK 10 İŞLETMEYE ÖZEL</span></div>
+    <h2 class="text-4xl md:text-6xl font-heading font-extrabold mb-6">
+      Satışlarınızı <span class="g-text">Otomatikleştirmeye</span><br>Hazır mısınız?
+    </h2>
+    <p class="text-gray-300 text-lg mb-8 max-w-xl mx-auto">İlk 10 işletme arasına girin, ücretsiz kurulum desteği kazanın.</p>
+    <div class="inline-flex items-center gap-3 bg-red-500/10 border border-red-500/30 text-red-300 px-6 py-3 rounded-xl mb-8">
+      <span class="text-xl">🔥</span>
+      <span class="font-semibold">Kalan kota: <strong class="text-white">7/10</strong></span>
+    </div>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="https://airtable.com/appIaO89GctqKcQIi/pagC1j26ZJswZL904/form" class="btn btn-pulse text-lg px-10 py-4">🚀 Şimdi Başvur</a>
+      <a href="https://cal.eu/ali-sales-ai/demo" class="btn-outline text-lg px-8 py-4 justify-center">📅 Demo Al</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="bg-[#05040F] border-t border-[rgba(124,58,237,0.2)] py-14 px-5">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid md:grid-cols-4 gap-8 mb-10">
+      <div class="md:col-span-2">
+        <img src="assets/img/ali-logo-footer.png" alt="Ali Sales AI" class="h-9 w-auto mb-4">
+        <p class="text-gray-600 text-sm leading-relaxed max-w-sm">Türkiye'nin bitirim satışçısı. AI zekâsı ile esnaf zekâsını birleştiren satış otomasyon platformu.</p>
+      </div>
+      <div>
+        <h4 class="font-heading font-semibold text-white mb-4 text-sm">Platform</h4>
+        <ul class="space-y-2 text-sm text-gray-600">
+          <li><a href="#cozumler" class="hover:text-white transition">Çözümler</a></li>
+          <li><a href="#ozellikler" class="hover:text-white transition">Özellikler</a></li>
+          <li><a href="#fiyatlandirma" class="hover:text-white transition">Fiyatlandırma</a></li>
+          <li><a href="https://www.alisales.ai/checkout" class="hover:text-white transition">%50 İndirimle Başla</a></li>
+          <li><a href="#iletisim" class="hover:text-white transition">İletişim</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-heading font-semibold text-white mb-4 text-sm">Yasal</h4>
+        <ul class="space-y-2 text-sm text-gray-600">
+          <li><a href="/kullanim-sartlari" class="hover:text-white transition">Kullanım Şartları</a></li>
+          <li><a href="/gizlilik-politikasi" class="hover:text-white transition">Gizlilik Politikası</a></li>
+          <li><a href="/refund-policy" class="hover:text-white transition">İade-İptal Politikası</a></li>
+          <li><a href="/data-deletion" class="hover:text-white transition">Veri Silme Politikası</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-[rgba(124,58,237,0.1)] pt-8 flex flex-col md:flex-row items-center justify-between gap-3">
+      <p class="text-gray-700 text-sm">© 2025 ALI · Esnaf zekâsı + AI zekâsı ile üretildi.</p>
+      <p class="text-gray-700 text-sm italic">Türkiye'nin Bitirim Satışçısı — Satıştaki Sağ Kolunuz</p>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== CHATBOT WIDGET ===== -->
+<div class="cw">
+  <div id="cwBubble" class="hidden bg-[#1A1035] border border-[rgba(124,58,237,0.5)] rounded-2xl p-4 mb-3 shadow-2xl w-64">
+    <p class="text-sm text-white font-medium">💬 Bitirim Satışçınız Ali'yle konuşun!</p>
+    <p class="text-xs text-gray-400 mt-1">Hemen yanıt veriyorum...</p>
+  </div>
+  <button id="cwBtn" onclick="toggleCW()" class="w-16 h-16 rounded-full bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center shadow-2xl hover:scale-110 transition-transform" style="box-shadow:0 0 30px rgba(124,58,237,0.4)">
+    <img src="assets/img/ali-character-1.png" alt="Ali" class="w-full h-full rounded-full object-cover object-top">
+  </button>
+</div>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+  // Navbar scroll
+  const nav = document.getElementById('navbar');
+  window.addEventListener('scroll', () => nav.classList.toggle('scrolled', scrollY > 60));
+
+  // Mobile menu
+  const ham = document.getElementById('hamBtn');
+  const mob = document.getElementById('mobMenu');
+  ham.addEventListener('click', () => { mob.classList.add('open'); document.body.style.overflow='hidden'; });
+  document.getElementById('mobClose').addEventListener('click', closeMob);
+  document.querySelectorAll('.mob-lnk').forEach(l => l.addEventListener('click', closeMob));
+  function closeMob(){ mob.classList.remove('open'); document.body.style.overflow=''; }
+
+  // Hero headline rotation
+  const hls = document.querySelectorAll('.hl');
+  let hi = 0;
+  setInterval(() => {
+    hls[hi].classList.remove('active');
+    hi = (hi + 1) % hls.length;
+    hls[hi].classList.add('active');
+  }, 3200);
+
+  // Scroll reveal
+  const ro = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
+
+  // Count-up
+  function countUp(el) {
+    const t = parseInt(el.dataset.target);
+    const s = el.dataset.suffix || '';
+    if(isNaN(t)) return;
+    let c = 0; const steps = 50;
+    const iv = setInterval(() => {
+      c = Math.min(c + t/steps, t);
+      el.textContent = Math.floor(c) + s;
+      if(c >= t) clearInterval(iv);
+    }, 40);
+  }
+  const so = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting){ document.querySelectorAll('[data-target]').forEach(countUp); so.disconnect(); }
+    });
+  }, { threshold: 0.3 });
+  const firstStat = document.querySelector('[data-target]');
+  if(firstStat) so.observe(firstStat.closest('section'));
+
+  // Tabs
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelector('[data-content="' + btn.dataset.tab + '"]').classList.add('active');
+    });
+  });
+
+  // FAQ
+  function toggleFaq(btn) {
+    const ans = btn.nextElementSibling;
+    const ico = btn.querySelector('.faq-icon');
+    const open = ans.classList.contains('open');
+    document.querySelectorAll('.faq-ans').forEach(a => a.classList.remove('open'));
+    document.querySelectorAll('.faq-icon').forEach(i => i.classList.remove('open'));
+    if(!open){ ans.classList.add('open'); ico.classList.add('open'); }
+  }
+
+  // Pricing toggle
+  let yearly = false;
+  function togglePricing() {
+    yearly = !yearly;
+    document.getElementById('toggleDot').style.transform = yearly ? 'translateX(28px)' : '';
+    document.querySelectorAll('.pm').forEach(e => e.classList.toggle('hidden', yearly));
+    document.querySelectorAll('.py').forEach(e => e.classList.toggle('hidden', !yearly));
+  }
+
+  // Chatbot widget
+  function toggleCW(){ document.getElementById('cwBubble').classList.toggle('hidden'); }
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const t = document.querySelector(a.getAttribute('href'));
+      if(t){ e.preventDefault(); t.scrollIntoView({behavior:'smooth'}); }
+    });
+  });
+</script>
+</body>
+</html>

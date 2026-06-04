@@ -1,0 +1,186 @@
+{
+  "rapor_tarihi": "2026-05-23",
+  "site": "https://www.alisales.ai",
+  "sprint": "AEO/SEO Teknik Denetim — Görev 1",
+
+  "1_1_sitemap_robots_gsc": {
+    "durum": "KISMI",
+    "mevcut_deger": {
+      "robots_txt": {
+        "mevcut": true,
+        "url": "/robots.txt",
+        "icerik": "User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: https://www.alisales.ai/sitemap.xml",
+        "sitemap_referansi": "https://www.alisales.ai/sitemap.xml"
+      },
+      "sitemap_xml": {
+        "mevcut": true,
+        "url_sayisi": 6,
+        "url_listesi": [
+          "https://www.alisales.ai/",
+          "https://www.alisales.ai/iletisim",
+          "https://www.alisales.ai/kullanim-sartlari",
+          "https://www.alisales.ai/gizlilik-politikasi",
+          "https://www.alisales.ai/refund-policy",
+          "https://www.alisales.ai/data-deletion"
+        ],
+        "son_guncelleme": "2026-05-03",
+        "format": "GEÇERLİ — sitemaps.org/0.9 şeması"
+      },
+      "gsc_dogrulama": {
+        "meta_tag_mevcut": true,
+        "tag_degeri": "vM9KyniJZayx-p0K8OGjuBh3SkEcB3pEgO_XpeCodX4",
+        "gsc_bagli_mi": "DOGRULANAMADI — dashboard erişimi gerekiyor"
+      }
+    },
+    "sorunlar": [
+      "sitemap.xml lastmod tarihleri 20 gün eski (2026-05-03), sektörel sayfalar eklenince güncellenecek",
+      "GSC bağlantısı: verification tag HTML'de mevcut, ancak GSC dashboard'dan doğrulanamadı"
+    ],
+    "onerilen_aksiyon": "sitemap.xml güncelle → sektörel sayfa ekle, lastmod=2026-05-23 yap. GSC'ye giriş yap ve sitemap.xml'i tekrar gönder."
+  },
+
+  "1_2_ai_bot_erisimi": {
+    "durum": "GEÇER — iyileştirme öneriliyor",
+    "mevcut_deger": {
+      "kural": "User-agent: * / Allow: / — tüm botlar varsayılan olarak her şeye erişebilir",
+      "bot_durumu": {
+        "GPTBot": "ALLOW (User-agent:* mirasıyla)",
+        "PerplexityBot": "ALLOW (User-agent:* mirasıyla)",
+        "ClaudeBot": "ALLOW (User-agent:* mirasıyla)",
+        "Google-Extended": "ALLOW (User-agent:* mirasıyla)",
+        "Bingbot": "ALLOW (User-agent:* mirasıyla)",
+        "CCBot": "ALLOW (User-agent:* mirasıyla)",
+        "anthropic-ai": "ALLOW (User-agent:* mirasıyla)"
+      },
+      "engellenen_bot": "YOK"
+    },
+    "sorunlar": [
+      "AI botlar için açık per-bot girişi yok — bazı crawlerlar explicit Allow olmayınca ihtiyatlı davranır",
+      "AEO best practice: GPTBot/PerplexityBot/ClaudeBot için ayrı User-agent blokları eklenmiş olmalı"
+    ],
+    "onerilen_aksiyon": "robots.txt'e GPTBot, PerplexityBot, ClaudeBot, Google-Extended, Bingbot, anthropic-ai için explicit Allow: / ekle. Engelleme YOK, sadece açıklık için."
+  },
+
+  "1_3_core_web_vitals": {
+    "durum": "SORUNLU — ölçüm: statik kod analizi",
+    "not": "LCP/CLS/INP sayısal değerleri için PageSpeed API veya canlı tarayıcı gerekiyor. Aşağıdakiler kod incelemesine dayalıdır.",
+    "tespitler": {
+      "hero_video_lcp": {
+        "durum": "KRİTİK SORUN",
+        "sebep": "hero.mp4 autoplay+muted+loop ile yükleniyor, poster attribute YOK, preload='none' YOK",
+        "etki": "Tarayıcı videoyu hemen fetch eder → LCP skoru bozulur (özellikle mobil 3G/4G'de)",
+        "satir": "index.html:395"
+      },
+      "duplikat_meta_pixel": {
+        "durum": "SORUN",
+        "sebep": "fbq 10 kez geçiyor: inline script (satır 262-279) VE window.load handler (satır 244-260) — çift tetiklenme",
+        "etki": "Sayfa yükü performansı + Meta pixel analytics hatası"
+      },
+      "google_fonts": {
+        "durum": "KÜÇÜK SORUN",
+        "sebep": "rel=preload ile önyüklenip aynı URL tekrar rel=stylesheet ile çağrılıyor — örtüşen istekler",
+        "satir": "index.html:74-77"
+      },
+      "google_analytics": {
+        "durum": "İYİ",
+        "aciklama": "window.load içinde defer ile yükleniyor"
+      },
+      "lazy_loading": {
+        "durum": "İYİ",
+        "aciklama": "Tüm img etiketleri loading=lazy ile işaretli (hero dışı)"
+      },
+      "cls_riski": {
+        "durum": "DÜŞÜK",
+        "aciklama": "img boyutları (width/height) tanımlı, layout shift az beklenir"
+      }
+    },
+    "onerilen_aksiyon": [
+      "hero.mp4'e poster='assets/img/og-image.png' ekle (mevcut OG image boyutu uygun)",
+      "Inline Meta Pixel bloğunu (satır 262-279) sil — window.load handler yeterli",
+      "Google Fonts: preload bloğunu kaldır, sadece stylesheet bağlantısını bırak"
+    ]
+  },
+
+  "1_4_baslik_hiyerarsisi": {
+    "durum": "SORUNLU — AEO için uygunsuz",
+    "mevcut_deger": {
+      "h1_sayisi": 1,
+      "h1_icerik": "Ali ile Satış Yapmak Çok Kolay!",
+      "h2_listesi": [
+        "Satışta sağ kolunuz!",
+        "Artık yalnız değilsin.",
+        "Ali'nin Sırrı: hem basit hem derin",
+        "💜 Ali'yi Neden Seviyorlar?",
+        "Ali Bir Chatbot Değil",
+        "Fiyatlandırma",
+        "Türk satış kültürü, yapay zekânın gücüyle birleşti.",
+        "Sıkça Sorulan Sorular"
+      ],
+      "h3_listesi": [
+        "Türk satış kültürü AI ile birleşti!",
+        "Artık hiçbir müşteri kaçmayacak",
+        "Ali ile satışları 5 dakikada arttır",
+        "Tüm Mesajlar Tek Yerde",
+        "Chatbot Her Kanaldan 7/24 Fırsat Yakalar",
+        "Günlük Satış Ajandan Hazır",
+        "Ali Raporlarıyla Bütün Resmi Gösterir",
+        "Beta Dönemi Fırsatı",
+        "Ali, Sözünün Eri"
+      ]
+    },
+    "sorunlar": [
+      "H1 pazarlama sloganı — AEO için 'Ali nedir / ne yapar' formatında olmalı",
+      "H2'lerin TAMAMI pazarlama kopyası — soru temelli başlık YOK",
+      "AEO ilkesi: AI botlar H2/H3 başlıklarını Q&A ağacı olarak okur; slogan başlıklar bilgi vermiyor",
+      "Her bölümün başında 'Ali [sektör] için nedir?' veya 'Ali nasıl çalışır?' sorusu YOK"
+    ],
+    "onerilen_aksiyon": "Her bölümün H2/H3 altına 40-60 kelimelik AEO cevap bloğu ekle (Görev 2.4). H1'i değiştirmeden bölüm girişleri query-formatında yeniden yaz."
+  },
+
+  "1_5_indeksleme_keywords": {
+    "durum": "ÖLÇÜLEMEYEN — GSC API / harici araç gerekiyor",
+    "mevcut_deger": {
+      "title_tag": "Ali Sales AI | WhatsApp & Instagram Satış Otomasyonu",
+      "meta_description": "Ali, WhatsApp, Instagram ve e-postanızdan gelen tüm müşterileri 7/24 otomatik yönetir. Türkiye'ye özgü yapay zeka satış asistanınız. Ücretsiz kurulum, hemen başlayın!",
+      "canonical": "https://www.alisales.ai/",
+      "og_locale": "tr_TR",
+      "hedeflenen_kelimeler_tahmini": [
+        "WhatsApp satış otomasyonu",
+        "Instagram satış botu",
+        "yapay zeka satış asistanı Türkiye",
+        "KOBİ CRM Türkçe",
+        "satış otomasyonu küçük işletme"
+      ],
+      "gsc_siralamasi": "MEVCUT DEĞİL — GSC bağlantısı doğrulanamadı",
+      "not": "Baseline sıralama verisi için GSC Search Analytics API erişimi gerekiyor"
+    },
+    "sorunlar": [
+      "Anahtar kelime yoğunluğu ölçülemiyor",
+      "'satış yapay zeka Türkiye' gibi yüksek arama hacimli sorgular için içerik yeterliliği bilinmiyor"
+    ],
+    "onerilen_aksiyon": "GSC dashboard'dan Search Queries raporunu paylaş → mevcut sıralamalar baseline olarak kaydedilsin."
+  },
+
+  "mevcut_schema_ozeti": {
+    "SoftwareApplication": {
+      "mevcut": true,
+      "eksikler": ["SoftwareApplicationCategory 'BusinessApplication' yerine 'SalesAutomation' olmalı", "screenshot alanı yok", "aggregateRating yok"]
+    },
+    "Organization": {
+      "mevcut": true,
+      "eksikler": ["logo favicon.png gösteriyor, ali-logo.webp olmalı", "telephone alanı yok", "foundingDate yok"]
+    },
+    "FAQPage": {
+      "mevcut": false,
+      "not": "10 SSS sorusu HTML'de mevcut ama FAQPage schema YOK — Görev 2.1 ile eklenecek"
+    }
+  },
+
+  "oncelikli_duzeltmeler": [
+    {"oncelik": 1, "madde": "1.3", "eylem": "hero.mp4 poster ekle + duplikat Meta Pixel sil", "etki": "LCP + analytics"},
+    {"oncelik": 2, "madde": "1.2", "eylem": "robots.txt explicit AI bot girişleri", "etki": "AEO crawlability"},
+    {"oncelik": 3, "madde": "2.1", "eylem": "FAQPage schema ekle", "etki": "Rich Results + AEO"},
+    {"oncelik": 4, "madde": "2.4", "eylem": "Her bölüme 40-60 kelime AEO cevap bloğu", "etki": "AI görünürlüğü"},
+    {"oncelik": 5, "madde": "1.1", "eylem": "sitemap.xml lastmod güncelle + sektörel sayfa ekle (Görev 3 sonrası)", "etki": "indexing"}
+  ]
+}

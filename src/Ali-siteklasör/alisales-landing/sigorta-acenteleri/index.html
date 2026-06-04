@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sigorta Acenteleri için Yapay Zeka Satış Asistanı | Ali Sales AI</title>
+  <meta name="description" content="Ali, sigorta acentelerinde satış temsilcilerinin poliçe vade takibini, günlük ajandası ve akşam KPI raporunu otomatik yönetir. Acente sahipleri için 7/24 satış otomasyon sistemi.">
+  <link rel="canonical" href="https://www.alisales.ai/sigorta-acenteleri">
+  <meta name="google-site-verification" content="vM9KyniJZayx-p0K8OGjuBh3SkEcB3pEgO_XpeCodX4">
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://www.alisales.ai/sigorta-acenteleri">
+  <meta property="og:site_name" content="Ali Sales AI">
+  <meta property="og:locale" content="tr_TR">
+  <meta property="og:title" content="Sigorta Acenteleri için Yapay Zeka Satış Asistanı | Ali Sales AI">
+  <meta property="og:description" content="Ali, sigorta acentelerinde satış temsilcilerinin poliçe vade takibini, günlük ajandası ve akşam KPI raporunu otomatik yönetir.">
+  <meta property="og:image" content="https://www.alisales.ai/assets/img/og-image.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Sigorta Acenteleri için Yapay Zeka Satış Asistanı | Ali Sales AI">
+  <meta name="twitter:description" content="Ali, sigorta acentelerinde satış temsilcilerinin poliçe vade takibini, günlük ajandası ve akşam KPI raporunu otomatik yönetir.">
+  <meta name="twitter:image" content="https://www.alisales.ai/assets/img/og-image.png">
+
+  <link rel="icon" href="../assets/img/favicon.png">
+
+  <!-- Structured Data: BreadcrumbList + FAQPage -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Ana Sayfa",
+            "item": "https://www.alisales.ai/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Sigorta Acenteleri",
+            "item": "https://www.alisales.ai/sigorta-acenteleri"
+          }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Ali hangi sigorta branşlarını ayrı ayrı takip edebilir mi?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Evet. Ali sağlık, elementer ve hayat sigortası branşlarını ayrı kategorilerde takip eder. Her branş için bağımsız vade takvimi ve hatırlatma kuralı tanımlanabilir."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Poliçe yenileme hatırlatmaları müşteriye mi, temsilciye mi gönderilir?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Her iki yönde de çalışır. Temsilciye sabah ajanda olarak, müşteriye doğrudan WhatsApp veya e-posta ile — tercih acentenin akışına göre ayarlanır."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Mevcut Excel veya CRM verilerimi Ali'ye nasıl aktarırım?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Excel veya Google Sheets aktarımı standart yöntemdir; kurulum adımında ekip sizi yönlendirir. Ortalama aktarım süresi yarım iş günü."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Birden fazla satış temsilcisi aynı anda kullanabilir mi?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Evet. Ali çok kullanıcılı yapıda çalışır; her temsilci kendi kanalı ve müşteri listesiyle bağlanır, yönetici tüm ekibi tek ekrandan görür."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Müşteri arama geçmişi ve notlar nerede saklanır, KVKK uyumlu mu?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Müşteri verileri ve görüşme notları erişim kontrollü sistemlerde saklanır ve KVKK kapsamında işlenir. Veri işleyen altyapı sağlayıcıları sözleşmeli hizmet kapsamında çalışır. Acentenizin özel KVKK gereksinimleri kurulumda netleştirilir."
+            }
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;600;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind (shared purged build) -->
+  <link rel="stylesheet" href="../assets/css/tw.min.css">
+
+  <style>
+    :root {
+      --purple: #5B47E0;
+      --action: #7C3AED;
+      --lavender: #F5F3FF;
+      --lavender2: #EDE9FE;
+      --dark: #1C1629;
+      --muted: #6E717B;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; color: var(--dark); background: #fff; margin: 0; -webkit-font-smoothing: antialiased; }
+
+    /* Navbar */
+    .navbar { position: fixed; top: 0; width: 100%; z-index: 100; transition: all .3s; }
+    .navbar.scrolled { background: rgba(255,255,255,.92); backdrop-filter: blur(16px); box-shadow: 0 1px 0 rgba(110,86,207,.1); }
+    .ham { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+    @media (max-width: 768px) {
+      .desk-nav, .desk-btn { display: none !important; }
+      .ham { display: flex; }
+    }
+
+    /* Mobile menu */
+    .mob-menu { display: none; position: fixed; inset: 0; background: rgba(28,22,41,.97); z-index: 200; flex-direction: column; align-items: center; justify-content: center; gap: 2rem; }
+    .mob-menu.open { display: flex; }
+
+    /* Buttons */
+    .btn-primary { background: linear-gradient(135deg, #6E56CF, #BD45E6); color: #fff; font-family: 'Hanken Grotesk', sans-serif; font-weight: 700; padding: .85rem 2rem; border-radius: 1rem; text-decoration: none; display: inline-flex; align-items: center; gap: .5rem; transition: all .3s; border: none; cursor: pointer; font-size: 15px; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(110,86,207,.35); }
+    .btn-ghost { background: rgba(110,86,207,.08); border: 1.5px solid rgba(110,86,207,.3); color: #6E56CF; font-family: 'Hanken Grotesk', sans-serif; font-weight: 600; padding: .85rem 2rem; border-radius: 1rem; text-decoration: none; display: inline-flex; align-items: center; gap: .5rem; transition: all .3s; font-size: 15px; }
+    .btn-ghost:hover { background: rgba(110,86,207,.14); transform: translateY(-2px); }
+    .btn-white { background: #fff; color: #6E56CF; font-family: 'Hanken Grotesk', sans-serif; font-weight: 700; padding: .85rem 2rem; border-radius: 1rem; text-decoration: none; display: inline-flex; align-items: center; gap: .5rem; transition: all .3s; font-size: 15px; }
+    .btn-white:hover { background: var(--lavender); transform: translateY(-2px); }
+
+    /* Cards */
+    .card-light { background: #fff; border: 1px solid var(--lavender2); border-radius: 1rem; transition: box-shadow .25s, border-color .25s; }
+    .card-light:hover { box-shadow: 0 8px 32px rgba(110,86,207,.1); border-color: rgba(110,86,207,.2); }
+    .card-lavender { background: var(--lavender); border: 1px solid var(--lavender2); border-radius: 1rem; }
+
+    /* Gradient text */
+    .gt { background: linear-gradient(135deg, #BD45E6 0%, #6E56CF 60%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    /* Badges */
+    .badge-purple { background: rgba(110,86,207,.1); border: 1px solid rgba(110,86,207,.25); color: #6E56CF; padding: .3rem .9rem; border-radius: 2rem; font-size: .7rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; display: inline-flex; align-items: center; gap: .4rem; }
+    .badge-green  { background: rgba(34,197,94,.1);  border: 1px solid rgba(34,197,94,.3);  color: #16A34A; padding: .3rem .9rem; border-radius: 2rem; font-size: .7rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; display: inline-flex; align-items: center; gap: .4rem; }
+
+    /* Step number circle */
+    .step-n { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: linear-gradient(135deg, #6E56CF, #BD45E6); display: flex; align-items: center; justify-content: center; font-family: 'Hanken Grotesk', sans-serif; font-weight: 800; color: #fff; font-size: .95rem; flex-shrink: 0; }
+
+    /* Metric placeholder boxes */
+    .metric-box { background: #fff; border: 2px dashed rgba(110,86,207,.2); border-radius: 1rem; padding: 1.25rem 1rem; text-align: center; }
+    .metric-val { font-family: 'Hanken Grotesk', sans-serif; font-weight: 900; font-size: 2rem; color: #6E56CF; display: block; margin-bottom: .25rem; line-height: 1; }
+    .metric-lbl { font-size: .75rem; color: var(--muted); display: block; line-height: 1.4; }
+
+    /* FAQ accordion */
+    .faq-ans { max-height: 0; overflow: hidden; transition: max-height .4s ease; }
+    .faq-ans.open { max-height: 500px; }
+    .faq-ico { transition: transform .3s; display: inline-block; line-height: 1; }
+    .faq-ico.open { transform: rotate(45deg); }
+
+    /* Reveal */
+    .reveal { opacity: 0; transform: translateY(20px); transition: opacity .6s cubic-bezier(.16,1,.3,1), transform .6s cubic-bezier(.16,1,.3,1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* Section divider heading */
+    .sec-h2-row { display: flex; align-items: center; gap: 20px; margin-bottom: 1rem; }
+    .sec-h2-row .line { flex: 1; height: 1px; background: #EBEAF6; }
+    .sec-h2 { font-family: 'Hanken Grotesk', sans-serif; font-size: clamp(20px, 3vw, 34px); font-weight: 600; letter-spacing: -0.03em; color: #1C1629; margin: 0; }
+
+    /* Icon box */
+    .icon-box { width: 40px; height: 40px; background: var(--lavender); border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+
+<!-- ===== NAVBAR ===== -->
+<nav class="navbar" id="navbar">
+  <div class="max-w-7xl mx-auto px-5 py-3.5 flex items-center justify-between">
+    <a href="/" class="flex-shrink-0">
+      <img width="400" height="225" src="../assets/img/ali-logo.webp" alt="Ali Sales AI" class="h-16 w-auto">
+    </a>
+    <div class="desk-nav flex items-center gap-2">
+      <a href="https://www.paytr.com/link/YEkv4tK" style="background:transparent;border:1px solid #6E56CF;color:#6E56CF;font-family:'Hanken Grotesk',sans-serif;font-weight:600;padding:.5rem 1.25rem;border-radius:100px;text-decoration:none;display:inline-flex;align-items:center;font-size:.875rem;letter-spacing:-.03em;box-shadow:0 1px 4px rgba(110,86,207,.15);transition:all .2s;" onmouseover="this.style.background='rgba(110,86,207,.07)'" onmouseout="this.style.background='transparent'">Başla</a>
+      <div class="flex items-center gap-6 text-sm font-medium text-[#1C1629] ml-3">
+        <a href="/#cozumler"      class="hover:text-[#6E56CF] transition">Çözümler</a>
+        <a href="/#ozellikler"    class="hover:text-[#6E56CF] transition">Özellikler</a>
+        <a href="/#fiyatlandirma" class="hover:text-[#6E56CF] transition">Fiyatlandırma</a>
+        <a href="/iletisim"       class="hover:text-[#6E56CF] transition">İletişim</a>
+      </div>
+    </div>
+    <a href="https://panel.alisales.ai" class="desk-btn" style="background:transparent;border:1px solid #BD45E6;color:#1C1629;font-family:'Hanken Grotesk',sans-serif;font-weight:600;padding:.5rem 1.25rem;border-radius:100px;text-decoration:none;display:inline-flex;align-items:center;font-size:.875rem;box-shadow:0 1px 4px rgba(45,24,93,.15);transition:all .2s;" onmouseover="this.style.background='rgba(189,69,230,.06)'" onmouseout="this.style.background='transparent'">Giriş</a>
+    <button class="ham" id="hamBtn" aria-label="Menüyü aç">
+      <span style="width:24px;height:2px;background:#1C1629;border-radius:2px;display:block;"></span>
+      <span style="width:24px;height:2px;background:#1C1629;border-radius:2px;display:block;"></span>
+      <span style="width:24px;height:2px;background:#1C1629;border-radius:2px;display:block;"></span>
+    </button>
+  </div>
+</nav>
+
+<!-- Mobile Menu -->
+<div class="mob-menu" id="mobMenu">
+  <button id="mobClose" style="position:absolute;top:1.5rem;right:1.5rem;color:#fff;font-size:1.75rem;background:none;border:none;cursor:pointer;" aria-label="Menüyü kapat">✕</button>
+  <a href="/"              style="color:#fff;font-family:'Hanken Grotesk',sans-serif;font-size:1.5rem;font-weight:700;text-decoration:none;">Ana Sayfa</a>
+  <a href="/#cozumler"     style="color:#fff;font-family:'Hanken Grotesk',sans-serif;font-size:1.5rem;font-weight:700;text-decoration:none;">Çözümler</a>
+  <a href="/#fiyatlandirma" style="color:#fff;font-family:'Hanken Grotesk',sans-serif;font-size:1.5rem;font-weight:700;text-decoration:none;">Fiyatlandırma</a>
+  <a href="https://www.paytr.com/link/YEkv4tK" style="background:linear-gradient(135deg,#6E56CF,#BD45E6);color:#fff;font-family:'Hanken Grotesk',sans-serif;font-size:1.1rem;font-weight:700;text-decoration:none;padding:.85rem 2.5rem;border-radius:1rem;">Başla</a>
+</div>
+
+<!-- ===== §1 BREADCRUMB ===== -->
+<div style="padding-top:88px;background:#F8F5FF;border-bottom:1px solid #EBEAF6;">
+  <div class="max-w-5xl mx-auto px-5 py-3">
+    <nav aria-label="Gezinti izi" style="font-size:13px;color:var(--muted);">
+      <ol style="list-style:none;margin:0;padding:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+        <li><a href="/" style="color:#6E56CF;text-decoration:none;font-weight:500;">Ana Sayfa</a></li>
+        <li style="color:#C4C4C4;">›</li>
+        <li style="color:var(--dark);font-weight:500;">Sigorta Acenteleri</li>
+      </ol>
+    </nav>
+  </div>
+</div>
+
+<!-- ===== §2 HERO ===== -->
+<section style="background:linear-gradient(180deg,#F8F5FF 0%,#fff 100%);padding:4rem 1.25rem 3.5rem;">
+  <div class="max-w-4xl mx-auto text-center reveal">
+
+    <span class="badge-purple" style="margin-bottom:1.25rem;display:inline-flex;">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+      Sigorta Acenteleri için Ali
+    </span>
+
+    <h1 style="font-family:'Hanken Grotesk',sans-serif;font-size:clamp(30px,5vw,56px);font-weight:700;letter-spacing:-0.04em;line-height:1.1;color:#1C1629;margin:0 0 1.25rem;">
+      Sigorta Acenteleri için<br><span class="gt">Yapay Zeka Satış Asistanı</span>
+    </h1>
+
+    <!-- AEO direct answer block -->
+    <p style="font-size:16px;line-height:1.8;color:#4B5563;max-width:680px;margin:0 auto 2rem;">
+      Ali, sigorta acentelerinde çalışan satış temsilcileri için her sabah poliçe vade takvimini, müşteri sıcaklık skorunu ve arama önceliklerini otomatik hesaplar. Temsilci o gün kimi arayacağını, hangi teklifin takipte olduğunu ve son görüşme notunu hazır liste olarak alır; akşam yönetici ekibin KPI raporuna ulaşır.
+    </p>
+
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a href="https://www.paytr.com/link/YEkv4tK" class="btn-primary">Sigorta Acenteniz için Demo Al →</a>
+      <a href="/#fiyatlandirma" class="btn-ghost">Fiyatları Gör</a>
+    </div>
+
+  </div>
+</section>
+
+<!-- ===== §3 KİM İÇİN ===== -->
+<section style="padding:4rem 1.25rem;background:#fff;">
+  <div class="max-w-5xl mx-auto">
+
+    <div class="text-center reveal" style="margin-bottom:2.5rem;">
+      <div class="sec-h2-row" style="justify-content:center;">
+        <div class="line"></div>
+        <h2 class="sec-h2" style="white-space:nowrap;">Hangi Sigorta Acenteleri Ali'yi Kullanır?</h2>
+        <div class="line"></div>
+      </div>
+      <p style="font-size:13px;color:var(--muted);max-width:480px;margin:.5rem auto 0;">Portföy büyüklüğünden bağımsız — takip yükü insanı aştığında Ali devreye girer.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-4 reveal">
+
+      <div class="card-light p-5 flex gap-4 items-start">
+        <div class="icon-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6E56CF" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <div>
+          <div style="font-family:'Hanken Grotesk',sans-serif;font-weight:700;color:#1C1629;margin-bottom:4px;">Yoğun Portföylü Acenteler</div>
+          <p style="font-size:13px;color:var(--muted);margin:0;line-height:1.65;">Geniş bir firma portföyünü yöneten, manuel takip kapasitesinin dışına çıkmış acente ekipleri.</p>
+        </div>
+      </div>
+
+      <div class="card-light p-5 flex gap-4 items-start">
+        <div class="icon-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6E56CF" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div>
+          <div style="font-family:'Hanken Grotesk',sans-serif;font-weight:700;color:#1C1629;margin-bottom:4px;">3–20 Temsilcili Ekipler</div>
+          <p style="font-size:13px;color:var(--muted);margin:0;line-height:1.65;">Her temsilcinin kendi listesini takip ettiği, yöneticinin tek ekrandan görmek istediği orta ölçekli acenteler.</p>
+        </div>
+      </div>
+
+      <div class="card-light p-5 flex gap-4 items-start">
+        <div class="icon-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6E56CF" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div>
+          <div style="font-family:'Hanken Grotesk',sans-serif;font-weight:700;color:#1C1629;margin-bottom:4px;">Yenileme Sezonunda Baskı Altındaki Yöneticiler</div>
+          <p style="font-size:13px;color:var(--muted);margin:0;line-height:1.65;">Poliçe yenileme döneminde müşteri kaçırmak istemeyen, yenileme riskini erken görmek isteyen satış yöneticileri.</p>
+        </div>
+      </div>
+
+      <div class="card-light p-5 flex gap-4 items-start">
+        <div class="icon-box">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6E56CF" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div>
+          <div style="font-family:'Hanken Grotesk',sans-serif;font-weight:700;color:#1C1629;margin-bottom:4px;">WhatsApp Tabanlı Çalışan Acenteler</div>
+          <p style="font-size:13px;color:var(--muted);margin:0;line-height:1.65;">WhatsApp ve e-posta üzerinden çalışan, karmaşık CRM kurmaya zaman bulamayan acenteler.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== §4 NASIL ÇALIŞIR ===== -->
+<section style="padding:4rem 1.25rem;background:#F8F5FF;">
+  <div class="max-w-4xl mx-auto">
+
+    <div class="text-center reveal" style="margin-bottom:2.5rem;">
+      <div class="sec-h2-row" style="justify-content:center;">
+        <div class="line"></div>
+        <h2 class="sec-h2" style="white-space:nowrap;">Ali Sigorta Acentesinde Nasıl Çalışır?</h2>
+        <div class="line"></div>
+      </div>
+      <p style="font-size:13px;color:var(--muted);max-width:440px;margin:.5rem auto 0;">Sabahtan akşama otomatik döngü — temsilci sadece satışa odaklanır.</p>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:1rem;" class="reveal">
+
+      <div class="card-light p-5 flex gap-4 items-start">
+        <div class="step-n">1</div>
+        <div>
+          <div style="font-family:'Hanken Grotesk',sans-serif;font-weight:700;color:#1C1629;margin-bottom:5px;font-size:15px;">Sabah — Günlük Ajanda</div>
+          <p style="font-size:14px;color:var(--muted);margin:0;line-height:1.75;">Ali, vadesi yaklaşan poliçeleri ve müşteri sıcaklık skorunu tarar. Her temsilciye o gün öncelikli kimi arayacağını, hangi teklifin takipte olduğunu ve son görüşme notunu hazır liste olarak gönderir.</p>
+        </div>
+      </div>
+
+      <div class="card-light p-5 flex gap-4 items-start">
+        <div class="step-n">2</div>
+        <div>
+          <div style="font-family:'Hanken Grotesk',sans-serif;font-weight:700;color:#1C1629;margin-bottom:5px;font-size:15px;">Gün İçi — Görüşme Takibi</div>
+          <p style="font-size:14px;color:var(--muted);margin:0;line-height:1.75;">Temsilci her görüşme sonrası notu sisteme girer. Ali bunu CRM'e yazar, satış sürecini günceller ve gerekirse takip hatırlatması oluşturur.</p>
+        </div>
+      </div>
+
+      <div class="card-light p-5 flex gap-4 items-start">
+        <div class="step-n">3</div>
+        <div>
+          <div style="font-family:'Hanken Grotesk',sans-serif;font-weight:700;color:#1C1629;margin-bottom:5px;font-size:15px;">Akşam — KPI Raporu</div>
+          <p style="font-size:14px;color:var(--muted);margin:0;line-height:1.75;">Günün tüm görüşmeleri özetlenir. Yönetici, branş bazlı dönüşüm oranlarını ve temsilci performansını gösteren KPI raporuna otomatik ulaşır.</p>
+        </div>
+      </div>
+
+      <div class="card-light p-5 flex gap-4 items-start">
+        <div class="step-n">4</div>
+        <div>
+          <div style="font-family:'Hanken Grotesk',sans-serif;font-weight:700;color:#1C1629;margin-bottom:5px;font-size:15px;">Sürekli — Yenileme Takibi</div>
+          <p style="font-size:14px;color:var(--muted);margin:0;line-height:1.75;">Poliçe yenileme tarihi yaklaşan firmalar otomatik işaretlenir ve öncelik sırasına alınır. Yenileme riski taşıyan hiçbir müşteri gözden kaçmaz.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== §5 VAKA: sigortan.biz ===== -->
+<section style="padding:4rem 1.25rem;background:#fff;">
+  <div class="max-w-4xl mx-auto">
+
+    <div class="text-center reveal" style="margin-bottom:2rem;">
+      <span class="badge-green" style="margin-bottom:.75rem;display:inline-flex;">
+        <svg width="8" height="8" viewBox="0 0 8 8"><circle cx="4" cy="4" r="4" fill="#16A34A"/></svg>
+        Canlı Kullanım
+      </span>
+      <h2 style="font-family:'Hanken Grotesk',sans-serif;font-size:clamp(20px,3vw,32px);font-weight:700;letter-spacing:-0.03em;color:#1C1629;margin:.5rem 0 .25rem;">sigortan.biz</h2>
+      <p style="font-size:13px;color:var(--muted);margin:0;">Sigorta acenteliği · İç satış yönetimi</p>
+    </div>
+
+    <div class="card-lavender p-6 md:p-8 reveal">
+
+      <!-- Senaryo -->
+      <div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:1.5rem;">
+        <div style="width:36px;height:36px;background:linear-gradient(135deg,#6E56CF,#BD45E6);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <div>
+          <div style="font-family:'Hanken Grotesk',sans-serif;font-weight:700;color:#1C1629;margin-bottom:8px;">Senaryo</div>
+          <p style="font-size:14px;line-height:1.8;color:#374151;margin:0;">
+            sigortan.biz, geniş bir firma portföyünü yöneten acente ekipleri için Ali'yi kullanıyor. Her sabah WhatsApp ve Google Sheets üzerinden temsilcilere poliçe vadelerine ve müşteri sıcaklık skoruna göre hazırlanmış öncelikli arama listesi otomatik gönderiliyor. Temsilciler gün içinde görüşme notlarını giriyor; Ali bunları CRM'e yazıyor ve satış sürecini güncelliyor. Akşam yönetici ekibin KPI raporuna otomatik ulaşıyor.
+          </p>
+        </div>
+      </div>
+
+      <!-- Aktif kanallar -->
+      <div style="border-top:1px solid rgba(110,86,207,.15);padding-top:1.25rem;margin-bottom:1.5rem;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.07em;text-transform:uppercase;margin-bottom:.75rem;">Aktif Kanallar</div>
+        <div style="display:flex;flex-wrap:wrap;gap:.5rem;">
+          <span style="background:#fff;border:1px solid #EBEAF6;border-radius:100px;padding:5px 14px;font-size:12px;font-weight:600;color:#1C1629;">💬 WhatsApp</span>
+          <span style="background:#fff;border:1px solid #EBEAF6;border-radius:100px;padding:5px 14px;font-size:12px;font-weight:600;color:#1C1629;">📊 Google Sheets</span>
+          <span style="background:#fff;border:1px solid #EBEAF6;border-radius:100px;padding:5px 14px;font-size:12px;font-weight:600;color:#1C1629;">📧 Gmail</span>
+        </div>
+      </div>
+
+      <!-- Metric placeholders (data-metric attributes rezerve — Hakan onayı sonrası) -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.75rem;">
+        <div class="metric-box">
+          <span class="metric-val" data-metric="yenileme-orani">—</span>
+          <span class="metric-lbl">Yenileme Oranı</span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-val" data-metric="ajanda-suresi">—</span>
+          <span class="metric-lbl">Günlük Ajanda</span>
+        </div>
+        <div class="metric-box">
+          <span class="metric-val" data-metric="kpi-raporu">—</span>
+          <span class="metric-lbl">Akşam KPI Raporu</span>
+        </div>
+      </div>
+      <p style="font-size:11px;color:var(--muted);text-align:center;margin:.75rem 0 0;">Performans rakamları yakında eklenecek.</p>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== §6 SSS ===== -->
+<section style="padding:4rem 1.25rem;background:#F8F5FF;">
+  <div class="max-w-3xl mx-auto">
+
+    <div class="text-center reveal" style="margin-bottom:2rem;">
+      <h2 style="font-family:'Hanken Grotesk',sans-serif;font-size:clamp(20px,3vw,34px);font-weight:700;letter-spacing:-0.03em;color:#1C1629;margin:0;">Sigorta Acentelerine Özel<br>Sıkça Sorulan Sorular</h2>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:.75rem;" class="reveal">
+
+      <div class="card-light" style="overflow:hidden;">
+        <button onclick="toggleFaq(this)" style="width:100%;text-align:left;padding:1.1rem 1.25rem;background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;">
+          <span style="font-family:'Hanken Grotesk',sans-serif;font-weight:600;color:#1C1629;font-size:15px;line-height:1.45;">Ali hangi sigorta branşlarını ayrı ayrı takip edebilir mi?</span>
+          <span class="faq-ico" style="font-size:1.4rem;color:#6E56CF;flex-shrink:0;margin-top:-1px;">+</span>
+        </button>
+        <div class="faq-ans">
+          <p style="padding:0 1.25rem 1.1rem;margin:0;font-size:14px;color:var(--muted);line-height:1.75;">Evet. Ali sağlık, elementer ve hayat sigortası branşlarını ayrı kategorilerde takip eder. Her branş için bağımsız vade takvimi ve hatırlatma kuralı tanımlanabilir.</p>
+        </div>
+      </div>
+
+      <div class="card-light" style="overflow:hidden;">
+        <button onclick="toggleFaq(this)" style="width:100%;text-align:left;padding:1.1rem 1.25rem;background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;">
+          <span style="font-family:'Hanken Grotesk',sans-serif;font-weight:600;color:#1C1629;font-size:15px;line-height:1.45;">Poliçe yenileme hatırlatmaları müşteriye mi, temsilciye mi gönderilir?</span>
+          <span class="faq-ico" style="font-size:1.4rem;color:#6E56CF;flex-shrink:0;margin-top:-1px;">+</span>
+        </button>
+        <div class="faq-ans">
+          <p style="padding:0 1.25rem 1.1rem;margin:0;font-size:14px;color:var(--muted);line-height:1.75;">Her iki yönde de çalışır. Temsilciye sabah ajanda olarak, müşteriye doğrudan WhatsApp veya e-posta ile — tercih acentenin akışına göre ayarlanır.</p>
+        </div>
+      </div>
+
+      <div class="card-light" style="overflow:hidden;">
+        <button onclick="toggleFaq(this)" style="width:100%;text-align:left;padding:1.1rem 1.25rem;background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;">
+          <span style="font-family:'Hanken Grotesk',sans-serif;font-weight:600;color:#1C1629;font-size:15px;line-height:1.45;">Mevcut Excel veya CRM verilerimi Ali'ye nasıl aktarırım?</span>
+          <span class="faq-ico" style="font-size:1.4rem;color:#6E56CF;flex-shrink:0;margin-top:-1px;">+</span>
+        </button>
+        <div class="faq-ans">
+          <p style="padding:0 1.25rem 1.1rem;margin:0;font-size:14px;color:var(--muted);line-height:1.75;">Excel veya Google Sheets aktarımı standart yöntemdir; kurulum adımında ekip sizi yönlendirir. Ortalama aktarım süresi yarım iş günü.</p>
+        </div>
+      </div>
+
+      <div class="card-light" style="overflow:hidden;">
+        <button onclick="toggleFaq(this)" style="width:100%;text-align:left;padding:1.1rem 1.25rem;background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;">
+          <span style="font-family:'Hanken Grotesk',sans-serif;font-weight:600;color:#1C1629;font-size:15px;line-height:1.45;">Birden fazla satış temsilcisi aynı anda kullanabilir mi?</span>
+          <span class="faq-ico" style="font-size:1.4rem;color:#6E56CF;flex-shrink:0;margin-top:-1px;">+</span>
+        </button>
+        <div class="faq-ans">
+          <p style="padding:0 1.25rem 1.1rem;margin:0;font-size:14px;color:var(--muted);line-height:1.75;">Evet. Ali çok kullanıcılı yapıda çalışır; her temsilci kendi kanalı ve müşteri listesiyle bağlanır, yönetici tüm ekibi tek ekrandan görür.</p>
+        </div>
+      </div>
+
+      <div class="card-light" style="overflow:hidden;">
+        <button onclick="toggleFaq(this)" style="width:100%;text-align:left;padding:1.1rem 1.25rem;background:none;border:none;cursor:pointer;display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;">
+          <span style="font-family:'Hanken Grotesk',sans-serif;font-weight:600;color:#1C1629;font-size:15px;line-height:1.45;">Müşteri arama geçmişi ve notlar nerede saklanır, KVKK uyumlu mu?</span>
+          <span class="faq-ico" style="font-size:1.4rem;color:#6E56CF;flex-shrink:0;margin-top:-1px;">+</span>
+        </button>
+        <div class="faq-ans">
+          <p style="padding:0 1.25rem 1.1rem;margin:0;font-size:14px;color:var(--muted);line-height:1.75;">Müşteri verileri ve görüşme notları erişim kontrollü sistemlerde saklanır ve KVKK kapsamında işlenir. Veri işleyen altyapı sağlayıcıları sözleşmeli hizmet kapsamında çalışır. Acentenizin özel KVKK gereksinimleri kurulumda netleştirilir.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ===== §7 CTA ===== -->
+<section style="padding:4rem 1.25rem 5rem;background:linear-gradient(135deg,#1C1629 0%,#2D1845 100%);">
+  <div class="max-w-3xl mx-auto text-center reveal">
+    <h2 style="font-family:'Hanken Grotesk',sans-serif;font-size:clamp(24px,4vw,42px);font-weight:700;letter-spacing:-0.04em;line-height:1.15;color:#fff;margin:0 0 1rem;">Sigorta Acentenizde Ali'yi Deneyin</h2>
+    <p style="font-size:15px;line-height:1.8;color:rgba(255,255,255,.7);max-width:520px;margin:0 auto 2rem;">Poliçe vadelerini kaçırmak, temsilci takibini kaybetmek, manuel raporlara zaman harcamak zorunda değilsiniz.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+      <a href="https://www.paytr.com/link/YEkv4tK" class="btn-primary">Ücretsiz Demo Al</a>
+      <a href="/#fiyatlandirma" class="btn-white">Fiyatları Gör</a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer style="border-top:1px solid #EBEAF6;padding:2.5rem 1.25rem 4rem;background:#F8F5FF;">
+  <div class="max-w-6xl mx-auto">
+
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;flex-wrap:wrap;gap:1rem;">
+      <img loading="lazy" src="../assets/img/favicon.png" alt="Ali" style="height:40px;width:auto;">
+      <div style="display:flex;align-items:center;gap:1.25rem;">
+        <a href="https://www.instagram.com/ali_salesai/" aria-label="Instagram" style="color:#6E717B;display:flex;"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+        <a href="https://www.facebook.com/alisales.ai" aria-label="Facebook" style="color:#6E717B;display:flex;"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+        <a href="https://www.linkedin.com/company/ali-sales-ai/" aria-label="LinkedIn" style="color:#6E717B;display:flex;"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:1.5rem 2.5rem;margin-bottom:.75rem;font-size:.875rem;font-weight:500;color:#1C1629;">
+      <a href="/"              style="color:#1C1629;text-decoration:none;">Ali</a>
+      <a href="/#cozumler"     style="color:#1C1629;text-decoration:none;">Çözümler</a>
+      <a href="/#ozellikler"   style="color:#1C1629;text-decoration:none;">Özellikler</a>
+      <a href="/#fiyatlandirma" style="color:#1C1629;text-decoration:none;">Fiyatlandırma</a>
+      <a href="https://www.paytr.com/link/YEkv4tK" style="color:#6E56CF;text-decoration:none;">%50 İndirimle Başla</a>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:1.5rem 2.5rem;margin-bottom:2rem;font-size:.875rem;color:#6E717B;">
+      <a href="/iletisim"           style="color:#6E717B;text-decoration:none;">İletişim</a>
+      <a href="/kullanim-sartlari"  style="color:#6E717B;text-decoration:none;">Kullanım Şartları</a>
+      <a href="/gizlilik-politikasi" style="color:#6E717B;text-decoration:none;">Gizlilik</a>
+      <a href="/refund-policy"      style="color:#6E717B;text-decoration:none;">İade-İptal Politikası</a>
+    </div>
+
+    <div style="border-top:1px solid #EBEAF6;padding-top:1.5rem;display:flex;flex-direction:column;gap:.4rem;">
+      <div style="color:#6E56CF;font-family:'Hanken Grotesk',sans-serif;font-weight:600;font-size:.875rem;">Türkiye'nin Bitirim Satışçısı: Satıştaki Sağ Kolunuz</div>
+      <p style="color:#6E717B;font-size:.875rem;margin:0;">© 2025 ALI · Esnaf zekâsı + AI zekâsı ile üretildi.</p>
+    </div>
+
+  </div>
+</footer>
+
+<script>
+  // Navbar scroll effect
+  var nav = document.getElementById('navbar');
+  window.addEventListener('scroll', function() {
+    nav.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
+
+  // Mobile menu
+  document.getElementById('hamBtn').addEventListener('click', function() {
+    document.getElementById('mobMenu').classList.add('open');
+  });
+  document.getElementById('mobClose').addEventListener('click', function() {
+    document.getElementById('mobMenu').classList.remove('open');
+  });
+
+  // FAQ accordion — one open at a time
+  function toggleFaq(btn) {
+    var ans = btn.nextElementSibling;
+    var ico = btn.querySelector('.faq-ico');
+    var isOpen = ans.classList.contains('open');
+    document.querySelectorAll('.faq-ans').forEach(function(el) { el.classList.remove('open'); });
+    document.querySelectorAll('.faq-ico').forEach(function(el) { el.classList.remove('open'); });
+    if (!isOpen) { ans.classList.add('open'); ico.classList.add('open'); }
+  }
+
+  // Reveal on scroll (IntersectionObserver)
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(e) {
+      if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }
+    });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(function(el) { obs.observe(el); });
+</script>
+
+</body>
+</html>

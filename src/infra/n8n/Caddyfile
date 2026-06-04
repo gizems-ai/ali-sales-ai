@@ -1,0 +1,39 @@
+n8n.alisales.ai {
+
+    # Webhook path — public, iframe izinli (Softr embed)
+    @webhook path /webhook/* /webhook-test/*
+    handle @webhook {
+        header {
+            Strict-Transport-Security "max-age=31536000; includeSubDomains"
+            X-Content-Type-Options "nosniff"
+            Referrer-Policy "strict-origin-when-cross-origin"
+            X-Frame-Options "ALLOWALL"
+            Content-Security-Policy "frame-ancestors *;"
+            -Server
+        }
+        reverse_proxy n8n:5678 {
+            flush_interval -1
+        }
+    }
+
+    # Diğer tüm path'ler — iframe engelli
+    handle {
+        header {
+            Strict-Transport-Security "max-age=31536000; includeSubDomains"
+            X-Content-Type-Options "nosniff"
+            X-Frame-Options "DENY"
+            Referrer-Policy "strict-origin-when-cross-origin"
+            -Server
+        }
+        reverse_proxy n8n:5678 {
+            flush_interval -1
+        }
+    }
+
+    log {
+        output file /var/log/caddy/n8n.log {
+            roll_size 10mb
+            roll_keep 5
+        }
+    }
+}

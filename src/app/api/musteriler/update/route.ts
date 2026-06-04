@@ -1,0 +1,156 @@
+import { type NextRequest } from 'next/server'
+import { currentUser } from '@clerk/nextjs/server'
+import { getMusterilerIzni } from '@/lib/musteriler-izin'
+import { getTenantConfigFromRequest } from '@/lib/yetki'
+import { atTableUrl, translatePatch } from '@/lib/tenants'
+
+const EDITILEBILIR = new Set([
+  'Firma Adı', 'Sektör', 'İl / İlçe', 'Adres', 'Genel Telefon', 'Genel Mail',
+  'Web Sitesi', 'LinkedIn URL', 'Son İletişim Kanalı', 'Son İletişim Tarihi',
+  'Branş', 'Vade Ayı Grubu', 'Sağlık Poliçe Türü', 'Sağlık Vade Tarihi',
+  'Elementer Ürün', 'Elementer Vade', 'Mevcut Aracı Kurum', 'Kişi Sayısı',
+  'Ürün', 'Öncelik', 'Bugün Aranacak', '2026 Arandı mı', '2026 Ulaşıldı mı',
+  'Sonra Ara Tarihi', 'Son Durum 2026', 'Kaybedilme Nedeni', 'Ali Özeti',
+  'Branş Onaylandı', 'Cross-Sell İmkânı', 'Global Anlaşma',
+])
+
+const DATE_ALANLARI = [
+  'Son İletişim Tarihi', 'Sağlık Vade Tarihi', 'Elementer Vade', 'Sonra Ara Tarihi',
+]
+
+export async function PATCH(req: NextRequest) {
+  const [izin, cfg] = await Promise.all([
+    getMusterilerIzni(),
+    getTenantConfigFromRequest(),
+  ])
+  if (izin.tip === 'yok') return Response.json({ error: 'Yetkisiz' }, { status: 403 })
+  if (!cfg) return Response.json({ error: 'Tenant bulunamıyor' }, { status: 403 })
+
+  let body: { recordId?: string; fields?: Record<string, unknown>; notEkle?: string }
+  try { body = await req.json() }
+  catch { return Response.json({ error: 'Geçersiz JSON' }, { status: 400 }) }
+
+  const { recordId, fields = {}, notEkle } = body
+  if (!recordId || !/^rec[A-Za-z0-9]+$/.test(recordId)) {
+    return Response.json({ error: 'Geçersiz recordId' }, { status: 400 })
+  }
+
+  const token = process.env.AIRTABLE_TOKEN
+  if (!token) return Response.json({ error: 'Token eksik' }, { status: 500 })
+
+  const BASE_URL = atTableUrl(cfg, 'firmalar')
+
+  let checkRes: Response
+  try {
+    checkRes = await fetch(`${BASE_URL}/${recordId}`, {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: 'no-store',
+    })
+  } catch {
+    return Response.json({ error: 'Airtable bağlantı hatası' }, { status: 503 })
+  }
+  if (checkRes.status === 404) return Response.json({ error: 'Kayıt bulunamadı' }, { status: 404 })
+  if (checkRes.status === 429) return Response.json({ error: 'Limit aşıldı, lütfen bekleyin' }, { status: 429 })
+  if (!checkRes.ok) return Response.json({ error: 'Airtable iletişim hatası' }, { status: 502 })
+
+  const checkRec = await checkRes.json()
+  const atanan: string | undefined = checkRec.fields?.['Atanan Temsilci']
+  const prevFields = {
+    'Son İletişim Tarihi':   checkRec.fields?.['Son İletişim Tarihi']   ?? null,
+    '2026 Arandı mı':        checkRec.fields?.['2026 Arandı mı']        ?? false,
+    '2026 Ulaşıldı mı':      checkRec.fields?.['2026 Ulaşıldı mı']      ?? false,
+    'Sonra Ara Tarihi':      checkRec.fields?.['Sonra Ara Tarihi']      ?? null,
+  }
+
+  if (atanan === cfg.airtable.sistemAdi) return Response.json({ error: 'Yetkisiz' }, { status: 403 })
+  if (izin.tip === 'temsilci' && atanan !== izin.temsilci) {
+    return Response.json({ error: 'Yetkisiz' }, { status: 403 })
+  }
+
+  const patchFields: Record<string, unknown> = {}
+
+  for (const [key, value] of Object.entries(fields)) {
+    if (key === 'Atanan Temsilci') {
+      if (izin.tip !== 'yönetici') {
+        return Response.json({ error: 'Atanan Temsilci: yalnızca yönetici değiştirebilir' }, { status: 403 })
+      }
+      patchFields[key] = value
+      continue
+    }
+    if (EDITILEBILIR.has(key)) patchFields[key] = value
+  }
+
+  if ('Firma Adı' in patchFields) {
+    const v = String(patchFields['Firma Adı'] ?? '').trim()
+    if (!v) return Response.json({ error: 'Firma adı boş olamaz' }, { status: 422 })
+    patchFields['Firma Adı'] = v
+  }
+  if (patchFields['Genel Mail']) {
+    const m = String(patchFields['Genel Mail'])
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m)) {
+      return Response.json({ error: 'Geçersiz e-posta formatı' }, { status: 422 })
+    }
+  }
+  for (const df of DATE_ALANLARI) {
+    if (patchFields[df] && !/^\d{4}-\d{2}-\d{2}$/.test(String(patchFields[df]))) {
+      return Response.json({ error: `${df}: geçersiz tarih (YYYY-MM-DD)` }, { status: 422 })
+    }
+  }
+
+  if (notEkle?.trim()) {
+    const user = await currentUser()
+    const adSoyad = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Kullanıcı'
+
+    const noteQS = new URLSearchParams()
+    noteQS.append('fields[]', 'Birikimli Görüşme Notları')
+    let mevcutNot = ''
+    try {
+      const noteRes = await fetch(`${BASE_URL}/${recordId}?${noteQS}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        cache: 'no-store',
+      })
+      if (noteRes.ok) {
+        const noteRec = await noteRes.json()
+        mevcutNot = String(noteRec.fields?.['Birikimli Görüşme Notları'] ?? '')
+      }
+    } catch { /* mevcut not okunamadı, yeni not tek başına yazılır */ }
+
+    const now = new Date()
+    const tarih = now.toLocaleString('tr-TR', {
+      timeZone: 'Europe/Istanbul',
+      day: 'numeric', month: 'long', year: 'numeric',
+      hour: '2-digit', minute: '2-digit',
+    })
+
+    patchFields['Birikimli Görüşme Notları'] = mevcutNot
+      ? `${mevcutNot}\n\n--- [${tarih}] ${adSoyad} ---\n${notEkle.trim()}`
+      : `--- [${tarih}] ${adSoyad} ---\n${notEkle.trim()}`
+  }
+
+  if (Object.keys(patchFields).length === 0) {
+    return Response.json({ ok: true, changed: 0 })
+  }
+
+  const actualPatchFields = translatePatch(cfg, 'firmalar', patchFields)
+
+  let patchRes: Response
+  try {
+    patchRes = await fetch(`${BASE_URL}/${recordId}`, {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fields: actualPatchFields }),
+      cache: 'no-store',
+    })
+  } catch {
+    return Response.json({ error: 'Airtable bağlantı hatası' }, { status: 503 })
+  }
+
+  if (patchRes.status === 429) return Response.json({ error: 'Limit aşıldı, lütfen bekleyin' }, { status: 429 })
+  if (!patchRes.ok) {
+    const text = await patchRes.text()
+    return Response.json({ error: `Airtable ${patchRes.status}: ${text.slice(0, 120)}` }, { status: 502 })
+  }
+
+  const updated = await patchRes.json()
+  return Response.json({ ok: true, fields: updated.fields, prev: prevFields })
+}

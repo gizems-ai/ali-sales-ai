@@ -1,0 +1,188 @@
+{
+  "meta": {
+    "olusturma_tarihi": "2026-05-23",
+    "amac": "Görev 3 — Sektörel sayfa şablonu için vaka envanteri ve içerik taslakları",
+    "kanit_kurali": "Olgunluk=kuruluyor vakalar için sayısal sonuç, dönüşüm oranı veya rakam iddiası YOK. Sadece senaryo ve yapı.",
+    "gizli_alan_notu": "Gerçek müşteri verileri (firma listesi, temsilci adları, Airtable ID'leri) bu dosyada yer almaz — operasyonel güvenlik gereği."
+  },
+
+  "vakalar": [
+
+    {
+      "id": "sigortan-biz",
+      "isim": "sigortan.biz",
+      "sektor": "Sigorta acenteliği",
+      "olgunluk": "canli",
+      "alt_model": "iç_satis_yonetimi",
+      "not": "Bu vaka doğrudan müşteri chatbotu değil; Ali satış ekibini (temsilciler) yönetir. Sektörel sayfada 'acente sahipleri için' perspektifinden yazılmalı.",
+
+      "ana_kanal": [
+        "WhatsApp (temsilci-müşteri görüşmeleri)",
+        "Google Sheets (günlük satış listesi)",
+        "Gmail (sabah ajandası + akşam KPI raporu)"
+      ],
+
+      "kullanim_senaryosu": "Ali, binlerce sigortalı firmayı takip eden acente ekipleri için her sabah öncelikli arama listesini poliçe vadeleri ve sıcaklık skoruna göre otomatik hazırlar. Temsilciler gün boyunca görüşme notlarını girer; Ali bunları CRM'e yazar, pipeline'ı günceller ve akşam yöneticiye KPI özeti sunar. Yenileme tarihi yaklaşan firmalar hiçbir zaman gözden kaçmaz.",
+
+      "40_60_cevap_taslagi": "Ali, sigorta acentelerinde çalışan satış temsilcileri için her sabah poliçe vade takvimini, müşteri sıcaklık skorunu ve arama önceliklerini otomatik olarak hesaplar. Temsilci, o gün kimi araması gerektiğini, hangi teklifin takipte olduğunu ve son görüşme notunu hazır liste olarak alır; akşam yönetici ekibin günlük KPI raporuna ulaşır.",
+
+      "ssss_adaylari": [
+        "Ali hangi sigorta branşlarını (sağlık, elementer, hayat) ayrı ayrı takip edebilir mi?",
+        "Poliçe yenileme hatırlatmaları müşteriye mi, temsilciye mi gönderilir?",
+        "Mevcut Excel veya CRM verilerimi Ali'ye nasıl aktarırım?",
+        "Birden fazla satış temsilcisi aynı anda kullanabilir mi?",
+        "Müşteri arama geçmişi ve notlar nerede saklanır, KVKK uyumlu mu?"
+      ],
+
+      "gosterge_sayfa_slug": "/sigorta-acenteleri"
+    },
+
+    {
+      "id": "fiscus-ai",
+      "isim": "Fiscus AI",
+      "sektor": "Fintech / Mali müşavirlik",
+      "olgunluk": "canli",
+      "alt_model": "musteri_chatbotu_ve_lead_yonetimi",
+
+      "ana_kanal": [
+        "WhatsApp",
+        "Web (chatbot)",
+        "E-posta"
+      ],
+
+      "kullanim_senaryosu": "Ali, mali müşavir ve vergi danışmanlığı ofislerinin kanallarından gelen müşteri sorularını yanıtlar. Vergi beyannamesi, SGK bildirimi, bilanço gibi takvim bazlı hizmetler için hatırlatmalar gönderir; potansiyel müşterilere ön bilgilendirme yapar ve nitelikli başvuruları ofis takvimindeki randevuya yönlendirir.",
+
+      "40_60_cevap_taslagi": "Ali, mali müşavir ofislerinin WhatsApp, web ve e-posta kanallarından gelen müşteri sorularını 7/24 yanıtlar; vergi beyannamesi ve SGK bildirimi tarihleri yaklaşan müşterilere otomatik hatırlatma gönderir, danışma randevusu organize eder ve yeni başvuruları ön bilgilendirme sonrası nitelikli lead olarak CRM'e kaydeder.",
+
+      "ssss_adaylari": [
+        "Ali beyanname ve ödeme takvimlerini otomatik takip edebilir mi?",
+        "Müşteriye özel vergi hatırlatması nasıl kurulur?",
+        "Yeni potansiyel müşterinin başvurusu Ali'ye nasıl düşer?",
+        "Mali müşavir ofisindeki farklı danışmanlar aynı sistemi kullanabilir mi?",
+        "Müşteri finansal verileri güvenli mi, kim görebilir?"
+      ],
+
+      "gosterge_sayfa_slug": "/mali-musavirlik"
+    },
+
+    {
+      "id": "turkeyhealth-care",
+      "isim": "TurkeyHealth.care",
+      "sektor": "Sağlık turizmi",
+      "olgunluk": "canli",
+      "alt_model": "cok_dilli_hasta_yolculugu",
+      "not": "3 dil (EN/DE/TR), 50-75 yaş Avrupalı hasta hedef kitlesi. Ali, sitedeki AliChatDrawer üzerinden entegre çalışıyor.",
+
+      "ana_kanal": [
+        "Web sitesi chatbotu (AliChatDrawer — İngilizce/Almanca/Türkçe)",
+        "WhatsApp",
+        "E-posta (Resend / ali@turkeyhealth.care)"
+      ],
+
+      "kullanim_senaryosu": "Ali, Türkiye'ye tedavi için gelen uluslararası hastaların dilinde (İngilizce, Almanca, Türkçe) tedavi seçeneklerini açıklar ve fiyat aralığını iletir. 11 soruluk planlayıcı akışıyla hastanın ihtiyacını anlar, uygun paket ve şehri önerir, e-posta üzerinden kişisel plan gönderir ve hastane randevu sürecini koordine eder.",
+
+      "40_60_cevap_taslagi": "Ali, Türkiye'ye medikal tedavi için gelen 50-75 yaş uluslararası hastaların İngilizce, Almanca ve Türkçe sorularını web ve WhatsApp üzerinden yanıtlar; tedavi seçeneklerini açıklar, fiyat aralığını iletir, hasta profiline göre uygun şehir ve hastane önerir, randevuyu organize eder ve tedavi sürecini başından sonuna koordine eder.",
+
+      "ssss_adaylari": [
+        "Türkiye'de tedavi Almanya veya Avrupa'ya kıyasla ne kadar uygun?",
+        "Hangi tedavi türlerinde (diş, göz, ortopedi, estetik) destek alabiliyorum?",
+        "Hastane güvenilirliği nasıl belgeleniyor (JCI/ISO akreditasyon)?",
+        "Seyahat sigortası ve Alman Krankenkasse ile uyum nasıl sağlanır?",
+        "Tedavi planımı görmek için ne yapmalıyım?"
+      ],
+
+      "gosterge_sayfa_slug": "/saglik-turizmi"
+    },
+
+    {
+      "id": "turkiye-nomad-fest",
+      "isim": "Türkiye Nomad Fest",
+      "sektor": "Etkinlik / Dijital göçebe topluluğu",
+      "olgunluk": "canli",
+      "alt_model": "etkinlik_katilimci_yonetimi",
+      "not": "Site: handoff-ebon.vercel.app (DNS: turkiyenomadfest.com → Bluehost A kaydı bekliyor). Sezonluk etkinlik modeli; sayfa hazır olduğunda katılımcı soruları yoğunlaşır.",
+
+      "ana_kanal": [
+        "Instagram DM",
+        "WhatsApp",
+        "E-posta"
+      ],
+
+      "kullanim_senaryosu": "Ali, dijital göçebe buluşmaları ve nomad etkinliklerinin Instagram DM ve WhatsApp kanallarından gelen katılım, bilet ve program sorularını yanıtlar; kayıt bilgilerini iletir, konaklama ve ulaşım rehberliği yapar, etkinlik güncellemelerini otomatik dağıtır ve organizatörün yüzlerce katılımcı mesajını tek ekrandan takip etmesini sağlar.",
+
+      "40_60_cevap_taslagi": "Ali, dijital göçebe etkinlikleri için Instagram DM, WhatsApp ve e-posta kanallarından gelen katılımcı sorularını 7/24 yanıtlar; kayıt ve bilet sürecini yönetir, program ve konaklama bilgilerini iletir, etkinlik güncellemelerini otomatik dağıtır ve organizatörün tüm katılımcı iletişimini tek ekrandan koordine etmesini sağlar.",
+
+      "ssss_adaylari": [
+        "Etkinliğe nasıl kayıt olabilirim, bilet nereden alınır?",
+        "Ali birden fazla etkinlik sezonunu aynı anda yönetebilir mi?",
+        "Katılımcılara toplu güncelleme veya duyuru nasıl gönderilir?",
+        "Son dakika iptal veya değişikliklerde katılımcılar nasıl bilgilendirilir?"
+      ],
+
+      "gosterge_sayfa_slug": "/etkinlik-organizasyonu"
+    },
+
+    {
+      "id": "kenya-trip-advisor",
+      "isim": "Kenya Trip Advisor",
+      "sektor": "Seyahat / Uluslararası tur operatörlüğü",
+      "olgunluk": "kuruluyor",
+      "alt_model": "rezervasyon_ve_tur_yonetimi",
+      "not": "Ali henüz kurulmadı. Rakam ve sonuç iddiası YOK. Aşağıdaki senaryo sektör mantığına dayanır.",
+
+      "ana_kanal": [
+        "belirlenecek",
+        "Instagram DM (beklenen)",
+        "WhatsApp (beklenen)"
+      ],
+
+      "kullanim_senaryosu": "Ali, uluslararası tur operatörlerinin Instagram, WhatsApp ve web kanallarından gelen paket tur, güzergah ve fiyat sorularını yanıtlar. Müşteri tercihlerine göre rota önerir, rezervasyon sürecini başlatır, ön ödeme bilgisini iletir ve onay sonrasında seyahat detayları ile destinasyon rehberini otomatik gönderir.",
+
+      "40_60_cevap_taslagi": "Ali, uluslararası tur operatörlerinin Instagram DM, WhatsApp ve web kanallarından gelen tur paketi ve güzergah sorularını 7/24 yanıtlar; müşteri tercihine göre rota önerir, rezervasyon sürecini başlatır, ödeme bilgisini iletir ve onay sonrasında seyahat detayları ile destinasyon rehberini otomatik olarak gönderir.",
+
+      "ssss_adaylari": [
+        "Özel veya grup tur paketi nasıl oluşturulur?",
+        "Fiyat teklifi almak için ne yapmam gerekiyor?",
+        "Rezervasyon güvencesi ve iptal koşulları nelerdir?",
+        "Vize ve seyahat sigortası konusunda destek alabilir miyim?",
+        "Son dakika değişikliklerinde Ali nasıl bildirim yapar?"
+      ],
+
+      "gosterge_sayfa_slug": "/seyahat-acenteleri"
+    },
+
+    {
+      "id": "jsoil",
+      "isim": "J'Soil",
+      "sektor": "Wellness / Aromaterapi e-ticaret",
+      "olgunluk": "kuruluyor",
+      "alt_model": "eticaret_musteri_hizmetleri",
+      "not": "Ali henüz kurulmadı. Rakam ve sonuç iddiası YOK. Aşağıdaki senaryo sektör mantığına dayanır.",
+
+      "ana_kanal": [
+        "belirlenecek",
+        "Instagram DM (beklenen)",
+        "WhatsApp (beklenen)"
+      ],
+
+      "kullanim_senaryosu": "Ali, aromaterapi ve doğal bakım ürünleri markalarının Instagram DM ve WhatsApp kanallarından gelen ürün sorusu, cilt tipi danışmanlığı ve sipariş takip taleplerini yönetir. Müşterinin ihtiyacına göre ürün önerir, sipariş ve kargo sürecini otomatik bildirir, yeni koleksiyon ve kampanya duyurularını düzenli müşterilere iletir.",
+
+      "40_60_cevap_taslagi": "Ali, aromaterapi ve doğal bakım ürünleri markalarının Instagram DM ve WhatsApp kanallarından gelen ürün sorularını yanıtlar; müşterinin cilt tipine ve ihtiyacına göre ürün önerir, sipariş sürecini yönetir, kargo takibini otomatik paylaşır ve yeni koleksiyon ile kampanya bilgilerini düzenli müşterilere iletir.",
+
+      "ssss_adaylari": [
+        "Cilt tipime uygun ürünü nasıl seçebilirim?",
+        "Sipariş takibimi Ali üzerinden öğrenebilir miyim?",
+        "İade ve değişim sürecini Ali yönetebilir mi?",
+        "Toplu sipariş veya kurumsal satın alma için nasıl iletişime geçebilirim?"
+      ],
+
+      "gosterge_sayfa_slug": "/wellness-eticaret"
+    }
+
+  ],
+
+  "sablon_notu": {
+    "cokaltma_rehberi": "Her yeni sektör için şu 6 alan değiştirilir: sektor, ana_kanal, kullanim_senaryosu, 40_60_cevap_taslagi, ssss_adaylari, gosterge_sayfa_slug. Görünür metinler Türkçe kalır. Olgunluk=kuruluyor vakalar için ssss_adaylari hipotetik yazılır, sayısal sonuç girilmez.",
+    "gorev3_pilot": "Görev 3 pilotu sigortan.biz vakasıdır — senaryo en olgun, alan verisi en zengin, SSS en spesifik. Şablon bu vakadan türetilir."
+  }
+}

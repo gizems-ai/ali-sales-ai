@@ -1,0 +1,54 @@
+# Ali Sales AI
+
+> Ali, Türk KOBİ'ler ve girişimciler için WhatsApp, Instagram ve e-posta üzerinden çalışan yapay zeka satış asistanı ve satış otomasyon sistemidir. Müşteri mesajlarını 7/24 otomatik yönetir, satış sürecini takip eder, randevu organize eder ve günlük KPI raporunu hazırlar.
+
+Ali bir chatbot değil; CRM, satış asistanı ve iş zekası sistemi bir aradaDır. Sigorta acenteliği, mali müşavirlik, sağlık turizmi, etkinlik organizasyonu, seyahat acenteliği ve e-ticaret sektörlerinde aktif olarak kullanılmaktadır.
+
+## Ana Sayfa
+
+- [Ali Sales AI — Ana Sayfa](https://www.alisales.ai/): WhatsApp ve Instagram satış otomasyonu, fiyatlandırma, SSS ve demo.
+
+## Ürün Özellikleri
+
+Ali'nin temel işlevleri:
+- Tüm kanallardan (WhatsApp, Instagram DM, e-posta) gelen mesajları tek ekranda toplar
+- Müşteriyi tanır, satış aşamasını takip eder, fırsatları tespit eder
+- Randevu hatırlatmaları ve poliçe vadeleri gibi takvim bazlı görevleri otomatize eder
+- Sabah öncelikli arama listesi ve akşam KPI özeti hazırlar
+- Türkçe, doğal ve akıcı konuşur; Türk satış kültürüne uygun dil kullanır
+
+## Fiyatlandırma
+
+Üç paket mevcuttur (TRY, aylık):
+- Başlangıç: 1.490 TRY/ay — tek kanal, temel otomasyon
+- Büyüme: orta ölçekli işletmeler için çok kanallı
+- İşletme: 9.990 TRY/ay — büyüyen ekipler, gelişmiş raporlama
+
+Beta dönemi: %100 ücret iadesi garantisi geçerlidir.
+
+## Sıkça Sorulan Sorular
+
+- Ali sadece chatbot mudur? Hayır. CRM, satış asistanı ve iş zekası sistemi bir arada.
+- Kurulum zor mu? Teknik bilgi gerekmez; ortalama kurulum 5 dakika.
+- Veriler güvende mi? KVKK kapsamında, şifrelenmiş sunucularda saklanır.
+- WhatsApp nasıl bağlanır? Meta Business API üzerinden; adım adım rehber sağlanır.
+- Ek maliyet var mı? Aylık abonelik dışında gizli ücret yoktur.
+
+## Aktif Kullanım Sektörleri
+
+- Sigorta acenteliği: poliçe vade takibi, temsilci sabah ajandası, akşam KPI raporu
+- Mali müşavirlik: beyanname takvimi, SGK bildirimi hatırlatmaları, randevu yönetimi
+- Sağlık turizmi: çok dilli hasta yolculuğu (TR/EN/DE), tedavi koordinasyonu
+- Etkinlik organizasyonu: katılımcı soruları, bilet ve kayıt yönetimi
+- Seyahat acenteliği: paket tur sorguları, rezervasyon ve destinasyon rehberi
+- E-ticaret / wellness: ürün danışmanlığı, sipariş takibi, kampanya bildirimleri
+
+## Sektörel Sayfalar
+
+- [Sigorta Acenteleri için Ali](https://www.alisales.ai/sigorta-acenteleri): Poliçe vade takibi, sabah öncelikli arama listesi, acente ekibi için günlük KPI raporu ve satış süreci otomasyonu.
+
+## İletişim
+
+- Web: https://www.alisales.ai/iletisim
+- Instagram: https://www.instagram.com/ali_salesai/
+- Telefon: +90-532-302-2945

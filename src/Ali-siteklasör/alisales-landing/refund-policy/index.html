@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>İade ve İptal Politikası — Ali Sales AI</title>
+  <link rel="icon" href="../assets/img/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{fontFamily:{sans:['Inter','sans-serif'],heading:['Hanken Grotesk','sans-serif']}}}}</script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box}
+    html{overflow-x:hidden}
+    body{font-family:'Inter',sans-serif;color:#1C1629;background:#fff;overflow-x:hidden;font-size:16px;line-height:1.7;-webkit-font-smoothing:antialiased}
+    ::-webkit-scrollbar{width:5px} ::-webkit-scrollbar-thumb{background:#6E56CF;border-radius:3px}
+    .navbar{position:fixed;top:0;width:100%;z-index:100;transition:all .3s ease}
+    .navbar.scrolled{background:rgba(255,255,255,.9);backdrop-filter:blur(16px);box-shadow:0 1px 0 rgba(110,86,207,.1)}
+    .mob-menu{display:none;position:fixed;inset:0;background:rgba(28,22,41,.97);z-index:200;flex-direction:column;align-items:center;justify-content:center;gap:2rem}
+    .mob-menu.open{display:flex}
+    .cw{position:fixed;bottom:2rem;right:2rem;z-index:999}
+    .prose h2{font-family:'Hanken Grotesk',sans-serif;font-size:1.25rem;font-weight:700;color:#1C1629;margin:2rem 0 .75rem;letter-spacing:-.02em}
+    .prose p{color:#374151;margin-bottom:1rem;font-size:.9375rem}
+    @media(max-width:768px){.desk-nav,.desk-btn{display:none!important}.ham{display:flex!important}}
+    @media(min-width:769px){.ham{display:none!important}}
+  </style>
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+  <div class="max-w-7xl mx-auto px-5 py-3.5 flex items-center justify-between">
+    <a href="/" class="flex-shrink-0"><img src="../assets/img/ali-logo.png" alt="Ali" class="h-8 w-auto"></a>
+    <div class="desk-nav flex items-center gap-2">
+      <a href="https://www.alisales.ai/checkout" style="background:rgba(224,232,255,0);border:1px solid #6E56CF;color:#6E56CF;font-family:'Hanken Grotesk',sans-serif;font-weight:500;padding:.45rem 1.1rem;border-radius:8px;text-decoration:none;display:inline-flex;align-items:center;font-size:.875rem;letter-spacing:-.03em;transition:all .2s;" onmouseover="this.style.background='rgba(110,86,207,.07)'" onmouseout="this.style.background='rgba(224,232,255,0)'">Satın al</a>
+      <div class="flex items-center gap-6 text-sm font-medium text-[#1C1629] ml-3">
+        <a href="/#cozumler" class="hover:text-[#6E56CF] transition">Çözümler</a>
+        <a href="/#ozellikler" class="hover:text-[#6E56CF] transition">Özellikler</a>
+        <a href="/#fiyatlandirma" class="hover:text-[#6E56CF] transition">Fiyatlandırma</a>
+        <a href="/#iletisim" class="hover:text-[#6E56CF] transition">İletişim</a>
+      </div>
+    </div>
+    <a href="https://panel.alisales.ai" class="desk-btn" style="background:transparent;border:1px solid #BD45E6;color:#1C1629;font-family:'Hanken Grotesk',sans-serif;font-weight:600;padding:.5rem 1.25rem;border-radius:100px;text-decoration:none;display:inline-flex;align-items:center;font-size:.875rem;box-shadow:0 1px 4px rgba(45,24,93,.15);transition:all .2s;" onmouseover="this.style.background='rgba(189,69,230,.06)'" onmouseout="this.style.background='transparent'">Giriş</a>
+    <button class="ham flex-col gap-1.5 cursor-pointer" id="hamBtn">
+      <span class="block w-6 h-0.5 bg-[#1C1629] rounded"></span>
+      <span class="block w-6 h-0.5 bg-[#1C1629] rounded"></span>
+      <span class="block w-6 h-0.5 bg-[#1C1629] rounded"></span>
+    </button>
+  </div>
+</nav>
+
+<div class="mob-menu" id="mobMenu">
+  <button id="mobClose" class="absolute top-6 right-6 text-white text-3xl">✕</button>
+  <a href="/#cozumler" class="text-2xl font-semibold text-white" style="font-family:'Hanken Grotesk',sans-serif">Çözümler</a>
+  <a href="/#ozellikler" class="text-2xl font-semibold text-white" style="font-family:'Hanken Grotesk',sans-serif">Özellikler</a>
+  <a href="/#fiyatlandirma" class="text-2xl font-semibold text-white" style="font-family:'Hanken Grotesk',sans-serif">Fiyatlandırma</a>
+  <a href="/#iletisim" class="text-2xl font-semibold text-white" style="font-family:'Hanken Grotesk',sans-serif">İletişim</a>
+</div>
+
+<main class="pt-32 pb-24 px-5">
+  <div class="max-w-3xl mx-auto">
+    <p class="text-sm text-[#6E56CF] font-semibold mb-2">Son Güncelleme: 09.01.2026</p>
+    <h1 style="font-family:'Hanken Grotesk',sans-serif;font-size:clamp(28px,4vw,42px);font-weight:700;letter-spacing:-.03em;color:#1C1629;margin-bottom:8px;">İade ve İptal Politikası</h1>
+    <p class="text-[#6E717B] text-sm mb-10">Ali Sales AI — alisales.ai</p>
+
+    <div class="prose">
+      <p>Ali Sales AI, Gizem Burteçin adına faaliyet gösteren, abonelik bazlı bir dijital yazılım hizmetidir (SaaS). Bu hizmet, ticari marka adı olarak "Ali Sales AI" markası altında sunulmaktadır.</p>
+
+      <h2>1. İade Politikası</h2>
+      <p>Ali Sales AI dijital içerik ve anında erişim sağlanan yazılım hizmeti sunduğundan, ilgili tüketici koruma mevzuatı uyarınca iade zorunluluğu bulunmamaktadır.</p>
+      <p>Teknik arızalar veya giderilemeyen erişim sorunlarında iade talepleri değerlendirmeye alınabilir.</p>
+
+      <h2>2. Abonelik İptali</h2>
+      <p>Kullanıcılar dilediği zaman aboneliği iptal edebilir. İptal edilen abonelikler mevcut fatura döneminin sonuna kadar aktif kalır. İptal sonrası yeni ücret tahsil edilmez. Dönem ortasında iptaller için iade yapılmaz.</p>
+
+      <h2>3. Deneme ve Kampanyalar</h2>
+      <p>Deneme, promosyon veya indirimli dönemlerde başlatılan aboneliklerde iade yapılmaz.</p>
+
+      <h2>4. Ödeme Altyapısı</h2>
+      <p>Ödemeler PAYTR aracılığıyla alınır. Ürün/hizmet kararları Gizem Burteçin sorumluluğundadır.</p>
+
+      <h2>5. İletişim</h2>
+      <p>İade ve iptal talepleri: <a href="mailto:info@alisales.ai" style="color:#6E56CF;">info@alisales.ai</a></p>
+    </div>
+  </div>
+</main>
+
+<footer class="border-t border-[#EBEAF6] pt-10 pb-16 px-5" style="background:#F8F5FF;">
+  <div class="max-w-6xl mx-auto">
+    <div class="flex items-center justify-between mb-7">
+      <img src="../assets/img/favicon.png" alt="Ali" class="h-10 w-auto">
+      <div class="flex items-center gap-5">
+        <a href="https://www.instagram.com/alisales.ai" aria-label="Instagram" class="text-[#6E717B] hover:text-[#1C1629] transition"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg></a>
+        <a href="https://www.facebook.com/alisales.ai" aria-label="Facebook" class="text-[#6E717B] hover:text-[#1C1629] transition"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+        <a href="https://www.linkedin.com/company/alisales-ai" aria-label="LinkedIn" class="text-[#6E717B] hover:text-[#1C1629] transition"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg></a>
+        <a href="https://wa.me/905434870808" aria-label="WhatsApp" class="text-[#6E717B] hover:text-[#1C1629] transition"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/></svg></a>
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-x-7 gap-y-2 mb-2.5 text-sm font-medium text-[#1C1629]">
+      <a href="/" class="hover:text-[#6E56CF] transition">Ali</a>
+      <a href="/#cozumler" class="hover:text-[#6E56CF] transition">Çözümler</a>
+      <a href="/#ozellikler" class="hover:text-[#6E56CF] transition">Özellikler</a>
+      <a href="/#fiyatlandirma" class="hover:text-[#6E56CF] transition">Fiyatlandırma</a>
+      <a href="https://www.paytr.com/link/YEkv4tK" class="hover:text-[#6E56CF] transition">%50 İndirimle Başla</a>
+    </div>
+    <div class="flex flex-wrap gap-x-7 gap-y-2 mb-8 text-sm text-[#6E717B]">
+      <a href="/#iletisim" class="hover:text-[#1C1629] transition">İletişim</a>
+      <a href="/kullanim-sartlari" class="hover:text-[#1C1629] transition">Kullanım Şartları</a>
+      <a href="/gizlilik-politikasi" class="hover:text-[#1C1629] transition">Gizlilik</a>
+      <a href="/refund-policy" class="hover:text-[#1C1629] transition">İade-İptal Politikası</a>
+      <a href="/data-deletion" class="hover:text-[#1C1629] transition">Veri Silme Politikası</a>
+    </div>
+    <div class="border-t border-[#EBEAF6] pt-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-2">
+      <div class="text-[#6E56CF] font-semibold text-sm leading-snug">Türkiye'nin Bitirim Satışçısı:<br>Satıştaki Sağ Kolunuz</div>
+      <p class="text-[#6E717B] text-sm" style="padding-right:80px;">© 2025 ALI · Esnaf zekâsı + AI zekâsı ile üretildi.</p>
+    </div>
+  </div>
+</footer>
+
+<div class="cw" style="display:flex;flex-direction:column;align-items:flex-end;gap:12px;">
+  <div id="cwBubble" class="bg-white rounded-2xl px-4 py-3 shadow-lg" style="border:1px solid #EBEAF6;max-width:220px;">
+    <p class="text-sm text-[#1C1629] font-semibold leading-snug">Bitirim Satışçınız Ali'yle konuşun!</p>
+  </div>
+  <a href="https://wa.me/905434870808" target="_blank" rel="noopener" class="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 hover:scale-105 transition-transform" style="background:linear-gradient(135deg,#8B5CF6,#6E56CF);box-shadow:0 8px 30px rgba(110,86,207,.45);">
+    <img src="../assets/img/ali-character-1.png" alt="Ali" class="w-full h-full object-cover object-top">
+  </a>
+</div>
+
+<script>
+  const nav=document.getElementById('navbar');
+  window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>50));
+  document.getElementById('hamBtn').addEventListener('click',()=>{document.getElementById('mobMenu').classList.add('open');document.body.style.overflow='hidden';});
+  document.getElementById('mobClose').addEventListener('click',()=>{document.getElementById('mobMenu').classList.remove('open');document.body.style.overflow='';});
+</script>
+</body>
+</html>
