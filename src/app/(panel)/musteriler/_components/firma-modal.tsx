@@ -405,6 +405,14 @@ function FirmaDetayIcerik({
       <section>
         <GrupBaslik>Notlar</GrupBaslik>
         <div className="space-y-3">
+          {/* Önerilen Açılış (ajanda mail'indeki Claude cümlesi) */}
+          {!em && f['Önerilen Açılış'] && (
+            <div className="rounded-xl bg-emerald-50 border border-emerald-100 p-4">
+              <p className="text-[11px] text-emerald-700 font-semibold uppercase tracking-wide mb-2">💬 Önerilen Açılış</p>
+              <p className="text-sm text-emerald-900 leading-relaxed">{f['Önerilen Açılış']}</p>
+            </div>
+          )}
+
           {/* Ali Özeti */}
           {em ? (
             <EF label="Ali Özeti" fk="Ali Özeti" type="textarea" em={em} rec={record} pend={pend} onCh={onCh} />

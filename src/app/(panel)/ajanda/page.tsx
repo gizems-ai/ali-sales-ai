@@ -1,91 +1,63 @@
-import { redirect } from 'next/navigation'
+import { getMusterilerIzni, buildMusterilerFormula } from '@/lib/musteriler-izin'
+import { getFirmalarSayfasi, getDashboardCounts } from '@/lib/airtable'
+import { getBrifing, type BrifingData } from '@/lib/brifing'
 import { getKullanicıProfili, getTenantConfigFromRequest } from '@/lib/yetki'
-import { AjandaAdminView } from './_components/ajanda-admin-view'
+import { type TenantConfig } from '@/lib/tenants'
+import { redirect } from 'next/navigation'
+import { AjandaClient } from './_components/ajanda-client'
 
 export const dynamic = 'force-dynamic'
 
-// n8n endpoint: {N8N_BASE_URL}/{n8nSlug}/sabah-ajanda?user={temsilciSlug}&mode=web
-// Orijinal AJANDA_URL: https://n8n.alisales.ai/webhook/sigortambiz/sabah-ajanda
-async function fetchAjandaHtml(n8nSlug: string, temsilciSlug: string): Promise<string | null> {
-  try {
-    const base = process.env.N8N_BASE_URL ?? 'https://n8n.alisales.ai/webhook'
-    const url = `${base}/${n8nSlug}/sabah-ajanda?user=${temsilciSlug}&mode=web`
-    const res = await fetch(url, {
-      headers: { Authorization: `Basic ${process.env.BRIFING_BASIC}` },
-      cache: 'no-store',
-    })
-    if (!res.ok) return null
-    return await res.text()
-  } catch {
-    return null
+function getSicakKpi(d: BrifingData | null, temsilciFilter?: string, cfg?: TenantConfig): number {
+  if (!d) return 0
+  if (temsilciFilter && cfg) {
+    const t = cfg.temsilciler.find(x => x.ad === temsilciFilter)
+    if (t) return d.temsilci[t.slug]?.hot ?? d.sicak_firsatlar
   }
-}
-
-function temsilciSlugFromAd(ad: string, slugMap: Record<string, string>): string {
-  const norm = ad.toLowerCase()
-    .replace(/ü/g, 'u').replace(/ı/g, 'i').replace(/ş/g, 's')
-    .replace(/ğ/g, 'g').replace(/ö/g, 'o').replace(/ç/g, 'c')
-  for (const [k, v] of Object.entries(slugMap)) {
-    if (norm.startsWith(k)) return v
-  }
-  return norm
-}
-
-function AjandaFrame({ html }: { html: string }) {
-  return (
-    <div className="-mx-4 -my-4 sm:-mx-6 sm:-my-6">
-      <iframe
-        srcDoc={html}
-        className="w-full border-0 block"
-        style={{ height: 'calc(100vh - 73px)' }}
-        sandbox="allow-same-origin"
-        title="Sabah Ajandası"
-      />
-    </div>
-  )
-}
-
-function AjandaBoş({ slug }: { slug: string }) {
-  return (
-    <div className="flex items-center justify-center" style={{ minHeight: '60vh' }}>
-      <div className="text-center">
-        <p className="text-gray-500 text-sm">Ajanda yüklenemedi.</p>
-        <p className="text-gray-400 text-xs mt-1">{slug} için güncel rapor bulunamadı.</p>
-      </div>
-    </div>
-  )
+  return d.sicak_firsatlar
 }
 
 export default async function AjandaPage() {
-  const profil = await getKullanicıProfili()
-  if (!profil) redirect('/login')
-
-  const cfg = (await getTenantConfigFromRequest()) ?? undefined
+  const [izin, profil, cfg] = await Promise.all([
+    getMusterilerIzni(),
+    getKullanicıProfili(),
+    getTenantConfigFromRequest(),
+  ])
   if (!cfg) redirect('/login')
-  const n8nSlug = cfg.n8nSlug
 
-  const slugMap: Record<string, string> = Object.fromEntries(
-    cfg.temsilciler.map(t => [
-      t.ad.toLowerCase()
-        .replace(/ü/g, 'u').replace(/ı/g, 'i').replace(/ş/g, 's')
-        .replace(/ğ/g, 'g').replace(/ö/g, 'o').replace(/ç/g, 'c'),
-      t.slug,
-    ])
-  )
-
-  if (profil.rol === 'satış_temsilcisi' && profil.temsilciAdi) {
-    const slug = temsilciSlugFromAd(profil.temsilciAdi, slugMap)
-    const html = await fetchAjandaHtml(n8nSlug, slug)
-    return html ? <AjandaFrame html={html} /> : <AjandaBoş slug={slug} />
+  if (izin.tip === 'yok') {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-lg font-semibold text-gray-900 mb-4">Ajanda</h1>
+        <div className="rounded-xl border border-dashed border-red-200 bg-red-50 p-12 flex flex-col items-center justify-center text-center">
+          <p className="text-sm font-medium text-red-600">Yetkiniz tanımlı değil</p>
+          <p className="text-xs text-red-400 mt-1">Bu sayfayı görüntülemek için yöneticinizle iletişime geçin.</p>
+        </div>
+      </div>
+    )
   }
 
-  // Admin / Yönetici — tüm temsilcilerin ajandası
-  const htmlMap: Record<string, string | null> = {}
-  await Promise.all(
-    cfg.temsilciler.map(async t => {
-      htmlMap[t.slug] = await fetchAjandaHtml(n8nSlug, t.slug)
-    })
-  )
+  const temsilciFilter = izin.tip === 'temsilci' ? izin.temsilci : undefined
+  // Ajanda her zaman Bugün Aranacak = TRUE ile başlar
+  const formula = buildMusterilerFormula(izin, { bugun: true }, cfg)
 
-  return <AjandaAdminView temsilciler={cfg.temsilciler} htmlMap={htmlMap} />
+  const [{ records, offset }, brifingData, counts] = await Promise.all([
+    getFirmalarSayfasi(formula, undefined, 0, cfg),
+    getBrifing(cfg),
+    getDashboardCounts(temsilciFilter, cfg),
+  ])
+  const isAdmin = profil?.rol === 'admin'
+  const sicakKpi = getSicakKpi(brifingData, temsilciFilter, cfg)
+
+  return (
+    <AjandaClient
+      izin={izin}
+      initialRecords={records}
+      initialOffset={offset}
+      brifingData={brifingData}
+      counts={counts}
+      sicakKpi={sicakKpi}
+      isAdmin={isAdmin}
+    />
+  )
 }

@@ -203,7 +203,7 @@ export interface FirmaDetay {
   'Pipeline Aşaması'?: string; 'Öncelik'?: string; 'Durum'?: string
   'Bugün Aranacak'?: boolean; '2026 Arandı mı'?: boolean; '2026 Ulaşıldı mı'?: boolean
   'Sonra Ara Tarihi'?: string; 'Kaynak'?: string; 'Data Sahibi'?: string
-  'Analiz Katmanı'?: string; 'Ali Özeti'?: string; 'Birikimli Görüşme Notları'?: string
+  'Analiz Katmanı'?: string; 'Ali Özeti'?: string; 'Önerilen Açılış'?: string; 'Birikimli Görüşme Notları'?: string
   'Son Durum 2026'?: string; 'Kaybedilme Nedeni'?: string; 'Google Puanı'?: number
   'Google Yorum Sayısı'?: number; 'Oluşturma Tarihi'?: string; 'Son Not Tarihi'?: string
   'Veri Kaynağı'?: string
