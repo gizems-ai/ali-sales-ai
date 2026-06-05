@@ -1,3 +1,4 @@
+import { unstable_cache } from 'next/cache'
 import {
   resolveTenant, type TenantConfig,
   fieldActual, translateFormula, translateFieldList, untranslateRecord,
@@ -255,7 +256,29 @@ export interface DashboardCounts {
   teklifSessiz: number; bugunAranacak: number; yanitBekleyen: number
 }
 
+async function _getDashboardCountsRaw(
+  tenantId: string,
+  temsilciFilter: string | null,
+): Promise<DashboardCounts> {
+  const cfg = resolveTenant(tenantId)
+  const filter = temsilciFilter ?? undefined
+  return _getDashboardCountsImpl(filter, cfg)
+}
+
+const _getDashboardCountsCached = unstable_cache(
+  _getDashboardCountsRaw,
+  ['dashboard-counts'],
+  { revalidate: 60 },
+)
+
 export async function getDashboardCounts(
+  temsilciFilter?: string,
+  cfg = resolveTenant(),
+): Promise<DashboardCounts> {
+  return _getDashboardCountsCached(cfg.id, temsilciFilter ?? null)
+}
+
+async function _getDashboardCountsImpl(
   temsilciFilter?: string,
   cfg = resolveTenant(),
 ): Promise<DashboardCounts> {
