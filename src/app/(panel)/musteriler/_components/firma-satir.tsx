@@ -25,6 +25,38 @@ const C = {
   red: '#FF445F',
 }
 
+const BRANS_RENK = {
+  saglik:    '#27ae60',
+  elementer: '#e67e22',
+  acibadem:  '#8e44ad',
+  takip:     '#2980b9',
+} as const
+
+function normTR(s: string) {
+  return s.toLowerCase()
+    .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s')
+    .replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c')
+}
+
+function getBransRenk(f: import('@/lib/airtable').FirmaListeItem): string {
+  // 1. Takip: Sonra Ara Tarihi bu hafta
+  const sonraAra = f['Sonra Ara Tarihi']
+  if (sonraAra) {
+    const today = new Date().toLocaleDateString('sv-SE')
+    const week  = new Date(); week.setDate(week.getDate() + 7)
+    if (sonraAra >= today && sonraAra <= week.toLocaleDateString('sv-SE')) return BRANS_RENK.takip
+  }
+  // 2. Acıbadem: Branş içeriyor (diğerlerinden önce)
+  const bransArr = f['Branş'] ?? []
+  if (bransArr.some(b => normTR(b).includes('acib'))) return BRANS_RENK.acibadem
+  // 3+4+5. Sağlık / Cross-sell / Elementer
+  const hasSaglik = Boolean(f['Sağlık Vade Tarihi'] || f['Sağlık Poliçe Türü'])
+  const hasElem   = Boolean(f['Elementer Ürün'] || f['Elementer Vade'])
+  if (hasSaglik) return BRANS_RENK.saglik  // cross-sell → Sağlık öncelikli
+  if (hasElem)   return BRANS_RENK.elementer
+  return C.line
+}
+
 const PIPELINE_COLOR: Record<string, string> = Object.fromEntries(
   PIPELINE_ASAMALARI.map(a => [a.value, a.color])
 )
@@ -194,11 +226,12 @@ export function FirmaSatir({
   function doNot()        { const t = notInput.trim(); if (t && onNotEkle) onNotEkle(record.id, t, firmaAdi); setNotAcik(false); setNotInput('') }
 
   const temsilciInitials = temsilci ? temsilci.slice(0, 2).toUpperCase() : '—'
+  const bransRenk = getBransRenk(f)
 
   return (
     <div
-      className="border-b last:border-b-0 group"
-      style={{ borderColor: '#DDE1ED' }}
+      className="border-b last:border-b-0 border-l-[5px] group"
+      style={{ borderBottomColor: '#DDE1ED', borderLeftColor: bransRenk }}
     >
       {/* Ana tablo satırı */}
       <div

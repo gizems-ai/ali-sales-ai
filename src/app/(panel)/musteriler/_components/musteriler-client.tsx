@@ -19,6 +19,41 @@ import { type BrifingData } from '@/lib/brifing'
 import { FirmaSatir, GRID } from './firma-satir'
 import { FirmaModal } from './firma-modal'
 
+// ── Kategori gruplama ──────────────────────────────────────────────────────
+
+type Kategori = 'takip' | 'saglik' | 'elementer' | 'acibadem' | 'diger'
+
+const _normTR = (s: string) => s.toLowerCase()
+  .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s')
+  .replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c')
+
+function getKategori(f: FirmaListeItem): Kategori {
+  const sonraAra = f['Sonra Ara Tarihi']
+  if (sonraAra) {
+    const today = new Date().toLocaleDateString('sv-SE')
+    const week = new Date(); week.setDate(week.getDate() + 7)
+    if (sonraAra >= today && sonraAra <= week.toLocaleDateString('sv-SE')) return 'takip'
+  }
+  const bransArr = f['Branş'] ?? []
+  if (bransArr.some(b => _normTR(b).includes('acib'))) return 'acibadem'
+  const hasSaglik = Boolean(f['Sağlık Vade Tarihi'] || f['Sağlık Poliçe Türü'])
+  const hasElem   = Boolean(f['Elementer Ürün'] || f['Elementer Vade'])
+  if (hasSaglik) return 'saglik'
+  if (hasElem)   return 'elementer'
+  return 'diger'
+}
+
+const KATEGORI_SIRA: Record<Kategori, number> = { takip: 0, saglik: 1, elementer: 2, acibadem: 3, diger: 4 }
+
+const GRUP_CFG: Partial<Record<Kategori, { emoji: string; label: string; color: string }>> = {
+  takip:     { emoji: '📞', label: 'TAKİP',     color: '#2980b9' },
+  saglik:    { emoji: '🏥', label: 'SAĞLIK',    color: '#27ae60' },
+  elementer: { emoji: '🔧', label: 'ELEMENTER', color: '#e67e22' },
+  acibadem:  { emoji: '💎', label: 'ACİBADEM',  color: '#8e44ad' },
+}
+
+// ──────────────────────────────────────────────────────────────────────────
+
 const C = {
   navy: '#061f3d',
   violet: '#5B38E8',
@@ -543,17 +578,52 @@ export function MusterilerClient({
                     )}
                   </div>
                 ) : (
-                  records.map(r => (
-                    <FirmaSatir
-                      key={r.id}
-                      record={r}
-                      showTemsilci={showTemsilci}
-                      izin={izin}
-                      onClick={() => setModalId(r.id)}
-                      onAksiyon={handleAksiyon}
-                      onNotEkle={handleNotEkle}
-                    />
-                  ))
+                  (() => {
+                    const siralanmis = [...records].sort((a, b) => {
+                      const ka = KATEGORI_SIRA[getKategori(a.fields)]
+                      const kb = KATEGORI_SIRA[getKategori(b.fields)]
+                      if (ka !== kb) return ka - kb
+                      const sa = a.fields['Pipeline Aşaması'] === 'Randevu' ? 11 : (a.fields['Sıcaklık Skoru'] ?? 0)
+                      const sb = b.fields['Pipeline Aşaması'] === 'Randevu' ? 11 : (b.fields['Sıcaklık Skoru'] ?? 0)
+                      return sb - sa
+                    })
+                    const gruplar: Array<{ kat: Kategori; items: typeof siralanmis }> = []
+                    for (const r of siralanmis) {
+                      const kat = getKategori(r.fields)
+                      if (!gruplar.length || gruplar[gruplar.length - 1].kat !== kat) {
+                        gruplar.push({ kat, items: [r] })
+                      } else {
+                        gruplar[gruplar.length - 1].items.push(r)
+                      }
+                    }
+                    return gruplar.map(({ kat, items }) => (
+                      <div key={kat}>
+                        {GRUP_CFG[kat] && (
+                          <div
+                            className="flex items-center gap-[8px] px-[15px] py-[7px] border-b border-l-[5px]"
+                            style={{ borderBottomColor: C.line, borderLeftColor: GRUP_CFG[kat]!.color, background: '#F8FAFC' }}
+                          >
+                            <span className="text-[10px] font-black uppercase tracking-[.15em]"
+                              style={{ color: GRUP_CFG[kat]!.color }}>
+                              {GRUP_CFG[kat]!.emoji} {GRUP_CFG[kat]!.label}
+                            </span>
+                            <span className="text-[10px] text-slate-400 font-bold">{items.length}</span>
+                          </div>
+                        )}
+                        {items.map(r => (
+                          <FirmaSatir
+                            key={r.id}
+                            record={r}
+                            showTemsilci={showTemsilci}
+                            izin={izin}
+                            onClick={() => setModalId(r.id)}
+                            onAksiyon={handleAksiyon}
+                            onNotEkle={handleNotEkle}
+                          />
+                        ))}
+                      </div>
+                    ))
+                  })()
                 )}
               </div>
             </div>

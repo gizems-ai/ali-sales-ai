@@ -58,7 +58,9 @@ const FIRMA_LISTE_FIELDS = [
   'Firma Adı', 'Sektör', 'Atanan Temsilci', 'Sıcaklık Skoru',
   'Pipeline Aşaması', 'Genel Telefon', 'Genel Mail', 'Öncelik',
   'Vade Ayı Grubu', 'Durum', 'Bugün Aranacak', 'İl / İlçe',
-  'Son İletişim Tarihi', 'Ali Özeti',
+  'Son İletişim Tarihi', 'Ali Özeti', 'Branş',
+  'Sağlık Vade Tarihi', 'Sağlık Poliçe Türü',
+  'Elementer Ürün', 'Elementer Vade', 'Sonra Ara Tarihi',
 ]
 
 async function fetchPage<T>(
@@ -212,7 +214,9 @@ export interface FirmaListeItem {
   'Sıcaklık Skoru'?: number; 'Pipeline Aşaması'?: string; 'Genel Telefon'?: string
   'Genel Mail'?: string; 'Öncelik'?: string; 'Vade Ayı Grubu'?: string
   'Durum'?: string; 'Bugün Aranacak'?: boolean; 'İl / İlçe'?: string
-  'Son İletişim Tarihi'?: string; 'Ali Özeti'?: string
+  'Son İletişim Tarihi'?: string; 'Ali Özeti'?: string; 'Branş'?: string[]
+  'Sağlık Vade Tarihi'?: string; 'Sağlık Poliçe Türü'?: string
+  'Elementer Ürün'?: string; 'Elementer Vade'?: string; 'Sonra Ara Tarihi'?: string
 }
 
 export interface FirmalarSayfasi {
