@@ -24,14 +24,31 @@ export interface BrifingData {
 
 export async function getBrifing(cfg: TenantConfig = resolveTenant()): Promise<BrifingData | null> {
   if (!cfg.modules.aksamBrifing) return null
+  const tableId = cfg.airtable.tables.raporlar
+  if (!tableId) return null
+  const token = process.env.AIRTABLE_TOKEN
+  if (!token) return null
   try {
-    const url = `${cfg.n8nBaseUrl}/${cfg.n8nSlug}/aksam-brifing?format=json`
+    const qs = new URLSearchParams({
+      filterByFormula: "{Tip}='Brifing JSON'",
+      'sort[0][field]': 'Tarih',
+      'sort[0][direction]': 'desc',
+      maxRecords: '1',
+    })
+    qs.append('fields[]', 'HTML İçerik')
+    qs.append('fields[]', 'Tarih')
+    const url = `https://api.airtable.com/v0/${cfg.airtable.baseId}/${tableId}?${qs}`
     const res = await fetch(url, {
-      headers: { Authorization: `Basic ${process.env.BRIFING_BASIC}` },
-      next: { revalidate: 300 },
+      headers: { Authorization: `Bearer ${token}` },
+      next: { revalidate: 60 },
     })
     if (!res.ok) return null
-    return (await res.json()) as BrifingData
+    const data = await res.json()
+    const record = data.records?.[0]
+    if (!record) return null
+    const jsonStr: unknown = record.fields?.['HTML İçerik']
+    if (!jsonStr || typeof jsonStr !== 'string') return null
+    return JSON.parse(jsonStr) as BrifingData
   } catch {
     return null
   }
