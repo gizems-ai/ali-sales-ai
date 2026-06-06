@@ -1088,6 +1088,7 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
                     <EF label="Elementer Ürün" fk="Elementer Ürün" em={em} rec={record} pend={pend} onCh={onCh} />
                     <EF label="Elementer Vade" fk="Elementer Vade" type="date" em={em} rec={record} pend={pend} onCh={onCh} />
                     <EF label="Mevcut Aracı Kurum" fk="Mevcut Aracı Kurum" em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label="Ürün" fk="Ürün" type="select" opts={SAGLIK_POLICE} em={em} rec={record} pend={pend} onCh={onCh} />
                     <EF label="Kişi Sayısı" fk="Kişi Sayısı" type="number" em={em} rec={record} pend={pend} onCh={onCh} />
                   </div>
                 ) : (
@@ -1104,6 +1105,7 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
                     <Alan label="Elementer Ürün" value={f['Elementer Ürün']} />
                     <Alan label="Elementer Vade" value={f['Elementer Vade'] ? formatTarih(f['Elementer Vade']) : undefined} />
                     <Alan label="Mevcut Aracı" value={f['Mevcut Aracı Kurum']} />
+                    <Alan label="Ürün" value={f['Ürün']} />
                     <Alan label="Kişi Sayısı" value={f['Kişi Sayısı']} />
                     <div className="col-span-2 flex flex-wrap gap-2 pt-1">
                       {checkboxAlanlar.filter(c => Boolean(record.fields[c.fk])).map(c => <CheckBadge key={c.fk} label={c.label} />)}
