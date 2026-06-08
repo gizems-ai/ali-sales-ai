@@ -5,7 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
 } from 'recharts'
-import { FileText, ExternalLink } from 'lucide-react'
+import { FileText, ExternalLink, Phone, CalendarCheck } from 'lucide-react'
 import { type MusterilerIzin } from '@/lib/musteriler-izin'
 import { type TemsilciAktivite } from '@/app/api/raporlar/bugun-aktivite/route'
 import { RaporModal } from './rapor-modal'
@@ -89,14 +89,20 @@ function formatTarih(iso: string): string {
   return `${d.getDate()} ${TR_AY[d.getMonth()]} ${d.getFullYear()} ${TR_GUN[d.getDay()]}`
 }
 
+const HEDEF = 50
+
 function BugunAktiviteKart({ t, tarih }: { t: TemsilciAktivite; tarih: string }) {
+  const bos = t.toplam === 0
+  const hedefPct = Math.min(t.toplam / HEDEF * 100, 100)
+
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-4 flex flex-col gap-3">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span
             className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
-            style={{ backgroundColor: t.renk }}
+            style={{ backgroundColor: bos ? '#D1D5DB' : t.renk }}
           >
             {t.ad.charAt(0)}
           </span>
@@ -105,36 +111,84 @@ function BugunAktiviteKart({ t, tarih }: { t: TemsilciAktivite; tarih: string })
         <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wide">Bugün</span>
       </div>
 
+      {/* Tarih */}
       <div className="text-[10px] text-gray-400">{formatTarih(tarih)}</div>
 
-      <div className="flex flex-col gap-1">
-        <span
-          className="text-[32px] font-black leading-none"
-          style={{ color: t.toplam > 0 ? C_PRIMARY : '#D1D5DB' }}
-        >
+      {/* Toplam */}
+      <div className="flex items-baseline gap-1">
+        <span className="text-[32px] font-black leading-none" style={{ color: bos ? '#D1D5DB' : C_PRIMARY }}>
           {t.toplam}
         </span>
-        {t.toplam === 0 ? (
-          <span className="text-[11px] text-gray-400">Henüz aktivite yok</span>
-        ) : (
-          <div className="flex flex-col gap-[4px] mt-1">
-            {Object.entries(t.kirilim).map(([durum, sayi]) => {
-              const dcfg = DURUM_CFG[durum]
-              return (
-                <div key={durum} className="flex items-center justify-between text-[12px]">
-                  <span className="flex items-center gap-1.5 text-gray-500">
-                    <span className="text-[10px] w-3 text-center" style={{ color: dcfg?.renk ?? '#9CA3AF' }}>
-                      {dcfg?.ikon ?? '·'}
-                    </span>
-                    {dcfg?.label ?? durum}
-                  </span>
-                  <span className="font-semibold text-gray-700">{sayi}</span>
-                </div>
-              )
-            })}
-          </div>
-        )}
+        <span className="text-xs text-gray-400">aktivite</span>
       </div>
+
+      {bos ? (
+        <p className="text-[11px] text-gray-400 italic">Henüz aktivite kaydı yok</p>
+      ) : (
+        <>
+          {/* Metrik 1: ulaşıldı + % */}
+          <div className="flex items-center gap-2">
+            <Phone size={12} className="shrink-0" style={{ color: C_PRIMARY }} />
+            <span className="text-[12px] font-bold" style={{ color: C_PRIMARY }}>
+              {t.kirilim['Ulaşıldı'] ?? 0} ulaşıldı
+            </span>
+            {t.ulasma_yuzde !== null && (
+              <span className="ml-auto text-[11px] font-bold" style={{ color: C_PRIMARY }}>
+                %{t.ulasma_yuzde} ulaşma
+              </span>
+            )}
+          </div>
+
+          {/* Metrik 2: randevu + dönüşüm % */}
+          <div className="flex items-center gap-2">
+            <CalendarCheck size={12} className="text-[#10B981] shrink-0" />
+            <span className="text-[12px] font-bold text-[#10B981]">
+              {t.randevu} randevu
+            </span>
+            {t.donusum_yuzde !== null && (
+              <span className="ml-auto text-[11px] font-bold text-[#10B981]">
+                %{t.donusum_yuzde} dönüşüm
+              </span>
+            )}
+          </div>
+
+          {/* Hedef bar */}
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center justify-between text-[10px] text-gray-400">
+              <span>Hedef</span>
+              <span>{Math.min(t.toplam, HEDEF)}/{HEDEF}</span>
+            </div>
+            <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+              <div
+                className="h-full rounded-full"
+                style={{
+                  width: `${hedefPct}%`,
+                  backgroundColor: t.toplam >= HEDEF ? '#10B981' : C_PRIMARY,
+                }}
+              />
+            </div>
+            {t.toplam >= HEDEF && (
+              <span className="text-[10px] text-[#10B981] font-medium">✓ Hedefe ulaşıldı</span>
+            )}
+          </div>
+
+          {/* 3 stat kutu */}
+          <div className="grid grid-cols-3 gap-1.5">
+            <div className="rounded-lg px-2 py-1.5 text-center" style={{ backgroundColor: '#D1FAE5' }}>
+              <p className="text-[11px] font-bold" style={{ color: '#10B981' }}>{t.kirilim['Ulaşıldı'] ?? 0}</p>
+              <p className="text-[9px]" style={{ color: '#10B981' }}>Ulaşıldı</p>
+            </div>
+            <div className="rounded-lg px-2 py-1.5 text-center" style={{ backgroundColor: '#FEF3C7' }}>
+              <p className="text-[11px] font-bold" style={{ color: '#F59E0B' }}>{t.kirilim['Cevap Yok'] ?? 0}</p>
+              <p className="text-[9px]" style={{ color: '#F59E0B' }}>Cevap Yok</p>
+            </div>
+            <div className="rounded-lg px-2 py-1.5 text-center" style={{ backgroundColor: '#DBEAFE' }}>
+              <p className="text-[11px] font-bold" style={{ color: '#3B82F6' }}>{t.kirilim['Geri Aranacak'] ?? 0}</p>
+              <p className="text-[9px]" style={{ color: '#3B82F6' }}>Geri Ara</p>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
