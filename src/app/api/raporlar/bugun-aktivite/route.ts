@@ -21,7 +21,7 @@ async function fetchBugunAktiviteRaw(
   temsilciFilter: string | null,
   token: string,
 ): Promise<Record<string, Record<string, number>>> {
-  const formulaParts = [`{Tarih}='${tarih}'`]
+  const formulaParts = [`DATESTR({Tarih})='${tarih}'`]
   if (temsilciFilter) formulaParts.push(`{Temsilci}='${temsilciFilter}'`)
   const formula = formulaParts.length > 1
     ? `AND(${formulaParts.join(',')})`
