@@ -7,6 +7,7 @@ import {
 } from 'recharts'
 import { FileText, ExternalLink } from 'lucide-react'
 import { type MusterilerIzin } from '@/lib/musteriler-izin'
+import { type TemsilciAktivite } from '@/app/api/raporlar/bugun-aktivite/route'
 import { RaporModal } from './rapor-modal'
 
 // ── Renk paleti — sadece mor tonları ──────────────────────────────────────
@@ -74,10 +75,77 @@ function GrafikKart({ title, children }: { title: string; children: React.ReactN
 }
 
 // ── Ana bileşen ───────────────────────────────────────────────────────────
+const DURUM_CFG: Record<string, { label: string; renk: string; ikon: string }> = {
+  'Ulaşıldı':      { label: 'Ulaşıldı',      renk: '#10B981', ikon: '✓' },
+  'Cevap Yok':     { label: 'Cevap Yok',     renk: '#F59E0B', ikon: '○' },
+  'Geri Aranacak': { label: 'Geri Aranacak', renk: '#6B7280', ikon: '↻' },
+}
+
+const TR_GUN = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi']
+const TR_AY  = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık']
+
+function formatTarih(iso: string): string {
+  const d = new Date(iso + 'T00:00:00')
+  return `${d.getDate()} ${TR_AY[d.getMonth()]} ${d.getFullYear()} ${TR_GUN[d.getDay()]}`
+}
+
+function BugunAktiviteKart({ t, tarih }: { t: TemsilciAktivite; tarih: string }) {
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white p-4 flex flex-col gap-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span
+            className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
+            style={{ backgroundColor: t.renk }}
+          >
+            {t.ad.charAt(0)}
+          </span>
+          <span className="text-sm font-semibold text-gray-800">{t.ad}</span>
+        </div>
+        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wide">Bugün</span>
+      </div>
+
+      <div className="text-[10px] text-gray-400">{formatTarih(tarih)}</div>
+
+      <div className="flex flex-col gap-1">
+        <span
+          className="text-[32px] font-black leading-none"
+          style={{ color: t.toplam > 0 ? C_PRIMARY : '#D1D5DB' }}
+        >
+          {t.toplam}
+        </span>
+        {t.toplam === 0 ? (
+          <span className="text-[11px] text-gray-400">Henüz aktivite yok</span>
+        ) : (
+          <div className="flex flex-col gap-[4px] mt-1">
+            {Object.entries(t.kirilim).map(([durum, sayi]) => {
+              const dcfg = DURUM_CFG[durum]
+              return (
+                <div key={durum} className="flex items-center justify-between text-[12px]">
+                  <span className="flex items-center gap-1.5 text-gray-500">
+                    <span className="text-[10px] w-3 text-center" style={{ color: dcfg?.renk ?? '#9CA3AF' }}>
+                      {dcfg?.ikon ?? '·'}
+                    </span>
+                    {dcfg?.label ?? durum}
+                  </span>
+                  <span className="font-semibold text-gray-700">{sayi}</span>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export function RaporlarClient({ izin }: { izin: Exclude<MusterilerIzin, { tip: 'yok' }> }) {
   const [grafik, setGrafik] = useState<GrafikData | null>(null)
   const [grafikLoading, setGrafikLoading] = useState(true)
   const [grafikError, setGrafikError] = useState<string | null>(null)
+
+  const [bugunAktivite, setBugunAktivite] = useState<{ tarih: string; temsilciler: TemsilciAktivite[] } | null>(null)
+  const [bugunLoading, setBugunLoading] = useState(true)
 
   const [arsiv, setArsiv] = useState<ArsivRecord[]>([])
   const [arsivLoading, setArsivLoading] = useState(true)
@@ -87,6 +155,14 @@ export function RaporlarClient({ izin }: { izin: Exclude<MusterilerIzin, { tip: 
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => { setMounted(true) }, [])
+
+  useEffect(() => {
+    fetch('/api/raporlar/bugun-aktivite')
+      .then(r => r.json())
+      .then(d => { if (!d.error) setBugunAktivite({ tarih: d.tarih, temsilciler: d.temsilciler ?? [] }) })
+      .catch(() => {})
+      .finally(() => setBugunLoading(false))
+  }, [])
 
   useEffect(() => {
     fetch('/api/raporlar/grafik')
@@ -115,6 +191,26 @@ export function RaporlarClient({ izin }: { izin: Exclude<MusterilerIzin, { tip: 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <h1 className="text-lg font-semibold text-gray-900">Raporlar</h1>
+
+      {/* ── Bugün Aktivite ────────────────────────────────────────────── */}
+      <section className="space-y-3">
+        <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+          Bugün Aktivite
+        </h2>
+        {bugunLoading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {[0, 1].map(i => (
+              <div key={i} className="h-[120px] rounded-xl border border-gray-100 bg-gray-50 animate-pulse" />
+            ))}
+          </div>
+        ) : bugunAktivite && bugunAktivite.temsilciler.length > 0 ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            {bugunAktivite.temsilciler.map(t => (
+              <BugunAktiviteKart key={t.slug} t={t} tarih={bugunAktivite.tarih} />
+            ))}
+          </div>
+        ) : null}
+      </section>
 
       {/* ── Canlı Grafikler ───────────────────────────────────────────── */}
       <section className="space-y-4">
