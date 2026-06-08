@@ -1,5 +1,5 @@
 import { type NextRequest } from 'next/server'
-import { getKullanicıProfili, yetkiVar, getTenantConfig } from '@/lib/yetki'
+import { getKullanicıProfili, yetkiVar, getTenantConfigFromRequest } from '@/lib/yetki'
 import { PIPELINE_ASAMALARI } from '@/lib/airtable'
 import { atTableUrl, fieldActual } from '@/lib/tenants'
 
@@ -32,7 +32,8 @@ export async function PATCH(req: NextRequest) {
   const token = process.env.AIRTABLE_TOKEN
   if (!token) return Response.json({ error: 'Token eksik' }, { status: 500 })
 
-  const cfg = getTenantConfig(profil)
+  const cfg = await getTenantConfigFromRequest()
+  if (!cfg) return Response.json({ error: 'Tenant bulunamıyor' }, { status: 403 })
   const BASE_URL = atTableUrl(cfg, 'firmalar')
 
   if (profil.rol === 'satış_temsilcisi') {

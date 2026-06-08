@@ -234,11 +234,8 @@ export function atTableUrl(
   return `${AT_BASE}/${cfg.airtable.baseId}/${cfg.airtable.tables[table]}`
 }
 
-/** Host string'inden tenant resolve eder. Preview/dev için previewId override kabul eder. */
+/** Preview/dev için tenant resolve eder. Prod domainleri PROD_HOST_MAP (yetki.ts) ile çözülür. */
 export function tenantFromHost(host: string, previewId?: string | null): TenantConfig | null {
-  if (host.includes('sigorta')) return TENANTS['sigortan_biz']
-  if (host.includes('crm'))     return TENANTS['ali_genel']
-  // preview / localhost
   if (previewId && TENANTS[previewId]) return TENANTS[previewId]
   if (host.includes('localhost') || host.startsWith('127.')) return TENANTS[DEFAULT_TENANT_ID]
   return null

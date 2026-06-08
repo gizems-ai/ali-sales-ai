@@ -1,5 +1,5 @@
 import { type NextRequest } from 'next/server'
-import { getKullanicıProfili, getTenantConfig } from '@/lib/yetki'
+import { getKullanicıProfili, getTenantConfigFromRequest } from '@/lib/yetki'
 import { atTableUrl } from '@/lib/tenants'
 
 export async function DELETE(
@@ -20,7 +20,8 @@ export async function DELETE(
   const token = process.env.AIRTABLE_TOKEN
   if (!token) return Response.json({ error: 'Token eksik' }, { status: 500 })
 
-  const cfg = getTenantConfig(profil)
+  const cfg = await getTenantConfigFromRequest()
+  if (!cfg) return Response.json({ error: 'Tenant bulunamıyor' }, { status: 403 })
   const AT_URL = atTableUrl(cfg, 'aktiviteler')
 
   let res: Response

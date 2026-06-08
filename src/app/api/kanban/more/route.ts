@@ -1,6 +1,6 @@
 import { type NextRequest } from 'next/server'
 import { getPipelineKolonu } from '@/lib/airtable'
-import { getKullanicıProfili, yetkiVar, izolasyonBelirle, getTenantConfig } from '@/lib/yetki'
+import { getKullanicıProfili, yetkiVar, izolasyonBelirle, getTenantConfigFromRequest } from '@/lib/yetki'
 
 export async function GET(req: NextRequest) {
   const profil = await getKullanicıProfili()
@@ -17,7 +17,8 @@ export async function GET(req: NextRequest) {
 
   if (!asama) return Response.json({ error: 'asama gerekli' }, { status: 400 })
 
-  const cfg = getTenantConfig(profil)
+  const cfg = await getTenantConfigFromRequest()
+  if (!cfg) return Response.json({ error: 'Tenant bulunamıyor' }, { status: 403 })
 
   try {
     const result = await getPipelineKolonu(asama, offset, temsilciFilter, cfg)
