@@ -278,6 +278,20 @@ export function FirmaSatir({
                 {vadeRozet.label}
               </span>
             )}
+            {(f['Branş'] ?? []).map(b => {
+              const n = normTR(b)
+              let bg: string, fg: string
+              if (n.includes('saglik'))    { bg = '#D1FAE5'; fg = '#10B981' }
+              else if (n.includes('elem')) { bg = '#FED7AA'; fg = '#F97316' }
+              else if (n.includes('acib')) { bg = '#E9D5FF'; fg = '#9333EA' }
+              else return null
+              return (
+                <span key={b} className="rounded-[8px] px-[8px] py-[4px] text-[11px] font-semibold"
+                  style={{ background: bg, color: fg }}>
+                  {b.slice(0, 3)}
+                </span>
+              )
+            })}
           </div>
           {(tel || mail) && (
             <div className="flex items-center gap-3 mt-1">
