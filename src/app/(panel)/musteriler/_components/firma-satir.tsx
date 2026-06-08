@@ -194,6 +194,7 @@ export function FirmaSatir({
   const bugun     = f['Bugün Aranacak']
   const sonTarih  = f['Son İletişim Tarihi']
   const aliOzeti  = f['Ali Özeti']
+  const vadeAyi   = f['Vade Ayı Grubu']
 
   const [mobileMenu, setMobileMenu] = useState(false)
   const [sonraAraAcik, setSonraAra] = useState(false)
@@ -228,6 +229,19 @@ export function FirmaSatir({
   const temsilciInitials = temsilci ? temsilci.slice(0, 2).toUpperCase() : '—'
   const bransRenk = getBransRenk(f)
 
+  const AYLAR: Record<string, number> = { 'Ocak':0,'Şubat':1,'Mart':2,'Nisan':3,'Mayıs':4,'Haziran':5,'Temmuz':6,'Ağustos':7,'Eylül':8,'Ekim':9,'Kasım':10,'Aralık':11 }
+  const vadeRozet = (() => {
+    if (!vadeAyi || vadeAyi === 'Bilinmiyor') return null
+    const vadeIdx = AYLAR[vadeAyi]
+    if (vadeIdx === undefined) return null
+    const simdi = new Date()
+    const diff = (vadeIdx - simdi.getMonth() + 12) % 12
+    const label = vadeAyi.slice(0, 3)
+    if (diff === 0)  return { label, bg: '#FEE2E2', fg: '#DC2626' }
+    if (diff === 1)  return { label, bg: '#FFEDD5', fg: '#F97316' }
+    return { label, bg: '#D1FAE5', fg: '#10B981' }
+  })()
+
   return (
     <div
       className="border-b last:border-b-0 border-l-[5px] group"
@@ -257,6 +271,11 @@ export function FirmaSatir({
             {oncelik === 'Yüksek' && (
               <span className="rounded-[6px] px-[6px] py-[2px] text-[9px] font-black uppercase tracking-wide" style={{ background: C.lavender, color: C.violet }}>
                 ↑ Yüksek
+              </span>
+            )}
+            {vadeRozet && (
+              <span className="rounded-[8px] px-[8px] py-[4px] text-[11px] font-semibold" style={{ background: vadeRozet.bg, color: vadeRozet.fg }}>
+                {vadeRozet.label}
               </span>
             )}
           </div>
