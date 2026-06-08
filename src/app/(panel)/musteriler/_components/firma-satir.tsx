@@ -108,7 +108,7 @@ function PipelinePill({ asama }: { asama: string }) {
 
 function PriorityPill({ value }: { value: string }) {
   const map: Record<string, [string, string]> = {
-    'Yüksek': [C.red, '#FFF0F3'],
+    'Yüksek': ['#B91C1C', '#FEE2E2'],
     'Orta':   [C.violet, C.lavender],
     'Normal': ['#6B7280', '#F3F4F6'],
     'Düşük':  ['#6B7280', '#F3F4F6'],
@@ -266,11 +266,6 @@ export function FirmaSatir({
             {bugun && (
               <span className="rounded-full bg-red-50 px-[6px] py-[2px] text-[9px] font-semibold text-red-500 uppercase tracking-wide">
                 Bugün
-              </span>
-            )}
-            {oncelik === 'Yüksek' && (
-              <span className="rounded-[6px] px-[6px] py-[2px] text-[9px] font-black uppercase tracking-wide" style={{ background: C.lavender, color: C.violet }}>
-                ↑ Yüksek
               </span>
             )}
             {vadeRozet && (
