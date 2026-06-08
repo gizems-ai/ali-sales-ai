@@ -36,8 +36,8 @@ function getKategori(f: FirmaListeItem): Kategori {
   }
   const bransArr = f['Branş'] ?? []
   if (bransArr.some(b => _normTR(b).includes('acib'))) return 'acibadem'
-  const hasSaglik = Boolean(f['Sağlık Vade Tarihi'] || f['Sağlık Poliçe Türü'])
-  const hasElem   = Boolean(f['Elementer Ürün'] || f['Elementer Vade'])
+  const hasSaglik = bransArr.some(b => _normTR(b).includes('saglik'))
+  const hasElem   = bransArr.some(b => _normTR(b).includes('elem'))
   if (hasSaglik) return 'saglik'
   if (hasElem)   return 'elementer'
   return 'diger'
