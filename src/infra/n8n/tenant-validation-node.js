@@ -13,11 +13,15 @@
  * ─── ENFORCE GEÇİŞ PROTOKOLÜ ──────────────────────────────────────────────────
  * 1. Klon workflow'da bu node + n8n-403-gateway.json'daki IF + Reject 403'ü ekle
  *    (bağlantı: bu node çıkışı → IF girişi)
- * 2. LOG_ONLY = true → klon aktif et, test et:
- *    a) Gerçek widget mesajı gönder → log: hiç INVALID_* görünmemeli
- *    b) curl evil.com origin ile gönder → log: INVALID_ORIGIN LOG_ONLY görünmeli
- * 3. Her iki koşul da sağlandıktan sonra LOG_ONLY = false yap → aynı curl → 403
- * 4. Orijinal workflow'u devreden çıkar, klonu `chatbot-v2` path'ine taşı
+ * 2. LOG_ONLY = true → klon aktif et.
+ *    SOAK TESTİ: 5dk curl yeterli değil. GERÇEK müşteri trafiğini bekle.
+ *    Minimum: birkaç saat veya bir iş günü boyunca sigortan.ai widget'tan GERÇEK mesaj gelmeli.
+ *    → logda "INVALID_ORIGIN" veya "MISSING_ORIGIN" SIFIR görülünce enforce et.
+ *    (sigortan.ai gerçekten widget'in gömülü olduğu origin mi? log bunu kanıtlayacak.)
+ * 3. Soak onaylandıktan sonra LOG_ONLY = false yap → curl evil.com → 403, gerçek widget → OK.
+ * 4. Orijinal workflow'u DEAKTİF bırak, SİLME — enforce sonrası rollback için şart.
+ *    Flip'i düşük trafik saatinde (gece) yap, ertesi sabah logu kontrol et.
+ *    Rollback: klonu kapat, orijinali aç — 1 dakika.
  *
  * ─── TEST KOMUTLARI ───────────────────────────────────────────────────────────
  * # Geçersiz origin (INVALID_ORIGIN loglanmalı; enforce'da 403 dönmeli)
