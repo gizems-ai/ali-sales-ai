@@ -168,7 +168,6 @@ export const TENANTS: Record<string, TenantConfig> = {
     temsilciler: [
       { ad: 'Rüya', slug: 'ruya', renk: '#5B47E0' },
       { ad: 'Sude', slug: 'sude', renk: '#D67BAF' },
-      { ad: 'Hakan', slug: 'hakan', renk: '#2D8B6F' },
     ],
     // fields: undefined → identity (alan isimleri birebir aynı)
     modules: ALL_ON,
