@@ -1,0 +1,74 @@
+{
+  "_comment": "Bu dosya n8n UI'da elle eklenecek iki node'un tanımını içerir.",
+  "_usage": [
+    "1. Klonlanan workflow'u aç.",
+    "2. Her node için: canvas'a sağ tık → Import from JSON → ilgili node'u yapıştır.",
+    "   VEYA: node tipini UI'dan ekle, parametreleri aşağıya bakarak doldur.",
+    "3. Bağlantıları kur (aşağıdaki connections bölümüne bak).",
+    "4. Validation node çıkışı → IF node girişi. IF true → Get Tenant Config. IF false → Reject 403."
+  ],
+  "nodes": [
+    {
+      "name": "Validation Geçti mi?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "v-ok-check",
+              "leftValue": "={{ $json.__v_ok }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        }
+      },
+      "_position_note": "Validation node'un sağına yerleştir (mevcut node pozisyonu + [176, 0])"
+    },
+    {
+      "name": "Reject 403",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ error: 'Forbidden' }) }}",
+        "options": {
+          "responseCode": 403
+        }
+      },
+      "_position_note": "IF false (alt) çıkışının altına yerleştir",
+      "_security_note": "Detay verme: 'Forbidden' yeterli. INVALID_* nedeni body'de asla dönme."
+    }
+  ],
+  "connections": {
+    "_before": {
+      "Webhook": { "main": [[{ "node": "Get Tenant Config", "type": "main", "index": 0 }]] }
+    },
+    "_after": {
+      "Webhook": {
+        "main": [[{ "node": "Tenant & Origin Validation", "type": "main", "index": 0 }]]
+      },
+      "Tenant & Origin Validation": {
+        "main": [[{ "node": "Validation Geçti mi?", "type": "main", "index": 0 }]]
+      },
+      "Validation Geçti mi?": {
+        "main": [
+          [{ "node": "Get Tenant Config", "type": "main", "index": 0 }],
+          [{ "node": "Reject 403", "type": "main", "index": 0 }]
+        ]
+      }
+    },
+    "_note": "main[0] = IF true çıkışı (geçerli istek → Get Tenant Config), main[1] = false çıkışı (reddedilen → Reject 403)"
+  }
+}

@@ -176,8 +176,9 @@ export const TENANTS: Record<string, TenantConfig> = {
     security: {
       allowedOrigins: [
         'https://sigorta.alisales.ai',
-        'https://sigortan.biz',
-        'https://www.sigortan.biz',
+        'https://sigortan.ai',
+        'https://www.sigortan.ai',
+        // staging varsa ekle: 'https://staging.sigortan.ai'
       ],
     },
   },
