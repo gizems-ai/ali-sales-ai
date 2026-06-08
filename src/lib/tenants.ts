@@ -36,6 +36,13 @@ export interface TenantAirtable {
   sistemAdi: string  // bu isimle kayıtlar filtreden hariç tutulur; '' = filtre yok
 }
 
+export interface TenantSecurity {
+  /** Web widget'ın gömüldüğü domainler (tam Origin, trailing slash yok).
+   *  n8n tenant-validation-node.js ile senkron tutulmalı.
+   *  Boş dizi = widget yok / sadece panel kullanan tenant. */
+  allowedOrigins: string[]
+}
+
 export interface TenantModules {
   dashboard: boolean
   ajanda: boolean
@@ -64,6 +71,7 @@ export interface TenantConfig {
   fields?: TenantFields    // sigortan_biz'de undefined (identity), ali_genel'de dolu
   modules: TenantModules
   branding: TenantBranding
+  security: TenantSecurity
 }
 
 // ─── Field-map yardımcıları ────────────────────────────────────────────────────
@@ -165,6 +173,13 @@ export const TENANTS: Record<string, TenantConfig> = {
     // fields: undefined → identity (alan isimleri birebir aynı)
     modules: ALL_ON,
     branding: { logo: 'sigortan.ai' },
+    security: {
+      allowedOrigins: [
+        'https://sigorta.alisales.ai',
+        'https://sigortan.biz',
+        'https://www.sigortan.biz',
+      ],
+    },
   },
 
   ali_genel: {
@@ -217,6 +232,11 @@ export const TENANTS: Record<string, TenantConfig> = {
       portfoy: false,
     },
     branding: { logo: 'alisales.ai', logoImage: '/ali-logo.png' },
+    security: {
+      allowedOrigins: [
+        'https://crm.alisales.ai',
+      ],
+    },
   },
 }
 

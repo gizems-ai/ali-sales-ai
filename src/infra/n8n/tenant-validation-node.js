@@ -1,78 +1,192 @@
 /**
- * TENANT VALIDATION — LOG-ONLY (Faz 1)
+ * TENANT & ORIGIN VALIDATION — Web Widget (GTOFjZkTVVTEU2L9)
+ * Konum: Webhook → [bu node] → Get Tenant Config
  *
- * Bu node Webhook → Get Tenant Config arasına girer.
- * Faz 1: Geçersiz istekler LOGLANIR ama bloklanmaz.
- * Faz 2 (geçişte): LOG_ONLY = false → geçersiz istek durdurulur.
+ * Üç katman:
+ *   1. tenant_id allowlist
+ *   2. Origin / Referer — tenant'ın kayıtlı domainleriyle tam eşleşme
+ *   3. Per-tenant + per-IP rate limit (n8n static data, window: 60s)
  *
- * Workflow'lar: GTOFjZkTVVTEU2L9 (Ali Chatbot v2 Multi-tenant)
- *              50sSMwjHzon1TdRU  (360Dialog WhatsApp Echo Bot)
+ * LOG_ONLY = true  → ihlaller loglanır, istek geçer  (Faz 1 — doğrulama)
+ * LOG_ONLY = false → ihlaller bloklanır, 500 döner   (Faz 2 — enforce)
  *
- * Deployment adımları:
- *   1. Canlı workflow'u KLONLA (n8n UI: üç nokta → Duplicate)
- *   2. Klona bu node'u ekle, bağlantıyı güncelle (Webhook → TenantValidation → GetTenantConfig)
- *   3. Klonu aktifleştir, canlıyı kapat (aynı webhook path'i kullanmaz!)
- *      NOT: Önce path'i değiştir (ör. chatbot-v2-test), 360Dialog'u geçici olarak yönlendir.
- *   4. Gerçek WA mesajıyla test et → logda VALID görünmeli
- *   5. Sahte POST at: curl -X POST https://n8n.alisales.ai/webhook/chatbot-v2-test
- *        -H "Content-Type: application/json"
- *        -d '{"tenant_id":"__HACKER__","from":"905001234567","message":"test"}'
- *      → logda INVALID_TENANT_ID görünmeli, mesaj yine de geçmeli (LOG-ONLY)
- *   6. Onaylandıktan sonra LOG_ONLY = false yap, tekrar test et → sahte bloklanmalı
- *   7. Klonu canlı path'e taşı, orijinali devreden çıkar.
+ * Geçişe hazır olma kriteri (ikisi birden):
+ *   ✓ Gerçek widget trafiği: logda "VALID" görünüyor
+ *   ✓ Sahte POST (curl, farklı origin): logda INVALID_* görünüyor, bloklanmıyor
+ * Sonra LOG_ONLY = false yap, aynı curl → 500, meşru istek → normal akış.
+ *
+ * Test komutu (LOG_ONLY her değerde çalışır; false'da reject beklenir):
+ *   # Geçersiz origin:
+ *   curl -X POST https://n8n.alisales.ai/webhook/chatbot-v2-test \
+ *     -H "Content-Type: application/json" \
+ *     -H "Origin: https://evil.com" \
+ *     -d '{"tenant_id":"sigortan_biz","from":"905001234567","message":"test"}'
+ *
+ *   # Origin hiç yok:
+ *   curl -X POST https://n8n.alisales.ai/webhook/chatbot-v2-test \
+ *     -H "Content-Type: application/json" \
+ *     -d '{"tenant_id":"sigortan_biz","from":"905001234567","message":"test"}'
+ *
+ *   # Geçerli origin (izin verilmeli):
+ *   curl -X POST https://n8n.alisales.ai/webhook/chatbot-v2-test \
+ *     -H "Content-Type: application/json" \
+ *     -H "Origin: https://sigortan.biz" \
+ *     -d '{"tenant_id":"sigortan_biz","from":"905001234567","message":"test"}'
  */
 
-// ─── Konfigürasyon ─────────────────────────────────────────────────────────────
+// ─── ENFORCE TOGGLE ────────────────────────────────────────────────────────────
+const LOG_ONLY = true; // → false: enforce modu, false döndürür ve akışı durdurur
 
-const LOG_ONLY = true; // false = ENFORCE modu: geçersiz tenant bloklar
+// ─── TENANT KONFİGÜRASYONU ─────────────────────────────────────────────────────
+// allowedOrigins: widget'ın gömüldüğü domainin tam Origin değerleri (trailing slash YOK).
+// Yeni tenant / yeni domain eklenince buraya + Airtable Tenants tablosuna ekle.
+const TENANT_CONFIGS = {
+  sigortan_biz: {
+    allowedOrigins: [
+      'https://sigorta.alisales.ai',
+      'https://sigortan.biz',
+      'https://www.sigortan.biz',
+      // widget başka bir domaine gömülünce buraya ekle
+    ],
+    rateLimit: { perTenant: 60, perIp: 10, windowSec: 60 },
+  },
+  ali_genel: {
+    allowedOrigins: [
+      'https://crm.alisales.ai',
+    ],
+    rateLimit: { perTenant: 120, perIp: 20, windowSec: 60 },
+  },
+  fiscus_ai: {
+    allowedOrigins: [
+      // TODO: Fiscus widget domain'ini ekle
+    ],
+    rateLimit: { perTenant: 30, perIp: 5, windowSec: 60 },
+  },
+  lbc_network: {
+    allowedOrigins: [
+      // TODO: LBC domain'ini ekle
+    ],
+    rateLimit: { perTenant: 60, perIp: 10, windowSec: 60 },
+  },
+  turkey_health: {
+    allowedOrigins: [
+      // TODO: TurkeyHealth domain'ini ekle
+    ],
+    rateLimit: { perTenant: 60, perIp: 10, windowSec: 60 },
+  },
+};
+
+const VALID_TENANT_IDS = new Set(Object.keys(TENANT_CONFIGS));
+
+// ─── YARDIMCILAR ───────────────────────────────────────────────────────────────
 
 /**
- * Master base'deki Tenants tablosundaki page_id değerleri.
- * Yeni tenant onboard edilince buraya + Airtable'a ekle.
+ * Origin header veya Referer'dan origin kısmını çıkar.
+ * Referer: "https://sigortan.biz/sayfa" → "https://sigortan.biz"
+ * Origin: "https://sigortan.biz" → "https://sigortan.biz"
+ * Hiçbiri yoksa: ""
  */
-const VALID_TENANT_IDS = new Set([
-  'sigortan_biz',
-  'ali_genel',
-  'fiscus_ai',
-  'lbc_network',
-  'turkey_health',
-  // buraya ekle: 'yeni_tenant_id'
-]);
-
-// ─── Validation ────────────────────────────────────────────────────────────────
-
-const item = $input.first();
-const body = item.json.body ?? {};
-const reqHeaders = item.json.headers ?? {};
-
-const tenant_id  = String(body.tenant_id ?? '').trim();
-const origin     = reqHeaders['origin'] ?? reqHeaders['referer'] ?? 'unknown';
-const remoteIp   = reqHeaders['x-forwarded-for'] ?? reqHeaders['x-real-ip'] ?? 'unknown';
-const now        = new Date().toISOString();
-
-const isValid = tenant_id.length > 0 && VALID_TENANT_IDS.has(tenant_id);
-
-if (!isValid) {
-  const logEntry = {
-    level:    'SECURITY',
-    event:    'INVALID_TENANT_ID',
-    received: tenant_id || '(boş)',
-    origin,
-    ip:       remoteIp,
-    ts:       now,
-    mode:     LOG_ONLY ? 'LOG_ONLY' : 'ENFORCE',
-  };
-  console.error('[TenantValidation]', JSON.stringify(logEntry));
-
-  if (!LOG_ONLY) {
-    // ENFORCE modu: workflow'u durdur, 403 dön (Webhook Response node'u olmalı)
-    // Bu throw'u aktifleştirmek için LOG_ONLY = false yap.
-    throw new Error(`[SECURITY] Geçersiz tenant_id: "${tenant_id}" | ip: ${remoteIp}`);
+function extractOrigin(headers) {
+  const origin = (headers['origin'] ?? '').trim();
+  if (origin) return origin;
+  const referer = (headers['referer'] ?? '').trim();
+  if (!referer) return '';
+  try {
+    const u = new URL(referer);
+    return u.origin; // scheme + host + port
+  } catch {
+    return '';
   }
-} else {
-  // Geçerli istek — isteğe bağlı debug log
-  // console.log('[TenantValidation] VALID:', tenant_id, origin);
 }
 
-// Her durumda downstream'e geç (LOG_ONLY=true iken geçersiz de geçer)
+/** Static data tabanlı sliding-window rate limiter. true = limit dahilinde. */
+function checkRateLimit(store, key, maxCount, windowSec) {
+  const now = Date.now();
+  const windowMs = windowSec * 1000;
+  const entry = store[key];
+  if (!entry || now > entry.resetAt) {
+    store[key] = { count: 1, resetAt: now + windowMs };
+    return true;
+  }
+  entry.count += 1;
+  return entry.count <= maxCount;
+}
+
+// ─── ANA DOĞRULAMA ─────────────────────────────────────────────────────────────
+
+const item       = $input.first();
+const body       = item.json.body ?? {};
+const reqHeaders = item.json.headers ?? {};
+
+const tenant_id    = String(body.tenant_id ?? '').trim();
+const effectiveOrigin = extractOrigin(reqHeaders);
+const remoteIp     = (reqHeaders['x-forwarded-for'] ?? '').split(',')[0].trim()
+                  || reqHeaders['x-real-ip']
+                  || 'unknown';
+const ts           = new Date().toISOString();
+
+/** İhlali logla; enforce modunda throw at. false döndürür (early-return için). */
+function reject(event, details) {
+  console.error('[TenantValidation]', JSON.stringify({
+    level: 'SECURITY', event, tenant_id, origin: effectiveOrigin,
+    ip: remoteIp, ts, mode: LOG_ONLY ? 'LOG_ONLY' : 'ENFORCE',
+    ...details,
+  }));
+  if (!LOG_ONLY) {
+    throw new Error(`[SECURITY] ${event} | tenant:${tenant_id} | origin:${effectiveOrigin} | ip:${remoteIp}`);
+  }
+  return false;
+}
+
+// 1. tenant_id allowlist
+if (!VALID_TENANT_IDS.has(tenant_id)) {
+  reject('INVALID_TENANT_ID', { received: tenant_id || '(boş)' });
+  // LOG_ONLY modunda akışa devam (tenant cfg olmadan — downstream hata verebilir, beklenen)
+  return $input.all();
+}
+
+const cfg = TENANT_CONFIGS[tenant_id];
+
+// 2. Origin / Referer doğrulaması
+// Web widget her zaman bir Origin gönderir. Origin yoksa sunucu tarafı istek veya curl — reddet.
+const originOk = effectiveOrigin !== ''
+  && cfg.allowedOrigins.length > 0
+  && cfg.allowedOrigins.includes(effectiveOrigin);
+
+// allowedOrigins henüz doldurulmamış tenant (boş dizi) → sadece origin varlığını kontrol et
+const allowedListEmpty = cfg.allowedOrigins.length === 0;
+
+if (!effectiveOrigin) {
+  // Origin hiç yok
+  reject('MISSING_ORIGIN', {});
+} else if (!allowedListEmpty && !originOk) {
+  // Tanınan bir origin değil
+  reject('INVALID_ORIGIN', {
+    expected: cfg.allowedOrigins,
+    got: effectiveOrigin,
+    hint: allowedListEmpty ? 'allowedOrigins henüz doldurulmadı' : undefined,
+  });
+}
+
+// allowedOrigins boşsa origin varlığı yeterliydi — warn bas ama geç
+if (allowedListEmpty && effectiveOrigin) {
+  console.warn('[TenantValidation] allowedOrigins BOŞ — tenant:', tenant_id, '| origin:', effectiveOrigin, '| doldurun!');
+}
+
+// 3. Rate limit
+const store = $getWorkflowStaticData('global');
+if (!store.rl) store.rl = {};
+
+const { perTenant, perIp, windowSec } = cfg.rateLimit;
+
+if (!checkRateLimit(store.rl, `t:${tenant_id}`, perTenant, windowSec)) {
+  reject('RATE_LIMIT_TENANT', { limit: perTenant, windowSec });
+}
+if (!checkRateLimit(store.rl, `ip:${remoteIp}:${tenant_id}`, perIp, windowSec)) {
+  reject('RATE_LIMIT_IP', { limit: perIp, windowSec });
+}
+
+// Tüm kontroller geçti — debug log (prod'da kapatılabilir)
+// console.log('[TenantValidation] VALID', { tenant_id, origin: effectiveOrigin, ip: remoteIp });
+
 return $input.all();
