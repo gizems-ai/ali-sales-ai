@@ -324,7 +324,7 @@ function HizliAksiyon({ record, izin, onAirtableUpdate, onPipelineChange, disabl
       label: 'Arandı',
       emoji: '📞',
       color: '#3B82F6',
-      fields: { 'Son İletişim Tarihi': today, '2026 Arandı mı': true },
+      fields: { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, 'Bugün Aranacak': false },
       sonuc: 'Geri Aranacak',
     },
     {
@@ -332,7 +332,7 @@ function HizliAksiyon({ record, izin, onAirtableUpdate, onPipelineChange, disabl
       label: 'Ulaşıldı',
       emoji: '✓',
       color: '#10B981',
-      fields: { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, '2026 Ulaşıldı mı': true },
+      fields: { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, '2026 Ulaşıldı mı': true, 'Bugün Aranacak': false },
       sonuc: 'Ulaşıldı',
     },
     {
@@ -340,7 +340,7 @@ function HizliAksiyon({ record, izin, onAirtableUpdate, onPipelineChange, disabl
       label: 'Ulaşılamadı',
       emoji: '✗',
       color: '#DC2626',
-      fields: { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, 'Pipeline Aşaması': 'Ulaşılamadı' },
+      fields: { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, 'Pipeline Aşaması': 'Ulaşılamadı', 'Bugün Aranacak': false },
       sonuc: 'Cevap Yok',
     },
     {
@@ -771,7 +771,11 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
   }
 
   // Hızlı aksiyon: Airtable update + aktivite log
-  async function handleHizliAksiyon(fields: Record<string, unknown>, aramaSonucu?: string) {
+  async function handleHizliAksiyon(
+    fields: Record<string, unknown>,
+    aramaSonucu?: string,
+    opts?: { randevuAlindi?: boolean; toastMesaj?: string },
+  ) {
     if (!record) return
     const firmaAdi = record.fields['Firma Adı'] ?? 'Firma'
     const prevFields: Partial<FirmaDetay> = {}
@@ -787,7 +791,11 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
       }),
       aramaSonucu ? fetch('/api/aktivite/ekle', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ firmaId: record.id, aramaSonucu }),
+        body: JSON.stringify({
+          firmaId: record.id,
+          aramaSonucu,
+          ...(opts?.randevuAlindi ? { randevuAlindi: true } : {}),
+        }),
       }) : Promise.resolve(null),
     ])
 
@@ -799,7 +807,8 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
 
     const prevData = updateRes.status === 'fulfilled' ? await updateRes.value.json().catch(() => ({})) : {}
     let mesaj = `${firmaAdi} · güncellendi`
-    if (aramaSonucu === 'Ulaşıldı') mesaj = `${firmaAdi} · Ulaşıldı ✓`
+    if (opts?.toastMesaj) mesaj = `${firmaAdi} · ${opts.toastMesaj}`
+    else if (aramaSonucu === 'Ulaşıldı') mesaj = `${firmaAdi} · Ulaşıldı ✓`
     else if (aramaSonucu === 'Cevap Yok') mesaj = `${firmaAdi} · Ulaşılamadı`
     else if (aramaSonucu === 'Geri Aranacak') mesaj = `${firmaAdi} · Arandı kaydedildi`
     else if ('Sonra Ara Tarihi' in fields) mesaj = `${firmaAdi} · Sonra ara tarihi ayarlandı`
@@ -819,7 +828,19 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
   }
 
   async function handlePipelineChange(asama: string) {
-    await handleHizliAksiyon({ 'Pipeline Aşaması': asama })
+    const today = new Date().toLocaleDateString('sv-SE')
+    // Pipeline → Arama Sonucu eşlemesi (eşleşmeyen aşamalarda aktivite logu açılmaz)
+    let aramaSonucu: string | undefined
+    let randevuAlindi = false
+    if (asama === 'Randevu') { aramaSonucu = 'Randevu Alındı'; randevuAlindi = true }
+    else if (asama === 'Teklif' || asama === 'Kazanıldı' || asama === 'Yanıt Alındı') aramaSonucu = 'Ulaşıldı'
+    else if (asama === 'Ulaşılamadı' || asama === 'Kaybedildi') aramaSonucu = 'Cevap Yok'
+
+    await handleHizliAksiyon(
+      { 'Pipeline Aşaması': asama, 'Son İletişim Tarihi': today, 'Bugün Aranacak': false },
+      aramaSonucu,
+      { randevuAlindi, toastMesaj: `Pipeline: ${asama}` },
+    )
   }
 
   async function handleNotEkle() {
@@ -1058,7 +1079,7 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
                   </div>
                 )}
                 {em ? (
-                  <EF label="Birikimli Görüşme Notları" fk="Birikimli Görüşme Notları" type="textarea" em={em} rec={record} pend={pend} onCh={onCh} />
+                  <EF label="Birikimli Görüşme Notları" fk="Birikimli Görüşme Notları" type="textarea" em={false} rec={record} pend={pend} onCh={onCh} />
                 ) : (
                   <>
                     <textarea rows={3} value={notInput} onChange={e => setNotInput(e.target.value)}

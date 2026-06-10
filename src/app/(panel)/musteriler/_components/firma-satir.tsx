@@ -220,9 +220,18 @@ export function FirmaSatir({
 
   const today = new Date().toLocaleDateString('sv-SE')
 
-  function doArandi()     { if (!canWrite) return; onAksiyon!(record.id, { 'Son İletişim Tarihi': today, '2026 Arandı mı': true }, firmaAdi); setMobileMenu(false) }
-  function doUlasildi()   { if (!canWrite) return; onAksiyon!(record.id, { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, '2026 Ulaşıldı mı': true }, firmaAdi); setMobileMenu(false) }
-  function doUlasilamadi(){ if (!canWrite) return; onAksiyon!(record.id, { 'Son İletişim Tarihi': today, '2026 Arandı mı': true }, firmaAdi); setMobileMenu(false) }
+  // Aktivite logu (fire-and-forget) — PATCH ile paralel gider
+  function logAktivite(aramaSonucu: string) {
+    fetch('/api/aktivite/ekle', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ firmaId: record.id, aramaSonucu }),
+    }).catch(console.warn)
+  }
+
+  function doArandi()     { if (!canWrite) return; onAksiyon!(record.id, { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, 'Bugün Aranacak': false }, firmaAdi); logAktivite('Geri Aranacak'); setMobileMenu(false) }
+  function doUlasildi()   { if (!canWrite) return; onAksiyon!(record.id, { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, '2026 Ulaşıldı mı': true, 'Bugün Aranacak': false }, firmaAdi); logAktivite('Ulaşıldı'); setMobileMenu(false) }
+  function doUlasilamadi(){ if (!canWrite) return; onAksiyon!(record.id, { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, 'Pipeline Aşaması': 'Ulaşılamadı', 'Bugün Aranacak': false }, firmaAdi); logAktivite('Cevap Yok'); setMobileMenu(false) }
   function doSonraAra()   { if (!sonraAraTarih || !canWrite) { setSonraAra(false); return }; onAksiyon!(record.id, { 'Sonra Ara Tarihi': sonraAraTarih }, firmaAdi); setSonraAra(false); setSAT('') }
   function doNot()        { const t = notInput.trim(); if (t && onNotEkle) onNotEkle(record.id, t, firmaAdi); setNotAcik(false); setNotInput('') }
 

@@ -11,7 +11,12 @@ const EDITILEBILIR = new Set([
   'Elementer Ürün', 'Elementer Vade', 'Mevcut Aracı Kurum', 'Kişi Sayısı',
   'Ürün', 'Öncelik', 'Bugün Aranacak', '2026 Arandı mı', '2026 Ulaşıldı mı',
   'Sonra Ara Tarihi', 'Son Durum 2026', 'Kaybedilme Nedeni', 'Ali Özeti',
-  'Branş Onaylandı', 'Cross-Sell İmkânı', 'Global Anlaşma',
+  'Branş Onaylandı', 'Cross-Sell İmkânı', 'Global Anlaşma', 'Pipeline Aşaması',
+])
+
+const PIPELINE_ASAMALARI = new Set([
+  'Potansiyel', 'İlk Temas', 'Yanıt Alındı', 'Randevu', 'Teklif',
+  'Müzakere', 'Kazanıldı', 'Kaybedildi', 'Ulaşılamadı', 'Geri Aranacak',
 ])
 
 const DATE_ALANLARI = [
@@ -60,6 +65,8 @@ export async function PATCH(req: NextRequest) {
     '2026 Arandı mı':        checkRec.fields?.['2026 Arandı mı']        ?? false,
     '2026 Ulaşıldı mı':      checkRec.fields?.['2026 Ulaşıldı mı']      ?? false,
     'Sonra Ara Tarihi':      checkRec.fields?.['Sonra Ara Tarihi']      ?? null,
+    'Pipeline Aşaması':      checkRec.fields?.['Pipeline Aşaması']      ?? null,
+    'Bugün Aranacak':        checkRec.fields?.['Bugün Aranacak']        ?? false,
   }
 
   if (atanan === cfg.airtable.sistemAdi) return Response.json({ error: 'Yetkisiz' }, { status: 403 })
@@ -96,10 +103,17 @@ export async function PATCH(req: NextRequest) {
       return Response.json({ error: `${df}: geçersiz tarih (YYYY-MM-DD)` }, { status: 422 })
     }
   }
+  if ('Pipeline Aşaması' in patchFields) {
+    const pv = patchFields['Pipeline Aşaması']
+    // null → alanı temizle (undo desteği); geçersiz string → sessizce at
+    if (pv != null && !PIPELINE_ASAMALARI.has(String(pv))) {
+      delete patchFields['Pipeline Aşaması']
+    }
+  }
 
   if (notEkle?.trim()) {
     const user = await currentUser()
-    const adSoyad = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Kullanıcı'
+    const adSoyad = user?.firstName || 'Kullanıcı'
 
     const noteQS = new URLSearchParams()
     noteQS.append('fields[]', 'Birikimli Görüşme Notları')
@@ -115,20 +129,19 @@ export async function PATCH(req: NextRequest) {
       }
     } catch { /* mevcut not okunamadı, yeni not tek başına yazılır */ }
 
-    const now = new Date()
-    const tarih = now.toLocaleString('tr-TR', {
-      timeZone: 'Europe/Istanbul',
-      day: 'numeric', month: 'long', year: 'numeric',
-      hour: '2-digit', minute: '2-digit',
-    })
+    // İstanbul saat dilimi — tr-TR formatı GG.AA.YYYY döner (sunucu UTC olsa bile doğru gün)
+    const tarihTR = new Date().toLocaleDateString('tr-TR', { timeZone: 'Europe/Istanbul' })
+    const stamp = `[${tarihTR} - ${adSoyad}]`
 
-    patchFields['Birikimli Görüşme Notları'] = mevcutNot
-      ? `${mevcutNot}\n\n--- [${tarih}] ${adSoyad} ---\n${notEkle.trim()}`
-      : `--- [${tarih}] ${adSoyad} ---\n${notEkle.trim()}`
+    patchFields['Birikimli Görüşme Notları'] = mevcutNot.trim()
+      ? `${stamp} ${notEkle.trim()}\n\n${mevcutNot}`
+      : `${stamp} ${notEkle.trim()}`
   }
 
+  // notEkle varsa yukarıda patchFields'a 'Birikimli Görüşme Notları' eklenmiştir;
+  // bu noktada patchFields hâlâ boşsa yazılabilir hiçbir alan yok demektir.
   if (Object.keys(patchFields).length === 0) {
-    return Response.json({ ok: true, changed: 0 })
+    return Response.json({ ok: false, error: 'no_writable_fields' }, { status: 400 })
   }
 
   const actualPatchFields = translatePatch(cfg, 'firmalar', patchFields)

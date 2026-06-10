@@ -282,7 +282,8 @@ export function MusterilerClient({
       return
     }
     let mesaj = `${firmaAdi} · güncellendi`
-    if ('2026 Ulaşıldı mı' in fields) mesaj = `${firmaAdi} · Ulaşıldı işaretlendi`
+    if ('Pipeline Aşaması' in fields) mesaj = `${firmaAdi} · ${fields['Pipeline Aşaması']} işaretlendi`
+    else if ('2026 Ulaşıldı mı' in fields) mesaj = `${firmaAdi} · Ulaşıldı işaretlendi`
     else if ('Sonra Ara Tarihi' in fields) mesaj = `${firmaAdi} · Sonra ara tarihi ayarlandı`
     else if ('2026 Arandı mı' in fields) mesaj = `${firmaAdi} · Arandı işaretlendi`
     showToast({ mesaj, undoRecordId: recordId, undoFields: data.prev })
