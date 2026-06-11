@@ -330,7 +330,7 @@ export function RaporlarClient({
 
           {/* a) Temsilci karşılaştırma — SADECE YÖNETİCİ */}
           {showTemsilci && (
-            <GrafikKart title="Rüya vs Sude">
+            <GrafikKart title={`${displayAdMap['Rüya'] ?? 'Rüya'} vs ${displayAdMap['Sude'] ?? 'Sude'}`}>
               {grafikLoading || !mounted ? <GrafikSkeleton /> : !grafik?.temsilci?.length ? (
                 <p className="text-xs text-gray-400 py-10 text-center">Veri yok</p>
               ) : (
