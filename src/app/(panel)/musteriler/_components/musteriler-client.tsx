@@ -89,6 +89,9 @@ interface Props {
   initialModalId?: string
   initialFilters?: InitialFilters
   isAdmin?: boolean
+  isEmlak?: boolean
+  isBireysel?: boolean
+  displayAdMap?: Record<string, string>  // realAd → displayAd
 }
 
 type BransChip = '' | 'saglik' | 'elementer' | 'acibadem' | 'crosssell'
@@ -150,6 +153,7 @@ function activeFilterCount(f: Filtreler) {
 
 export function MusterilerClient({
   izin, initialRecords, initialOffset, brifingData, counts, sicakKpi, initialModalId, initialFilters, isAdmin,
+  isEmlak = false, isBireysel = false, displayAdMap = {},
 }: Props) {
   const [filtreler, setFiltreler] = useState<Filtreler>({
     ...BOSLUK,
@@ -240,12 +244,14 @@ export function MusterilerClient({
   )
 
   useEffect(() => {
+    if (isBireysel) return  // bireysel: fixture verisi, API çağrısı yok
     fetchStats(BOSLUK)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     if (isFirst.current) { isFirst.current = false; return }
+    if (isBireysel) return  // bireysel: fixture verisi, API çağrısı yok
     const f = { ...filtreler, q: debouncedQ }
     fetchRecords(f)
     fetchStats(f)
@@ -303,7 +309,7 @@ export function MusterilerClient({
   }
 
   async function loadMore() {
-    if (!offset || loadingMore) return
+    if (isBireysel || !offset || loadingMore) return
     setLoadingMore(true)
     try {
       const res = await fetch(buildApiUrl('/api/musteriler/list', { ...filtreler, q: debouncedQ }, offset))
@@ -425,26 +431,34 @@ export function MusterilerClient({
             </div>
           </div>
 
+          {/* Örnek veri badge (bireysel segment) */}
+          {isBireysel && (
+            <div className="flex items-center gap-[8px] rounded-[10px] border border-amber-200 bg-amber-50 px-[14px] py-[8px]">
+              <span className="text-[12px] font-bold text-amber-700">Örnek veri</span>
+              <span className="text-[12px] text-amber-600">Bireysel segment — yerel fixture, Airtable bağlantısı yok.</span>
+            </div>
+          )}
+
           {/* KPI 3-grid */}
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-[12px]">
             <KpiCard
-              title="Toplam Portföy"
-              value={firmaToplam?.toLocaleString('tr-TR') ?? stats?.total?.toLocaleString('tr-TR') ?? '—'}
-              sub="Aktif firma"
+              title={isEmlak ? 'Aktif Müşteri' : 'Toplam Portföy'}
+              value={isBireysel ? String(initialRecords.length) : (firmaToplam?.toLocaleString('tr-TR') ?? stats?.total?.toLocaleString('tr-TR') ?? '—')}
+              sub={isEmlak ? 'Kayıtlı müşteri' : 'Aktif firma'}
               Icon={TrendingUp}
               tone="chart"
             />
             <KpiCard
-              title="Sıcak Fırsatlar"
+              title={isEmlak ? 'İlgi Puanı Yüksek' : 'Sıcak Fırsatlar'}
               value={String(sicakKpi)}
-              sub="Skor ≥ 7 firma"
+              sub={isEmlak ? 'Skor ≥ 7 müşteri' : 'Skor ≥ 7 firma'}
               Icon={Flame}
               tone="red"
             />
             <KpiCard
               title="Yanıt Bekleyen"
               value={String(counts.yanitBekleyen)}
-              sub="Pipeline'da"
+              sub={isEmlak ? 'Randevu bekleniyor' : 'Pipeline\'da'}
               Icon={MessageSquare}
               tone="violet"
             />
@@ -495,9 +509,10 @@ export function MusterilerClient({
             />
             {showTemsilci && (
               <FilterPill
-                label="Temsilci" value={filtreler.temsilci}
+                label={isEmlak ? 'Danışman' : 'Temsilci'} value={filtreler.temsilci}
                 onChange={v => setFiltreler(p => ({ ...p, temsilci: v }))}
                 options={[...TEMSILCILER]}
+                optionLabels={displayAdMap}
               />
             )}
             <FilterPill
@@ -860,12 +875,13 @@ function KpiCard({
 }
 
 function FilterPill({
-  label, value, onChange, options,
+  label, value, onChange, options, optionLabels = {},
 }: {
   label: string
   value: string
   onChange: (v: string) => void
   options: string[]
+  optionLabels?: Record<string, string>
 }) {
   return (
     <select
@@ -878,7 +894,7 @@ function FilterPill({
       }
     >
       <option value="">{label}</option>
-      {options.map(o => <option key={o} value={o}>{o}</option>)}
+      {options.map(o => <option key={o} value={o}>{optionLabels[o] ?? o}</option>)}
     </select>
   )
 }

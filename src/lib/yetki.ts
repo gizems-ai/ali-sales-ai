@@ -8,6 +8,7 @@ const PROD_HOST_MAP: Record<string, string> = {
   'sigorta.alisales.ai': 'sigortan_biz',
   'crm.alisales.ai':     'ali_genel',
   'panel.alisales.ai':   'sigortan_biz',  // legacy alias — gerekli değilse decommission et
+  'emlak.alisales.ai':   'emlak_demo',    // preview only, production alias yok
 }
 
 // ─── Tipler ──────────────────────────────────────────────────────────────────

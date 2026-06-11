@@ -34,6 +34,7 @@ export async function PATCH(req: NextRequest) {
 
   const cfg = await getTenantConfigFromRequest()
   if (!cfg) return Response.json({ error: 'Tenant bulunamıyor' }, { status: 403 })
+  if (cfg.readOnly) return Response.json({ error: 'Demo modunda yazma devre dışı' }, { status: 403 })
   const BASE_URL = atTableUrl(cfg, 'firmalar')
 
   if (profil.rol === 'satış_temsilcisi') {

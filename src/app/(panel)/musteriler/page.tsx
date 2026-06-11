@@ -4,6 +4,8 @@ import { getBrifing, type BrifingData } from '@/lib/brifing'
 import { getKullanicıProfili, getTenantConfigFromRequest } from '@/lib/yetki'
 import { type TenantConfig } from '@/lib/tenants'
 import { MusterilerClient } from './_components/musteriler-client'
+import { getSegment } from '@/lib/emlak-segment'
+import { BIREYSEL_MUSTERILER } from '@/lib/emlak-fixtures'
 
 export const dynamic = 'force-dynamic'
 
@@ -37,10 +39,11 @@ export default async function MusterilerPage({
     brans:   sp.brans && GECERLI_BRANS.includes(sp.brans as typeof GECERLI_BRANS[number]) ? sp.brans : undefined,
   }
 
-  const [izin, profil, cfg] = await Promise.all([
+  const [izin, profil, cfg, segment] = await Promise.all([
     getMusterilerIzni(),
     getKullanicıProfili(),
     getTenantConfigFromRequest(),
+    getSegment(),
   ])
   if (!cfg) return null
 
@@ -56,16 +59,31 @@ export default async function MusterilerPage({
     )
   }
 
+  const isEmlak = cfg.id === 'emlak_demo'
+  const isBireysel = isEmlak && segment === 'bireysel'
+
   const temsilciFilter = izin.tip === 'temsilci' ? izin.temsilci : undefined
-  const formula = buildMusterilerFormula(izin, {}, cfg)
 
-  const [{ records, offset }, brifingData, counts] = await Promise.all([
-    getFirmalarSayfasi(formula, undefined, 0, cfg),
-    getBrifing(cfg),
-    getDashboardCounts(temsilciFilter, cfg),
-  ])
+  // Bireysel segmentte fixture verisi kullanılır — Airtable'a hiç gidilmez
+  let records, offset: string | undefined, brifingData, counts
+  if (isBireysel) {
+    records = BIREYSEL_MUSTERILER
+    offset = undefined
+    brifingData = null
+    counts = {
+      sessizlesenler: 1, crossSellUygun: 2, yenilemeriski: 0,
+      teklifSessiz: 1, bugunAranacak: 3, yanitBekleyen: 2,
+    }
+  } else {
+    const formula = buildMusterilerFormula(izin, {}, cfg)
+    ;([{ records, offset }, brifingData, counts] = await Promise.all([
+      getFirmalarSayfasi(formula, undefined, 0, cfg),
+      getBrifing(cfg),
+      getDashboardCounts(temsilciFilter, cfg),
+    ]))
+  }
+
   const isAdmin = profil?.rol === 'admin'
-
   const sicakKpi = getSicakKpi(brifingData, temsilciFilter, cfg)
 
   return (
@@ -79,6 +97,9 @@ export default async function MusterilerPage({
       initialModalId={initialModalId}
       initialFilters={initialFilters}
       isAdmin={isAdmin}
+      isEmlak={isEmlak}
+      isBireysel={isBireysel}
+      displayAdMap={Object.fromEntries(cfg.temsilciler.filter(t => t.displayAd).map(t => [t.ad, t.displayAd!]))}
     />
   )
 }

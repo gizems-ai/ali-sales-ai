@@ -8,7 +8,9 @@ import {
   LayoutDashboard, Users, Flame, RefreshCw, Calendar,
   BarChart3, Lightbulb, Bell, Briefcase, UserCheck,
   Wallet, Settings2, MessageSquare, BookOpen, Users2, KanbanSquare,
+  Building2,
 } from 'lucide-react'
+import { SegmentSwitch } from './segment-switch'
 
 const C = {
   violet: '#5B38E8', bordo: '#982A49', pink: '#D978B6', line: '#E7EAF2', navy: '#061f3d',
@@ -31,8 +33,9 @@ const mainNav: NavItem[] = [
   { href: '/',             label: 'Ana Akış',         icon: LayoutDashboard, moduleKey: 'dashboard' },
   { href: '/ajanda',       label: 'Ajanda',           icon: Calendar,        moduleKey: 'ajanda' },
   { href: '/firsatlar',    label: 'Satış Fırsatları', icon: Flame,           moduleKey: 'firsatlar' },
-  { href: '/musteriler',   label: 'Müşteriler',        icon: Users,           moduleKey: 'musteriler' },
+  { href: '/musteriler',   label: 'Müşteriler',       icon: Users,           moduleKey: 'musteriler' },
   { href: '/satis-sureci', label: 'Satış Süreci',     icon: KanbanSquare,    moduleKey: 'satis_sureci' },
+  { href: '/stok',         label: 'Stok / Envanter',  icon: Building2,       moduleKey: 'stok' },
 ]
 
 const stubNav: StubItem[] = [
@@ -111,6 +114,9 @@ export function Sidebar() {
         )}
         <p className="text-[12px] font-medium text-slate-400 mt-2">CRM Paneli</p>
       </div>
+
+      {/* Segment switch — sadece emlak tenantında */}
+      {mods.segmentSwitch && <SegmentSwitch />}
 
       <nav className="flex-1 px-[14px] pt-[16px] overflow-y-auto">
 

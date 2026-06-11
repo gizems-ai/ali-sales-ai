@@ -30,6 +30,7 @@ export async function PATCH(req: NextRequest) {
   ])
   if (izin.tip === 'yok') return Response.json({ error: 'Yetkisiz' }, { status: 403 })
   if (!cfg) return Response.json({ error: 'Tenant bulunamıyor' }, { status: 403 })
+  if (cfg.readOnly) return Response.json({ error: 'Demo modunda yazma devre dışı' }, { status: 403 })
 
   let body: { recordId?: string; fields?: Record<string, unknown>; notEkle?: string }
   try { body = await req.json() }

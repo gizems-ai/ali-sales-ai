@@ -180,7 +180,7 @@ const GRID = 'grid-cols-[40px_minmax(220px,1fr)_100px_105px_90px_105px_105px_90p
 export function FirmaSatir({
   record, showTemsilci = true, izin, onClick, onAksiyon, onNotEkle,
 }: Props) {
-  const { airtable: { sistemAdi } } = useTenant()
+  const { airtable: { sistemAdi }, temsilciler } = useTenant()
   const f = record.fields
   const firmaAdi  = f['Firma Adı'] ?? '—'
   const sektor    = f['Sektör']
@@ -189,7 +189,11 @@ export function FirmaSatir({
   const mail      = f['Genel Mail']
   const score     = f['Sıcaklık Skoru']
   const asama     = f['Pipeline Aşaması']
-  const temsilci  = f['Atanan Temsilci']
+  const temsilciRaw = f['Atanan Temsilci']
+  // displayAd override: emlak demoda Rüya→Hülya, Sude→Ahmet
+  const temsilci  = temsilciRaw
+    ? (temsilciler.find(t => t.ad === temsilciRaw)?.displayAd ?? temsilciRaw)
+    : undefined
   const oncelik   = f['Öncelik']
   const bugun     = f['Bugün Aranacak']
   const sonTarih  = f['Son İletişim Tarihi']
@@ -215,7 +219,7 @@ export function FirmaSatir({
   const canWrite = Boolean(onAksiyon) && (
     !izin ||
     izin.tip === 'yönetici' ||
-    (izin.tip === 'temsilci' && temsilci === izin.temsilci)
+    (izin.tip === 'temsilci' && temsilciRaw === izin.temsilci)
   )
 
   const today = new Date().toLocaleDateString('sv-SE')
@@ -236,6 +240,8 @@ export function FirmaSatir({
   function doNot()        { const t = notInput.trim(); if (t && onNotEkle) onNotEkle(record.id, t, firmaAdi); setNotAcik(false); setNotInput('') }
 
   const temsilciInitials = temsilci ? temsilci.slice(0, 2).toUpperCase() : '—'
+  // showTemsilci guard için gerçek isimle karşılaştır
+  const isSystemRecord = sistemAdi && temsilciRaw === sistemAdi
   const bransRenk = getBransRenk(f)
 
   const AYLAR: Record<string, number> = { 'Ocak':0,'Şubat':1,'Mart':2,'Nisan':3,'Mayıs':4,'Haziran':5,'Temmuz':6,'Ağustos':7,'Eylül':8,'Ekim':9,'Kasım':10,'Aralık':11 }
@@ -330,7 +336,7 @@ export function FirmaSatir({
 
         {/* Temsilci */}
         <div>
-          {showTemsilci && temsilci && (!sistemAdi || temsilci !== sistemAdi) ? (
+          {showTemsilci && temsilci && !isSystemRecord ? (
             <div className="flex items-center gap-[7px]">
               <span className="h-[23px] w-[23px] rounded-full grid place-items-center text-[10px] font-black text-white shrink-0"
                 style={{ background: `linear-gradient(135deg, ${C.bordo}, ${C.violet})` }}>

@@ -89,9 +89,19 @@ function formatTarih(iso: string): string {
   return `${d.getDate()} ${TR_AY[d.getMonth()]} ${d.getFullYear()} ${TR_GUN[d.getDay()]}`
 }
 
+function formatHafta(weekStart: string, today: string): string {
+  const s = new Date(weekStart + 'T00:00:00')
+  const e = new Date(today + 'T00:00:00')
+  if (weekStart === today) return `${s.getDate()} ${TR_AY[s.getMonth()]} ${s.getFullYear()}`
+  if (s.getMonth() === e.getMonth()) {
+    return `${s.getDate()}-${e.getDate()} ${TR_AY[s.getMonth()]} ${s.getFullYear()}`
+  }
+  return `${s.getDate()} ${TR_AY[s.getMonth()]} - ${e.getDate()} ${TR_AY[e.getMonth()]} ${e.getFullYear()}`
+}
+
 const HEDEF = 50
 
-function BugunAktiviteKart({ t, tarih }: { t: TemsilciAktivite; tarih: string }) {
+function BugunAktiviteKart({ t, weekStart, tarih }: { t: TemsilciAktivite; weekStart: string; tarih: string }) {
   const bos = t.toplam === 0
   const hedefPct = Math.min(t.toplam / HEDEF * 100, 100)
 
@@ -108,11 +118,11 @@ function BugunAktiviteKart({ t, tarih }: { t: TemsilciAktivite; tarih: string })
           </span>
           <span className="text-sm font-semibold text-gray-800">{t.ad}</span>
         </div>
-        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wide">Bugün</span>
+        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wide">Bu Hafta</span>
       </div>
 
-      {/* Tarih */}
-      <div className="text-[10px] text-gray-400">{formatTarih(tarih)}</div>
+      {/* Tarih aralığı */}
+      <div className="text-[10px] text-gray-400">{formatHafta(weekStart, tarih)}</div>
 
       {/* Toplam */}
       <div className="flex items-baseline gap-1">
@@ -193,16 +203,24 @@ function BugunAktiviteKart({ t, tarih }: { t: TemsilciAktivite; tarih: string })
   )
 }
 
-export function RaporlarClient({ izin }: { izin: Exclude<MusterilerIzin, { tip: 'yok' }> }) {
+export function RaporlarClient({
+  izin,
+  isBireysel = false,
+  displayAdMap = {},
+}: {
+  izin: Exclude<MusterilerIzin, { tip: 'yok' }>
+  isBireysel?: boolean
+  displayAdMap?: Record<string, string>
+}) {
   const [grafik, setGrafik] = useState<GrafikData | null>(null)
-  const [grafikLoading, setGrafikLoading] = useState(true)
+  const [grafikLoading, setGrafikLoading] = useState(!isBireysel)
   const [grafikError, setGrafikError] = useState<string | null>(null)
 
-  const [bugunAktivite, setBugunAktivite] = useState<{ tarih: string; temsilciler: TemsilciAktivite[] } | null>(null)
-  const [bugunLoading, setBugunLoading] = useState(true)
+  const [bugunAktivite, setBugunAktivite] = useState<{ tarih: string; weekStart: string; temsilciler: TemsilciAktivite[] } | null>(null)
+  const [bugunLoading, setBugunLoading] = useState(!isBireysel)
 
   const [arsiv, setArsiv] = useState<ArsivRecord[]>([])
-  const [arsivLoading, setArsivLoading] = useState(true)
+  const [arsivLoading, setArsivLoading] = useState(!isBireysel)
   const [arsivError, setArsivError] = useState<string | null>(null)
 
   const [modalId, setModalId] = useState<string | null>(null)
@@ -211,25 +229,44 @@ export function RaporlarClient({ izin }: { izin: Exclude<MusterilerIzin, { tip: 
   useEffect(() => { setMounted(true) }, [])
 
   useEffect(() => {
-    fetch('/api/raporlar/bugun-aktivite')
+    if (isBireysel) return
+    fetch('/api/raporlar/bugun-aktivite', { cache: 'no-store' })
       .then(r => r.json())
-      .then(d => { if (!d.error) setBugunAktivite({ tarih: d.tarih, temsilciler: d.temsilciler ?? [] }) })
+      .then(d => {
+        if (!d.error) {
+          const temsilcilerMapped = (d.temsilciler ?? []).map((t: TemsilciAktivite) => ({
+            ...t,
+            ad: displayAdMap[t.ad] ?? t.ad,
+          }))
+          setBugunAktivite({ tarih: d.tarih, weekStart: d.weekStart ?? d.tarih, temsilciler: temsilcilerMapped })
+        }
+      })
       .catch(() => {})
       .finally(() => setBugunLoading(false))
-  }, [])
+  }, [isBireysel]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (isBireysel) return
     fetch('/api/raporlar/grafik')
       .then(r => r.json())
       .then(d => {
         if (d.error) { setGrafikError('Grafikler yüklenemedi'); return }
-        setGrafik(d)
+        // Temsilci grafik verilerinde displayAd uygula
+        const mapped = { ...d }
+        if (mapped.temsilci) {
+          mapped.temsilci = mapped.temsilci.map((item: TemsilciItem) => ({
+            ...item,
+            temsilci: displayAdMap[item.temsilci] ?? item.temsilci,
+          }))
+        }
+        setGrafik(mapped)
       })
       .catch(() => setGrafikError('Grafikler yüklenemedi'))
       .finally(() => setGrafikLoading(false))
-  }, [])
+  }, [isBireysel]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (isBireysel) return
     fetch('/api/raporlar/arsiv')
       .then(r => r.json())
       .then(d => {
@@ -238,18 +275,31 @@ export function RaporlarClient({ izin }: { izin: Exclude<MusterilerIzin, { tip: 
       })
       .catch(() => setArsivError('Arşiv yüklenemedi'))
       .finally(() => setArsivLoading(false))
-  }, [])
+  }, [isBireysel]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const showTemsilci = izin.tip === 'yönetici'
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
-      <h1 className="text-lg font-semibold text-gray-900">Raporlar</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-lg font-semibold text-gray-900">Raporlar</h1>
+        {isBireysel && (
+          <span className="rounded-full border border-amber-200 bg-amber-50 px-[11px] py-[5px] text-[11px] font-bold text-amber-700">
+            Örnek veri
+          </span>
+        )}
+      </div>
+
+      {isBireysel && (
+        <div className="rounded-[12px] border border-amber-200 bg-amber-50 px-[16px] py-[12px] text-[13px] text-amber-700">
+          Bireysel segmentte raporlar örnek verilerle gösterilmektedir. Gerçek Airtable bağlantısı kurulmaz.
+        </div>
+      )}
 
       {/* ── Bugün Aktivite ────────────────────────────────────────────── */}
       <section className="space-y-3">
         <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
-          Bugün Aktivite
+          Bu Hafta Aktivite
         </h2>
         {bugunLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -260,7 +310,7 @@ export function RaporlarClient({ izin }: { izin: Exclude<MusterilerIzin, { tip: 
         ) : bugunAktivite && bugunAktivite.temsilciler.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {bugunAktivite.temsilciler.map(t => (
-              <BugunAktiviteKart key={t.slug} t={t} tarih={bugunAktivite.tarih} />
+              <BugunAktiviteKart key={t.slug} t={t} weekStart={bugunAktivite.weekStart} tarih={bugunAktivite.tarih} />
             ))}
           </div>
         ) : null}

@@ -3,6 +3,9 @@ import { getDashboardCounts } from '@/lib/airtable'
 import { getKullanicıProfili, izolasyonBelirle, getTenantConfigFromRequest } from '@/lib/yetki'
 import { type TenantConfig } from '@/lib/tenants'
 import { redirect } from 'next/navigation'
+import { getSegment } from '@/lib/emlak-segment'
+import { resolveDisplayAd } from '@/lib/emlak-display'
+import { BIREYSEL_MUSTERILER } from '@/lib/emlak-fixtures'
 import {
   Clock3, Heart, Bell, Gift,
   MessageCircle, TrendingUp,
@@ -313,31 +316,44 @@ function HizliYolCard({
 //  SAYFA
 // ══════════════════════════════════════════════════════════════════
 export default async function DashboardPage() {
-  const [profil, cfg] = await Promise.all([
+  const [profil, cfg, segment] = await Promise.all([
     getKullanicıProfili(),
     getTenantConfigFromRequest(),
+    getSegment(),
   ])
   if (!profil) redirect('/login')
   if (!cfg) redirect('/login')
+
+  const isEmlak = cfg.id === 'emlak_demo'
+  const isBireysel = isEmlak && segment === 'bireysel'
 
   const izolasyon = izolasyonBelirle(profil)
   const temsilciFilter = izolasyon.tip === 'temsilci' ? izolasyon.ad : undefined
   const showTeam = izolasyon.tip !== 'temsilci'
 
+  // Bireysel segmentte fixture'dan gelen sayılar kullanılır
+  const bireyselCounts = isBireysel ? {
+    sessizlesenler: 1, crossSellUygun: 2, yenilemeriski: 0,
+    teklifSessiz: 1, bugunAranacak: 3, yanitBekleyen: 2,
+  } : null
+
   const [d, counts] = await Promise.all([
-    getBrifing(cfg),
-    getDashboardCounts(temsilciFilter, cfg),
+    isBireysel ? Promise.resolve(null) : getBrifing(cfg),
+    isBireysel ? Promise.resolve(bireyselCounts!) : getDashboardCounts(temsilciFilter, cfg),
   ])
 
   // Portföy KPI — izolasyonlu
   let portfoyToplam: number
   let portfoySub: string | undefined
-  if (!d) {
+  if (isBireysel) {
+    portfoyToplam = BIREYSEL_MUSTERILER.length
+    portfoySub = 'Örnek müşteri verisi'
+  } else if (!d) {
     portfoyToplam = 0
   } else if (showTeam) {
     portfoyToplam = d.firma_toplam
     portfoySub = cfg.temsilciler
-      .map(t => `${t.ad}: ${fmt(d.temsilci[t.slug]?.toplam_portfoy ?? 0)}`)
+      .map(t => `${t.displayAd ?? t.ad}: ${fmt(d.temsilci[t.slug]?.toplam_portfoy ?? 0)}`)
       .join(' · ')
   } else {
     const t = temsilciFilter
@@ -348,7 +364,9 @@ export default async function DashboardPage() {
 
   // Sıcak KPI — izolasyonlu
   let sicakKpi = 0
-  if (d) {
+  if (isBireysel) {
+    sicakKpi = BIREYSEL_MUSTERILER.filter(r => (r.fields['Sıcaklık Skoru'] ?? 0) >= 7).length
+  } else if (d) {
     if (!showTeam && temsilciFilter) {
       const t = cfg.temsilciler.find(x => x.ad === temsilciFilter)
       sicakKpi = t ? (d.temsilci[t.slug]?.hot ?? d.sicak_firsatlar) : d.sicak_firsatlar
@@ -358,11 +376,24 @@ export default async function DashboardPage() {
   }
 
   // Sıcak firma listesi — izolasyonlu
-  const sicakListesi = d?.sicak_dokunulmayan ?? []
-  const filtrelenmis = temsilciFilter
+  const sicakListesi = isBireysel
+    ? BIREYSEL_MUSTERILER
+        .filter(r => (r.fields['Sıcaklık Skoru'] ?? 0) >= 7)
+        .map(r => ({
+          firma: r.fields['Firma Adı'] ?? '—',
+          skor: r.fields['Sıcaklık Skoru'] ?? 0,
+          temsilci: resolveDisplayAd(cfg.temsilciler, r.fields['Atanan Temsilci'] ?? ''),
+        }))
+    : (d?.sicak_dokunulmayan ?? []).map(item => ({
+        ...item,
+        temsilci: resolveDisplayAd(cfg.temsilciler, item.temsilci ?? ''),
+      }))
+
+  const filtrelenmis = !isBireysel && temsilciFilter
     ? sicakListesi.filter(item => {
-        const a = item.temsilci?.toLowerCase().replace(/ü/g, 'u') ?? ''
-        return a === temsilciFilter.toLowerCase().replace(/ü/g, 'u')
+        const a = item.temsilci?.toLowerCase().replace(/ü/g, 'u').replace(/ı/g, 'i') ?? ''
+        const b = resolveDisplayAd(cfg.temsilciler, temsilciFilter).toLowerCase().replace(/ü/g, 'u').replace(/ı/g, 'i')
+        return a === b
       })
     : sicakListesi
 
@@ -441,6 +472,16 @@ export default async function DashboardPage() {
         </div>
       </section>
 
+      {/* ── Örnek veri banner (bireysel segment) ──────────── */}
+      {isBireysel && (
+        <div className="flex items-center gap-[10px] rounded-[12px] border border-amber-200 bg-amber-50 px-[16px] py-[10px]">
+          <span className="text-[13px] font-bold text-amber-700">Örnek veri</span>
+          <span className="text-[12px] text-amber-600 flex-1">
+            Bireysel segment — tüm veriler yerel fixture&apos;dan geliyor. Airtable&apos;a bağlanılmıyor.
+          </span>
+        </div>
+      )}
+
       {/* ── 2-KOLON LAYOUT ──────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_288px] gap-5">
 
@@ -449,10 +490,10 @@ export default async function DashboardPage() {
 
           {/* KPI 4'lü Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-[14px]">
-            <KpiCard icon={Building2}     tone="chart"  label="Toplam Portföy"  value={fmt(portfoyToplam)} sub={portfoySub} />
-            <KpiCard icon={Flame}         tone="red"    label="Sıcak Fırsatlar" value={fmt(sicakKpi)}       sub="Skor ≥ 7 firma" />
-            <KpiCard icon={MessageCircle} tone="violet" label="Yanıt Bekleyen"  value={fmt(counts.yanitBekleyen)} sub="Pipeline: Yanıt Alındı" />
-            <KpiCard icon={Wallet}        tone="bordo"  label="Bu Ay Komisyon"  yakinda />
+            <KpiCard icon={Building2}     tone="chart"  label={isEmlak ? 'Aktif Müşteri' : 'Toplam Portföy'}   value={fmt(portfoyToplam)} sub={portfoySub} />
+            <KpiCard icon={Flame}         tone="red"    label={isEmlak ? 'İlgi Puanı Yüksek' : 'Sıcak Fırsatlar'} value={fmt(sicakKpi)} sub={isEmlak ? 'Skor ≥ 7 müşteri' : 'Skor ≥ 7 firma'} />
+            <KpiCard icon={MessageCircle} tone="violet" label={isEmlak ? 'Yanıt Bekleyen' : 'Yanıt Bekleyen'}   value={fmt(counts.yanitBekleyen)} sub={isEmlak ? 'Randevu bekleniyor' : 'Pipeline: Yanıt Alındı'} />
+            <KpiCard icon={Wallet}        tone="bordo"  label={isEmlak ? 'Bu Ay Kazanım' : 'Bu Ay Komisyon'}    yakinda />
           </div>
 
           {/* Ali Öneriyor + Uyarılar */}

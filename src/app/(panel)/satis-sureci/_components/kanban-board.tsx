@@ -77,15 +77,19 @@ export interface InitialColumn {
 function CardContent({
   record, asama = '', overlay = false,
 }: { record: AirtableRecord<FirmaKart>; asama?: string; overlay?: boolean }) {
-  const { airtable: { sistemAdi } } = useTenant()
+  const { airtable: { sistemAdi }, temsilciler } = useTenant()
   const f = record.fields
-  const isYuksek  = f['Öncelik'] === 'Yüksek'
-  const temsilci  = f['Atanan Temsilci']
+  const isYuksek    = f['Öncelik'] === 'Yüksek'
+  const temsilciRaw = f['Atanan Temsilci']
+  // displayAd override: emlak demoda Rüya→Hülya, Sude→Ahmet
+  const temsilci    = temsilciRaw
+    ? (temsilciler.find(t => t.ad === temsilciRaw)?.displayAd ?? temsilciRaw)
+    : undefined
   const branslar  = f['Branş'] ?? []
   const skor      = f['Sıcaklık Skoru']
   const isKazandi = asama === 'Kazanıldı'
 
-  const temRenk = TEMSILCI_RENK[temsilci ?? ''] ?? TEMSILCI_RENK_FALLBACK
+  const temRenk = TEMSILCI_RENK[temsilciRaw ?? ''] ?? TEMSILCI_RENK_FALLBACK
 
   const tagColors: Record<string, [string, string]> = {
     'Sağlık':    [C.violet, C.lavender],
@@ -140,7 +144,7 @@ function CardContent({
       </div>
 
       {/* Temsilci */}
-      {temsilci && (!sistemAdi || temsilci !== sistemAdi) && (
+      {temsilci && (!sistemAdi || temsilciRaw !== sistemAdi) && (
         <div className="mt-[8px] flex items-center gap-[5px]">
           <span className="h-[16px] w-[16px] rounded-full grid place-items-center text-[8px] font-black text-white"
             style={{ background: temRenk }}>
@@ -280,7 +284,7 @@ export function KanbanBoard({
   initialModalId?: string
   isAdmin?: boolean
 }) {
-  const { airtable: { sistemAdi } } = useTenant()
+  const { airtable: { sistemAdi }, temsilciler: cfgTemsilciler } = useTenant()
   const [cols, setCols] = useState<Record<string, ColState>>(() => {
     const map: Record<string, ColState> = {}
     for (const c of initialColumns) map[c.value] = { records: c.records, offset: c.offset }
@@ -313,8 +317,8 @@ export function KanbanBoard({
     return () => document.removeEventListener('mousedown', onDown)
   }, [filterAcik])
 
-  // Ekrandaki kartlardan benzersiz temsilciler
-  const temsilciler = useMemo(() => {
+  // Ekrandaki kartlardan benzersiz temsilciler (gerçek Airtable isimleri)
+  const temsilcilerRaw = useMemo(() => {
     const set = new Set<string>()
     for (const col of initialColumns) {
       for (const r of col.records) {
@@ -562,20 +566,25 @@ export function KanbanBoard({
                         style={{ borderColor: '#DDE1ED' }}>
 
                         {/* Temsilci */}
-                        {temsilciler.length > 0 && (
+                        {temsilcilerRaw.length > 0 && (
                           <div>
                             <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-[7px]">Temsilci</p>
                             <div className="space-y-[4px]">
-                              {['', ...temsilciler].map(t => (
-                                <button key={t || '__tumu'} onClick={() => setKFilter(f => ({ ...f, temsilci: t }))}
-                                  className="w-full text-left text-[12px] px-[9px] py-[5px] rounded-[8px] font-medium transition-colors"
-                                  style={{
-                                    background: kFilter.temsilci === t ? C.lavender : 'transparent',
-                                    color:      kFilter.temsilci === t ? C.violet : '#475569',
-                                  }}>
-                                  {t || 'Tümü'}
-                                </button>
-                              ))}
+                              {['', ...temsilcilerRaw].map(tAd => {
+                                const tDisplay = tAd
+                                  ? (cfgTemsilciler.find(x => x.ad === tAd)?.displayAd ?? tAd)
+                                  : 'Tümü'
+                                return (
+                                  <button key={tAd || '__tumu'} onClick={() => setKFilter(f => ({ ...f, temsilci: tAd }))}
+                                    className="w-full text-left text-[12px] px-[9px] py-[5px] rounded-[8px] font-medium transition-colors"
+                                    style={{
+                                      background: kFilter.temsilci === tAd ? C.lavender : 'transparent',
+                                      color:      kFilter.temsilci === tAd ? C.violet : '#475569',
+                                    }}>
+                                    {tDisplay}
+                                  </button>
+                                )
+                              })}
                             </div>
                           </div>
                         )}

@@ -11,6 +11,7 @@ export async function POST(req: NextRequest) {
   if (!token) return Response.json({ error: 'Token eksik' }, { status: 500 })
 
   const cfg = await getTenantConfigFromRequest(); if (!cfg) return Response.json({ error: "Tenant bulunamıyor" }, { status: 403 })
+  if (cfg.readOnly) return Response.json({ error: 'Demo modunda yazma devre dışı' }, { status: 403 })
   const AT_URL = atTableUrl(cfg, 'aktiviteler')
 
   let body: {

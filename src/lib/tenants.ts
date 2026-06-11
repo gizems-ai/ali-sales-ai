@@ -23,6 +23,7 @@ export interface TenantTemsilci {
   ad: string
   slug: string
   renk: string
+  displayAd?: string  // emlak demo gibi yerlerde görünür isim override'ı
 }
 
 export interface TenantAirtable {
@@ -59,6 +60,8 @@ export interface TenantModules {
   ali_asistan: boolean
   aksamBrifing: boolean  // n8n aksam brifing webhook'u çağrılsın mı
   portfoy: boolean       // dashboard'da portföy/vade kartları gösterilsin mi
+  stok: boolean          // gayrimenkul stok/envanter sayfası
+  segmentSwitch: boolean // Kurumsal/Bireysel segment switch'i göster
 }
 
 export interface TenantConfig {
@@ -72,6 +75,7 @@ export interface TenantConfig {
   modules: TenantModules
   branding: TenantBranding
   security: TenantSecurity
+  readOnly?: boolean       // true ise tüm yazma aksiyonları (aktivite/update/kanban) bloklanır
 }
 
 // ─── Field-map yardımcıları ────────────────────────────────────────────────────
@@ -146,6 +150,7 @@ const ALL_ON: TenantModules = {
   musteriler: true, raporlar: true, teklifler: true, policeler: true,
   yenilemeler: true, komisyonlar: true, takvim: true, gorevler: true,
   ali_asistan: true, aksamBrifing: true, portfoy: true,
+  stok: false, segmentSwitch: false,
 }
 
 export const TENANTS: Record<string, TenantConfig> = {
@@ -230,6 +235,8 @@ export const TENANTS: Record<string, TenantConfig> = {
       ali_asistan: false,
       aksamBrifing: false,
       portfoy: false,
+      stok: false,
+      segmentSwitch: false,
     },
     branding: { logo: 'alisales.ai', logoImage: '/ali-logo.png' },
     security: {
@@ -237,6 +244,51 @@ export const TENANTS: Record<string, TenantConfig> = {
         'https://crm.alisales.ai',
       ],
     },
+  },
+  emlak_demo: {
+    id: 'emlak_demo',
+    name: 'Emlak Demo',
+    readOnly: true,
+    airtable: {
+      // SB_* tabloları — sadece okuma (readOnly:true sayesinde yazma API'leri bloklanır)
+      baseId: 'appjULACncjRV48pf',
+      tables: {
+        firmalar:      'tblHy9njVwfkmNSMP',
+        opportunities: 'tblBdnZ4dDUGroLpC',
+        aktiviteler:   'tbl0ISTyEy8nvZBbn',
+        raporlar:      'tblXFizKL2iTqY6Fr',
+      },
+      sistemAdi: 'SIGORTAN BIZ',
+    },
+    n8nBaseUrl: 'https://n8n.alisales.ai/webhook',
+    n8nSlug: 'emlak_demo',
+    // Gerçek Airtable isimleri (ad) + görünür override (displayAd)
+    // Hiçbir yerde Clerk/n8n/SB_Kullanicilar değiştirilmiyor.
+    temsilciler: [
+      { ad: 'Rüya', slug: 'ruya', renk: '#5B47E0', displayAd: 'Hülya' },
+      { ad: 'Sude', slug: 'sude', renk: '#D67BAF', displayAd: 'Ahmet' },
+    ],
+    modules: {
+      dashboard: true,
+      ajanda: false,
+      firsatlar: true,
+      satis_sureci: true,
+      musteriler: true,
+      raporlar: true,
+      teklifler: false,
+      policeler: false,
+      yenilemeler: false,
+      komisyonlar: false,
+      takvim: false,
+      gorevler: false,
+      ali_asistan: false,
+      aksamBrifing: false,
+      portfoy: false,
+      stok: true,
+      segmentSwitch: true,
+    },
+    branding: { logo: 'emlak.ai' },
+    security: { allowedOrigins: [] },
   },
 }
 
