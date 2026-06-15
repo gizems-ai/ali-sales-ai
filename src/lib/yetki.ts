@@ -141,5 +141,10 @@ export async function getKullanicıProfili(): Promise<KullanicıProfili | null> 
   if (typeof meta.temsilci === 'string' && meta.temsilci) {
     return { userId: user.id, rol: 'satış_temsilcisi', temsilciAdi: meta.temsilci }
   }
+  // emlak_demo: metadata olmayan authenticated user → admin (demo tenant, tüm data fixture)
+  const hdrs = await headers()
+  const host = hdrs.get('host') ?? ''
+  const tenantId = PROD_HOST_MAP[host] ?? hdrs.get('x-tenant-id') ?? ''
+  if (tenantId === 'emlak_demo') return { userId: user.id, rol: 'admin' }
   return null
 }
