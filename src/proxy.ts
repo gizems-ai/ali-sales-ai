@@ -37,6 +37,8 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon\\.ico|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|woff2?|ttf)).*)',
+    // decks/ — public/decks altındaki statik HTML deck'ler auth middleware'ini baypas eder
+    // (yoksa Clerk /decks/*.html'i /login'e 307'liyor → ContentViewer iframe boş kalıyor).
+    '/((?!_next/static|_next/image|favicon\\.ico|decks/|.*\\.(?:png|jpg|jpeg|gif|svg|ico|webp|woff2?|ttf)).*)',
   ],
 }
