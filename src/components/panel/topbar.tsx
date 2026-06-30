@@ -39,7 +39,11 @@ export async function Topbar() {
         display: 'flex',
         alignItems: 'center',
         gap: 22,
-        background: 'transparent',
+        // Frosted glass — sticky'ken altından kayan içerik bulanıklaşır, selamlama okunur kalır
+        background: 'rgba(247, 246, 251, .72)',
+        backdropFilter: 'blur(22px) saturate(165%)',
+        WebkitBackdropFilter: 'blur(22px) saturate(165%)',
+        borderBottom: '1px solid rgba(255,255,255,.6)',
       }}>
         {/* Greeting */}
         <div>
