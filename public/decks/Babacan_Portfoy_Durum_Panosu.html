@@ -1,0 +1,488 @@
+<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Babacan — Portföy Durum Panosu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#17255C; --navy-deep:#0E1844; --ink:#1B2030;
+  --pur:#8E7BE8; --lil:#C6A6DF; --peach:#F2B79C; --pink:#E79DC4;
+  --coral:#F08456; --coral-soft:#FBE4D8;
+  --lav:#B4A6EC; --lav-soft:#F0ECFB; --lav-panel:#EBE5FA;
+  --soft:#6A7088; --line:#E8EAF2; --bg:#FFFFFF; --mint:#7FC4A3; --mint-soft:#E2F2EA;
+  --red:#E06A6A; --gold:#D6A24A;
+  --grad: linear-gradient(102deg, var(--pur) 0%, var(--lil) 42%, var(--peach) 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:#FAFAFC;-webkit-font-smoothing:antialiased;overflow-x:hidden;line-height:1.5}
+h1,h2,h3,h4{font-family:'Sora',sans-serif;letter-spacing:-.022em;line-height:1.08}
+em{font-style:normal}
+.grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.wrap{max-width:1180px;margin:0 auto;padding:0 6vw}
+.eyebrow{font-family:'Space Mono';font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--lav);font-weight:700;margin-bottom:14px;display:inline-block}
+.eyebrow.coral{color:var(--coral)} .eyebrow.mint{color:var(--mint)}
+
+/* header */
+header{background:var(--navy-deep);color:#fff;padding:54px 0 46px;position:relative;overflow:hidden}
+header .holo{position:absolute;inset:0;z-index:0;overflow:hidden}
+header .holo::before{content:"";position:absolute;width:70vw;height:70vw;right:-15vw;top:-30vh;border-radius:50%;
+  background:radial-gradient(closest-side at 40% 40%,rgba(142,123,232,.5),transparent 70%),radial-gradient(closest-side at 65% 60%,rgba(242,183,156,.4),transparent 70%);filter:blur(40px);opacity:.8}
+header .wrap{position:relative;z-index:2}
+.brand{font-family:'Sora';font-weight:800;font-size:18px;letter-spacing:-.03em;color:#fff;margin-bottom:26px}
+.brand .ai{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.brand .spark{color:var(--lav);font-size:12px;vertical-align:super}
+header h1{font-size:clamp(30px,5vw,52px);font-weight:800;color:#fff;margin-bottom:14px}
+header .sub{font-size:clamp(15px,1.8vw,18px);color:#C9CFEA;max-width:680px;font-weight:500}
+.metaline{font-family:'Space Mono';font-size:12px;color:#8E96C4;margin-top:22px;letter-spacing:.02em}
+.frame{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:30px;max-width:860px}
+.fbox{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:18px 20px}
+.fbox .h{font-family:'Space Mono';font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;margin-bottom:10px}
+.fbox.see .h{color:var(--mint)} .fbox.blind .h{color:var(--coral)}
+.fbox ul{list-style:none;font-size:13.5px;color:#E3E7F6;line-height:1.85}
+.fbox ul li::before{content:"›";margin-right:9px;font-weight:700}
+.fbox.see li::before{color:var(--mint)} .fbox.blind li::before{color:var(--coral)}
+
+/* kpi strip */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:-30px auto 0;position:relative;z-index:5}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 18px;box-shadow:0 12px 34px rgba(23,37,92,.08)}
+.kpi .v{font-family:'Sora';font-weight:800;font-size:clamp(22px,2.6vw,32px);color:var(--navy);line-height:1}
+.kpi .v.g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.kpi .l{font-size:12px;color:var(--soft);margin-top:9px;font-weight:600;line-height:1.3}
+
+section{padding:52px 0}
+.sechead{margin-bottom:8px}
+h2.big{font-size:clamp(25px,3.6vw,40px);font-weight:800;color:var(--navy)}
+.lead{font-size:clamp(15px,1.6vw,17px);color:var(--soft);max-width:760px;margin-top:10px}
+
+/* map / geography */
+.geo{display:flex;gap:0;align-items:stretch;margin-top:30px;position:relative}
+.zone{flex:1;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 18px;margin:0 6px;position:relative;text-align:center}
+.zone:first-child{margin-left:0} .zone:last-child{margin-right:0}
+.zone.anchor{border:2px solid var(--mint);background:var(--mint-soft)}
+.zone .role{font-family:'Space Mono';font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--soft)}
+.zone.anchor .role{color:var(--mint)}
+.zone h3{font-size:19px;color:var(--navy);margin:8px 0 6px}
+.zone p{font-size:12.5px;color:var(--soft);line-height:1.4}
+.zone .pill{display:inline-block;margin-top:11px;font-family:'Space Mono';font-size:10px;font-weight:700;letter-spacing:.05em;padding:5px 10px;border-radius:20px;background:#fff;border:1px solid var(--line);color:var(--navy)}
+.zone.anchor .pill{background:var(--mint);color:#fff;border:none}
+.geoline{height:2px;background:linear-gradient(90deg,var(--mint),var(--lav),var(--coral));position:absolute;top:50%;left:2%;right:2%;z-index:-1;opacity:.35}
+.proof{margin-top:18px;background:var(--navy);color:#fff;border-radius:16px;padding:18px 22px;display:flex;gap:20px;align-items:center;flex-wrap:wrap}
+.proof .pnum{font-family:'Sora';font-weight:800;font-size:30px;color:var(--mint)}
+.proof .ptxt{font-size:14px;color:#D5DAEC;font-weight:500}
+.proof .ptxt strong{color:#fff;font-weight:700}
+
+/* treemap */
+.treemap{display:flex;gap:8px;margin-top:24px;height:200px}
+.tcol{display:flex;flex-direction:column;gap:8px}
+.tile{border-radius:16px;padding:18px 18px;color:#fff;position:relative;overflow:hidden;display:flex;flex-direction:column;justify-content:space-between}
+.tile h4{font-family:'Sora';font-size:18px;font-weight:800;line-height:1}
+.tile .ts{font-size:12px;opacity:.92;font-weight:500;margin-top:4px}
+.tile .tv{font-family:'Sora';font-weight:800;font-size:22px;margin-top:auto}
+.tile .tsub{font-family:'Space Mono';font-size:10.5px;opacity:.85;letter-spacing:.03em;margin-top:3px}
+.t-lagoon{background:linear-gradient(135deg,#17255C,#2C3E84)} 
+.t-port{background:linear-gradient(135deg,#8E7BE8,#A99BEF)}
+.t-central{background:linear-gradient(135deg,#F08456,#F4A077)}
+.t-premium{background:linear-gradient(135deg,#7FC4A3,#9AD3B8)}
+.mapnote{margin-top:16px;font-size:13px;color:var(--coral);font-weight:600;background:var(--coral-soft);border-radius:12px;padding:13px 18px;display:flex;gap:10px;align-items:flex-start}
+.mapnote b{font-family:'Space Mono';font-size:11px;letter-spacing:.05em}
+.esmap{margin-top:26px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 10px 30px rgba(23,37,92,.05);overflow:hidden}
+.maplegend{display:flex;gap:18px;flex-wrap:wrap;align-items:center;margin-top:12px;padding:0 6px;font-size:12.5px;color:var(--soft);font-weight:600}
+.maplegend span{display:flex;align-items:center;gap:7px}
+.maplegend i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.maplegend em{font-family:'Space Mono';font-size:11px;color:var(--lav);margin-left:auto;font-style:normal}
+/* risk strip */
+.rstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:26px}
+.rcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;border-left:6px solid}
+.rcard.red{border-left-color:var(--red)} .rcard.amber{border-left-color:var(--coral)} .rcard.green{border-left-color:var(--mint)}
+.rcard .rtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.rcard h4{font-size:18px;color:var(--navy)}
+.rcard .badge{font-family:'Space Mono';font-size:10px;font-weight:700;letter-spacing:.08em;padding:4px 10px;border-radius:20px;text-transform:uppercase}
+.rcard.red .badge{background:#FBE3E3;color:var(--red)} .rcard.amber .badge{background:var(--coral-soft);color:var(--coral)} .rcard.green .badge{background:var(--mint-soft);color:#4FA37E}
+.rcard p{font-size:13px;color:var(--soft);line-height:1.45}
+.rcard .mv{font-family:'Space Mono';font-size:11px;font-weight:700;color:var(--navy);margin-top:10px;letter-spacing:.02em}
+/* matrix */
+.matrixbox{margin-top:30px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 10px 30px rgba(23,37,92,.05)}
+.matrixbox svg{width:100%;height:auto;display:block}
+.mlegend{display:flex;gap:20px;flex-wrap:wrap;margin-top:14px;font-size:12.5px;color:var(--soft);font-weight:600;align-items:center}
+.mlegend span{display:flex;align-items:center;gap:7px}
+.mlegend i{width:13px;height:13px;border-radius:50%}
+.mlegend em{font-family:'Space Mono';font-size:11px;color:var(--lav);font-style:normal;margin-left:auto}
+@media(max-width:820px){.rstrip{grid-template-columns:1fr 1fr}}
+
+/* project cards */
+.projects{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:28px}
+.pcard{background:#fff;border:1px solid var(--line);border-radius:22px;padding:26px;box-shadow:0 10px 30px rgba(23,37,92,.05);border-top:5px solid var(--navy)}
+.pcard.lagoon{border-top-color:var(--navy)} .pcard.port{border-top-color:var(--pur)}
+.pcard.central{border-top-color:var(--coral)} .pcard.premium{border-top-color:var(--mint)}
+.pcard .top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.pcard h3{font-size:24px;color:var(--navy)}
+.pcard .share{font-family:'Space Mono';font-size:12px;font-weight:700;color:var(--lav)}
+.pcard .dur{font-family:'Space Mono';font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);margin-bottom:18px}
+.pgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px 18px;margin-bottom:16px}
+.pg .pv{font-family:'Sora';font-weight:800;font-size:23px;color:var(--navy);line-height:1}
+.pg .pl{font-size:11.5px;color:var(--soft);margin-top:5px;font-weight:600}
+.sold{font-size:13px;color:var(--ink);background:var(--lav-soft);border-radius:12px;padding:12px 15px;line-height:1.5}
+.sold .miss{color:var(--coral);font-weight:600}
+.sold b{color:var(--navy)}
+
+/* type bar */
+.tbar{display:flex;gap:6px;margin-top:26px;height:74px;align-items:flex-end}
+.tb{flex:1;background:var(--lav-soft);border-radius:10px 10px 0 0;position:relative;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;padding-bottom:0}
+.tb .fill{width:100%;background:var(--grad);border-radius:10px 10px 0 0}
+.tb .cap{position:absolute;top:-22px;font-family:'Sora';font-weight:800;font-size:15px;color:var(--navy);width:100%;text-align:center}
+.tb .lbl{font-family:'Space Mono';font-size:11px;color:var(--soft);font-weight:700;margin-top:8px}
+.tbwrap .lblrow{display:flex;gap:6px;margin-top:6px}
+.tbwrap .lblrow span{flex:1;text-align:center;font-family:'Space Mono';font-size:11px;color:var(--soft);font-weight:700}
+
+/* gaps panel */
+.gaps{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:26px}
+.gap{background:#fff;border:1px solid #F3CDBC;border-left:5px solid var(--coral);border-radius:16px;padding:20px 22px}
+.gap h4{font-size:16px;color:var(--navy);margin-bottom:6px;display:flex;align-items:center;gap:9px}
+.gap h4 .q{font-family:'Sora';color:var(--coral);font-size:20px}
+.gap p{font-size:13.5px;color:var(--soft);line-height:1.5}
+.gap .act{font-family:'Space Mono';font-size:11px;font-weight:700;color:var(--coral);margin-top:10px;letter-spacing:.02em;text-transform:uppercase}
+
+/* scenario table */
+.scen{width:100%;border-collapse:separate;border-spacing:0;margin-top:24px;font-size:14.5px;background:#fff;border-radius:18px;overflow:hidden;border:1px solid var(--line)}
+.scen th{font-family:'Space Mono';text-transform:uppercase;font-size:11px;letter-spacing:.08em;color:#fff;background:var(--navy);text-align:left;padding:15px 18px;font-weight:700}
+.scen td{padding:15px 18px;border-top:1px solid var(--line);vertical-align:middle}
+.scen tr:nth-child(even) td{background:#FAFAFC}
+.scen td:first-child{font-family:'Sora';font-weight:700;color:var(--navy)}
+.scen .hl td{background:var(--lav-soft)!important}
+.scen .pct{font-family:'Sora';font-weight:800;color:var(--coral)}
+.scen .vol{font-family:'Sora';font-weight:700;color:var(--navy)}
+
+/* decisions */
+.decs{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:26px}
+.dec{background:var(--navy);color:#fff;border-radius:16px;padding:20px 16px}
+.dec .dn{font-family:'Sora';font-weight:800;font-size:26px;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;line-height:1}
+.dec h4{font-size:14.5px;color:#fff;margin:10px 0 6px;line-height:1.2}
+.dec p{font-size:12px;color:#C9CFEA;line-height:1.4}
+
+footer{background:var(--navy-deep);color:#fff;padding:34px 0;text-align:center}
+footer .ft{font-family:'Sora';font-weight:800;font-size:20px}
+footer .fc{font-size:13px;color:#8E96C4;margin-top:8px;font-family:'Space Mono';letter-spacing:.02em}
+
+@media(max-width:820px){
+  .kpis{grid-template-columns:repeat(2,1fr)}
+  .frame,.projects,.gaps{grid-template-columns:1fr}
+  .geo{flex-wrap:wrap;gap:10px} .zone{flex:1 1 45%;margin:0} .geoline{display:none}
+  .treemap{flex-direction:column;height:auto} .tcol{flex-direction:row}
+  .tile{min-height:90px} .decs{grid-template-columns:repeat(2,1fr)}
+  .tbar{height:60px}
+}
+</style></head><body>
+
+<header>
+  <div class="holo"></div>
+  <div class="wrap">
+    <div class="brand">Babacan <span style="opacity:.5">×</span> Sales<span class="ai">AI</span><span class="spark">✦</span></div>
+    <span class="eyebrow" style="color:var(--lav)">Portföy Durum Panosu · Bugün net görünüm</span>
+    <h1>Elimizde tam olarak <em class="grad">ne var?</em></h1>
+    <p class="sub">Stok analizi + marka dünyası tek ekranda. Tüm değerler tek kur politikasıyla: <strong style="color:#fff">1 USD = 50 TL</strong>. USD esas alınır, TL = USD × 50.</p>
+    <div class="metaline">KAYNAK: 4 stok/fiyat listesi · 14.06.2026 · marka dünyası çalıştayı · kur 1 USD = 50 TL</div>
+    <div class="frame">
+      <div class="fbox see"><div class="h">✓ Veride net görünen</div>
+        <ul><li>Satıştaki stok: adet · m² · liste değeri · $/m²</li><li>Proje ve tip bazında dağılım</li><li>Central & Port Royal satılan adet/değer</li><li>Kanıtlanmış coğrafya: Esenyurt Crown ailesi</li></ul></div>
+      <div class="fbox blind"><div class="h">⌛ Netleşmesi gereken veriler</div>
+        <ul><li>Yabancı / yerli satış kırılımı</li><li>Broker vs direkt satış kırılımı</li><li>Lagoon & Premium satılan stok kaydı</li><li>Lagoon satılabilirlik · Port Royal stok mutabakatı</li></ul></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="kpis">
+    <div class="kpi"><div class="v g">507</div><div class="l">Satılabilir stok (adet)</div></div>
+    <div class="kpi"><div class="v">$129,3M</div><div class="l">Liste değeri · ₺6,47 Milyar (×50)</div></div>
+    <div class="kpi"><div class="v">53.078</div><div class="l">Satılabilir m²</div></div>
+    <div class="kpi"><div class="v">$2.436</div><div class="l">Ortalama USD/m²</div></div>
+    <div class="kpi"><div class="v">4</div><div class="l">Aktif satış projesi</div></div>
+  </div>
+</div>
+
+<!-- GEOGRAPHY / MAP -->
+<section>
+  <div class="wrap">
+    <div class="sechead"><span class="eyebrow mint">01 · Coğrafya haritası</span>
+      <h2 class="big">Tüm portföy <em class="grad">Esenyurt'ta.</em></h2>
+      <p class="lead">Satıştaki 4 projenin tamamı Esenyurt'ta — Babacan'ın kanıtlanmış üssü. Crown ailesiyle 14+ yıllık yaşayan topluluk burada. Coğrafya dağınık değil; güç tek bölgede yoğunlaşmış.</p>
+    </div>
+
+    <div class="esmap">
+      <svg viewBox="0 0 1000 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
+        <defs>
+          <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DCE6F2"/><stop offset="1" stop-color="#C4D6EC"/></linearGradient>
+          <linearGradient id="land" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4F2F8"/><stop offset="1" stop-color="#ECE9F4"/></linearGradient>
+        </defs>
+        <!-- land -->
+        <rect x="0" y="0" width="1000" height="270" fill="url(#land)"/>
+        <!-- marmara sea -->
+        <rect x="0" y="270" width="1000" height="110" fill="url(#sea)"/>
+        <text x="500" y="345" text-anchor="middle" font-family="Space Mono" font-size="13" fill="#7E94B4" letter-spacing="3">MARMARA DENİZİ</text>
+        <!-- E5 / TEM roads -->
+        <path d="M0,150 Q500,135 1000,150" stroke="#D8C9A8" stroke-width="6" fill="none" opacity=".7"/>
+        <text x="40" y="142" font-family="Space Mono" font-size="11" fill="#B09B6E">TEM</text>
+        <path d="M0,210 Q500,200 1000,210" stroke="#D8C9A8" stroke-width="6" fill="none" opacity=".7"/>
+        <text x="40" y="232" font-family="Space Mono" font-size="11" fill="#B09B6E">D-100 / E-5</text>
+        <!-- neighbour districts -->
+        <text x="120" y="60" text-anchor="middle" font-family="Inter" font-size="14" font-weight="600" fill="#A7A2B8">Beylikdüzü</text>
+        <text x="880" y="60" text-anchor="middle" font-family="Inter" font-size="14" font-weight="600" fill="#A7A2B8">Avcılar</text>
+        <!-- Esenyurt zone -->
+        <ellipse cx="500" cy="160" rx="270" ry="115" fill="#7FC4A3" opacity=".13"/>
+        <ellipse cx="500" cy="160" rx="270" ry="115" fill="none" stroke="#7FC4A3" stroke-width="2" stroke-dasharray="7 6"/>
+        <text x="500" y="48" text-anchor="middle" font-family="Sora" font-size="22" font-weight="800" fill="#17255C">ESENYURT</text>
+        <text x="500" y="68" text-anchor="middle" font-family="Space Mono" font-size="10.5" fill="#7FC4A3" letter-spacing="2">KANITLANMIŞ ÜS · CROWN AİLESİ</text>
+
+        <!-- project markers, sized by value -->
+        <!-- Lagoon (largest) -->
+        <circle cx="430" cy="150" r="48" fill="#17255C" opacity=".92"/>
+        <text x="430" y="146" text-anchor="middle" font-family="Sora" font-size="15" font-weight="800" fill="#fff">Lagoon</text>
+        <text x="430" y="164" text-anchor="middle" font-family="Space Mono" font-size="11" fill="#C6CDEC">$64,0M</text>
+        <!-- Port Royal -->
+        <circle cx="585" cy="135" r="38" fill="#8E7BE8" opacity=".95"/>
+        <text x="585" y="132" text-anchor="middle" font-family="Sora" font-size="13" font-weight="800" fill="#fff">Port Royal</text>
+        <text x="585" y="149" text-anchor="middle" font-family="Space Mono" font-size="10" fill="#EDE9FB">$39,5M</text>
+        <!-- Central -->
+        <circle cx="470" cy="218" r="26" fill="#F08456" opacity=".95"/>
+        <text x="470" y="216" text-anchor="middle" font-family="Sora" font-size="12" font-weight="800" fill="#fff">Central</text>
+        <text x="470" y="231" text-anchor="middle" font-family="Space Mono" font-size="9" fill="#FCE4D8">$15,5M</text>
+        <!-- Premium -->
+        <circle cx="600" cy="210" r="22" fill="#7FC4A3" opacity=".95"/>
+        <text x="600" y="208" text-anchor="middle" font-family="Sora" font-size="11" font-weight="800" fill="#fff">Premium</text>
+        <text x="600" y="222" text-anchor="middle" font-family="Space Mono" font-size="9" fill="#E2F2EA">$10,3M</text>
+      </svg>
+      <div class="maplegend"><span><i style="background:#17255C"></i>Lagoon</span><span><i style="background:#8E7BE8"></i>Port Royal</span><span><i style="background:#F08456"></i>Central</span><span><i style="background:#7FC4A3"></i>Premium</span><em>Daire boyutu = liste değeri</em></div>
+    </div>
+
+    <div class="proof">
+      <div class="pnum">~907</div>
+      <div class="ptxt"><strong>Esenyurt Crown projesi</strong> (Residence · Tower · Deluxe) — 907 konut + 64 ticari ünite, 2011–2017. <strong>14+ yıl</strong> yaşayan, güvenen topluluk. Kanıt zaten elimizde; "Esenyurt denince Babacan" konumlanması için tutarlı bir dünya kuruluyor.</div>
+    </div>
+
+    <div class="sechead" style="margin-top:44px"><span class="eyebrow">Satıştaki stok ısı haritası</span>
+      <h2 class="big" style="font-size:clamp(22px,3vw,32px)">Değer <em class="grad">nerede duruyor?</em></h2></div>
+    <div class="treemap">
+      <div class="tcol" style="flex:0 0 49.5%"><div class="tile t-lagoon" style="flex:1">
+        <div><h4>Lagoon</h4><div class="ts">251 daire · 27.817 m²</div></div>
+        <div><div class="tv">$64,0M</div><div class="tsub">%49,5 · ₺3,20 Mr · $2.301/m²</div></div></div></div>
+      <div class="tcol" style="flex:0 0 30.5%"><div class="tile t-port" style="flex:1">
+        <div><h4>Port Royal</h4><div class="ts">158 daire · 13.185 m²</div></div>
+        <div><div class="tv">$39,5M</div><div class="tsub">%30,5 · ₺1,97 Mr · $2.993/m²</div></div></div></div>
+      <div class="tcol" style="flex:0 0 19%;gap:8px">
+        <div class="tile t-central" style="flex:1.5"><div><h4>Central</h4><div class="ts">50 daire</div></div><div><div class="tv" style="font-size:18px">$15,5M</div><div class="tsub">%12,0 · ₺774M</div></div></div>
+        <div class="tile t-premium" style="flex:1"><div><h4 style="font-size:15px">Premium</h4></div><div><div class="tv" style="font-size:16px">$10,3M</div><div class="tsub">%8,0 · ₺517M</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section style="background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sechead"><span class="eyebrow">02 · Proje proje</span>
+      <h2 class="big">Devam eden stok, <em class="grad">proje proje.</em></h2>
+      <p class="lead">Her projede kalan satılabilir stok, değeri ve — verisi varsa — şimdiye kadar satılan.</p></div>
+    <div class="projects">
+      <div class="pcard lagoon"><div class="top"><h3>Lagoon</h3><span class="share">%49,5 değer payı</span></div>
+        <div class="dur">Durum: Fiyat listesi / stok</div>
+        <div class="pgrid">
+          <div class="pg"><div class="pv">251</div><div class="pl">Satılabilir daire</div></div>
+          <div class="pg"><div class="pv">$64,0M</div><div class="pl">₺3,20 Milyar (×50)</div></div>
+          <div class="pg"><div class="pv">27.817</div><div class="pl">m²</div></div>
+          <div class="pg"><div class="pv">$2.301</div><div class="pl">Ort. USD/m²</div></div></div>
+        <div class="sold"><b>Tip:</b> 152× 1+1 · 69× 2+1 · 29× 3+1 · 1× 4+1. <span class="miss">Satış durumu kolonu henüz yok; 251 kalem stok kabul edildi — satılabilirlik netleştirilecek.</span></div></div>
+
+      <div class="pcard port"><div class="top"><h3>Port Royal</h3><span class="share">%30,5 değer payı</span></div>
+        <div class="dur">Durum: Satışa açık</div>
+        <div class="pgrid">
+          <div class="pg"><div class="pv">158</div><div class="pl">Satılabilir daire</div></div>
+          <div class="pg"><div class="pv">$39,5M</div><div class="pl">₺1,97 Milyar (×50)</div></div>
+          <div class="pg"><div class="pv">13.185</div><div class="pl">m²</div></div>
+          <div class="pg"><div class="pv">$2.993</div><div class="pl">Ort. USD/m² · en yüksek</div></div></div>
+        <div class="sold"><b>Satılan:</b> 578 daire / ~$134,9M (barter dahil). En hızlı nakit: 54× 1+0 küçük metrekare. <span class="miss">Stok mutabakatı: iki listede 158 ve 299 satışa açık — tek liste kilitlenecek.</span></div></div>
+
+      <div class="pcard central"><div class="top"><h3>Central</h3><span class="share">%12,0 değer payı</span></div>
+        <div class="dur">Durum: BOŞ (satılabilir baz)</div>
+        <div class="pgrid">
+          <div class="pg"><div class="pv">50</div><div class="pl">Satılabilir (BOŞ)</div></div>
+          <div class="pg"><div class="pv">$15,5M</div><div class="pl">₺774M (×50)</div></div>
+          <div class="pg"><div class="pv">5.769</div><div class="pl">m²</div></div>
+          <div class="pg"><div class="pv">$2.685</div><div class="pl">Ort. USD/m²</div></div></div>
+        <div class="sold"><b>Satılan:</b> 174 daire / $38,8M. <span class="miss">Ayrıca 231 KAPALI daire satılabilir baz dışında — ayrı potansiyel havuz olarak incelenecek.</span></div></div>
+
+      <div class="pcard premium"><div class="top"><h3>Premium</h3><span class="share">%8,0 değer payı</span></div>
+        <div class="dur">Durum: Satışa açık</div>
+        <div class="pgrid">
+          <div class="pg"><div class="pv">48</div><div class="pl">Satılabilir daire</div></div>
+          <div class="pg"><div class="pv">$10,3M</div><div class="pl">₺517M (×50)</div></div>
+          <div class="pg"><div class="pv">6.307</div><div class="pl">m²</div></div>
+          <div class="pg"><div class="pv">$1.640</div><div class="pl">Ort. USD/m² · en düşük</div></div></div>
+        <div class="sold"><b>Tip:</b> 33× 2+1 · 13× 3+1 · 2× 4+1. <span class="miss">Satılan stok kaydı netleştirilecek.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- TYPE MIX -->
+<section>
+  <div class="wrap">
+    <div class="sechead"><span class="eyebrow">03 · Tip dağılımı</span>
+      <h2 class="big">Kalan 507 dairenin <em class="grad">tip karması.</em></h2>
+      <p class="lead">2+1 ve 1+1 birlikte stoğun %78'i. Hangi tip hangi havuza? — pazarlama kampanyalarının çıkış noktası.</p></div>
+    <div class="tbwrap">
+      <div class="tbar">
+        <div class="tb"><span class="cap">54</span><div class="fill" style="height:27%"></div></div>
+        <div class="tb"><span class="cap">200</span><div class="fill" style="height:100%"></div></div>
+        <div class="tb"><span class="cap">193</span><div class="fill" style="height:96%"></div></div>
+        <div class="tb"><span class="cap">49</span><div class="fill" style="height:24%"></div></div>
+        <div class="tb"><span class="cap">8</span><div class="fill" style="height:5%"></div></div>
+        <div class="tb"><span class="cap">3</span><div class="fill" style="height:3%"></div></div>
+      </div>
+      <div class="lblrow"><span>1+0</span><span>1+1</span><span>2+1</span><span>3+1</span><span>3.5+1</span><span>4+1</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- RISK & OPPORTUNITY -->
+<section style="background:var(--lav-soft);border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sechead"><span class="eyebrow coral">04 · Stok risk & fırsat</span>
+      <h2 class="big">En büyük problem ve en büyük kaldıraç <em class="grad">aynı yerde.</em></h2>
+      <p class="lead">90 günlük baz hedef $32,3M — bu, Port Royal + Central'ın tamamı kadar. Yani küçükleri tümüyle satsan bile hedef tutmaz; <strong>hedef matematiksel olarak Lagoon'u eritmeyi zorunlu kılıyor.</strong></p></div>
+
+    <div class="rstrip">
+      <div class="rcard red"><div class="rtop"><h4>Lagoon</h4><span class="badge">● Kritik</span></div>
+        <p>Portföyün yarısı tek projede. Satış durumu kolonu yok → sıfır görünürlük. 251 dairenin 152'si 1+1 → tip doygunluğu.</p>
+        <div class="mv">$64,0M · %49,5 · tek tip yığını</div></div>
+      <div class="rcard amber"><div class="rtop"><h4>Central</h4><span class="badge">● Saklı risk</span></div>
+        <p>Satılabilir taraf küçük (50 BOŞ). Arkasında 61 RİSKLİ KAPALI → iptal/tahsilat riskiyle stoğa geri düşebilir.</p>
+        <div class="mv">$15,5M · +231 KAPALI havuz</div></div>
+      <div class="rcard amber"><div class="rtop"><h4>Premium</h4><span class="badge">● Fiyat sorusu</span></div>
+        <p>$/m² $1.640 — diğerlerinden %30–40 ucuz. Gerçek konum/spec farkı mı, fazla agresif fiyat mı? Netleşmeli.</p>
+        <div class="mv">$10,3M · en düşük $/m²</div></div>
+      <div class="rcard green"><div class="rtop"><h4>Port Royal</h4><span class="badge">● Hızlı kazanç</span></div>
+        <p>Kanıtlı satış (578 satılmış), en yüksek $/m². 54× 1+0 = en hızlı nakit. Tek iş: 158-299 mutabakatı.</p>
+        <div class="mv">$39,5M · 1+0 = hızlı nakit</div></div>
+    </div>
+
+    <div class="matrixbox">
+      <svg viewBox="0 0 940 620" xmlns="http://www.w3.org/2000/svg" font-family="Inter">
+        <!-- quadrant tints -->
+        <rect x="150" y="70" width="370" height="225" fill="#FBE3E3"/>
+        <rect x="520" y="70" width="370" height="225" fill="#EBE5FA"/>
+        <rect x="150" y="295" width="370" height="225" fill="#F2F1F6"/>
+        <rect x="520" y="295" width="370" height="225" fill="#E2F2EA"/>
+        <rect x="150" y="70" width="740" height="450" fill="none" stroke="#CFD2E0" stroke-width="1.5"/>
+        <line x1="520" y1="70" x2="520" y2="520" stroke="#fff" stroke-width="3"/>
+        <line x1="150" y1="295" x2="890" y2="295" stroke="#fff" stroke-width="3"/>
+
+        <!-- quadrant captions in corners -->
+        <text x="166" y="92" font-family="Space Mono" font-size="13" font-weight="700" fill="#E06A6A">ÖNCE DENETLE</text>
+        <text x="166" y="109" font-size="12" fill="#C58A8A">temizle / iptal riski</text>
+        <text x="874" y="92" text-anchor="end" font-family="Space Mono" font-size="13" font-weight="700" fill="#8E7BE8">STRATEJİK ÖNCELİK</text>
+        <text x="874" y="109" text-anchor="end" font-size="12" fill="#A99BEF">yönet & eritme planı</text>
+        <text x="166" y="506" font-family="Space Mono" font-size="13" font-weight="700" fill="#9A98A8">BEKLET</text>
+        <text x="166" y="489" font-size="12" fill="#B4B2C0">yeniden fiyatla</text>
+        <text x="874" y="506" text-anchor="end" font-family="Space Mono" font-size="13" font-weight="700" fill="#4FA37E">HIZLI KAZANÇ</text>
+        <text x="874" y="489" text-anchor="end" font-size="12" fill="#6FB893">hemen vur</text>
+
+        <!-- axis labels -->
+        <text x="520" y="556" text-anchor="middle" font-family="Sora" font-size="15" font-weight="700" fill="#17255C">FIRSAT / ERİTME ÇEKİCİLİĞİ  →</text>
+        <text x="158" y="548" font-family="Space Mono" font-size="12" fill="#9A98A8">Düşük</text>
+        <text x="882" y="548" text-anchor="end" font-family="Space Mono" font-size="12" fill="#9A98A8">Yüksek</text>
+        <text x="64" y="295" text-anchor="middle" font-family="Sora" font-size="15" font-weight="700" fill="#17255C" transform="rotate(-90 64 295)">RİSK / BELİRSİZLİK  →</text>
+        <text x="98" y="514" font-family="Space Mono" font-size="12" fill="#9A98A8" transform="rotate(-90 98 514)">Düşük</text>
+        <text x="98" y="90" text-anchor="end" font-family="Space Mono" font-size="12" fill="#9A98A8" transform="rotate(-90 98 90)">Yüksek</text>
+
+        <!-- sub markers -->
+        <circle cx="812" cy="430" r="11" fill="#fff" stroke="#4FA37E" stroke-width="2.5"/>
+        <text x="812" y="411" text-anchor="middle" font-family="Space Mono" font-size="11" font-weight="700" fill="#4FA37E">PR 1+0</text>
+        <text x="812" y="455" text-anchor="middle" font-family="Space Mono" font-size="10.5" fill="#6FB893">hızlı nakit</text>
+        <circle cx="352" cy="150" r="12" fill="#fff" stroke="#E06A6A" stroke-width="2.5"/>
+        <text x="352" y="131" text-anchor="middle" font-family="Space Mono" font-size="11" font-weight="700" fill="#E06A6A">61 daire</text>
+        <text x="352" y="178" text-anchor="middle" font-family="Space Mono" font-size="10.5" fill="#C58A8A">RİSKLİ KAPALI</text>
+
+        <!-- main bubbles: name inside, value below -->
+        <circle cx="735" cy="180" r="52" fill="#17255C"/>
+        <text x="735" y="187" text-anchor="middle" font-family="Sora" font-size="19" font-weight="800" fill="#fff">Lagoon</text>
+        <text x="735" y="248" text-anchor="middle" font-family="Sora" font-size="15" font-weight="800" fill="#17255C">$64,0M · %49,5</text>
+
+        <circle cx="715" cy="388" r="42" fill="#8E7BE8"/>
+        <text x="715" y="394" text-anchor="middle" font-family="Sora" font-size="16" font-weight="800" fill="#fff">Port Royal</text>
+        <text x="715" y="446" text-anchor="middle" font-family="Sora" font-size="14" font-weight="800" fill="#6B5BC4">$39,5M · %30,5</text>
+
+        <circle cx="430" cy="300" r="28" fill="#F08456"/>
+        <text x="430" y="305" text-anchor="middle" font-family="Sora" font-size="13" font-weight="800" fill="#fff">Central</text>
+        <text x="430" y="343" text-anchor="middle" font-family="Sora" font-size="13" font-weight="800" fill="#C9683E">$15,5M</text>
+
+        <circle cx="300" cy="358" r="22" fill="#7FC4A3"/>
+        <text x="300" y="363" text-anchor="middle" font-family="Sora" font-size="12" font-weight="800" fill="#fff">Premium</text>
+        <text x="300" y="394" text-anchor="middle" font-family="Sora" font-size="13" font-weight="800" fill="#4FA37E">$10,3M</text>
+      </svg>
+      <div class="mlegend">
+        <span><i style="background:#17255C"></i>Lagoon</span>
+        <span><i style="background:#8E7BE8"></i>Port Royal</span>
+        <span><i style="background:#F08456"></i>Central</span>
+        <span><i style="background:#7FC4A3"></i>Premium</span>
+        <em>Daire boyutu = liste değeri</em>
+      </div>
+    </div>
+    <p class="lead" style="margin-top:18px;font-size:14px"><strong>Okuma:</strong> Lagoon yüksek fırsat + yüksek belirsizlik → eritme planının merkezi ama önce görünürlük. Port Royal hazır kazanç, 1+0'lardan başla. Central'ın asıl meselesi satılmamış stok değil, RİSKLİ KAPALI iptal riski. Premium fiyat netleşene kadar beklet.</p>
+  </div>
+</section>
+
+<!-- GAPS — netleşmesi gereken veriler -->
+<section style="background:#fff;border-top:1px solid var(--line)">
+  <div class="wrap">
+    <div class="sechead"><span class="eyebrow coral">05 · Netleşmesi gereken veriler</span>
+      <h2 class="big">Karara çıkmadan <em style="color:var(--coral)">netleşecek 6 başlık.</em></h2>
+      <p class="lead">Yabancı/yerli ve broker kırılımı bu dosyalarda tutulmuyor — tahminle değil, şirket içi kayıttan netleşmeli. Listeyi olduğu gibi stok eritme masasına taşıyoruz.</p></div>
+    <div class="gaps">
+      <div class="gap"><h4><span class="q">⌛</span> Yabancı / yerli satış kırılımı</h4><p>Alıcı uyruğu kaydı yok. "Yabancı ağ" yalnızca kanal önerisi olarak geçiyor — gerçek satış kırılımı değil.</p><div class="act">Kaynak → CRM / satış sözleşmeleri</div></div>
+      <div class="gap"><h4><span class="q">⌛</span> Broker / direkt satış kırılımı</h4><p>"Broker hızlandırma" kanal önerisi. Kaç satış brokerdan, kaçı direkt — kayıt henüz yok.</p><div class="act">Kaynak → satış kayıtları + komisyon dökümü</div></div>
+      <div class="gap"><h4><span class="q">⌛</span> Lagoon satılabilirlik</h4><p>Satış durumu kolonu yok; 251 kalemin tamamı stok kabul edildi. Bir kısmı rezerve/satılmış olabilir.</p><div class="act">Kaynak → Lagoon güncel stok mutabakatı</div></div>
+      <div class="gap"><h4><span class="q">⌛</span> Port Royal: 158 mi 299 mu?</h4><p>İki listede 158 ve 299 satışa açık görünüyor. Tek doğru liste kilitlenmeden kampanya bütçesi bağlanmamalı.</p><div class="act">Kaynak → tek stok kaynağı kilidi</div></div>
+      <div class="gap"><h4><span class="q">✓</span> Kur politikası — çözüldü</h4><p>Önceki dosyalarda karışık kurlar (38,8–47,4) vardı. Artık tek politika: <strong>1 USD = 50 TL</strong>, USD esas.</p><div class="act">Uygulandı → tüm TL = USD × 50</div></div>
+      <div class="gap"><h4><span class="q">⌛</span> Central KAPALI havuzu</h4><p>231 KAPALI daire satılabilir baz dışında. Gerçekten satışa kapalı mı, yoksa gizli stok mu?</p><div class="act">Aksiyon → KAPALI stok denetimi</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- SCENARIOS -->
+<section>
+  <div class="wrap">
+    <div class="sechead"><span class="eyebrow">06 · Gelir senaryoları</span>
+      <h2 class="big">Stok eritme <em class="grad">ne getirir?</em></h2>
+      <p class="lead"><strong>Yeni plan</strong> — satışa açık $129,3M (₺6,47 Mr) liste değeri üzerinden satış oranı senaryoları. Başarı primi liste değerine değil, <strong>tahsil edilen</strong> satışa bağlı.</p></div>
+    <table class="scen">
+      <thead><tr><th>Senaryo</th><th>Satış oranı</th><th>Satış hacmi</th><th>Başarı primi %</th><th>Prim potansiyeli</th></tr></thead>
+      <tbody>
+        <tr><td>90 gün · Muhafazakâr</td><td class="pct">%15</td><td class="vol">$19,4M · ₺970M</td><td>%5</td><td>$0,97M</td></tr>
+        <tr class="hl"><td>90 gün · Baz <span style="font-family:Space Mono;font-size:10px;color:var(--coral)">← hedef</span></td><td class="pct">%25</td><td class="vol">$32,3M · ₺1,62 Mr</td><td>%5</td><td>$1,62M</td></tr>
+        <tr><td>90 gün · Atak</td><td class="pct">%35</td><td class="vol">$45,3M · ₺2,26 Mr</td><td>%5</td><td>$2,26M</td></tr>
+        <tr><td>12 ay · Baz</td><td class="pct">%60</td><td class="vol">$77,6M · ₺3,88 Mr</td><td>%5</td><td>$3,88M</td></tr>
+      </tbody>
+    </table>
+    <p class="lead" style="margin-top:14px;font-size:14px"><strong>İlk hedef:</strong> 90 günde liste değerinin %25'ini nakde çevirmek. Önerilen model: kurulum retainer + tahsilata bağlı başarı primi. Prim ekip priminden değil, yaratılan ek nakitten ödenir.</p>
+  </div>
+</section>
+
+<!-- DECISIONS -->
+<section style="background:var(--navy-deep)">
+  <div class="wrap">
+    <div class="sechead"><span class="eyebrow" style="color:var(--lav)">07 · Bugün alınacak kararlar</span>
+      <h2 class="big" style="color:#fff">5 karar, <em class="grad">tek masada.</em></h2></div>
+    <div class="decs">
+      <div class="dec"><div class="dn">1</div><h4>Stok eritme war-room</h4><p>Satış + Finans + CRM aynı masaya.</p></div>
+      <div class="dec"><div class="dn">2</div><h4>4 sepet</h4><p>Hızlı sat / yeniden fiyatla / paketle / tut-kirala.</p></div>
+      <div class="dec"><div class="dn">3</div><h4>CRM merkezli satış</h4><p>Tek müşteri kaydı, lead skoru, takip disiplini.</p></div>
+      <div class="dec"><div class="dn">4</div><h4>Prim = tahsilat</h4><p>Kapanan değil, tahsil edilen satış üzerinden.</p></div>
+      <div class="dec"><div class="dn">5</div><h4>Veri temizliği</h4><p>Durum, fiyat, kur, stok sahipliği netleşsin.</p></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="ft grad">Arsadan değere, değerden güvene.</div>
+  <div class="fc">Babacan Portföy Durum Panosu · Gizem Burteçin & Dr. Hakan Tetik · gizem@alisales.ai</div>
+</footer>
+
+</body></html>

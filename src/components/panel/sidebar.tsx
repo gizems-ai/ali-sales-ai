@@ -155,13 +155,13 @@ interface EmlakNavLink {
   active?: boolean
   muted?: boolean
   lavender?: boolean   // Ali kimlikli (lavanta aksan) nav öğesi
-  star?: boolean       // ⭐ vurgulu öğe (Satışçı Kütüphanesi)
+  star?: boolean       // ⭐ vurgulu öğe (Satış Kütüphanesi)
 }
 
-// GELİŞİM grubu — Satışçı Kütüphanesi açılış; çoğu öğe stub (yakında).
+// GELİŞİM grubu — Satış Kütüphanesi açılış; çoğu öğe stub (yakında).
 // Not: Ali Satış Zekâsı ayrı bir ANA bölümdür (EMLAK_NAV) — buraya derin link konmaz (çift kapı olmasın).
 const EMLAK_GELISIM_NAV: EmlakNavLink[] = [
-  { href: GELISIM_SLUG, label: 'Satışçı Kütüphanesi', iconId: 'star', lavender: true, star: true },
+  { href: GELISIM_SLUG, label: 'Satış Kütüphanesi', iconId: 'star', lavender: true, star: true },
   { label: 'AI Koçum',                 iconId: 'sparkle',  muted: true },
   { label: 'Günlük Challenge',         iconId: 'target',   muted: true },
   { label: 'Rol Yap (AI Simülasyon)',  iconId: 'play',     muted: true },
@@ -226,11 +226,14 @@ function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
     }}>
       {/* Brand */}
       <div style={{ padding: '4px 8px 0', display: 'flex', flexDirection: 'column', gap: 2 }}>
-        <div style={{ fontSize: 23, fontWeight: 800, letterSpacing: '-0.02em', color: '#1c2a22' }}>
-          emlak<span style={{ color: '#248a47' }}>.ai</span>
+        <div style={{ fontSize: 18.5, fontWeight: 800, letterSpacing: '-0.02em', color: '#1c2a22', whiteSpace: 'nowrap', display: 'flex', alignItems: 'baseline' }}>
+          Babacan
+          <span style={{ color: '#8c97d8', fontWeight: 700, margin: '0 6px' }}>×</span>
+          Sales<span style={{ color: '#6D5BE0' }}>AI</span>
+          <span style={{ color: '#8c97d8', fontSize: 12, marginLeft: 3, alignSelf: 'flex-start', lineHeight: 1 }}>✦</span>
         </div>
         <div style={{ fontSize: 11, fontWeight: 600, color: '#8b988f', letterSpacing: '0.02em' }}>
-          CRM Paneli
+          Satış Zekâsı Paneli
         </div>
       </div>
 

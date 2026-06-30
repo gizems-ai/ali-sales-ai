@@ -1,7 +1,9 @@
 'use client'
 
-import { TrendingUp, EyeOff, AlertTriangle, Layers, TrendingDown, Target } from 'lucide-react'
+import { useState } from 'react'
+import { TrendingUp, EyeOff, AlertTriangle, Layers, TrendingDown, Target, FileText, ChevronRight } from 'lucide-react'
 import { Z, PERSONA_ETIKET, fmtFiyat, yoneticiOzet } from '@/lib/ali-zeka'
+import { ContentViewer } from '@/app/(panel)/gelisim/_components/content-viewer'
 
 function Kart({ baslik, icon, accent, children }: {
   baslik: string; icon: React.ReactNode; accent: string; children: React.ReactNode
@@ -41,6 +43,7 @@ function Satir({ ad, alt, deger, degerRenk = Z.text, bar }: {
 export function Yonetici() {
   const o = yoneticiOzet()
   const maxOneri = Math.max(1, ...o.enCokOnerilen.map(x => x.sayi))
+  const [panoAcik, setPanoAcik] = useState(false)
 
   return (
     <div className="space-y-[16px]">
@@ -50,6 +53,25 @@ export function Yonetici() {
           <b>Yönetici görünümü</b> — stok/öneri sağlığını tek ekrandan gör. Skorlar CRM&apos;e özel iç bilgidir; alıcıya bakan yüzeylere taşınmaz.
         </p>
       </div>
+
+      {/* Portföy Durum Panosu — gömülü canlı rapor */}
+      <button onClick={() => setPanoAcik(true)}
+        className="w-full text-left rounded-[22px] border bg-white p-[16px] shadow-sm flex items-center gap-[14px] transition-shadow hover:shadow-md"
+        style={{ borderColor: Z.line }}>
+        <span className="grid place-items-center rounded-[13px] text-white shrink-0" style={{ width: 44, height: 44, background: Z.lavGrad }}>
+          <FileText size={20} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-[8px] flex-wrap">
+            <p className="text-[15px] font-black" style={{ color: Z.text }}>Portföy Durum Panosu</p>
+            <span className="inline-flex items-center gap-[5px] rounded-full px-[8px] py-[2px] text-[10px] font-bold" style={{ background: '#D1FAE5', color: '#065F46' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />Canlı içerik
+            </span>
+          </div>
+          <p className="text-[12px] text-slate-400 mt-[2px] truncate">Stok analizi + risk-fırsat · Esenyurt · 507 daire / $129,3M</p>
+        </div>
+        <ChevronRight size={18} className="text-slate-300 shrink-0" />
+      </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-[16px]">
         {/* En çok önerilen */}
@@ -114,6 +136,13 @@ export function Yonetici() {
           ))}
         </Kart>
       </div>
+
+      <ContentViewer
+        open={panoAcik}
+        baslik="Portföy Durum Panosu"
+        src="/decks/Babacan_Portfoy_Durum_Panosu.html"
+        onClose={() => setPanoAcik(false)}
+      />
     </div>
   )
 }

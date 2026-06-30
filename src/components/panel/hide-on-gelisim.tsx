@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation'
 
-// Satışçı Kütüphanesi (GELİŞİM) kendi başlığını/aramasını taşır;
+// Satış Kütüphanesi (GELİŞİM) kendi başlığını/aramasını taşır;
 // global Topbar bu sayfada gizlenir (çift arama çubuğu olmasın).
 export function HideOnGelisim({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()

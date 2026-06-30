@@ -21,7 +21,7 @@ const jakarta = Plus_Jakarta_Sans({
   variable: "--font-jakarta",
 });
 
-// GELİŞİM / Satışçı Kütüphanesi tasarım fontları (Sora · Inter · Space Mono)
+// GELİŞİM / Satış Kütüphanesi tasarım fontları (Sora · Inter · Space Mono)
 const sora = Sora({
   subsets: ["latin"],
   weight: ["500", "600", "700", "800"],

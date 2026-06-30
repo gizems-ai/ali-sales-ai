@@ -1,10 +1,10 @@
-// ── Satışçı Kütüphanesi (GELİŞİM merkezi) ───────────────────────────────────
+// ── Satış Kütüphanesi (GELİŞİM merkezi) ───────────────────────────────────
 // Ali Satış Zekâsı'nın eğitim/enablement eşi. readOnly tenant: HİÇBİR yazma yok.
 // Tüm veri fixture; XP / rozet / ilerleme / challenge / koç notu / WhatsApp taslağı
 // salt-okunur gösterim. Hazır workshop deck'leri public/decks altında gömülü açılır.
 
 // Tek sabit (prompt §0): bölüm adı sadece burada tanımlanır.
-export const SECTION_NAME = 'Satışçı Kütüphanesi'
+export const SECTION_NAME = 'Satış Kütüphanesi'
 export const SECTION_SLUG = '/gelisim'
 export const GROUP_NAME = 'GELİŞİM'
 export const MANIFESTO = 'Öğren, uygula, geliş ve lider ol.'
@@ -220,6 +220,15 @@ export const AKADEMI: Content[] = [
     altMetin: 'Persona Kütüphanesi',
     canli: true,
     src: '/decks/Babacan_Alici_Yolculugu_Haritasi.html',
+  },
+  {
+    id: 'cont_portfoy_durum',
+    tip: 'oyunKitabi',
+    baslik: 'Portföy Durum Panosu',
+    altMetin: 'Stok analizi + risk-fırsat · Esenyurt · 507 daire / $129,3M',
+    etiket: 'Yeni',
+    canli: true,
+    src: '/decks/Babacan_Portfoy_Durum_Panosu.html',
   },
 ]
 

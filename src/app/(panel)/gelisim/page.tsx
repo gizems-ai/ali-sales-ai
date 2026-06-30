@@ -5,7 +5,7 @@ import { Kutuphane } from './_components/kutuphane'
 
 export const dynamic = 'force-dynamic'
 
-// Satışçı Kütüphanesi — GELİŞİM merkezi açılış ekranı.
+// Satış Kütüphanesi — GELİŞİM merkezi açılış ekranı.
 // readOnly tenant: tüm veri fixture; hiçbir yazma işlemi tetiklenmez.
 export default async function GelisimPage() {
   const [profil, cfg, segment] = await Promise.all([
