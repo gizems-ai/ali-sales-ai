@@ -18,6 +18,7 @@ import { TEMSILCILER } from '@/lib/temsilciler'
 import { type BrifingData } from '@/lib/brifing'
 import { FirmaSatir, GRID } from './firma-satir'
 import { FirmaModal } from './firma-modal'
+import { EmlakMusteriModal } from './emlak-musteri-modal'
 
 // ── Kategori gruplama ──────────────────────────────────────────────────────
 
@@ -830,7 +831,14 @@ export function MusterilerClient({
         )}
       </div>
 
-      <FirmaModal recordId={modalId} izin={izin} onClose={() => setModalId(null)} isAdmin={isAdmin} />
+      {isEmlak ? (
+        <EmlakMusteriModal
+          record={modalId ? (records.find(r => r.id === modalId) ?? null) : null}
+          onClose={() => setModalId(null)}
+        />
+      ) : (
+        <FirmaModal recordId={modalId} izin={izin} onClose={() => setModalId(null)} isAdmin={isAdmin} />
+      )}
 
       {/* Toast */}
       {toast && (
