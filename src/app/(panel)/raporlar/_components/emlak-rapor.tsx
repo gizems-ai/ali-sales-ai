@@ -1,8 +1,10 @@
 'use client'
 
 import { TEMSILCI_SKORU, LEAD_YASLANMA, BUGUNUN_HAMLELERI, STOK_LISTESI } from '@/lib/emlak-fixtures'
-import { TrendingUp, Home, Users, Phone, BarChart3 } from 'lucide-react'
+import { TrendingUp, Home, Users, Phone, BarChart3, FileText, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
+import { useState } from 'react'
+import { ContentViewer } from '@/app/(panel)/gelisim/_components/content-viewer'
 
 const E = {
   green1: '#0E5132', green2: '#1B7A47', green3: '#2E9D5E',
@@ -23,6 +25,7 @@ const KAYNAK_DATA = [
 ]
 
 export function EmlakRapor() {
+  const [panoAcik, setPanoAcik] = useState(false)
   const toplamCiro   = TEMSILCI_SKORU.reduce((s, t) => s + t.ciro, 0)
   const toplamSatis  = TEMSILCI_SKORU.reduce((s, t) => s + t.satisAdedi, 0)
   const komisyonOrani = 0.025
@@ -68,6 +71,25 @@ export function EmlakRapor() {
         <span className="text-[12px] font-bold text-amber-700">Emlak Demo — Örnek veri</span>
         <span className="text-[12px] text-amber-600 flex-1">Gerçek veriler Airtable entegrasyonu sonrası aktif olacak.</span>
       </div>
+
+      {/* Stok Durumu Analizi — gömülü canlı pano */}
+      <button onClick={() => setPanoAcik(true)}
+        className="w-full text-left rounded-[22px] border bg-white p-[16px] shadow-sm flex items-center gap-[14px] transition-shadow hover:shadow-md"
+        style={{ borderColor: E.line }}>
+        <span className="grid place-items-center rounded-[13px] text-white shrink-0" style={{ width: 44, height: 44, background: 'linear-gradient(135deg,#6D5BE0,#8c97d8)' }}>
+          <FileText size={20} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-[8px] flex-wrap">
+            <p className="text-[15px] font-black" style={{ color: E.text }}>Stok Durumu Analizi</p>
+            <span className="inline-flex items-center gap-[5px] rounded-full px-[8px] py-[2px] text-[10px] font-bold" style={{ background: '#D1FAE5', color: '#065F46' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />Canlı içerik
+            </span>
+          </div>
+          <p className="text-[12px] text-slate-400 mt-[2px] truncate">Portföy Durum Panosu · risk-fırsat matrisi · Esenyurt · 507 daire / $129,3M</p>
+        </div>
+        <ChevronRight size={18} className="text-slate-300 shrink-0" />
+      </button>
 
       {/* Tahmini Ciro / Komisyon / Döngü KPI'ları */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-[12px]">
@@ -201,6 +223,12 @@ export function EmlakRapor() {
         </div>
       </div>
 
+      <ContentViewer
+        open={panoAcik}
+        baslik="Portföy Durum Panosu"
+        src="/decks/Babacan_Portfoy_Durum_Panosu.html"
+        onClose={() => setPanoAcik(false)}
+      />
     </div>
   )
 }
