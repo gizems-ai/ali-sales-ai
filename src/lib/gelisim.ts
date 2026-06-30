@@ -231,6 +231,15 @@ export const AKADEMI: Content[] = [
     src: '/decks/Babacan_Alici_Yolculugu_Haritasi.html',
   },
   {
+    id: 'cont_persona',
+    tip: 'persona',
+    baslik: 'Persona Kütüphanesi',
+    altMetin: 'Persona × senaryo matrisi · alıcı havuzları',
+    etiket: 'Yeni',
+    canli: true,
+    src: '/decks/Babacan_Persona_Kutuphanesi.html',
+  },
+  {
     id: 'cont_portfoy_durum',
     tip: 'oyunKitabi',
     baslik: 'Portföy Durum Panosu',
