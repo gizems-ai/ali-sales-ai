@@ -89,6 +89,16 @@ h2.big{font-size:clamp(25px,3.6vw,40px);font-weight:800;color:var(--navy)}
 .maplegend span{display:flex;align-items:center;gap:7px}
 .maplegend i{width:12px;height:12px;border-radius:50%;display:inline-block}
 .maplegend em{font-family:'Space Mono';font-size:11px;color:var(--lav);margin-left:auto;font-style:normal}
+.loccards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:26px}
+@media(max-width:760px){.loccards{grid-template-columns:1fr 1fr}}
+.loccard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 8px 24px rgba(23,37,92,.05);border-top:4px solid var(--navy)}
+.loccard:nth-child(2){border-top-color:var(--pur)}.loccard:nth-child(3){border-top-color:var(--coral)}.loccard:nth-child(4){border-top-color:var(--mint)}
+.loccard .lc-d{font-family:'Space Mono';font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--lav);font-weight:700}
+.loccard h3{font-family:'Sora';font-size:21px;color:var(--navy);margin:3px 0 10px}
+.loccard .lc-v{font-family:'Sora';font-weight:800;font-size:18px;color:var(--navy)}
+.loccard .lc-p{font-size:12px;color:var(--soft);font-weight:600;margin-top:2px}
+.loccard .lc-r{font-size:12.5px;color:var(--soft);margin-top:10px;border-top:1px solid var(--line);padding-top:9px;line-height:1.4}
+.loccard .lc-r b{color:var(--navy)}
 /* risk strip */
 .rstrip{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:26px}
 .rcard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;border-left:6px solid}
@@ -182,7 +192,7 @@ footer .fc{font-size:13px;color:#8E96C4;margin-top:8px;font-family:'Space Mono';
     <div class="metaline">KAYNAK: 4 stok/fiyat listesi · 14.06.2026 · marka dünyası çalıştayı · kur 1 USD = 50 TL</div>
     <div class="frame">
       <div class="fbox see"><div class="h">✓ Veride net görünen</div>
-        <ul><li>Satıştaki stok: adet · m² · liste değeri · $/m²</li><li>Proje ve tip bazında dağılım</li><li>Central & Port Royal satılan adet/değer</li><li>Kanıtlanmış coğrafya: Esenyurt Crown ailesi</li></ul></div>
+        <ul><li>Satıştaki stok: adet · m² · liste değeri · $/m²</li><li>Proje ve tip bazında dağılım</li><li>Central & Port Royal satılan adet/değer</li><li>Teslim edilmiş sicil: Esenyurt Crown (satış portföyünden ayrı)</li></ul></div>
       <div class="fbox blind"><div class="h">⌛ Netleşmesi gereken veriler</div>
         <ul><li>Yabancı / yerli satış kırılımı</li><li>Broker vs direkt satış kırılımı</li><li>Lagoon & Premium satılan stok kaydı</li><li>Lagoon satılabilirlik · Port Royal stok mutabakatı</li></ul></div>
     </div>
@@ -202,60 +212,22 @@ footer .fc{font-size:13px;color:#8E96C4;margin-top:8px;font-family:'Space Mono';
 <!-- GEOGRAPHY / MAP -->
 <section>
   <div class="wrap">
-    <div class="sechead"><span class="eyebrow mint">01 · Coğrafya haritası</span>
-      <h2 class="big">Tüm portföy <em class="grad">Esenyurt'ta.</em></h2>
-      <p class="lead">Satıştaki 4 projenin tamamı Esenyurt'ta — Babacan'ın kanıtlanmış üssü. Crown ailesiyle 14+ yıllık yaşayan topluluk burada. Coğrafya dağınık değil; güç tek bölgede yoğunlaşmış.</p>
+    <div class="sechead"><span class="eyebrow mint">01 · Konum & coğrafya</span>
+      <h2 class="big">Satış portföyü <em class="grad">dört ilçede.</em></h2>
+      <p class="lead">Satıştaki 4 proje İstanbul'un dört farklı ilçesinde — merkezi/premium konumlardan (Levent, Sefaköy) Beylikdüzü ve Esenyurt'a. Portföy tek bölgeye sıkışmış değil; farklı persona ve fiyat segmentlerine yayılıyor. Esenyurt ise ayrı bir rol taşıyor: teslim edilmiş topluluk üssü.</p>
     </div>
 
-    <div class="esmap">
-      <svg viewBox="0 0 1000 380" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;display:block">
-        <defs>
-          <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#DCE6F2"/><stop offset="1" stop-color="#C4D6EC"/></linearGradient>
-          <linearGradient id="land" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4F2F8"/><stop offset="1" stop-color="#ECE9F4"/></linearGradient>
-        </defs>
-        <!-- land -->
-        <rect x="0" y="0" width="1000" height="270" fill="url(#land)"/>
-        <!-- marmara sea -->
-        <rect x="0" y="270" width="1000" height="110" fill="url(#sea)"/>
-        <text x="500" y="345" text-anchor="middle" font-family="Space Mono" font-size="13" fill="#7E94B4" letter-spacing="3">MARMARA DENİZİ</text>
-        <!-- E5 / TEM roads -->
-        <path d="M0,150 Q500,135 1000,150" stroke="#D8C9A8" stroke-width="6" fill="none" opacity=".7"/>
-        <text x="40" y="142" font-family="Space Mono" font-size="11" fill="#B09B6E">TEM</text>
-        <path d="M0,210 Q500,200 1000,210" stroke="#D8C9A8" stroke-width="6" fill="none" opacity=".7"/>
-        <text x="40" y="232" font-family="Space Mono" font-size="11" fill="#B09B6E">D-100 / E-5</text>
-        <!-- neighbour districts -->
-        <text x="120" y="60" text-anchor="middle" font-family="Inter" font-size="14" font-weight="600" fill="#A7A2B8">Beylikdüzü</text>
-        <text x="880" y="60" text-anchor="middle" font-family="Inter" font-size="14" font-weight="600" fill="#A7A2B8">Avcılar</text>
-        <!-- Esenyurt zone -->
-        <ellipse cx="500" cy="160" rx="270" ry="115" fill="#7FC4A3" opacity=".13"/>
-        <ellipse cx="500" cy="160" rx="270" ry="115" fill="none" stroke="#7FC4A3" stroke-width="2" stroke-dasharray="7 6"/>
-        <text x="500" y="48" text-anchor="middle" font-family="Sora" font-size="22" font-weight="800" fill="#17255C">ESENYURT</text>
-        <text x="500" y="68" text-anchor="middle" font-family="Space Mono" font-size="10.5" fill="#7FC4A3" letter-spacing="2">KANITLANMIŞ ÜS · CROWN AİLESİ</text>
-
-        <!-- project markers, sized by value -->
-        <!-- Lagoon (largest) -->
-        <circle cx="430" cy="150" r="48" fill="#17255C" opacity=".92"/>
-        <text x="430" y="146" text-anchor="middle" font-family="Sora" font-size="15" font-weight="800" fill="#fff">Lagoon</text>
-        <text x="430" y="164" text-anchor="middle" font-family="Space Mono" font-size="11" fill="#C6CDEC">$64,0M</text>
-        <!-- Port Royal -->
-        <circle cx="585" cy="135" r="38" fill="#8E7BE8" opacity=".95"/>
-        <text x="585" y="132" text-anchor="middle" font-family="Sora" font-size="13" font-weight="800" fill="#fff">Port Royal</text>
-        <text x="585" y="149" text-anchor="middle" font-family="Space Mono" font-size="10" fill="#EDE9FB">$39,5M</text>
-        <!-- Central -->
-        <circle cx="470" cy="218" r="26" fill="#F08456" opacity=".95"/>
-        <text x="470" y="216" text-anchor="middle" font-family="Sora" font-size="12" font-weight="800" fill="#fff">Central</text>
-        <text x="470" y="231" text-anchor="middle" font-family="Space Mono" font-size="9" fill="#FCE4D8">$15,5M</text>
-        <!-- Premium -->
-        <circle cx="600" cy="210" r="22" fill="#7FC4A3" opacity=".95"/>
-        <text x="600" y="208" text-anchor="middle" font-family="Sora" font-size="11" font-weight="800" fill="#fff">Premium</text>
-        <text x="600" y="222" text-anchor="middle" font-family="Space Mono" font-size="9" fill="#E2F2EA">$10,3M</text>
-      </svg>
-      <div class="maplegend"><span><i style="background:#17255C"></i>Lagoon</span><span><i style="background:#8E7BE8"></i>Port Royal</span><span><i style="background:#F08456"></i>Central</span><span><i style="background:#7FC4A3"></i>Premium</span><em>Daire boyutu = liste değeri</em></div>
+    <div class="loccards">
+      <div class="loccard"><div class="lc-d">5. Levent</div><h3>Lagoon</h3><div class="lc-v">$64,0M</div><div class="lc-p">portföyün %49,5'i</div><div class="lc-r"><b>Hacim & yatırımcı.</b> 251 daire, 1+1 ağırlıklı — eritme planının merkezi.</div></div>
+      <div class="loccard"><div class="lc-d">Sefaköy</div><h3>Port Royal</h3><div class="lc-v">$39,5M</div><div class="lc-p">portföyün %30,5'i · en yüksek $/m²</div><div class="lc-r"><b>Hızlı kazanç.</b> Kanıtlı satış; 1+0'lar hızlı nakit.</div></div>
+      <div class="loccard"><div class="lc-d">Beylikdüzü</div><h3>Central</h3><div class="lc-v">$15,5M</div><div class="lc-p">portföyün %12'si</div><div class="lc-r"><b>İlk ev & aile.</b> Küçük satılabilir stok; konum avantajı.</div></div>
+      <div class="loccard"><div class="lc-d">Esenyurt</div><h3>Premium</h3><div class="lc-v">$10,3M</div><div class="lc-p">portföyün %8'i · en düşük $/m²</div><div class="lc-r"><b>Fiyat avantajı.</b> Değer/giriş hikâyesi.</div></div>
     </div>
+    <div class="mapnote"><b>TEYİT</b> İlçe bilgileri Babacan Yapı sitesindeki "Satışı Devam Eden Projeler" listesine göredir; finalize etmeden önce güncel proje–ilçe eşleşmesini teyit edelim.</div>
 
     <div class="proof">
       <div class="pnum">~907</div>
-      <div class="ptxt"><strong>Esenyurt Crown projesi</strong> (Residence · Tower · Deluxe) — 907 konut + 64 ticari ünite, 2011–2017. <strong>14+ yıl</strong> yaşayan, güvenen topluluk. Kanıt zaten elimizde; "Esenyurt denince Babacan" konumlanması için tutarlı bir dünya kuruluyor.</div>
+      <div class="ptxt"><strong>Esenyurt Crown projesi</strong> (Residence · Tower · Deluxe) — 907 konut + 64 ticari ünite, 2011–2017. <strong>14+ yıl</strong> yaşayan, güvenen topluluk. Satıştaki portföyden ayrı: bu, <strong>teslim edilmiş sicil</strong> — markanın "güven kanıtı" tabanı. Satışta yalnız Premium Esenyurt'ta; ama Esenyurt'taki yaşayan topluluk markanın en güçlü referansı.</div>
     </div>
 
     <div class="sechead" style="margin-top:44px"><span class="eyebrow">Satıştaki stok ısı haritası</span>
@@ -447,7 +419,23 @@ footer .fc{font-size:13px;color:#8E96C4;margin-top:8px;font-family:'Space Mono';
 </section>
 
 <!-- SCENARIOS -->
-
+<section>
+  <div class="wrap">
+    <div class="sechead"><span class="eyebrow">06 · Gelir senaryoları</span>
+      <h2 class="big">Stok eritme <em class="grad">ne getirir?</em></h2>
+      <p class="lead"><strong>Yeni plan</strong> — satışa açık $129,3M (₺6,47 Mr) liste değeri üzerinden satış oranı senaryoları. Başarı primi liste değerine değil, <strong>tahsil edilen</strong> satışa bağlı.</p></div>
+    <table class="scen">
+      <thead><tr><th>Senaryo</th><th>Satış oranı</th><th>Satış hacmi</th><th>Başarı primi %</th><th>Prim potansiyeli</th></tr></thead>
+      <tbody>
+        <tr><td>90 gün · Muhafazakâr</td><td class="pct">%15</td><td class="vol">$19,4M · ₺970M</td><td>%5</td><td>$0,97M</td></tr>
+        <tr class="hl"><td>90 gün · Baz <span style="font-family:Space Mono;font-size:10px;color:var(--coral)">← hedef</span></td><td class="pct">%25</td><td class="vol">$32,3M · ₺1,62 Mr</td><td>%5</td><td>$1,62M</td></tr>
+        <tr><td>90 gün · Atak</td><td class="pct">%35</td><td class="vol">$45,3M · ₺2,26 Mr</td><td>%5</td><td>$2,26M</td></tr>
+        <tr><td>12 ay · Baz</td><td class="pct">%60</td><td class="vol">$77,6M · ₺3,88 Mr</td><td>%5</td><td>$3,88M</td></tr>
+      </tbody>
+    </table>
+    <p class="lead" style="margin-top:14px;font-size:14px"><strong>İlk hedef:</strong> 90 günde liste değerinin %25'ini nakde çevirmek. Önerilen model: kurulum retainer + tahsilata bağlı başarı primi. Prim ekip priminden değil, yaratılan ek nakitten ödenir.</p>
+  </div>
+</section>
 
 <!-- DECISIONS -->
 <section style="background:var(--navy-deep)">
