@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Image from 'next/image'
 import {
   PieChart, Pie, Cell, Tooltip,
   BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LabelList,
@@ -9,6 +10,8 @@ import { FileText, ExternalLink, Phone, CalendarCheck } from 'lucide-react'
 import { type MusterilerIzin } from '@/lib/musteriler-izin'
 import { type TemsilciAktivite } from '@/app/api/raporlar/bugun-aktivite/route'
 import { RaporModal } from './rapor-modal'
+import { Bolum2Ekip } from './bolum2-ekip'
+import { Bolum3Temsilci } from './bolum3-temsilci'
 
 // ── Bu Hafta Aktivite — mevcut mor palette korunuyor ─────────────────────────
 const C_PRIMARY = '#5B47E0'
@@ -17,57 +20,60 @@ const C_PRIMARY = '#5B47E0'
 const BORDO        = '#8e2433'
 const PALE_BORDO   = '#E5C8CE'
 
+const TEAL = '#1D9E75'  // Sağlık veri rengi
+
 const BRANS_COLORS: Record<string, string> = {
-  'Sağlık':           '#1D9E75',
-  'Elementer':        '#BA7517',
-  'Acıbadem Ürünleri':'#D4537E',
-  'Diğer':            '#888780',
+  'Sağlık':           TEAL,
+  'Elementer':        '#F59E0B',
+  'Acıbadem Ürünleri':'#E62164',
+  'Diğer':            '#A78BFA',
 }
-const BRANS_FALLBACKS = ['#1D9E75', '#BA7517', '#D4537E', '#888780', '#9CA3AF']
+const BRANS_FALLBACKS = [TEAL, '#F59E0B', '#E62164', '#A78BFA', '#5B38E8']
 
 const SEKTOR_COLORS: Record<string, string> = {
-  'Üretim & Sanayi':                    '#8e2433',
-  'Üretim':                             '#8e2433',
-  'Bilişim & Yazılım':                  '#1F2937',
-  'Bilişim':                            '#1F2937',
-  'Hizmet':                             '#1D9E75',
-  'Profesyonel Hizmet':                 '#1D9E75',
-  'İnşaat & Müteahhitlik':              '#EF9F27',
-  'İnşaat':                             '#EF9F27',
-  'Tekstil':                            '#D85A30',
-  'Lojistik & Nakliyat':               '#6B7280',
-  'Gıda & İçecek':                     '#92400E',
-  'Otomotiv & Yan Sanayi':             '#1E40AF',
-  'Eğitim & Danışmanlık':              '#7C3AED',
-  'Finans & Sigorta':                   '#0369A1',
+  'Üretim & Sanayi':                    '#982A49',
+  'Üretim':                             '#982A49',
+  'Bilişim & Yazılım':                  '#5B38E8',
+  'Bilişim':                            '#5B38E8',
+  'Hizmet':                             TEAL,
+  'Profesyonel Hizmet':                 TEAL,
+  'İnşaat & Müteahhitlik':              '#F59E0B',
+  'İnşaat':                             '#F59E0B',
+  'Tekstil':                            '#E62164',
+  'Lojistik & Nakliyat':               '#0EA5E9',
+  'Gıda & İçecek':                     '#EA580C',
+  'Otomotiv & Yan Sanayi':             '#4B1FB4',
+  'Eğitim & Danışmanlık':              '#9333EA',
+  'Finans & Sigorta':                   '#0284C7',
   'Sağlık Kuruluşu':                   '#059669',
-  'Turizm & Konaklama':                '#BE185D',
-  'Perakende & E-ticaret':             '#D97706',
-  'Toptan Ticaret & İthalat-İhracat':  '#4B5563',
-  'Reklam & Medya':                     '#9333EA',
-  'Diğer':                             '#888780',
+  'Turizm & Konaklama':                '#E62164',
+  'Perakende & E-ticaret':             '#FB923C',
+  'Toptan Ticaret & İthalat-İhracat':  '#0284C7',
+  'Reklam & Medya':                     '#A78BFA',
+  'Diğer':                             '#A78BFA',
 }
-const SEKTOR_FALLBACKS = ['#8e2433', '#1F2937', '#1D9E75', '#EF9F27', '#D85A30', '#888780', '#6B7280', '#92400E']
+const SEKTOR_FALLBACKS = ['#982A49', '#5B38E8', TEAL, '#F59E0B', '#E62164', '#0EA5E9', '#EA580C', '#9333EA']
 
+// Kanban board ile aynı renkler
 const PIPELINE_RENK: Record<string, string> = {
-  'Bilinmiyor':   '#C4C4C4',
-  'Ulaşılamadı':  '#9CA3AF',
-  'Yanıt Alındı': '#1F2937',
-  'Randevu':      '#1D9E75',
-  'Teklif':       '#EF9F27',
-  'Müzakere':     '#BA7517',
-  'Kazanıldı':    '#8e2433',
-  'Kaybedildi':   '#D1D5DB',
+  'Bilinmiyor':   '#C4B5FD',
+  'Ulaşılamadı':  '#982A49',
+  'Yanıt Alındı': '#5B38E8',
+  'Randevu':      '#E62164',
+  'Teklif':       '#4B1FB4',
+  'Müzakere':     '#9333EA',
+  'Kazanıldı':    '#982A49',
+  'Kaybedildi':   '#FDA4AF',
 }
 const PIPELINE_BG: Record<string, string> = {
-  'Bilinmiyor':   '#F3F4F6',
-  'Ulaşılamadı':  '#F3F4F6',
-  'Yanıt Alındı': '#EFF1F5',
-  'Randevu':      '#ECFDF5',
-  'Teklif':       '#FFFBEB',
-  'Müzakere':     '#FEF3C7',
-  'Kazanıldı':    '#F5E8EA',
-  'Kaybedildi':   '#F9FAFB',
+  'Bilinmiyor':   '#F5F3FF',
+  'Ulaşılamadı':  '#FFF3F6',
+  'Yanıt Alındı': '#F0EEFF',
+  'Randevu':      '#FFF0F6',
+  'Teklif':       '#EEE9FF',
+  'Müzakere':     '#F5EEFF',
+  'Kazanıldı':    '#FFF3F6',
+  'Kaybedildi':   '#FFF1F2',
 }
 const PIPELINE_LABEL: Record<string, string> = {
   'Kazanıldı': 'Satış / Kazanım',
@@ -159,12 +165,12 @@ function Kart({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5">
+    <div className="rounded-xl border border-gray-200 bg-white p-6">
       <div className="flex items-baseline justify-between mb-1">
-        <h3 className="text-[13px] font-semibold text-gray-800">{title}</h3>
-        {right && <span className="text-[11px] text-gray-400">{right}</span>}
+        <h3 className="text-[15px] font-semibold text-gray-800">{title}</h3>
+        {right && <span className="text-[12px] text-gray-400">{right}</span>}
       </div>
-      {subtitle && <p className="text-[11px] text-gray-400 mb-3">{subtitle}</p>}
+      {subtitle && <p className="text-[12px] text-gray-400 mb-3">{subtitle}</p>}
       {!subtitle && <div className="mb-3" />}
       {children}
     </div>
@@ -354,7 +360,7 @@ function SicaklikKart({ data, toplam, loading }: { data?: SicaklikData; toplam?:
   const tiers = [
     { key: 'hot',  label: 'HOT',  count: data.hot,  renk: '#8e2433', barBg: '#F5E8EA' },
     { key: 'warm', label: 'WARM', count: data.warm, renk: '#D97706', barBg: '#FEF3C7' },
-    { key: 'cold', label: 'COLD', count: data.cold, renk: '#374151', barBg: '#E5E7EB' },
+    { key: 'cold', label: 'COLD', count: data.cold, renk: '#5B38E8', barBg: '#F0EEFF' },
   ]
   return (
     <Kart title="Sıcaklık skoru" subtitle="Portföy dağılımı">
@@ -382,6 +388,50 @@ function SicaklikKart({ data, toplam, loading }: { data?: SicaklikData; toplam?:
         })}
       </div>
     </Kart>
+  )
+}
+
+// ── Raporlar Hero Banner ──────────────────────────────────────────────────────
+function RaporlarHero({ weekLabel }: { weekLabel: string }) {
+  return (
+    <section
+      className="relative h-[150px] rounded-[16px] overflow-hidden text-white flex items-center px-[31px] shadow-sm"
+      style={{ background: 'linear-gradient(105deg, #0a2c4e 0%, #1a1240 48%, #982A49 100%)' }}
+    >
+      {/* Dekoratif halkalar */}
+      <div className="absolute right-[-68px] top-[-120px] h-[390px] w-[390px] rounded-full border border-white/15 pointer-events-none" />
+      <div className="absolute right-[74px] top-[13px] h-[240px] w-[240px] rounded-full border border-white/12 pointer-events-none" />
+      <div className="absolute right-[160px] top-[63px] h-[100px] w-[100px] rounded-full border border-white/10 pointer-events-none" />
+
+      <div className="relative flex items-center gap-[28px]">
+        <div className="relative shrink-0 h-[92px] w-[92px]">
+          <div
+            className="absolute inset-[-7px] rounded-full opacity-60 blur-xl"
+            style={{ background: 'linear-gradient(135deg, #5B38E8, #D978B6)' }}
+          />
+          <div
+            className="absolute inset-0 rounded-full p-[4px]"
+            style={{ background: 'linear-gradient(135deg, #BCA8FF, #5B38E8, #982A49)' }}
+          >
+            <div className="h-full w-full rounded-full overflow-hidden">
+              <Image src="/ali-avatar.png" alt="Ali" width={84} height={84}
+                className="h-full w-full object-cover rounded-full" />
+            </div>
+          </div>
+        </div>
+        <div>
+          <div className="text-[11px] text-white/70 font-semibold uppercase tracking-[.12em]">
+            📊 Haftalık Raporlar
+          </div>
+          <h2 className="mt-[4px] text-[20px] font-black tracking-[-.02em]">
+            {weekLabel}
+          </h2>
+          <p className="mt-[6px] text-[13px] text-white/80">
+            Ekip performansını ve portföy durumunu takip ediyorsunuz.
+          </p>
+        </div>
+      </div>
+    </section>
   )
 }
 
@@ -506,6 +556,7 @@ export function RaporlarClient({
   const [arsivLoading, setArsivLoading] = useState(!isBireysel)
   const [arsivError, setArsivError] = useState<string | null>(null)
 
+  const [weekOffset, setWeekOffset] = useState(0)
   const [modalId, setModalId] = useState<string | null>(null)
   const [mounted, setMounted] = useState(false)
 
@@ -562,28 +613,26 @@ export function RaporlarClient({
   const weekLabel = mounted ? getWeekLabel() : ''
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-5xl mx-auto space-y-8">
 
-      {/* ── Sayfa başlığı ────────────────────────────────────────────── */}
-      <div>
-        <div className="flex items-center justify-between">
-          <h1 className="text-xl font-bold text-gray-900">Raporlar</h1>
-          {isBireysel && (
-            <span className="rounded-full border border-amber-200 bg-amber-50 px-[11px] py-[5px] text-[11px] font-bold text-amber-700">
-              Örnek veri
-            </span>
-          )}
-        </div>
-        {weekLabel && (
-          <p className="text-[12px] text-gray-400 mt-0.5">{weekLabel} · Bu hafta</p>
-        )}
-      </div>
+      {/* ── Hero Banner (yönetici) / Bireysel başlık ────────────────── */}
+      {!isBireysel
+        ? mounted && <RaporlarHero weekLabel={weekLabel || 'Bu Hafta'} />
+        : (
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h1 className="text-xl font-bold text-gray-900">Raporlar</h1>
+              <span className="rounded-full border border-amber-200 bg-amber-50 px-[11px] py-[5px] text-[11px] font-bold text-amber-700">
+                Örnek veri
+              </span>
+            </div>
+            <div className="rounded-[12px] border border-amber-200 bg-amber-50 px-[16px] py-[12px] text-[13px] text-amber-700">
+              Bireysel segmentte raporlar örnek verilerle gösterilmektedir.
+            </div>
+          </div>
+        )
+      }
 
-      {isBireysel && (
-        <div className="rounded-[12px] border border-amber-200 bg-amber-50 px-[16px] py-[12px] text-[13px] text-amber-700">
-          Bireysel segmentte raporlar örnek verilerle gösterilmektedir.
-        </div>
-      )}
 
       {/* ════════════════════════════════════════════════════════════ */}
       {/* BÖLÜM 1 — GENEL DAĞILIMLAR                                 */}
@@ -637,25 +686,41 @@ export function RaporlarClient({
         )}
       </section>
 
-      {/* ── Bu Hafta Aktivite ────────────────────────────────────────── */}
-      <section className="space-y-3">
-        <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-          Bu Hafta Aktivite
-        </h2>
-        {bugunLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {[0, 1].map(i => (
-              <div key={i} className="h-[120px] rounded-xl border border-gray-100 bg-gray-50 animate-pulse" />
-            ))}
-          </div>
-        ) : bugunAktivite && bugunAktivite.temsilciler.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {bugunAktivite.temsilciler.map(t => (
-              <BugunAktiviteKart key={t.slug} t={t} weekStart={bugunAktivite.weekStart} tarih={bugunAktivite.tarih} />
-            ))}
-          </div>
-        ) : null}
-      </section>
+      {/* ════════════════════════════════════════════════════════════ */}
+      {/* BÖLÜM 2 — EKİP PERFORMANSI (yalnızca yönetici)             */}
+      {/* ════════════════════════════════════════════════════════════ */}
+      {!isBireysel && izin.tip === 'yönetici' && (
+        <Bolum2Ekip displayAdMap={displayAdMap} weekOffset={weekOffset} onWeekChange={setWeekOffset} />
+      )}
+
+      {/* ════════════════════════════════════════════════════════════ */}
+      {/* BÖLÜM 3 — TEMSİLCİ PERFORMANSI (yönetici)                 */}
+      {/* ════════════════════════════════════════════════════════════ */}
+      {!isBireysel && izin.tip === 'yönetici' && (
+        <Bolum3Temsilci displayAdMap={displayAdMap} weekOffset={weekOffset} />
+      )}
+
+      {/* ── Bu Hafta Aktivite (temsilci görünümü) ────────────────── */}
+      {izin.tip !== 'yönetici' && (
+        <section className="space-y-3">
+          <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
+            Bu Hafta Aktivite
+          </h2>
+          {bugunLoading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {[0, 1].map(i => (
+                <div key={i} className="h-[120px] rounded-xl border border-gray-100 bg-gray-50 animate-pulse" />
+              ))}
+            </div>
+          ) : bugunAktivite && bugunAktivite.temsilciler.length > 0 ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {bugunAktivite.temsilciler.map(t => (
+                <BugunAktiviteKart key={t.slug} t={t} weekStart={bugunAktivite.weekStart} tarih={bugunAktivite.tarih} />
+              ))}
+            </div>
+          ) : null}
+        </section>
+      )}
 
       {/* ── Rapor Arşivi ─────────────────────────────────────────────── */}
       <section>

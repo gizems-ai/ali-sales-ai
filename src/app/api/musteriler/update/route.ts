@@ -116,19 +116,7 @@ export async function PATCH(req: NextRequest) {
     const user = await currentUser()
     const adSoyad = user?.firstName || 'Kullanıcı'
 
-    const noteQS = new URLSearchParams()
-    noteQS.append('fields[]', 'Birikimli Görüşme Notları')
-    let mevcutNot = ''
-    try {
-      const noteRes = await fetch(`${BASE_URL}/${recordId}?${noteQS}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        cache: 'no-store',
-      })
-      if (noteRes.ok) {
-        const noteRec = await noteRes.json()
-        mevcutNot = String(noteRec.fields?.['Birikimli Görüşme Notları'] ?? '')
-      }
-    } catch { /* mevcut not okunamadı, yeni not tek başına yazılır */ }
+    const mevcutNot = String(checkRec.fields?.['Birikimli Görüşme Notları'] ?? '')
 
     // İstanbul saat dilimi — tr-TR formatı GG.AA.YYYY döner (sunucu UTC olsa bile doğru gün)
     const tarihTR = new Date().toLocaleDateString('tr-TR', { timeZone: 'Europe/Istanbul' })

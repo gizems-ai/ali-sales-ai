@@ -3,8 +3,8 @@ import { getTenantConfigFromRequest } from '@/lib/yetki'
 import { atTableUrl } from '@/lib/tenants'
 
 const PIPELINE_ORDER = [
-  'Bilinmiyor', 'Ulaşılamadı', 'Yanıt Alındı', 'Randevu',
-  'Teklif', 'Müzakere', 'Kazanıldı', 'Kaybedildi',
+  'Ulaşılamadı', 'Bilinmiyor', 'Yanıt Alındı', 'Randevu',
+  'Teklif', 'Kazanıldı', 'Kaybedildi',
 ]
 const AY_ORDER = [
   'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
@@ -78,9 +78,9 @@ export async function GET() {
         const f = r.fields as Record<string, unknown>
         toplam++
 
-        // Pipeline — null/undefined → 'Bilinmiyor'
+        // Pipeline — null/undefined → 'Bilinmiyor', Müzakere → Teklif
         const a = f['Pipeline Aşaması'] as string | undefined
-        const pKey = a ?? 'Bilinmiyor'
+        const pKey = a === 'Müzakere' ? 'Teklif' : (a ?? 'Bilinmiyor')
         pipeline[pKey] = (pipeline[pKey] ?? 0) + 1
 
         // Vade

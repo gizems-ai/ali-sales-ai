@@ -25,17 +25,19 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   const cfg = await getTenantConfigFromRequest()
   if (!cfg) redirect('/login')
 
+  const isEmlak = cfg.id === 'emlak_demo'
+
   return (
     <TenantProvider config={cfg}>
-      <div className="flex h-screen overflow-hidden bg-gray-50">
+      <div className={isEmlak ? 'emlak-shell' : 'flex h-screen overflow-hidden bg-gray-50'}>
         <Sidebar />
-        <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+        <div className={isEmlak ? 'min-w-0 flex flex-col' : 'flex flex-col flex-1 min-w-0 overflow-hidden'}>
           <Topbar />
-          <main className="flex-1 overflow-y-auto p-4 sm:p-6 pb-24 lg:pb-6">
+          <main className={isEmlak ? 'flex-1 overflow-y-auto' : 'flex-1 overflow-y-auto p-4 sm:p-6 pb-24 lg:pb-6'}>
             {children}
           </main>
         </div>
-        <MobileNav />
+        {!isEmlak && <MobileNav />}
       </div>
     </TenantProvider>
   )

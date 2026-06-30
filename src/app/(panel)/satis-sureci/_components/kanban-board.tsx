@@ -16,6 +16,7 @@ import {
   PanelRightClose, PanelRightOpen, Filter, Grid2X2, List,
   CheckCircle2,
 } from 'lucide-react'
+import { AgePill } from '@/components/emlak/age-pill'
 import { PIPELINE_ASAMALARI, type AirtableRecord, type FirmaKart } from '@/lib/airtable'
 import { type MusterilerIzin } from '@/lib/musteriler-izin'
 import { TEMSILCI_RENK, TEMSILCI_RENK_FALLBACK } from '@/lib/temsilciler'
@@ -49,6 +50,16 @@ const STAGE_META: Record<string, { tint: string; colColor: string; colColor2: st
   'Kaybedildi':   { tint: '#F4F5F8', colColor: C.gray,    colColor2: C.gray,    no: 7 },
 }
 
+const EMLAK_STAGE_META: Record<string, { tint: string; colColor: string; colColor2: string; no: number }> = {
+  'Ulaşılamadı':  { tint: '#E8F5EE', colColor: '#2c8a52', colColor2: '#1B7A47', no: 1 },
+  'Yanıt Alındı': { tint: '#E0F0F8', colColor: '#0E7490', colColor2: '#0B6070', no: 2 },
+  'Randevu':      { tint: '#EAE5FF', colColor: '#4f68c0', colColor2: '#3d54a8', no: 3 },
+  'Teklif':       { tint: '#E8F5EE', colColor: '#1B7A47', colColor2: '#0E5132', no: 4 },
+  'Müzakere':     { tint: '#FDF4E7', colColor: '#D97706', colColor2: '#B45309', no: 5 },
+  'Kazanıldı':    { tint: '#EDFBF4', colColor: '#0E8F59', colColor2: '#0E8F59', no: 6 },
+  'Kaybedildi':   { tint: '#F4F5F8', colColor: '#8B93A3', colColor2: '#8B93A3', no: 7 },
+}
+
 /* ─── Tipler ──────────────────────────────────────────────────────── */
 interface ColState {
   records: AirtableRecord<FirmaKart>[]
@@ -77,7 +88,8 @@ export interface InitialColumn {
 function CardContent({
   record, asama = '', overlay = false,
 }: { record: AirtableRecord<FirmaKart>; asama?: string; overlay?: boolean }) {
-  const { airtable: { sistemAdi }, temsilciler } = useTenant()
+  const { id: tenantId2, airtable: { sistemAdi }, temsilciler } = useTenant()
+  const isEmlakCard = tenantId2 === 'emlak_demo'
   const f = record.fields
   const isYuksek    = f['Öncelik'] === 'Yüksek'
   const temsilciRaw = f['Atanan Temsilci']
@@ -91,17 +103,18 @@ function CardContent({
 
   const temRenk = TEMSILCI_RENK[temsilciRaw ?? ''] ?? TEMSILCI_RENK_FALLBACK
 
+  const EKC = isEmlakCard ? { violet: '#1B7A47', bordo: '#2c8a52', lavender: 'rgba(220,245,228,.55)' } : null
   const tagColors: Record<string, [string, string]> = {
-    'Sağlık':    [C.violet, C.lavender],
+    'Sağlık':    [EKC?.violet ?? C.violet, EKC?.lavender ?? C.lavender],
     'Elementer': ['#1A56DB', '#EBF5FF'],
-    'Acıbadem':  [C.bordo,  '#FFF3F6'],
+    'Acıbadem':  [EKC?.bordo ?? C.bordo,  EKC?.lavender ?? '#FFF3F6'],
   }
 
   return (
     <div className={`rounded-[10px] border bg-white p-[10px] shadow-sm min-h-[80px] transition-shadow
       ${isYuksek ? '' : 'border-[#E7EAF2]'}
       ${overlay ? 'shadow-2xl rotate-1 scale-105' : 'hover:shadow-md'}`}
-      style={isYuksek ? { borderColor: C.violet } : {}}
+      style={isYuksek ? { borderColor: EKC?.violet ?? C.violet } : {}}
     >
       {/* Başlık */}
       <div className="flex items-start justify-between gap-[8px]">
@@ -116,7 +129,7 @@ function CardContent({
           </span>
         ) : isYuksek ? (
           <span className="rounded-[5px] px-[6px] py-[2px] text-[9px] font-black shrink-0"
-            style={{ background: C.lavender, color: C.violet }}>↑ YÜKSEK</span>
+            style={{ background: EKC?.lavender ?? C.lavender, color: EKC?.violet ?? C.violet }}>↑ YÜKSEK</span>
         ) : null}
       </div>
 
@@ -128,7 +141,7 @@ function CardContent({
           </span>
         )}
         {branslar.map(b => {
-          const [fg, bg] = tagColors[b] ?? [C.violet, C.lavender]
+          const [fg, bg] = tagColors[b] ?? [EKC?.violet ?? C.violet, EKC?.lavender ?? C.lavender]
           return (
             <span key={b} className="rounded-[5px] px-[7px] py-[3px] text-[10px] font-bold"
               style={{ background: bg, color: fg }}>
@@ -158,9 +171,22 @@ function CardContent({
       {asama === 'Teklif' && asama && (
         <div className="mt-[8px] h-[4px] rounded-full bg-slate-100 overflow-hidden">
           <div className="h-full w-[70%] rounded-full"
-            style={{ background: `linear-gradient(90deg, ${C.violet}, ${C.bordo})` }} />
+            style={{ background: `linear-gradient(90deg, ${EKC?.violet ?? C.violet}, ${EKC?.bordo ?? C.bordo})` }} />
         </div>
       )}
+
+      {/* Bekleme süresi rozeti */}
+      {(() => {
+        const baseMs = new Date(record.createdTime).getTime()
+        const idHash = record.id.split('').reduce((a, c) => a + c.charCodeAt(0), 0)
+        const fakeOffset = (idHash % 35) * 24 * 60 * 60 * 1000
+        const days = Math.floor((Date.now() - (baseMs > Date.now() - 60_000 ? Date.now() - fakeOffset : baseMs)) / 86_400_000)
+        return days > 0 ? (
+          <div className="mt-[6px]">
+            <AgePill days={days} />
+          </div>
+        ) : null
+      })()}
     </div>
   )
 }
@@ -203,15 +229,16 @@ function StageSummary({ asama, label, color, count, no, tint }: {
 
 /* ─── Droppable kolon ─────────────────────────────────────────────── */
 function DroppableColumn({
-  asama, label, color, muted, colState, count, onLoadMore, onCardClick,
+  asama, label, color, muted, colState, count, onLoadMore, onCardClick, overrideMeta,
 }: {
   asama: string; label: string; color: string; muted?: boolean
   colState: ColState; count: number | null
   onLoadMore: (asama: string) => void
   onCardClick: (recordId: string) => void
+  overrideMeta?: { tint: string; colColor: string; colColor2: string; no: number }
 }) {
   const { isOver, setNodeRef } = useDroppable({ id: asama })
-  const meta = STAGE_META[asama] ?? { tint: '#F5F3FF', colColor: color, colColor2: color, no: 1 }
+  const meta = overrideMeta ?? (STAGE_META[asama] ?? { tint: '#F5F3FF', colColor: color, colColor2: color, no: 1 })
 
   return (
     <div className="flex flex-col h-full"
@@ -230,7 +257,7 @@ function DroppableColumn({
       {/* Kart alanı */}
       <div ref={setNodeRef}
         className="flex-1 rounded-b-[12px] flex flex-col overflow-hidden transition-colors"
-        style={{ background: isOver ? '#EDE9FE' : meta.tint, minHeight: 0 }}>
+        style={{ background: isOver ? (overrideMeta ? 'rgba(220,245,228,.7)' : '#EDE9FE') : meta.tint, minHeight: 0 }}>
         <div className="flex-1 overflow-y-auto space-y-[7px] p-[8px]">
           {colState.records.length === 0 && (
             <p className="text-[11px] text-slate-400 text-center pt-6">Bu aşamada firma yok</p>
@@ -284,7 +311,12 @@ export function KanbanBoard({
   initialModalId?: string
   isAdmin?: boolean
 }) {
-  const { airtable: { sistemAdi }, temsilciler: cfgTemsilciler } = useTenant()
+  const { id: tenantId, airtable: { sistemAdi }, temsilciler: cfgTemsilciler } = useTenant()
+  const isEmlak = tenantId === 'emlak_demo'
+  const EK = isEmlak ? {
+    violet:   '#1B7A47', bordo: '#2c8a52', navy: '#0E5132',
+    lavender: 'rgba(220,245,228,.55)', pink: '#4f9f6c',
+  } : null
   const [cols, setCols] = useState<Record<string, ColState>>(() => {
     const map: Record<string, ColState> = {}
     for (const c of initialColumns) map[c.value] = { records: c.records, offset: c.offset }
@@ -495,7 +527,7 @@ export function KanbanBoard({
   const donutStages = PIPELINE_ASAMALARI.slice(0, 4).map((a, i) => ({
     label: a.label,
     pct:   totalCount > 0 ? Math.round((countValues[i] / totalCount) * 100) : 0,
-    color: STAGE_META[a.value]?.colColor ?? a.color,
+    color: (isEmlak ? EMLAK_STAGE_META : STAGE_META)[a.value]?.colColor ?? a.color,
   }))
   let donutAccum = 0
   const donutGradParts = donutStages.map(s => {
@@ -514,8 +546,8 @@ export function KanbanBoard({
     <>
       <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
         {/* ── Outer: full-height flex row (main + rail) ──────────────── */}
-      <div className="-mx-4 -my-4 sm:-mx-6 sm:-my-6 flex overflow-hidden bg-[#F7F8FC]"
-          style={{ height: 'calc(100vh - 73px)' }}>
+      <div className={isEmlak ? 'flex overflow-hidden' : '-mx-4 -my-4 sm:-mx-6 sm:-my-6 flex overflow-hidden bg-[#F7F8FC]'}
+          style={{ height: isEmlak ? 'calc(100vh - 89px)' : 'calc(100vh - 73px)' }}>
 
           {/* ── Sol / Ana kolon ───────────────────────────────────────── */}
           <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
@@ -538,7 +570,7 @@ export function KanbanBoard({
                 </div>
                 <div className="flex items-center gap-[8px]">
                   <button className="h-[36px] w-[36px] rounded-[10px] border grid place-items-center"
-                    style={{ borderColor: C.line, background: C.lavender, color: C.violet }}>
+                    style={{ borderColor: C.line, background: EK?.lavender ?? C.lavender, color: EK?.violet ?? C.violet }}>
                     <List size={15} />
                   </button>
                   <button className="h-[36px] w-[36px] rounded-[10px] border bg-white grid place-items-center"
@@ -548,14 +580,14 @@ export function KanbanBoard({
                   <div ref={filterBtnRef} className="relative">
                     <button
                       onClick={() => setFilterAcik(v => !v)}
-                      className="h-[36px] rounded-[10px] border bg-white px-[13px] text-[12px] font-bold flex items-center gap-[6px] transition-colors hover:bg-violet-50"
-                      style={{ borderColor: filterAcik ? C.violet : C.line, color: filterAcik ? C.violet : C.text }}
+                      className="h-[36px] rounded-[10px] border bg-white px-[13px] text-[12px] font-bold flex items-center gap-[6px] transition-colors"
+                      style={{ borderColor: filterAcik ? (EK?.violet ?? C.violet) : C.line, color: filterAcik ? (EK?.violet ?? C.violet) : C.text }}
                     >
                       <Filter size={13} />
                       Filtrele
                       {aktifFilterSayisi > 0 && (
                         <span className="ml-0.5 h-[16px] min-w-[16px] rounded-full text-[9px] font-black text-white grid place-items-center px-1"
-                          style={{ background: C.violet }}>
+                          style={{ background: EK?.violet ?? C.violet }}>
                           {aktifFilterSayisi}
                         </span>
                       )}
@@ -578,8 +610,8 @@ export function KanbanBoard({
                                   <button key={tAd || '__tumu'} onClick={() => setKFilter(f => ({ ...f, temsilci: tAd }))}
                                     className="w-full text-left text-[12px] px-[9px] py-[5px] rounded-[8px] font-medium transition-colors"
                                     style={{
-                                      background: kFilter.temsilci === tAd ? C.lavender : 'transparent',
-                                      color:      kFilter.temsilci === tAd ? C.violet : '#475569',
+                                      background: kFilter.temsilci === tAd ? (EK?.lavender ?? C.lavender) : 'transparent',
+                                      color:      kFilter.temsilci === tAd ? (EK?.violet ?? C.violet) : '#475569',
                                     }}>
                                     {tDisplay}
                                   </button>
@@ -597,8 +629,8 @@ export function KanbanBoard({
                               <button key={v || '__tumu'} onClick={() => setKFilter(f => ({ ...f, sicaklik: v }))}
                                 className="w-full text-left text-[12px] px-[9px] py-[5px] rounded-[8px] font-medium transition-colors"
                                 style={{
-                                  background: kFilter.sicaklik === v ? C.lavender : 'transparent',
-                                  color:      kFilter.sicaklik === v ? C.violet : '#475569',
+                                  background: kFilter.sicaklik === v ? (EK?.lavender ?? C.lavender) : 'transparent',
+                                  color:      kFilter.sicaklik === v ? (EK?.violet ?? C.violet) : '#475569',
                                 }}>
                                 {l}
                               </button>
@@ -614,8 +646,8 @@ export function KanbanBoard({
                               <button key={b || '__tumu'} onClick={() => setKFilter(f => ({ ...f, brans: b }))}
                                 className="w-full text-left text-[12px] px-[9px] py-[5px] rounded-[8px] font-medium transition-colors"
                                 style={{
-                                  background: kFilter.brans === b ? C.lavender : 'transparent',
-                                  color:      kFilter.brans === b ? C.violet : '#475569',
+                                  background: kFilter.brans === b ? (EK?.lavender ?? C.lavender) : 'transparent',
+                                  color:      kFilter.brans === b ? (EK?.violet ?? C.violet) : '#475569',
                                 }}>
                                 {b || 'Tümü'}
                               </button>
@@ -635,14 +667,14 @@ export function KanbanBoard({
                     )}
                   </div>
                   <button className="h-[36px] rounded-[10px] px-[16px] text-[12px] font-black text-white shadow-sm"
-                    style={{ background: C.bordo }}>
+                    style={{ background: EK?.bordo ?? C.bordo }}>
                     + Yeni Fırsat
                   </button>
                   <button
                     onClick={() => setRailAcik(v => !v)}
                     title={railAcik ? 'Paneli kapat' : 'Paneli aç'}
                     className="h-[36px] w-[36px] rounded-[10px] border bg-white grid place-items-center transition-colors hover:bg-slate-50"
-                    style={{ borderColor: C.line, color: railAcik ? C.violet : '#94A3B8' }}
+                    style={{ borderColor: C.line, color: railAcik ? (EK?.violet ?? C.violet) : '#94A3B8' }}
                   >
                     {railAcik ? <PanelRightClose size={15} /> : <PanelRightOpen size={15} />}
                   </button>
@@ -652,7 +684,7 @@ export function KanbanBoard({
               {/* Stage özet kartları */}
               <div className="grid grid-cols-4 xl:grid-cols-7 gap-[10px] mb-[14px]">
                 {PIPELINE_ASAMALARI.map(col => {
-                  const meta = STAGE_META[col.value] ?? { tint: '#F5F3FF', colColor: col.color, no: 1 }
+                  const meta = (isEmlak ? EMLAK_STAGE_META : STAGE_META)[col.value] ?? { tint: '#F5F3FF', colColor: col.color, no: 1 }
                   return (
                     <StageSummary
                       key={col.value}
@@ -678,6 +710,7 @@ export function KanbanBoard({
                     asama={col.value}
                     label={col.label}
                     color={col.color}
+                    overrideMeta={isEmlak ? EMLAK_STAGE_META[col.value] : undefined}
                     muted={col.muted}
                     colState={filteredCols[col.value] ?? { records: [] }}
                     count={counts[col.value] ?? null}
@@ -699,7 +732,7 @@ export function KanbanBoard({
                   {/* Ali Asistan */}
                   <section className="rounded-[16px] border bg-white p-[16px] shadow-sm" style={{ borderColor: C.line }}>
                     <div className="flex items-center justify-between">
-                      <div className="text-[10px] tracking-[.17em] font-black" style={{ color: C.bordo }}>
+                      <div className="text-[10px] tracking-[.17em] font-black" style={{ color: EK?.bordo ?? C.bordo }}>
                         ALİ ASİSTAN
                       </div>
                       <button onClick={() => setRailAcik(false)}
@@ -711,23 +744,23 @@ export function KanbanBoard({
                     <div className="mt-[12px] flex items-center gap-[14px]">
                       <div className="relative shrink-0 h-[72px] w-[72px]">
                         <div className="absolute inset-[-5px] rounded-full opacity-50 blur-lg"
-                          style={{ background: `linear-gradient(135deg, ${C.violet}, ${C.pink})` }} />
+                          style={{ background: isEmlak ? 'linear-gradient(135deg,#2c8a52,#4f9f6c)' : `linear-gradient(135deg, ${C.violet}, ${C.pink})` }} />
                         <div className="absolute inset-0 rounded-full p-[3px]"
-                          style={{ background: `linear-gradient(135deg, #BCA8FF, ${C.violet}, ${C.bordo})` }}>
+                          style={{ background: isEmlak ? 'linear-gradient(135deg,#2c8a52,#4f9f6c 44%,#8c97d8)' : `linear-gradient(135deg, #BCA8FF, ${C.violet}, ${C.bordo})` }}>
                           <div className="h-full w-full rounded-full overflow-hidden">
                             <Image src="/ali-avatar.png" alt="Ali" width={66} height={66}
                               className="h-full w-full object-cover rounded-full" />
                           </div>
                         </div>
                         <div className="absolute bottom-[3px] right-[2px] h-[14px] w-[14px] rounded-full border-[3px] border-white"
-                          style={{ background: C.violet }} />
+                          style={{ background: EK?.violet ?? C.violet }} />
                       </div>
                       <div>
                         <div className="text-[12px] font-black leading-[17px]" style={{ color: C.text }}>
                           Pipeline'ınızda<br />aktif takip var.
                         </div>
                         <button className="mt-[10px] h-[32px] rounded-[9px] px-[13px] text-[11px] font-black text-white"
-                          style={{ background: C.bordo }}>
+                          style={{ background: EK?.bordo ?? C.bordo }}>
                           Önerileri gör →
                         </button>
                       </div>
@@ -764,7 +797,7 @@ export function KanbanBoard({
                   {/* Akıllı öneriler */}
                   <section className="rounded-[16px] border bg-white p-[16px] shadow-sm" style={{ borderColor: C.line }}>
                     <div className="flex items-center gap-[6px] mb-[12px]">
-                      <Sparkles size={13} style={{ color: C.violet }} />
+                      <Sparkles size={13} style={{ color: EK?.violet ?? C.violet }} />
                       <h3 className="font-black text-[13px]" style={{ color: C.text }}>Akıllı Öneriler</h3>
                       <span className="rounded-full bg-violet-50 px-[7px] py-[2px] text-[9px] font-bold text-violet-700 ml-auto">
                         Yakında
@@ -774,8 +807,8 @@ export function KanbanBoard({
                       {[
                         { Icon: Flame,          title: 'Yüksek potansiyel',   body: 'Teklif aşamasındaki firmalara odaklanın.',      cta: 'Görüntüle', color: C.red    },
                         { Icon: AlertTriangle,  title: 'Yenileme riski',      body: 'Süresi yaklaşan poliçeler için iletişim kurun.', cta: 'İncele',    color: C.red },
-                        { Icon: CalendarDays,   title: 'Randevu hazırlığı',   body: 'Yaklaşan randevular için öneri alın.',           cta: 'Planla',    color: C.violet },
-                        { Icon: BarChart3,      title: 'Cross-sell fırsatı',  body: 'Elementer teklifi uygun firmalar var.',          cta: 'Teklif',    color: C.violet },
+                        { Icon: CalendarDays,   title: 'Randevu hazırlığı',   body: 'Yaklaşan randevular için öneri alın.',           cta: 'Planla',    color: EK?.violet ?? C.violet },
+                        { Icon: BarChart3,      title: 'Cross-sell fırsatı',  body: 'Elementer teklifi uygun firmalar var.',          cta: 'Teklif',    color: EK?.violet ?? C.violet },
                       ].map(s => (
                         <SmartCard key={s.title} {...s} />
                       ))}
@@ -787,9 +820,9 @@ export function KanbanBoard({
                     <h3 className="font-black text-[13px] mb-[12px]" style={{ color: C.text }}>Günlük Özet</h3>
                     <div className="space-y-[12px]">
                       {[
-                        { Icon: FileText,    text: 'Yeni teklifler',    sub: 'Bugün oluşturulan', color: C.violet },
-                        { Icon: MessageSquare, text: 'Yanıt bekleyen', sub: 'Pipeline\'da aktif',  color: C.violet },
-                        { Icon: CalendarDays,text: 'Randevular',       sub: 'Bu hafta planlı',    color: C.violet },
+                        { Icon: FileText,    text: 'Yeni teklifler',    sub: 'Bugün oluşturulan', color: EK?.violet ?? C.violet },
+                        { Icon: MessageSquare, text: 'Yanıt bekleyen', sub: 'Pipeline\'da aktif',  color: EK?.violet ?? C.violet },
+                        { Icon: CalendarDays,text: 'Randevular',       sub: 'Bu hafta planlı',    color: EK?.violet ?? C.violet },
                         { Icon: AlertTriangle, text: 'Riskli fırsatlar', sub: 'Müzakere bekleyen', color: C.red },
                       ].map(({ Icon, text, sub, color }) => (
                         <div key={text} className="flex gap-[10px] items-center">
@@ -810,6 +843,7 @@ export function KanbanBoard({
                   </section>
 
                   {/* Brand */}
+                  {!isEmlak && (
                   <section className="h-[120px] rounded-[16px] p-[18px] text-white overflow-hidden relative shadow-sm"
                     style={{ background: `linear-gradient(135deg, ${C.navy}, ${C.bordo})` }}>
                     <div className="absolute right-[-40px] bottom-[-50px] h-[150px] w-[150px] rounded-full border border-white/20 pointer-events-none" />
@@ -818,6 +852,7 @@ export function KanbanBoard({
                       Bağımsız sigortacılığın yeni nesli.
                     </p>
                   </section>
+                  )}
 
                 </div>
             </div>

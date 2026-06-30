@@ -35,12 +35,10 @@ export default async function SatisSureciPage({
   const izin = await getMusterilerIzni()
 
   let initialColumns
-  if (isBireysel) {
-    // Bireysel: fixture verisi — Airtable'a hiç gitme
+  if (isEmlak) {
     initialColumns = PIPELINE_ASAMALARI.map(col => ({
       ...col,
       records: BIREYSEL_KANBAN.filter(r => r.fields['Atanan Temsilci'] !== undefined).filter((_, i) =>
-        // Fixture kayıtları pipeline aşamalarına dağıt
         i % PIPELINE_ASAMALARI.length === PIPELINE_ASAMALARI.findIndex(a => a.value === col.value)
       ),
       offset: undefined,
@@ -61,7 +59,7 @@ export default async function SatisSureciPage({
   const isAdmin = profil.rol === 'admin'
 
   return (
-    <div className="space-y-0">
+    <div className="space-y-0" style={isEmlak ? { padding: '24px 32px 0' } : {}}>
       {isBireysel && (
         <div className="mx-4 sm:mx-6 mt-4 mb-0 flex items-center gap-[8px] rounded-[10px] border border-amber-200 bg-amber-50 px-[14px] py-[8px]">
           <span className="text-[12px] font-bold text-amber-700">Örnek veri</span>

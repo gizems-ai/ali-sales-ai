@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useTenant } from '@/lib/tenant-context'
 import {
   Flame, Phone, Mail,
-  PhoneCall, PhoneOff, CalendarClock,
+  PhoneCall, PhoneOff, CalendarClock, CalendarCheck, CalendarX,
   MessageSquare, MoreHorizontal, Check, X as XIcon, Send,
 } from 'lucide-react'
 import { type FirmaListeItem, type AirtableRecord, PIPELINE_ASAMALARI } from '@/lib/airtable'
@@ -17,6 +17,8 @@ interface Props {
   onClick?: () => void
   onAksiyon?: (recordId: string, fields: Record<string, unknown>, firmaAdi: string) => void
   onNotEkle?: (recordId: string, not: string, firmaAdi: string) => void
+  onAjandadanCikar?: (recordId: string, firmaAdi: string) => void
+  onAjandayaEkle?: (recordId: string, firmaAdi: string) => void
 }
 
 const C = {
@@ -175,10 +177,11 @@ function WaBtn({ tel }: { tel?: string }) {
 }
 
 // Tablo grid sütunları — header ile eşleşmeli
-const GRID = 'grid-cols-[40px_minmax(220px,1fr)_100px_105px_90px_105px_105px_90px_100px]'
+const GRID = 'grid-cols-[40px_minmax(220px,1fr)_100px_105px_90px_105px_105px_90px_minmax(140px,auto)]'
 
 export function FirmaSatir({
   record, showTemsilci = true, izin, onClick, onAksiyon, onNotEkle,
+  onAjandadanCikar, onAjandayaEkle,
 }: Props) {
   const { airtable: { sistemAdi }, temsilciler } = useTenant()
   const f = record.fields
@@ -355,20 +358,47 @@ export function FirmaSatir({
         </div>
 
         {/* Aksiyon butonları */}
-        <div className="flex items-center gap-[5px]" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center gap-[4px]" onClick={e => e.stopPropagation()}>
           {canWrite ? (
             <>
-              <div className="hidden sm:flex items-center gap-[5px]">
+              <div className="hidden sm:flex items-center gap-[4px]">
                 <PhoneBtn tel={tel} />
+                <WaBtn tel={tel} />
                 <button
                   title="Sonra Ara"
                   onClick={e => { e.stopPropagation(); setSonraAra(v => !v); setNotAcik(false) }}
-                  className="h-[31px] w-[31px] rounded-[10px] border grid place-items-center transition-colors opacity-40 hover:opacity-70 text-gray-400 hover:text-violet-500 hover:bg-violet-50"
+                  className="h-[31px] w-[31px] rounded-[10px] border grid place-items-center transition-colors text-slate-400 hover:text-violet-600 hover:border-violet-200 hover:bg-violet-50"
                   style={{ borderColor: C.line }}
                 >
                   <CalendarClock size={14} />
                 </button>
-                <WaBtn tel={tel} />
+                <button
+                  title="Not ekle"
+                  onClick={e => { e.stopPropagation(); setNotAcik(v => !v); setSonraAra(false) }}
+                  className="h-[31px] w-[31px] rounded-[10px] border grid place-items-center transition-colors text-slate-400 hover:text-violet-600 hover:border-violet-200 hover:bg-violet-50"
+                  style={{ borderColor: C.line }}
+                >
+                  <MessageSquare size={14} />
+                </button>
+
+                {onAjandayaEkle && !bugun && (
+                  <button
+                    title="Ajandaya ekle"
+                    onClick={e => { e.stopPropagation(); onAjandayaEkle(record.id, firmaAdi) }}
+                    className="h-[31px] w-[31px] rounded-[10px] border border-emerald-200 grid place-items-center transition-colors bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:border-emerald-300"
+                  >
+                    <CalendarCheck size={14} />
+                  </button>
+                )}
+                {onAjandadanCikar && bugun && (
+                  <button
+                    title="Ajandadan çıkar"
+                    onClick={e => { e.stopPropagation(); onAjandadanCikar(record.id, firmaAdi) }}
+                    className="h-[31px] w-[31px] rounded-[10px] border border-rose-200 grid place-items-center transition-colors bg-rose-50 text-rose-500 hover:bg-rose-100 hover:border-rose-300"
+                  >
+                    <CalendarX size={14} />
+                  </button>
+                )}
               </div>
               <div className="sm:hidden">
                 <button onClick={() => setMobileMenu(v => !v)}
@@ -383,6 +413,12 @@ export function FirmaSatir({
                     <AkBtn icon={PhoneOff}      label="Ulaşılamadı" onClick={() => doUlasilamadi()} danger />
                     <AkBtn icon={CalendarClock} label="Sonra Ara"   onClick={() => { setSonraAra(true); setMobileMenu(false) }} />
                     <AkBtn icon={MessageSquare} label="Not"         onClick={() => { setNotAcik(true); setMobileMenu(false) }} />
+                    {onAjandayaEkle && !bugun && (
+                      <AkBtn icon={CalendarCheck} label="Ajandaya Ekle" onClick={() => { onAjandayaEkle(record.id, firmaAdi); setMobileMenu(false) }} />
+                    )}
+                    {onAjandadanCikar && bugun && (
+                      <AkBtn icon={CalendarX} label="Ajandadan Çıkar" onClick={() => { onAjandadanCikar(record.id, firmaAdi); setMobileMenu(false) }} danger />
+                    )}
                   </div>
                 )}
               </div>

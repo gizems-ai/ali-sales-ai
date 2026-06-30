@@ -5,16 +5,19 @@ import { type TenantConfig } from '@/lib/tenants'
 import { redirect } from 'next/navigation'
 import { getSegment } from '@/lib/emlak-segment'
 import { resolveDisplayAd } from '@/lib/emlak-display'
-import { BIREYSEL_MUSTERILER } from '@/lib/emlak-fixtures'
+import { BIREYSEL_MUSTERILER, BUGUNUN_HAMLELERI } from '@/lib/emlak-fixtures'
 import {
   Clock3, Heart, Bell, Gift,
   MessageCircle, TrendingUp,
   Users, ClipboardList, CalendarClock, AlertTriangle, Lightbulb,
   Building2, Flame, Wallet, PhoneCall, CalendarDays,
   ArrowRight, FileText, UserPlus, Upload,
+  Home, MapPin,
 } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { MoveCard } from '@/components/emlak/move-card'
+import { StatTile } from '@/components/emlak/stat-tile'
 
 export const revalidate = 300
 
@@ -26,6 +29,52 @@ const C = {
   line:     '#E7EAF2',
   text:     '#071B3A',
   lavender: '#F2EEFF',
+}
+
+const E = {
+  green1:   '#0E5132',
+  green2:   '#1B7A47',
+  green3:   '#2E9D5E',
+  surface:  '#EFF5EF',
+  lavender: '#F2EEFF',
+  coral:    '#EF6B4F',
+  text:     '#071B3A',
+  line:     '#E7EAF2',
+}
+
+// InsightTile — emlak için ikon tile bileşeni
+function InsightTile({
+  icon: Icon, label, description, count, href,
+}: {
+  icon: React.ElementType; label: string; description: string
+  count?: number; href?: string
+}) {
+  const inner = (
+    <div
+      className="rounded-[18px] border bg-white p-[14px] flex items-start gap-[12px] hover:shadow-md transition-shadow"
+      style={{ borderColor: E.line }}
+    >
+      <div
+        className="h-[38px] w-[38px] rounded-full grid place-items-center shrink-0 text-white"
+        style={{ background: `linear-gradient(135deg, ${E.green2}, ${E.green3})` }}
+      >
+        <Icon size={18} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-[13px] font-black" style={{ color: E.text }}>{label}</p>
+        <p className="text-[11px] text-slate-400 mt-[2px] leading-snug">{description}</p>
+      </div>
+      {count !== undefined && (
+        <span
+          className="shrink-0 h-[22px] min-w-[22px] rounded-full px-[7px] grid place-items-center text-[11px] font-bold text-white"
+          style={{ background: E.green2 }}
+        >
+          {count}
+        </span>
+      )}
+    </div>
+  )
+  return href ? <Link href={href}>{inner}</Link> : <div>{inner}</div>
 }
 
 function fmt(n: number | undefined) {
@@ -313,6 +362,442 @@ function HizliYolCard({
 }
 
 // ══════════════════════════════════════════════════════════════════
+//  EMLAK GLASS DASHBOARD
+// ══════════════════════════════════════════════════════════════════
+
+const GLASS_STYLE = {
+  background: 'rgba(255,255,255,.55)',
+  backdropFilter: 'blur(22px) saturate(160%)',
+  WebkitBackdropFilter: 'blur(22px) saturate(160%)',
+  border: '1px solid rgba(255,255,255,.72)',
+  borderRadius: 24,
+  boxShadow: '0 2px 6px rgba(40,60,45,.05),0 22px 46px -26px rgba(40,70,50,.30)',
+} as const
+
+const EMLAK_GRAD = 'linear-gradient(135deg,#2c8a52,#4f9f6c 44%,#8c97d8)'
+const GLASS_LINE = 'rgba(120,140,125,.16)'
+
+// Emlak token shorthands
+const ET = {
+  ink:    '#1c2a22',
+  body:   '#57655b',
+  muted:  '#8b988f',
+  green:  '#248a47',
+  greenD: '#1a6b37',
+  greenT: 'rgba(146,214,170,.26)',
+  hot:    '#d9572a',
+  hotT:   '#fde7df',
+  warn:   '#b07d1e',
+  warnT:  '#fbf1cf',
+  blue:   '#4f68c0',
+  blueT:  '#e7ecfb',
+  lav:    '#7d52c0',
+  lavT:   '#f0e7fb',
+}
+
+function EmlakGlass({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
+  return <div style={{ ...GLASS_STYLE, ...style }}>{children}</div>
+}
+
+// KPI Card (emlak glass version)
+function EKpiCard({
+  label, num, sub, iconPath, iconBg, iconStroke,
+}: {
+  label: string; num: string; sub?: string
+  iconPath: string; iconBg: string; iconStroke: string
+}) {
+  return (
+    <EmlakGlass style={{ padding: '18px 18px 16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span style={{ fontSize: 12.5, fontWeight: 700, color: ET.body }}>{label}</span>
+        <span style={{
+          width: 36, height: 36, borderRadius: 11, display: 'grid', placeItems: 'center', flexShrink: 0,
+          background: iconBg,
+        }}>
+          <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+            style={{ width: 18, height: 18, stroke: iconStroke }}
+            dangerouslySetInnerHTML={{ __html: iconPath }}
+          />
+        </span>
+      </div>
+      <div style={{ fontSize: 30, fontWeight: 800, letterSpacing: '-0.02em', marginTop: 14, lineHeight: 1, color: ET.ink }}>
+        {num}
+      </div>
+      {sub && <div style={{ fontSize: 11.5, fontWeight: 600, color: ET.muted, marginTop: 7 }}>{sub}</div>}
+    </EmlakGlass>
+  )
+}
+
+// Briefing count pill
+function BriefCnt({
+  variant, icon, n, label,
+}: { variant: 'sug' | 'warn' | 'opp'; icon: string; n: number; label: string }) {
+  const styles = {
+    sug:  { bg: 'linear-gradient(135deg,#aef0c2,#86e6a6)', color: '#14622f' },
+    warn: { bg: 'linear-gradient(135deg,#fbf0a6,#f6e57e)', color: '#7c6611' },
+    opp:  { bg: 'linear-gradient(135deg,#d8cdf4,#c2b2ec)', color: '#4b3a86' },
+  }[variant]
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px',
+      borderRadius: 14, background: styles.bg, color: styles.color,
+    }}>
+      <span style={{
+        width: 26, height: 26, borderRadius: 8, display: 'grid', placeItems: 'center',
+        flexShrink: 0, background: 'rgba(255,255,255,.55)',
+      }}>
+        <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+          style={{ width: 15, height: 15, stroke: styles.color }}
+          dangerouslySetInnerHTML={{ __html: icon }}
+        />
+      </span>
+      <div>
+        <div style={{ fontSize: 17, fontWeight: 800, lineHeight: 1 }}>{n}</div>
+        <div style={{ fontSize: 10.5, fontWeight: 700, marginTop: 2, opacity: 0.85 }}>{label}</div>
+      </div>
+    </div>
+  )
+}
+
+// Deal card (glass version replaces MoveCard in this layout)
+function EmlakDealCard({ item }: { item: import('@/lib/emlak-fixtures').HamleItem }) {
+  const telHref = `tel:${item.tel}`
+  const waHref  = `https://wa.me/90${item.tel.replace(/^0/, '').replace(/\s/g, '')}`
+
+  const stageStyle = item.asama === 'Teklif'
+    ? { bg: ET.hotT, color: ET.hot }
+    : item.asama === 'Randevu'
+    ? { bg: ET.blueT, color: ET.blue }
+    : { bg: ET.greenT, color: ET.greenD }
+
+  const dotColor = item.sicaklik === 'hot' ? ET.hot : item.sicaklik === 'warm' ? ET.warn : ET.muted
+
+  return (
+    <div className="emlak-deal-row" style={{ padding: '18px 22px', borderTop: `1px solid ${GLASS_LINE}` }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 11 }}>
+        <span style={{ width: 8, height: 8, borderRadius: '50%', background: dotColor, flexShrink: 0, display: 'block' }} />
+        <span style={{ fontSize: 15, fontWeight: 800, letterSpacing: '-0.01em', flexShrink: 0, color: ET.ink }}>{item.ad}</span>
+        <span style={{ fontSize: 12.5, fontWeight: 600, color: ET.muted }}>· {item.tip} · {item.il}</span>
+        <span style={{
+          marginLeft: 'auto', fontSize: 11.5, fontWeight: 700,
+          padding: '5px 12px', borderRadius: 999, flexShrink: 0,
+          background: stageStyle.bg, color: stageStyle.color,
+        }}>{item.asama}</span>
+      </div>
+
+      <div style={{
+        display: 'flex', gap: 10, marginTop: 12,
+        background: 'rgba(255,255,255,.45)',
+        border: '1px solid rgba(255,255,255,.72)',
+        borderRadius: 13, padding: '12px 14px',
+      }}>
+        <span style={{ fontSize: 12, fontWeight: 800, color: ET.greenD, flexShrink: 0 }}>Ali</span>
+        <span style={{ fontSize: 13, fontWeight: 500, color: ET.body, lineHeight: 1.5 }}>{item.aliGerekce}</span>
+      </div>
+
+      <div style={{ display: 'flex', gap: 9, marginTop: 13 }}>
+        <a href={telHref} style={{
+          display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 700,
+          padding: '9px 15px', borderRadius: 11, cursor: 'pointer',
+          border: '1px solid rgba(255,255,255,.72)', background: 'rgba(255,255,255,.55)',
+          color: ET.ink, textDecoration: 'none',
+        }}>
+          <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+            style={{ width: 15, height: 15, stroke: ET.green }}>
+            <path d="M5 4h3l2 5-2 1a11 11 0 0 0 5 5l1-2 5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>
+          </svg>
+          Ara
+        </a>
+        <a href={waHref} target="_blank" rel="noopener noreferrer" style={{
+          display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 700,
+          padding: '9px 15px', borderRadius: 11, cursor: 'pointer',
+          background: ET.green, border: `1px solid ${ET.green}`, color: '#fff', textDecoration: 'none',
+        }}>
+          <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+            style={{ width: 15, height: 15, stroke: '#fff' }}>
+            <path d="M4 19l1.4-4A8 8 0 1 1 9 18.6z"/>
+          </svg>
+          WhatsApp
+        </a>
+        <button style={{
+          marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 5,
+          fontSize: 13, fontWeight: 700, padding: '9px 15px', borderRadius: 11, cursor: 'pointer',
+          border: '1px solid rgba(255,255,255,.72)', background: 'rgba(255,255,255,.55)',
+          color: ET.muted, fontFamily: 'inherit',
+        }}>
+          <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+            style={{ width: 15, height: 15, stroke: ET.muted }}>
+            <circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>
+          </svg>
+          Ertele
+        </button>
+      </div>
+    </div>
+  )
+}
+
+// Quick filter row
+function EmlakFilter({
+  variant, iconPath, label, sub, count,
+}: { variant: 'hot' | 'appt' | 'wait' | 'new'; iconPath: string; label: string; sub: string; count: number }) {
+  const s = {
+    hot:  { fic: 'linear-gradient(135deg,#fbcdb9,#f3a98c)', stroke: '#a8421d', fn: { bg: ET.hotT, color: ET.hot } },
+    appt: { fic: 'linear-gradient(135deg,#bccaf2,#92a6e6)', stroke: '#36479a', fn: { bg: ET.blueT, color: ET.blue } },
+    wait: { fic: 'linear-gradient(135deg,#fbf0a6,#f6e57e)', stroke: '#7c6611', fn: { bg: ET.warnT, color: ET.warn } },
+    new:  { fic: 'linear-gradient(135deg,#aef0c2,#86e6a6)', stroke: '#14622f', fn: { bg: ET.greenT, color: ET.greenD } },
+  }[variant]
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', gap: 12, padding: '12px 18px',
+      cursor: 'pointer', borderTop: `1px solid ${GLASS_LINE}`,
+    }}>
+      <span style={{
+        width: 36, height: 36, borderRadius: 11, display: 'grid', placeItems: 'center', flexShrink: 0,
+        background: s.fic,
+      }}>
+        <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+          style={{ width: 17, height: 17, stroke: s.stroke }}
+          dangerouslySetInnerHTML={{ __html: iconPath }}
+        />
+      </span>
+      <div style={{ minWidth: 0 }}>
+        <div style={{ fontSize: 13.5, fontWeight: 700, color: ET.ink }}>{label}</div>
+        <div style={{ fontSize: 11.5, fontWeight: 600, color: ET.muted, marginTop: 1 }}>{sub}</div>
+      </div>
+      <span style={{
+        marginLeft: 'auto', fontSize: 12.5, fontWeight: 800, minWidth: 30, height: 30,
+        padding: '0 9px', borderRadius: 10, display: 'grid', placeItems: 'center',
+        background: s.fn.bg, color: s.fn.color,
+      }}>{count}</span>
+    </div>
+  )
+}
+
+async function EmlakDashboard({ sicakKpi, yanitBekleyen, portfoyToplam }: {
+  sicakKpi: number
+  yanitBekleyen: number
+  portfoyToplam: number
+}) {
+  const hamleleri = BUGUNUN_HAMLELERI
+  const oneriSayisi = hamleleri.filter(h => h.sicaklik === 'hot').length
+  const uyariSayisi = hamleleri.filter(h => h.sicaklik === 'cold').length
+
+  return (
+    <div style={{ padding: '8px 32px 48px', maxWidth: 1480, width: '100%' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 332px', gap: 22, alignItems: 'start' }}>
+
+        {/* ── MAIN COLUMN ── */}
+        <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', gap: 20 }}>
+
+          {/* Briefing strip */}
+          <EmlakGlass style={{ padding: '20px 22px', display: 'flex', alignItems: 'center', gap: 18, position: 'relative', overflow: 'hidden' }}>
+            {/* accent bar */}
+            <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: 5, background: EMLAK_GRAD }} />
+
+            {/* Ali avatar */}
+            <div style={{
+              width: 60, height: 60, flexShrink: 0, borderRadius: '50%',
+              background: 'linear-gradient(135deg,#2c8a52,#4f9f6c 44%,#8c97d8)',
+              padding: 3,
+            }}>
+              <div style={{ width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden', background: '#fff' }}>
+                <Image src="/ali-avatar.png" alt="Ali" width={54} height={54} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </div>
+            </div>
+
+            {/* Text */}
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em', color: ET.ink }}>
+                Ali bugün senin için çalıştı —{' '}
+                <b style={{ color: ET.greenD }}>{hamleleri.length} kritik gelişme</b> var.
+              </div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: ET.body, marginTop: 3 }}>
+                Sabah taraması tamamlandı · Portföy ve lead havuzu güncel.
+              </div>
+            </div>
+
+            {/* Counters */}
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 10, flexShrink: 0 }}>
+              <BriefCnt variant="sug"
+                icon='<path d="M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15l-1.8-4.2L5.5 9l4.7-1.3z"/>'
+                n={oneriSayisi} label="Öneri" />
+              <BriefCnt variant="warn"
+                icon='<path d="M12 4 3 19h18z"/><path d="M12 10v4M12 17h.01"/>'
+                n={uyariSayisi} label="Uyarı" />
+              <BriefCnt variant="opp"
+                icon='<path d="M4 16l5-5 4 3 6-7"/><path d="M19 7v4h-4"/>'
+                n={sicakKpi} label="Fırsat" />
+            </div>
+          </EmlakGlass>
+
+          {/* KPI row */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
+            <EKpiCard
+              label="Aktif Portföy"
+              num={String(portfoyToplam)}
+              sub="↑ 8 bu hafta eklendi"
+              iconBg="linear-gradient(135deg,#aef0c2,#86e6a6)"
+              iconStroke="#14622f"
+              iconPath='<path d="M4 20h16M6 20V7l6-3 6 3v13"/><path d="M10 11h4M10 15h4"/>'
+            />
+            <EKpiCard
+              label="Sıcak Lead"
+              num={String(sicakKpi)}
+              sub="Skor ≥ 8 müşteri"
+              iconBg="linear-gradient(135deg,#fbcdb9,#f3a98c)"
+              iconStroke="#a8421d"
+              iconPath='<path d="M12 3c1 3-2 4-2 7a3 3 0 0 0 6 .3c.8 1 1 2 1 3a5 5 0 1 1-10 0c0-4 3-5 5-10.3z"/>'
+            />
+            <EKpiCard
+              label="Yanıt Bekleyen"
+              num={String(yanitBekleyen)}
+              sub="Randevu / teklif yanıtı"
+              iconBg="linear-gradient(135deg,#bccaf2,#92a6e6)"
+              iconStroke="#36479a"
+              iconPath='<path d="M4 5h16v11H9l-4 3v-3H4z"/><path d="M8 10h8M8 13h5"/>'
+            />
+            <EKpiCard
+              label="Bu Ay Kazanım"
+              num="4,9M ₺"
+              sub="↑ %12 geçen aya göre"
+              iconBg="linear-gradient(135deg,#fbf0a6,#f6e57e)"
+              iconStroke="#7c6611"
+              iconPath='<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/>'
+            />
+          </div>
+
+          {/* Bugünün Hamleleri panel */}
+          <EmlakGlass style={{ overflow: 'hidden' }}>
+            {/* Panel header */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: 13,
+              padding: '18px 22px',
+              borderBottom: `1px solid ${GLASS_LINE}`,
+            }}>
+              <span style={{
+                width: 40, height: 40, borderRadius: 12, background: EMLAK_GRAD,
+                display: 'grid', placeItems: 'center', flexShrink: 0,
+                boxShadow: '0 8px 16px -9px rgba(40,120,70,.55)',
+              }}>
+                <svg viewBox="0 0 24 24" fill="none" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ width: 19, height: 19, stroke: '#fff' }}>
+                  <path d="M4 20h16M6 20V7l6-3 6 3v13"/>
+                </svg>
+              </span>
+              <div>
+                <div style={{ fontSize: 15.5, fontWeight: 800, letterSpacing: '-0.01em', color: ET.ink }}>
+                  Bugünün Hamleleri
+                </div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: ET.muted, marginTop: 1 }}>
+                  Ali&apos;nin önceliklendirdiği aksiyonlar
+                </div>
+              </div>
+              <span style={{
+                marginLeft: 4, fontSize: 11.5, fontWeight: 700, color: '#14622f',
+                background: 'linear-gradient(135deg,#aef0c2,#86e6a6)',
+                padding: '6px 12px', borderRadius: 999,
+              }}>
+                {hamleleri.length} hareket
+              </span>
+              <Link href="/satis-sureci" style={{
+                marginLeft: 'auto', fontSize: 13, fontWeight: 700, color: ET.greenD,
+                textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 5,
+              }}>
+                Satış süreci
+                <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                  style={{ width: 15, height: 15, stroke: ET.greenD }}>
+                  <path d="M5 12h14M13 6l6 6-6 6"/>
+                </svg>
+              </Link>
+            </div>
+
+            {/* Deal rows */}
+            {hamleleri.map(item => (
+              <EmlakDealCard key={item.id} item={item} />
+            ))}
+          </EmlakGlass>
+
+        </div>
+
+        {/* ── RIGHT RAIL ── */}
+        <aside style={{ display: 'flex', flexDirection: 'column', gap: 20, position: 'sticky', top: 18 }}>
+
+          {/* Ali assistant card */}
+          <EmlakGlass style={{ padding: '22px 20px', textAlign: 'center' }}>
+            <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase', color: ET.greenD }}>
+              Ali Asistanın
+            </div>
+            <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', marginTop: 4, lineHeight: 1, color: ET.ink }}>
+              Ali
+            </div>
+            {/* Portrait */}
+            <div style={{
+              width: 102, height: 102, margin: '18px auto 0', borderRadius: '50%',
+              background: 'linear-gradient(135deg,#2c8a52,#4f9f6c 44%,#8c97d8)',
+              padding: 4,
+            }}>
+              <div style={{ width: '100%', height: '100%', borderRadius: '50%', overflow: 'hidden' }}>
+                <Image src="/ali-avatar.png" alt="Ali" width={94} height={94} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }} />
+              </div>
+            </div>
+            {/* Status */}
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13, fontWeight: 700,
+              marginTop: 16, background: '#18241c', color: '#fff',
+              padding: '7px 16px', borderRadius: 999,
+            }}>
+              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4fdc7a', boxShadow: '0 0 0 3px rgba(79,220,122,.25)', display: 'block' }} />
+              Çevrimiçi
+            </div>
+            {/* Message */}
+            <div style={{ fontSize: 13.5, fontWeight: 600, color: ET.body, lineHeight: 1.5, marginTop: 16 }}>
+              Portföy analizi hazır. Sıcak lead&apos;lerin teklif aşamasında — önce onlara odaklanmanı öneriyorum.
+            </div>
+            {/* CTA */}
+            <button style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+              width: '100%', marginTop: 16,
+              background: EMLAK_GRAD, color: '#fff', border: 0,
+              fontFamily: 'inherit', fontSize: 14, fontWeight: 700,
+              padding: 14, borderRadius: 14, cursor: 'pointer',
+              boxShadow: '0 12px 24px -12px rgba(40,120,70,.6)',
+            }}>
+              Ali ile sohbet et
+              <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                style={{ width: 16, height: 16, stroke: '#fff' }}>
+                <path d="M5 12h14M13 6l6 6-6 6"/>
+              </svg>
+            </button>
+          </EmlakGlass>
+
+          {/* Quick filters card */}
+          <EmlakGlass style={{ overflow: 'hidden' }}>
+            {/* Card header */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '16px 18px 13px' }}>
+              <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: '-0.01em', color: ET.ink }}>Hızlı Filtreler</span>
+              <span style={{ marginLeft: 'auto', fontSize: 11.5, fontWeight: 700, color: ET.muted }}>Lead havuzu</span>
+            </div>
+            <EmlakFilter variant="hot"
+              iconPath='<path d="M12 3c1 3-2 4-2 7a3 3 0 0 0 6 .3c.8 1 1 2 1 3a5 5 0 1 1-10 0c0-4 3-5 5-10.3z"/>'
+              label="Sıcak Lead'ler" sub="Skor ≥ 8" count={sicakKpi} />
+            <EmlakFilter variant="appt"
+              iconPath='<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/>'
+              label="Randevular" sub="Önümüzdeki 7 gün" count={6} />
+            <EmlakFilter variant="wait"
+              iconPath='<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>'
+              label="Yanıt Bekleyen" sub="Teklif gönderildi" count={yanitBekleyen} />
+            <EmlakFilter variant="new"
+              iconPath='<path d="M12 5v14M5 12h14"/>'
+              label="Yeni Lead'ler" sub="Son 24 saat" count={11} />
+          </EmlakGlass>
+
+        </aside>
+      </div>
+    </div>
+  )
+}
+
+// ══════════════════════════════════════════════════════════════════
 //  SAYFA
 // ══════════════════════════════════════════════════════════════════
 export default async function DashboardPage() {
@@ -326,6 +811,18 @@ export default async function DashboardPage() {
 
   const isEmlak = cfg.id === 'emlak_demo'
   const isBireysel = isEmlak && segment === 'bireysel'
+
+  // Emlak tenant: return immediately with fixture data, skip all Airtable calls
+  if (isEmlak) {
+    const sicakKpiEmlak = BIREYSEL_MUSTERILER.filter(r => (r.fields['Sıcaklık Skoru'] ?? 0) >= 7).length || 4
+    return (
+      <EmlakDashboard
+        sicakKpi={sicakKpiEmlak}
+        yanitBekleyen={3}
+        portfoyToplam={isBireysel ? BIREYSEL_MUSTERILER.length : BUGUNUN_HAMLELERI.length + 18}
+      />
+    )
+  }
 
   const izolasyon = izolasyonBelirle(profil)
   const temsilciFilter = izolasyon.tip === 'temsilci' ? izolasyon.ad : undefined
@@ -397,8 +894,8 @@ export default async function DashboardPage() {
       })
     : sicakListesi
 
-  const oneriKalemSayisi = 3
-  const uyariKalemSayisi = 2
+  const oneriKalemSayisi = isEmlak ? BUGUNUN_HAMLELERI.filter(h => h.sicaklik === 'hot').length : 3
+  const uyariKalemSayisi = isEmlak ? BUGUNUN_HAMLELERI.filter(h => h.sicaklik === 'cold').length : 2
 
   const heroStats: Array<{ n: string; l: string; Icon: React.ElementType }> = [
     { n: oneriKalemSayisi.toString(), l: 'Öneri',  Icon: MessageCircle },
@@ -414,13 +911,21 @@ export default async function DashboardPage() {
     { Icon: ClipboardList, label: 'Rapor Oluştur'         },
   ]
 
+  const heroBg = isEmlak
+    ? `linear-gradient(105deg, ${E.green1} 0%, ${E.green2} 55%, ${E.green3} 100%)`
+    : `linear-gradient(105deg, ${C.navy} 0%, #092A4E 47%, ${C.violet} 100%)`
+
+  const heroAvatarShadow = isEmlak
+    ? '0 0 0 4px rgba(46,157,94,0.45), 0 0 0 8px rgba(27,122,71,0.2)'
+    : '0 0 0 4px rgba(188,168,255,0.5), 0 0 0 8px rgba(91,56,232,0.2)'
+
   return (
-    <div className="max-w-7xl mx-auto space-y-5" style={{ color: C.text }}>
+    <div className="max-w-7xl mx-auto space-y-5" style={{ color: isEmlak ? E.text : C.text }}>
 
       {/* ── HERO ─────────────────────────────────────────────── */}
       <section
-        className="relative h-[150px] rounded-[16px] overflow-hidden text-white flex items-center justify-between px-[22px] shadow-sm"
-        style={{ background: `linear-gradient(105deg, ${C.navy} 0%, #092A4E 47%, ${C.violet} 100%)` }}
+        className="relative h-[150px] rounded-[22px] overflow-hidden text-white flex items-center justify-between px-[22px] shadow-sm"
+        style={{ background: heroBg }}
       >
         {/* Dekoratif halkalar */}
         <div className="absolute right-[-68px] top-[-120px] h-[390px] w-[390px] rounded-full border border-white/15 pointer-events-none" />
@@ -435,7 +940,7 @@ export default async function DashboardPage() {
             width={110}
             height={110}
             className="rounded-full object-cover shrink-0"
-            style={{ boxShadow: '0 0 0 4px rgba(188,168,255,0.5), 0 0 0 8px rgba(91,56,232,0.2)' }}
+            style={{ boxShadow: heroAvatarShadow }}
             priority
           />
           <div>
@@ -444,7 +949,7 @@ export default async function DashboardPage() {
             </h2>
             <p className="mt-[5px] text-[15px] text-white/90">
               Kaçırmaman gereken{' '}
-              <span className="font-black">{fmt(sicakKpi)}</span> kritik gelişme var.
+              <span className="font-black">{isEmlak ? BUGUNUN_HAMLELERI.length : fmt(sicakKpi)}</span> kritik gelişme var.
             </p>
             <button
               disabled
@@ -456,7 +961,7 @@ export default async function DashboardPage() {
         </div>
 
         {/* SAĞ: 3 istatistik */}
-        <div className="relative flex items-center gap-[34px] pr-[26px] shrink-0">
+        <div className="relative flex items-center gap-[34px] pr-[26px] shrink-0 max-sm:hidden">
           {heroStats.map(({ n, l, Icon }, i) => (
             <div
               key={l}
@@ -496,8 +1001,79 @@ export default async function DashboardPage() {
             <KpiCard icon={Wallet}        tone="bordo"  label={isEmlak ? 'Bu Ay Kazanım' : 'Bu Ay Komisyon'}    yakinda />
           </div>
 
-          {/* Ali Öneriyor + Uyarılar */}
-          <div id="ali-oneriyor" className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-[14px]">
+          {/* ── PANEL: Bugünün Hamleleri (emlak-only) ──────────── */}
+          {isEmlak && (
+            <section>
+              <div className="flex items-center justify-between mb-[14px]">
+                <div className="flex items-center gap-[10px]">
+                  <div
+                    className="h-[34px] w-[34px] rounded-full grid place-items-center"
+                    style={{ background: `linear-gradient(135deg, ${E.green1}, ${E.green2})` }}
+                  >
+                    <Home size={16} className="text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-[17px] font-black" style={{ color: E.text }}>Panel</h2>
+                    <p className="text-[11px] text-slate-400">Bugünün Hamleleri</p>
+                  </div>
+                  <span
+                    className="ml-[6px] rounded-full px-[10px] py-[3px] text-[11px] font-bold"
+                    style={{ background: E.surface, color: E.green2 }}
+                  >
+                    {BUGUNUN_HAMLELERI.length} hareket
+                  </span>
+                </div>
+                <Link
+                  href="/satis-sureci"
+                  className="text-[12px] font-bold"
+                  style={{ color: E.green2 }}
+                >
+                  Satış süreci →
+                </Link>
+              </div>
+              <div className="space-y-[10px]">
+                {BUGUNUN_HAMLELERI.map(item => (
+                  <MoveCard key={item.id} item={item} />
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* ── Emlak: Ali Öneriyor + Uyarılar (tile versiyonu) ─── */}
+          {isEmlak && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-[14px]">
+              <section className="rounded-[22px] border bg-white p-[18px] shadow-sm" style={{ borderColor: E.line }}>
+                <div className="flex items-center gap-[8px] mb-[14px]">
+                  <Lightbulb size={18} style={{ color: E.green2 }} />
+                  <h3 className="text-[16px] font-black" style={{ color: E.text }}>Ali Öneriyor</h3>
+                  <span className="ml-auto rounded-full px-[10px] py-[3px] text-[11px] font-bold" style={{ background: E.surface, color: E.green2 }}>
+                    {oneriKalemSayisi} öneri
+                  </span>
+                </div>
+                <div className="space-y-[8px]">
+                  <InsightTile icon={Home}       label="Stok Güncelleme"       description="2 mülk 30+ gün gösterim almadı"  count={2} href="/stok" />
+                  <InsightTile icon={MapPin}      label="Bölgesel Fırsat"        description="Kadıköy'de talep artışı tespit ettim" count={1} />
+                  <InsightTile icon={TrendingUp}  label="Fiyat Revizyonu Öner"  description="3 mülk piyasanın üzerinde fiyatlanmış" count={3} />
+                </div>
+              </section>
+              <section className="rounded-[22px] border bg-white p-[18px] shadow-sm" style={{ borderColor: E.line }}>
+                <div className="flex items-center gap-[8px] mb-[14px]">
+                  <AlertTriangle size={18} style={{ color: E.coral }} />
+                  <h3 className="text-[16px] font-black" style={{ color: E.text }}>Ali Uyarılar</h3>
+                  <span className="ml-auto rounded-full px-[10px] py-[3px] text-[11px] font-bold" style={{ background: '#FFF0EC', color: E.coral }}>
+                    {uyariKalemSayisi} uyarı
+                  </span>
+                </div>
+                <div className="space-y-[8px]">
+                  <InsightTile icon={CalendarClock} label={`${fmt(counts.yanitBekleyen)} müşteri yanıt bekliyor`} description="48+ saattir iletişim yok"  count={counts.yanitBekleyen} />
+                  <InsightTile icon={Users}          label="Soğuk müşteriler"                                      description="7+ gün sessiz, harekete geç" count={uyariKalemSayisi} />
+                </div>
+              </section>
+            </div>
+          )}
+
+          {/* Ali Öneriyor + Uyarılar (sigorta) */}
+          {!isEmlak && <div id="ali-oneriyor" className="grid grid-cols-1 md:grid-cols-[2fr_1fr] gap-[14px]">
 
             <section className="rounded-[15px] border bg-white p-[18px] shadow-sm" style={{ borderColor: C.line }}>
               <div className="mb-[15px] flex items-center gap-[8px]">
@@ -579,7 +1155,7 @@ export default async function DashboardPage() {
                 </span>
               </div>
             </section>
-          </div>
+          </div>}
 
           {/* Portföy + Vade (sigorta-özel) */}
           {cfg.modules.portfoy && <div className="grid grid-cols-1 sm:grid-cols-2 gap-[14px]">

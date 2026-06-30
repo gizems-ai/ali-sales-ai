@@ -250,11 +250,30 @@ export function AjandaClient({
       showToast({ mesaj: `${firmaAdi}: ${data.error ?? 'Kaydedilemedi'}`, hataMi: true }, 5000)
       return
     }
+    if (fields['Bugün Aranacak'] === false) {
+      setRecords(prev => prev.filter(r => r.id !== recordId))
+    }
     let mesaj = `${firmaAdi} · güncellendi`
-    if ('2026 Ulaşıldı mı' in fields) mesaj = `${firmaAdi} · Ulaşıldı işaretlendi`
+    if ('Pipeline Aşaması' in fields) mesaj = `${firmaAdi} · ${fields['Pipeline Aşaması']} işaretlendi`
+    else if ('2026 Ulaşıldı mı' in fields) mesaj = `${firmaAdi} · Ulaşıldı işaretlendi`
     else if ('Sonra Ara Tarihi' in fields) mesaj = `${firmaAdi} · Sonra ara tarihi ayarlandı`
     else if ('2026 Arandı mı' in fields) mesaj = `${firmaAdi} · Arandı işaretlendi`
     showToast({ mesaj, undoRecordId: recordId, undoFields: data.prev })
+  }
+
+  async function handleAjandadanCikar(recordId: string, firmaAdi: string) {
+    const res = await fetch('/api/musteriler/update', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recordId, fields: { 'Bugün Aranacak': false } }),
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      showToast({ mesaj: `${firmaAdi}: Çıkarılamadı`, hataMi: true }, 4000)
+      return
+    }
+    setRecords(prev => prev.filter(r => r.id !== recordId))
+    showToast({ mesaj: `${firmaAdi} · Ajandadan çıkarıldı`, undoRecordId: recordId, undoFields: data.prev }, 5000)
   }
 
   async function handleNotEkle(recordId: string, not: string, firmaAdi: string) {
@@ -591,6 +610,7 @@ export function AjandaClient({
                             onClick={() => setModalId(r.id)}
                             onAksiyon={handleAksiyon}
                             onNotEkle={handleNotEkle}
+                            onAjandadanCikar={handleAjandadanCikar}
                           />
                         ))}
                       </div>

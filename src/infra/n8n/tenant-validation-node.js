@@ -74,9 +74,12 @@ const TENANT_CONFIGS = {
     ],
     rateLimit: { perTenant: 30, perIp: 5, windowSec: 60 },
   },
-  lbc_network: {
+  lbc: {
     allowedOrigins: [
-      // TODO: LBC domain'ini ekle
+      'https://londonbridge.club',
+      'https://www.londonbridge.club',
+      'https://londonbridge.vercel.app',
+      'https://alisales.ai',
     ],
     rateLimit: { perTenant: 60, perIp: 10, windowSec: 60 },
   },

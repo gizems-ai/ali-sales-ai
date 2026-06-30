@@ -7,6 +7,7 @@ import { MusterilerClient } from './_components/musteriler-client'
 import { getSegment } from '@/lib/emlak-segment'
 import { BIREYSEL_MUSTERILER } from '@/lib/emlak-fixtures'
 
+
 export const dynamic = 'force-dynamic'
 
 type SearchParams = Promise<{ modal?: string; oncelik?: string; bugun?: string; asama?: string; brans?: string; [k: string]: string | undefined }>
@@ -64,9 +65,8 @@ export default async function MusterilerPage({
 
   const temsilciFilter = izin.tip === 'temsilci' ? izin.temsilci : undefined
 
-  // Bireysel segmentte fixture verisi kullanılır — Airtable'a hiç gidilmez
   let records, offset: string | undefined, brifingData, counts
-  if (isBireysel) {
+  if (isEmlak) {
     records = BIREYSEL_MUSTERILER
     offset = undefined
     brifingData = null
@@ -86,7 +86,7 @@ export default async function MusterilerPage({
   const isAdmin = profil?.rol === 'admin'
   const sicakKpi = getSicakKpi(brifingData, temsilciFilter, cfg)
 
-  return (
+  const client = (
     <MusterilerClient
       izin={izin}
       initialRecords={records}
@@ -102,4 +102,8 @@ export default async function MusterilerPage({
       displayAdMap={Object.fromEntries(cfg.temsilciler.filter(t => t.displayAd).map(t => [t.ad, t.displayAd!]))}
     />
   )
+
+  return isEmlak
+    ? <div style={{ padding: '8px 32px 48px' }}>{client}</div>
+    : client
 }

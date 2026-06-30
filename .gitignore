@@ -39,3 +39,15 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.env*.local
+
+# clerk configuration (can include secrets)
+/.clerk/
+
+# ── git status gürültüsü (kaynak değil; dosyalar diskte kalır, sadece ignore) ──
+# Claude Code yerel ayarları
+src/.claude/
+# Ali-siteklasör statik landing HTML — TÜM ağaç (kaynak değil, status gürültüsü)
+/src/Ali-siteklasör/alisales-landing/
+# n8n workflow yedek json'ları (otomatik üretilen)
+src/infra/n8n/workflow_backup_*.json

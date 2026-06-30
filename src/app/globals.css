@@ -129,3 +129,24 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* ── Emlak Glass Theme ─────────────────────────────────────────── */
+.emlak-deal-row:hover {
+  background: rgba(255,255,255,.4);
+}
+
+.emlak-shell {
+  display: grid;
+  grid-template-columns: 256px 1fr;
+  min-height: 100vh;
+  background:
+    radial-gradient(56% 64% at 8% 6%, rgba(178,232,196,.85) 0%, rgba(178,232,196,0) 56%),
+    radial-gradient(48% 60% at 96% 4%, rgba(223,210,245,.8) 0%, rgba(223,210,245,0) 54%),
+    radial-gradient(60% 74% at 88% 98%, rgba(251,228,201,.75) 0%, rgba(251,228,201,0) 56%),
+    radial-gradient(56% 64% at 24% 100%, rgba(196,232,238,.65) 0%, rgba(196,232,238,0) 54%),
+    linear-gradient(135deg,#ddf0e4 0%,#e9e7f6 52%,#fbe9d7 100%);
+  background-attachment: fixed;
+  font-family: var(--font-jakarta, "Plus Jakarta Sans"), system-ui, sans-serif;
+  color: #1c2a22;
+  -webkit-font-smoothing: antialiased;
+}

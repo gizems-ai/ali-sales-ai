@@ -1,9 +1,11 @@
 'use client'
 
+import { useState, useEffect, useTransition } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useUser } from '@clerk/nextjs'
 import { useTenant } from '@/lib/tenant-context'
+import type { TenantConfig } from '@/lib/tenants'
 import {
   LayoutDashboard, Users, Flame, RefreshCw, Calendar,
   BarChart3, Lightbulb, Bell, Briefcase, UserCheck,
@@ -11,7 +13,9 @@ import {
   Building2,
 } from 'lucide-react'
 import { SegmentSwitch } from './segment-switch'
+import { SECTION_NAME, SECTION_SLUG } from '@/lib/ali-zeka'
 
+// ── Sigortan colours ──────────────────────────────────────────────
 const C = {
   violet: '#5B38E8', bordo: '#982A49', pink: '#D978B6', line: '#E7EAF2', navy: '#061f3d',
 }
@@ -36,12 +40,12 @@ const mainNav: NavItem[] = [
   { href: '/musteriler',   label: 'Müşteriler',       icon: Users,           moduleKey: 'musteriler' },
   { href: '/satis-sureci', label: 'Satış Süreci',     icon: KanbanSquare,    moduleKey: 'satis_sureci' },
   { href: '/stok',         label: 'Stok / Envanter',  icon: Building2,       moduleKey: 'stok' },
+  { href: '/temsilciler',  label: 'Temsilciler',       icon: UserCheck,       moduleKey: 'stok' },
 ]
 
 const stubNav: StubItem[] = [
   { label: 'Yenilemeler',       icon: RefreshCw,  moduleKey: 'yenilemeler' },
   { label: 'Portföy',           icon: Briefcase,  moduleKey: 'portfoy' },
-  { label: 'Temsilciler',       icon: UserCheck },
   { label: 'Komisyon',          icon: Wallet,     moduleKey: 'komisyonlar' },
   { label: 'Operasyon Merkezi', icon: Settings2 },
 ]
@@ -59,6 +63,335 @@ const aliStubNav: StubItem[] = [
   { label: 'Ali ile Sohbet', icon: MessageSquare, moduleKey: 'ali_asistan' },
 ]
 
+// ── Emlak segment switch (glass style) ────────────────────────────
+function EmlakSegmentSwitch() {
+  const [segment, setSegment] = useState<'kurumsal' | 'bireysel'>('kurumsal')
+  const [isPending, startTransition] = useTransition()
+  const router = useRouter()
+
+  useEffect(() => {
+    const match = document.cookie.match(/(?:^|;\s*)emlak_segment=([^;]*)/)
+    if (match?.[1] === 'bireysel') setSegment('bireysel')
+  }, [])
+
+  async function switchTo(next: 'kurumsal' | 'bireysel') {
+    if (next === segment || isPending) return
+    await fetch('/api/emlak-segment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ segment: next }),
+    })
+    setSegment(next)
+    startTransition(() => router.refresh())
+  }
+
+  return (
+    <div style={{
+      display: 'flex', gap: 4,
+      background: 'rgba(255,255,255,.6)',
+      border: '1px solid rgba(255,255,255,.72)',
+      borderRadius: 13, padding: 4,
+    }}>
+      {(['kurumsal', 'bireysel'] as const).map(s => (
+        <button
+          key={s}
+          disabled={isPending}
+          onClick={() => switchTo(s)}
+          style={{
+            flex: 1, border: 0, fontFamily: 'inherit',
+            fontSize: 13, fontWeight: 700, cursor: isPending ? 'wait' : 'pointer',
+            padding: '8px 0', borderRadius: 9, transition: '.15s',
+            ...(segment === s
+              ? { background: '#1c2a22', color: '#fff', boxShadow: '0 8px 16px -10px rgba(20,40,25,.6)' }
+              : { background: 'transparent', color: '#57655b' }),
+          }}
+        >
+          {s === 'kurumsal' ? 'Kurumsal' : 'Bireysel'}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+// ── Emlak SVG paths ───────────────────────────────────────────────
+const EMLAK_NAV_PATHS: Record<string, string> = {
+  grid:     '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+  flame:    '<path d="M12 3c1 3-2 4-2 7a3 3 0 0 0 6 .3c.8 1 1 2 1 3a5 5 0 1 1-10 0c0-4 3-5 5-10.3z"/>',
+  users:    '<circle cx="9" cy="8" r="3.2"/><path d="M3.5 20v-1a4.5 4.5 0 0 1 4.5-4.5h2A4.5 4.5 0 0 1 14.5 19v1"/><path d="M16 5.2a3.2 3.2 0 0 1 0 6M20.5 20v-1a3.4 3.4 0 0 0-2.6-3.3"/>',
+  columns:  '<rect x="3" y="4" width="5" height="16" rx="1.5"/><rect x="9.5" y="4" width="5" height="16" rx="1.5"/><rect x="16" y="4" width="5" height="16" rx="1.5"/>',
+  building: '<path d="M4 20h16M6 20V6a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v14M15 9h3a1 1 0 0 1 1 1v10"/><path d="M9 8h3M9 12h3M9 16h3"/>',
+  badge:    '<circle cx="12" cy="8" r="3.4"/><path d="M6 21v-1a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v1"/>',
+  chart:    '<path d="M4 20h16"/><path d="M7 16V9M12 16V5M17 16v-4"/>',
+  sliders:  '<path d="M4 8h10M18 8h2M4 16h2M10 16h10"/><circle cx="16" cy="8" r="2"/><circle cx="8" cy="16" r="2"/>',
+  book:     '<path d="M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 0-2 2z"/><path d="M5 4v16"/>',
+  sparkle:  '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 14.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>',
+}
+
+function EmlakIcon({ id }: { id: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ width: 19, height: 19, stroke: 'currentColor', flexShrink: 0, opacity: 0.85 }}
+      dangerouslySetInnerHTML={{ __html: EMLAK_NAV_PATHS[id] ?? '' }}
+    />
+  )
+}
+
+// ── Emlak Sidebar ─────────────────────────────────────────────────
+interface EmlakNavLink {
+  href?: string
+  label: string
+  iconId: string
+  active?: boolean
+  muted?: boolean
+  lavender?: boolean   // Ali kimlikli (lavanta aksan) nav öğesi
+}
+
+const EMLAK_NAV: EmlakNavLink[] = [
+  { href: '/',             label: 'Ana Akış',           iconId: 'grid' },
+  { href: '/firsatlar',    label: 'Satış Fırsatları',   iconId: 'flame' },
+  { href: '/musteriler',   label: 'Müşteriler',          iconId: 'users' },
+  { href: '/satis-sureci', label: 'Satış Süreci',       iconId: 'columns' },
+  { href: '/stok',         label: 'Stok / Envanter',    iconId: 'building' },
+  { href: SECTION_SLUG,    label: SECTION_NAME,         iconId: 'sparkle', lavender: true },
+  { href: '/temsilciler',  label: 'Temsilciler',         iconId: 'badge' },
+  { label: 'Operasyon Merkezi', iconId: 'sliders', muted: true },
+]
+
+// Ali bölümü için lavanta gradyanı (yeşil GRAD'in lavanta ikizi)
+const LAV_GRAD = 'linear-gradient(135deg,#6D5BE0,#8c97d8)'
+
+const EMLAK_RAPOR_NAV: EmlakNavLink[] = [
+  { label: 'Eğitim & İpuçları', iconId: 'book', muted: true },
+  { href: '/raporlar', label: 'Raporlar', iconId: 'chart' },
+]
+
+const GRAD = 'linear-gradient(135deg,#2c8a52,#4f9f6c 44%,#8c97d8)'
+const SHADOW = '0 2px 6px rgba(40,60,45,.05),0 22px 46px -26px rgba(40,70,50,.30)'
+
+function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
+  pathname: string
+  displayName: string
+  initials: string
+  rolEtiketi: string
+}) {
+  const isActive = (href?: string) => {
+    if (!href) return false
+    return href === '/' ? pathname === '/' : pathname.startsWith(href)
+  }
+
+  return (
+    <aside style={{
+      margin: '16px 0 16px 16px',
+      height: 'calc(100vh - 32px)',
+      background: 'rgba(255,255,255,.62)',
+      backdropFilter: 'blur(24px) saturate(165%)',
+      WebkitBackdropFilter: 'blur(24px) saturate(165%)',
+      border: '1px solid rgba(255,255,255,.72)',
+      borderRadius: 26,
+      boxShadow: SHADOW,
+      display: 'flex',
+      flexDirection: 'column',
+      padding: '22px 16px',
+      position: 'sticky',
+      top: 16,
+      overflowY: 'auto',
+    }}>
+      {/* Brand */}
+      <div style={{ padding: '4px 8px 0', display: 'flex', flexDirection: 'column', gap: 2 }}>
+        <div style={{ fontSize: 23, fontWeight: 800, letterSpacing: '-0.02em', color: '#1c2a22' }}>
+          emlak<span style={{ color: '#248a47' }}>.ai</span>
+        </div>
+        <div style={{ fontSize: 11, fontWeight: 600, color: '#8b988f', letterSpacing: '0.02em' }}>
+          CRM Paneli
+        </div>
+      </div>
+
+      {/* Segment switch — uses shared SegmentSwitch (glass-styled override below) */}
+      <div style={{ margin: '20px 4px 22px' }}>
+        <EmlakSegmentSwitch />
+      </div>
+
+      {/* Main nav */}
+      <nav style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        {EMLAK_NAV.map(item => {
+          const active = isActive(item.href)
+          const muted = item.muted && !active
+
+          if (item.href && !item.muted) {
+            const idleColor = item.lavender ? '#6D5BE0' : '#57655b'
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '11px 13px',
+                  borderRadius: 13,
+                  textDecoration: 'none',
+                  color: active ? '#fff' : idleColor,
+                  fontWeight: active ? 700 : 600,
+                  fontSize: 14,
+                  transition: '.16s',
+                  ...(active ? {
+                    background: item.lavender ? LAV_GRAD : GRAD,
+                    boxShadow: item.lavender
+                      ? '0 12px 22px -10px rgba(91,71,224,.55)'
+                      : '0 12px 22px -10px rgba(40,120,70,.55)',
+                  } : item.lavender ? {
+                    background: 'rgba(237,233,254,.55)',
+                  } : {}),
+                }}
+              >
+                <EmlakIcon id={item.iconId} />
+                {item.label}
+              </Link>
+            )
+          }
+
+          return (
+            <div
+              key={item.label}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '11px 13px',
+                borderRadius: 13,
+                color: muted ? '#8b988f' : '#57655b',
+                fontWeight: 600,
+                fontSize: 14,
+                cursor: 'default',
+              }}
+            >
+              <EmlakIcon id={item.iconId} />
+              {item.label}
+            </div>
+          )
+        })}
+      </nav>
+
+      {/* Education & Community label */}
+      <div style={{
+        fontSize: 10.5,
+        fontWeight: 800,
+        letterSpacing: '.12em',
+        textTransform: 'uppercase',
+        color: '#8b988f',
+        padding: '0 12px',
+        margin: '22px 0 8px',
+      }}>
+        Eğitim &amp; Topluluk
+      </div>
+
+      {/* Rapor nav */}
+      <nav style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        {EMLAK_RAPOR_NAV.map(item => {
+          const active = isActive(item.href)
+          if (item.href && !item.muted) {
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '11px 13px',
+                  borderRadius: 13,
+                  textDecoration: 'none',
+                  color: active ? '#fff' : '#57655b',
+                  fontWeight: active ? 700 : 600,
+                  fontSize: 14,
+                  transition: '.16s',
+                  ...(active ? {
+                    background: GRAD,
+                    boxShadow: '0 12px 22px -10px rgba(40,120,70,.55)',
+                  } : {}),
+                }}
+              >
+                <EmlakIcon id={item.iconId} />
+                {item.label}
+              </Link>
+            )
+          }
+          return (
+            <div
+              key={item.label}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '11px 13px',
+                borderRadius: 13,
+                color: '#8b988f',
+                fontWeight: 600,
+                fontSize: 14,
+                cursor: 'default',
+              }}
+            >
+              <EmlakIcon id={item.iconId} />
+              {item.label}
+            </div>
+          )
+        })}
+      </nav>
+
+      {/* User card */}
+      <div style={{
+        marginTop: 'auto',
+        display: 'flex',
+        alignItems: 'center',
+        gap: 11,
+        padding: 11,
+        border: '1px solid rgba(255,255,255,.72)',
+        borderRadius: 15,
+        background: 'rgba(255,255,255,.65)',
+      }}>
+        <div style={{
+          width: 36,
+          height: 36,
+          borderRadius: 11,
+          background: GRAD,
+          display: 'grid',
+          placeItems: 'center',
+          color: '#fff',
+          fontWeight: 800,
+          fontSize: 14,
+          flexShrink: 0,
+        }}>
+          {initials}
+        </div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, lineHeight: 1.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {displayName}
+          </div>
+          <div style={{ fontSize: 11, fontWeight: 600, color: '#8b988f' }}>
+            {rolEtiketi}
+          </div>
+        </div>
+        <span style={{
+          marginLeft: 'auto',
+          width: 9,
+          height: 9,
+          borderRadius: '50%',
+          background: '#36b35a',
+          boxShadow: '0 0 0 3px rgba(54,179,90,.22)',
+          flexShrink: 0,
+          display: 'block',
+        }} />
+      </div>
+    </aside>
+  )
+}
+
+// ── Main Sidebar export ───────────────────────────────────────────
 export function Sidebar() {
   const pathname = usePathname()
   const { user } = useUser()
@@ -75,11 +408,24 @@ export function Sidebar() {
   const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Kullanıcı'
   const initials = ((user?.firstName?.[0] ?? '') + (user?.lastName?.[0] ?? '')).toUpperCase() || '?'
 
+  const isEmlak = cfg.id === 'emlak_demo'
+
+  if (isEmlak) {
+    return (
+      <EmlakSidebar
+        pathname={pathname}
+        displayName={displayName}
+        initials={initials}
+        rolEtiketi={rolEtiketi}
+      />
+    )
+  }
+
+  // ── Sigortan / default sidebar ────────────────────────────────
   const logoDotIdx = cfg.branding.logo.lastIndexOf('.')
   const logoBase   = cfg.branding.logo.slice(0, logoDotIdx)
   const logoSuffix = cfg.branding.logo.slice(logoDotIdx)
 
-  // raporlar / ali section'larının en az bir görünür öğesi var mı?
   const showRapor = raporNav.some(n => moduleOn(n.moduleKey))
   const showAli   = [...aliNav, ...aliStubNav].some(n => moduleOn(n.moduleKey))
 

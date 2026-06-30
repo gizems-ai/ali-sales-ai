@@ -244,14 +244,14 @@ export function MusterilerClient({
   )
 
   useEffect(() => {
-    if (isBireysel) return  // bireysel: fixture verisi, API çağrısı yok
+    if (isEmlak) return  // emlak: fixture verisi, API çağrısı yok
     fetchStats(BOSLUK)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     if (isFirst.current) { isFirst.current = false; return }
-    if (isBireysel) return  // bireysel: fixture verisi, API çağrısı yok
+    if (isEmlak) return  // emlak: fixture verisi, API çağrısı yok
     const f = { ...filtreler, q: debouncedQ }
     fetchRecords(f)
     fetchStats(f)
@@ -308,6 +308,22 @@ export function MusterilerClient({
     showToast({ mesaj: `${firmaAdi} · Not eklendi` }, 4000)
   }
 
+  async function handleAjandayaEkle(recordId: string, firmaAdi: string) {
+    const res = await fetch('/api/musteriler/update', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ recordId, fields: { 'Bugün Aranacak': true } }),
+    })
+    if (!res.ok) {
+      showToast({ mesaj: `${firmaAdi}: Eklenemedi`, hataMi: true }, 4000)
+      return
+    }
+    setRecords(prev => prev.map(r =>
+      r.id === recordId ? { ...r, fields: { ...r.fields, 'Bugün Aranacak': true } } : r
+    ))
+    showToast({ mesaj: `${firmaAdi} · Ajandaya eklendi` }, 4000)
+  }
+
   async function loadMore() {
     if (isBireysel || !offset || loadingMore) return
     setLoadingMore(true)
@@ -342,44 +358,46 @@ export function MusterilerClient({
   return (
     <div className="space-y-[15px]">
 
-      {/* ── Hero ──────────────────────────────────────────────────────────── */}
-      <section
-        className="relative h-[150px] rounded-[16px] overflow-hidden text-white flex items-center px-[31px] shadow-sm"
-        style={{ background: `linear-gradient(105deg, ${C.navy} 0%, #251352 48%, ${C.bordo} 100%)` }}
-      >
-        <div className="absolute right-[-68px] top-[-120px] h-[390px] w-[390px] rounded-full border border-white/15 pointer-events-none" />
-        <div className="absolute right-[74px] top-[13px] h-[240px] w-[240px] rounded-full border border-white/12 pointer-events-none" />
-        <div className="absolute right-[160px] top-[63px] h-[100px] w-[100px] rounded-full border border-white/10 pointer-events-none" />
+      {/* ── Hero (sigortan only) ───────────────────────────────────────── */}
+      {!isEmlak && (
+        <section
+          className="relative h-[150px] rounded-[16px] overflow-hidden text-white flex items-center px-[31px] shadow-sm"
+          style={{ background: `linear-gradient(105deg, ${C.navy} 0%, #251352 48%, ${C.bordo} 100%)` }}
+        >
+          <div className="absolute right-[-68px] top-[-120px] h-[390px] w-[390px] rounded-full border border-white/15 pointer-events-none" />
+          <div className="absolute right-[74px] top-[13px] h-[240px] w-[240px] rounded-full border border-white/12 pointer-events-none" />
+          <div className="absolute right-[160px] top-[63px] h-[100px] w-[100px] rounded-full border border-white/10 pointer-events-none" />
 
-        {/* Ali avatar + text */}
-        <div className="relative flex items-center gap-[28px]">
-          <div className="relative shrink-0 h-[92px] w-[92px]">
-            <div className="absolute inset-[-7px] rounded-full opacity-60 blur-xl"
-              style={{ background: `linear-gradient(135deg, ${C.violet}, ${C.pink})` }} />
-            <div className="absolute inset-0 rounded-full p-[4px]"
-              style={{ background: `linear-gradient(135deg, #BCA8FF, ${C.violet}, ${C.bordo})` }}>
-              <div className="h-full w-full rounded-full overflow-hidden">
-                <Image src="/ali-avatar.png" alt="Ali" width={84} height={84}
-                  className="h-full w-full object-cover rounded-full" />
+          {/* Ali avatar + text */}
+          <div className="relative flex items-center gap-[28px]">
+            <div className="relative shrink-0 h-[92px] w-[92px]">
+              <div className="absolute inset-[-7px] rounded-full opacity-60 blur-xl"
+                style={{ background: `linear-gradient(135deg, ${C.violet}, ${C.pink})` }} />
+              <div className="absolute inset-0 rounded-full p-[4px]"
+                style={{ background: `linear-gradient(135deg, #BCA8FF, ${C.violet}, ${C.bordo})` }}>
+                <div className="h-full w-full rounded-full overflow-hidden">
+                  <Image src="/ali-avatar.png" alt="Ali" width={84} height={84}
+                    className="h-full w-full object-cover rounded-full" />
+                </div>
               </div>
             </div>
+            <div>
+              <div className="text-[11px] text-white/70 font-semibold">Portföy Özeti</div>
+              <h2 className="mt-[4px] text-[20px] font-black tracking-[-.02em]">
+                {firmaToplam
+                  ? `${firmaToplam.toLocaleString('tr-TR')} firma portföyünde`
+                  : 'Müşteri portföyünde'}
+              </h2>
+              <p className="mt-[6px] text-[13px] text-white/80">
+                {counts.bugunAranacak > 0
+                  ? `Bugün ${counts.bugunAranacak} müşteri aramanızı bekliyor.`
+                  : 'Portföyünüzü yönetin.'}
+              </p>
+            </div>
           </div>
-          <div>
-            <div className="text-[11px] text-white/70 font-semibold">Portföy Özeti</div>
-            <h2 className="mt-[4px] text-[20px] font-black tracking-[-.02em]">
-              {firmaToplam
-                ? `${firmaToplam.toLocaleString('tr-TR')} firma portföyünde`
-                : 'Müşteri portföyünde'}
-            </h2>
-            <p className="mt-[6px] text-[13px] text-white/80">
-              {counts.bugunAranacak > 0
-                ? `Bugün ${counts.bugunAranacak} müşteri aramanızı bekliyor.`
-                : 'Portföyünüzü yönetin.'}
-            </p>
-          </div>
-        </div>
 
-      </section>
+        </section>
+      )}
 
       {/* ── Two-column layout ─────────────────────────────────────────────── */}
       <div className={`grid grid-cols-1 gap-[20px] transition-all duration-300 ${railAcik ? 'xl:grid-cols-[1fr_300px]' : 'xl:grid-cols-1'}`}>
@@ -393,9 +411,9 @@ export function MusterilerClient({
               <h1 className="text-[23px] font-black tracking-[-.02em]" style={{ color: C.text }}>
                 Müşteriler
               </h1>
-              {statsLoading ? (
+              {!isEmlak && statsLoading ? (
                 <span className="rounded-full bg-violet-50 px-[10px] py-[4px] text-[11px] font-bold text-violet-400">…</span>
-              ) : stats ? (
+              ) : !isEmlak && stats ? (
                 <span className="rounded-full bg-violet-50 px-[10px] py-[4px] text-[11px] font-bold text-violet-700">
                   {stats.total.toLocaleString('tr-TR')} firma
                 </span>
@@ -404,7 +422,7 @@ export function MusterilerClient({
             <div className="flex items-center gap-[9px]">
               <button
                 className="h-[36px] w-[36px] rounded-[10px] grid place-items-center text-white shadow-sm"
-                style={{ background: C.violet }}
+                style={{ background: isEmlak ? '#1B7A47' : C.violet }}
               >
                 <List size={16} />
               </button>
@@ -416,7 +434,7 @@ export function MusterilerClient({
               </button>
               <button
                 className="h-[36px] rounded-[10px] px-[16px] text-[12px] font-black text-white shadow-sm"
-                style={{ background: C.bordo }}
+                style={{ background: isEmlak ? '#1B7A47' : C.bordo }}
               >
                 + Yeni Müşteri
               </button>
@@ -424,18 +442,18 @@ export function MusterilerClient({
                 onClick={() => setRailAcik(v => !v)}
                 title={railAcik ? 'Paneli kapat' : 'Paneli aç'}
                 className="h-[36px] w-[36px] rounded-[10px] border bg-white grid place-items-center transition-colors hover:bg-slate-50"
-                style={{ borderColor: C.line, color: railAcik ? C.violet : '#94A3B8' }}
+                style={{ borderColor: C.line, color: railAcik ? (isEmlak ? '#1B7A47' : C.violet) : '#94A3B8' }}
               >
                 {railAcik ? <PanelRightClose size={16} /> : <PanelRightOpen size={16} />}
               </button>
             </div>
           </div>
 
-          {/* Örnek veri badge (bireysel segment) */}
-          {isBireysel && (
+          {/* Örnek veri badge (emlak demo) */}
+          {isEmlak && (
             <div className="flex items-center gap-[8px] rounded-[10px] border border-amber-200 bg-amber-50 px-[14px] py-[8px]">
               <span className="text-[12px] font-bold text-amber-700">Örnek veri</span>
-              <span className="text-[12px] text-amber-600">Bireysel segment — yerel fixture, Airtable bağlantısı yok.</span>
+              <span className="text-[12px] text-amber-600">Emlak demo — yerel fixture, Airtable bağlantısı yok.</span>
             </div>
           )}
 
@@ -464,25 +482,27 @@ export function MusterilerClient({
             />
           </div>
 
-          {/* Branş chip filtresi */}
-          <div className="flex flex-wrap gap-[8px]">
-            {BRANS_CHIPS.map(({ key, label }) => {
-              const active = filtreler.brans === key
-              return (
-                <button
-                  key={key || 'hepsi'}
-                  onClick={() => setFiltreler(p => ({ ...p, brans: key }))}
-                  className="h-[32px] rounded-full px-[14px] text-[12px] font-semibold transition-colors"
-                  style={active
-                    ? { background: '#5B47E0', color: '#fff' }
-                    : { background: '#F2EEFF', color: '#5B47E0' }
-                  }
-                >
-                  {label}
-                </button>
-              )
-            })}
-          </div>
+          {/* Branş chip filtresi (sigortan only) */}
+          {!isEmlak && (
+            <div className="flex flex-wrap gap-[8px]">
+              {BRANS_CHIPS.map(({ key, label }) => {
+                const active = filtreler.brans === key
+                return (
+                  <button
+                    key={key || 'hepsi'}
+                    onClick={() => setFiltreler(p => ({ ...p, brans: key }))}
+                    className="h-[32px] rounded-full px-[14px] text-[12px] font-semibold transition-colors"
+                    style={active
+                      ? { background: '#5B47E0', color: '#fff' }
+                      : { background: '#F2EEFF', color: '#5B47E0' }
+                    }
+                  >
+                    {label}
+                  </button>
+                )
+              })}
+            </div>
+          )}
 
           {/* Filter bar — directly above the table */}
           <div className="flex flex-wrap gap-[9px]">
@@ -635,6 +655,7 @@ export function MusterilerClient({
                             onClick={() => setModalId(r.id)}
                             onAksiyon={handleAksiyon}
                             onNotEkle={handleNotEkle}
+                            onAjandayaEkle={handleAjandayaEkle}
                           />
                         ))}
                       </div>
@@ -675,7 +696,7 @@ export function MusterilerClient({
           {/* Ali Asistan card */}
           <section className="rounded-[18px] border bg-white p-[18px] shadow-sm" style={{ borderColor: C.line }}>
             <div className="flex items-center justify-between">
-              <div className="text-[11px] tracking-[.17em] font-black" style={{ color: C.bordo }}>
+              <div className="text-[11px] tracking-[.17em] font-black" style={{ color: isEmlak ? '#1B7A47' : C.bordo }}>
                 ALİ ASİSTANIN
               </div>
               <button
@@ -691,16 +712,16 @@ export function MusterilerClient({
             <div className="mt-[18px] flex justify-center">
               <div className="relative h-[110px] w-[110px]">
                 <div className="absolute inset-[-7px] rounded-full opacity-60 blur-xl"
-                  style={{ background: `linear-gradient(135deg, ${C.violet}, ${C.pink})` }} />
+                  style={{ background: isEmlak ? 'linear-gradient(135deg,#2c8a52,#8c97d8)' : `linear-gradient(135deg, ${C.violet}, ${C.pink})` }} />
                 <div className="absolute inset-0 rounded-full p-[4px]"
-                  style={{ background: `linear-gradient(135deg, #BCA8FF, ${C.violet}, ${C.bordo})` }}>
+                  style={{ background: isEmlak ? 'linear-gradient(135deg,#2c8a52,#4f9f6c 44%,#8c97d8)' : `linear-gradient(135deg, #BCA8FF, ${C.violet}, ${C.bordo})` }}>
                   <div className="h-full w-full rounded-full overflow-hidden">
                     <Image src="/ali-avatar.png" alt="Ali" width={102} height={102}
                       className="h-full w-full object-cover rounded-full" />
                   </div>
                 </div>
                 <div className="absolute bottom-[6px] right-[5px] h-[19px] w-[19px] rounded-full border-[4px] border-white"
-                  style={{ background: C.violet }} />
+                  style={{ background: isEmlak ? '#2c8a52' : C.violet }} />
               </div>
             </div>
             <div className="mt-[18px] inline-flex items-center gap-[8px] rounded-full px-[12px] py-[6px] text-[13px] font-bold text-white"
@@ -712,7 +733,7 @@ export function MusterilerClient({
             </p>
             <button
               className="mt-[16px] h-[42px] w-full rounded-[12px] text-[13px] font-black text-white shadow-sm"
-              style={{ background: C.bordo }}
+              style={{ background: isEmlak ? '#1B7A47' : C.bordo }}
             >
               Ali ile sohbet et →
             </button>
@@ -723,10 +744,10 @@ export function MusterilerClient({
             <h3 className="font-black text-[14px]" style={{ color: C.text }}>Hızlı Filtreler</h3>
             <div className="mt-[14px] grid grid-cols-2 gap-[10px]">
               {([
-                { Icon: Flame,         n: sicakKpi,             label: 'Sıcak',           color: C.bordo,  onClick: () => setFiltreler(f => ({ ...f, oncelik: 'Yüksek' })) },
-                { Icon: Clock3,        n: counts.bugunAranacak, label: 'Bugün aranacak',  color: C.violet, onClick: () => setFiltreler(f => ({ ...f, bugun: true })) },
-                { Icon: CalendarDays,  n: vade30 ?? '—',        label: 'Vadesi yaklaşan', color: C.violet, yakinda: true as const },
-                { Icon: AlertTriangle, n: counts.yenilemeriski, label: 'Riskli',          color: C.red,    yakinda: true as const },
+                { Icon: Flame,         n: sicakKpi,             label: 'Sıcak',           color: isEmlak ? '#1B7A47' : C.bordo,  onClick: () => setFiltreler(f => ({ ...f, oncelik: 'Yüksek' })) },
+                { Icon: Clock3,        n: counts.bugunAranacak, label: 'Bugün aranacak',  color: isEmlak ? '#2c8a52' : C.violet, onClick: () => setFiltreler(f => ({ ...f, bugun: true })) },
+                { Icon: CalendarDays,  n: vade30 ?? '—',        label: 'Vadesi yaklaşan', color: isEmlak ? '#2c8a52' : C.violet, yakinda: true as const },
+                { Icon: AlertTriangle, n: counts.yenilemeriski, label: 'Riskli',          color: C.red,                          yakinda: true as const },
               ]).map(({ Icon, n, label, color, ...rest }) => {
                 const yakinda = 'yakinda' in rest && rest.yakinda
                 const onClick  = 'onClick'  in rest ? rest.onClick as () => void : undefined
@@ -753,8 +774,8 @@ export function MusterilerClient({
             </div>
           </section>
 
-          {/* Branş Dağılımı */}
-          <section className="rounded-[18px] border bg-white p-[18px] shadow-sm" style={{ borderColor: C.line }}>
+          {/* Branş Dağılımı (sigortan only) */}
+          {!isEmlak && <section className="rounded-[18px] border bg-white p-[18px] shadow-sm" style={{ borderColor: C.line }}>
             <h3 className="font-black text-[14px]" style={{ color: C.text }}>Branş Dağılımı</h3>
             {branchSum > 0 ? (
               <div className="mt-[15px] flex items-center gap-[15px]">
@@ -790,9 +811,10 @@ export function MusterilerClient({
                 <p className="text-xs text-slate-400">Veri yükleniyor…</p>
               </div>
             )}
-          </section>
+          </section>}
 
-          {/* Brand card */}
+          {/* Brand card (sigortan only) */}
+          {!isEmlak && (
           <section
             className="h-[164px] rounded-[18px] p-[22px] text-white overflow-hidden relative shadow-sm"
             style={{ background: `linear-gradient(135deg, ${C.navy}, ${C.bordo})` }}
@@ -803,6 +825,7 @@ export function MusterilerClient({
               Bağımsız sigortacılığın yeni nesli.
             </p>
           </section>
+          )}
         </div>
         )}
       </div>
