@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Plus_Jakarta_Sans, Sora, Inter, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastContainer } from "@/components/ui/toast";
 import { ClerkProvider } from '@clerk/nextjs'
@@ -13,6 +13,31 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-jakarta",
+});
+
+// GELİŞİM / Satışçı Kütüphanesi tasarım fontları (Sora · Inter · Space Mono)
+const sora = Sora({
+  subsets: ["latin"],
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-sora",
+});
+
+const inter = Inter({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-inter",
+});
+
+const spaceMono = Space_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-space-mono",
 });
 
 export const metadata: Metadata = {
@@ -39,7 +64,7 @@ export default function RootLayout({
       signUpFallbackRedirectUrl="/"
     >
       <html lang="tr">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <body className={`${geistSans.variable} ${geistMono.variable} ${jakarta.variable} ${sora.variable} ${inter.variable} ${spaceMono.variable} antialiased`}>
           {children}
           <ToastContainer />
         </body>

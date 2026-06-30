@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { SegmentSwitch } from './segment-switch'
 import { SECTION_NAME, SECTION_SLUG } from '@/lib/ali-zeka'
+import { SECTION_SLUG as GELISIM_SLUG, GROUP_NAME as GELISIM_GROUP } from '@/lib/gelisim'
 
 // ── Sigortan colours ──────────────────────────────────────────────
 const C = {
@@ -125,6 +126,11 @@ const EMLAK_NAV_PATHS: Record<string, string> = {
   sliders:  '<path d="M4 8h10M18 8h2M4 16h2M10 16h10"/><circle cx="16" cy="8" r="2"/><circle cx="8" cy="16" r="2"/>',
   book:     '<path d="M5 4h11a2 2 0 0 1 2 2v14H7a2 2 0 0 0-2 2z"/><path d="M5 4v16"/>',
   sparkle:  '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 14.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7z"/>',
+  star:     '<path d="M12 3.5l2.6 5.3 5.9.8-4.3 4.1 1 5.8L12 16.8 6.8 19.5l1-5.8L3.5 9.6l5.9-.8z"/>',
+  target:   '<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4.2"/><circle cx="12" cy="12" r="1"/>',
+  play:     '<path d="M8 5.2v13.6a.6.6 0 0 0 .9.52l10.5-6.8a.6.6 0 0 0 0-1.04L8.9 4.68A.6.6 0 0 0 8 5.2z"/>',
+  chat:     '<path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-4 4V6a1 1 0 0 1 1-1z"/>',
+  cap:      '<path d="M3 9l9-4 9 4-9 4-9-4z"/><path d="M7 11.4V16c0 1.1 2.2 2 5 2s5-.9 5-2v-4.6"/>',
 }
 
 function EmlakIcon({ id }: { id: string }) {
@@ -149,7 +155,25 @@ interface EmlakNavLink {
   active?: boolean
   muted?: boolean
   lavender?: boolean   // Ali kimlikli (lavanta aksan) nav öğesi
+  star?: boolean       // ⭐ vurgulu öğe (Satışçı Kütüphanesi)
 }
+
+// GELİŞİM grubu — Satışçı Kütüphanesi açılış; çoğu öğe stub (yakında).
+// Stok Zekâsı = Ali Satış Zekâsı'na eğitim yüzü derin linki (§9b).
+const EMLAK_GELISIM_NAV: EmlakNavLink[] = [
+  { href: GELISIM_SLUG, label: 'Satışçı Kütüphanesi', iconId: 'star', lavender: true, star: true },
+  { label: 'AI Koçum',                 iconId: 'sparkle',  muted: true },
+  { label: 'Günlük Challenge',         iconId: 'target',   muted: true },
+  { label: 'Rol Yap (AI Simülasyon)',  iconId: 'play',     muted: true },
+  { label: 'Oyun Kitabı',              iconId: 'book',     muted: true },
+  { label: 'Hikâye Kütüphanesi',       iconId: 'book',     muted: true },
+  { label: 'Persona Kütüphanesi',      iconId: 'badge',    muted: true },
+  { label: 'Proje Akademisi',          iconId: 'cap',      muted: true },
+  { href: SECTION_SLUG, label: 'Stok Zekâsı', iconId: 'building' },
+  { label: 'İtiraz Merkezi',           iconId: 'chat',     muted: true },
+  { label: 'WhatsApp Kütüphanesi',     iconId: 'chat',     muted: true },
+  { href: '/raporlar', label: 'Raporlar', iconId: 'chart' },
+]
 
 const EMLAK_NAV: EmlakNavLink[] = [
   { href: '/',             label: 'Ana Akış',           iconId: 'grid' },
@@ -265,6 +289,81 @@ function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
                 padding: '11px 13px',
                 borderRadius: 13,
                 color: muted ? '#8b988f' : '#57655b',
+                fontWeight: 600,
+                fontSize: 14,
+                cursor: 'default',
+              }}
+            >
+              <EmlakIcon id={item.iconId} />
+              {item.label}
+            </div>
+          )
+        })}
+      </nav>
+
+      {/* GELİŞİM grup başlığı (Space Mono, UPPERCASE) */}
+      <div style={{
+        fontFamily: 'var(--font-space-mono), ui-monospace, monospace',
+        fontSize: 10.5,
+        fontWeight: 700,
+        letterSpacing: '.12em',
+        textTransform: 'uppercase',
+        color: '#8b988f',
+        padding: '0 12px',
+        margin: '22px 0 8px',
+      }}>
+        {GELISIM_GROUP}
+      </div>
+
+      {/* GELİŞİM nav */}
+      <nav style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+        {EMLAK_GELISIM_NAV.map(item => {
+          const active = isActive(item.href)
+          const idleColor = item.lavender ? '#6D5BE0' : '#57655b'
+
+          if (item.href && !item.muted) {
+            return (
+              <Link
+                key={item.label}
+                href={item.href}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 12,
+                  padding: '11px 13px',
+                  borderRadius: 13,
+                  textDecoration: 'none',
+                  color: active ? '#fff' : idleColor,
+                  fontWeight: active ? 700 : 600,
+                  fontSize: 14,
+                  transition: '.16s',
+                  ...(active ? {
+                    background: item.lavender ? LAV_GRAD : GRAD,
+                    boxShadow: item.lavender
+                      ? '0 12px 22px -10px rgba(91,71,224,.55)'
+                      : '0 12px 22px -10px rgba(40,120,70,.55)',
+                  } : item.lavender ? {
+                    background: 'rgba(237,233,254,.55)',
+                  } : {}),
+                }}
+              >
+                <EmlakIcon id={item.iconId} />
+                <span style={{ flex: 1 }}>{item.label}</span>
+                {item.star && <span aria-hidden style={{ fontSize: 12 }}>⭐</span>}
+              </Link>
+            )
+          }
+
+          return (
+            <div
+              key={item.label}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '11px 13px',
+                borderRadius: 13,
+                color: '#8b988f',
                 fontWeight: 600,
                 fontSize: 14,
                 cursor: 'default',

@@ -1,0 +1,255 @@
+<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Babacan &times; SalesAI &mdash; Pazarlama &amp; &#304;&#351; Geli&#351;tirme</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"><style>
+  :root{
+    --navy:#17255C; --navy-deep:#0E1844; --ink:#1B2030;
+    --pur:#8E7BE8; --lil:#C6A6DF; --peach:#F2B79C; --pink:#E79DC4;
+    --coral:#F08456; --coral-soft:#FBE4D8;
+    --lav:#B4A6EC; --lav-soft:#F0ECFB; --lav-panel:#EBE5FA;
+    --soft:#6A7088; --line:#E8EAF2; --bg:#FFFFFF; --mint:#7FC4A3; --mint-soft:#E2F2EA;
+    --red:#E06A6A;
+    --grad: linear-gradient(102deg, var(--pur) 0%, var(--lil) 42%, var(--peach) 100%);
+    --grad-w: linear-gradient(102deg,#A89AF0 0%,#D6B6E8 45%,#F4C3AB 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  h1,h2,h3{font-family:'Sora',sans-serif;letter-spacing:-.025em;line-height:1.05}
+  em{font-style:normal}
+  .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  .deck{scroll-snap-type:y mandatory;height:100vh;overflow-y:scroll}
+  .slide{scroll-snap-align:start;min-height:100vh;width:100%;position:relative;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:6vh 7vw;overflow:hidden}
+  .slide-inner{width:100%;max-width:1140px;margin:0 auto;position:relative;z-index:2;
+    opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+  .slide.in .slide-inner{opacity:1;transform:none}
+
+  .brand{position:absolute;top:4.2vh;right:7vw;z-index:5;font-family:'Sora';font-weight:800;font-size:21px;letter-spacing:-.03em;color:var(--navy)}
+  .brand .ai{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .brand .spark{color:var(--lav);font-size:14px;vertical-align:super}
+  .eyebrow{font-family:'Space Mono';font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--lav);font-weight:700;margin-bottom:18px;display:inline-block}
+  .eyebrow.coral{color:var(--coral)}
+
+  .holo{position:absolute;inset:0;z-index:0;overflow:hidden}
+  .holo::before{content:"";position:absolute;width:90vw;height:90vw;left:-10vw;top:-30vh;border-radius:50%;
+    background:
+      radial-gradient(closest-side at 35% 40%, rgba(142,123,232,.55), transparent 70%),
+      radial-gradient(closest-side at 65% 55%, rgba(231,157,196,.5), transparent 70%),
+      radial-gradient(closest-side at 55% 70%, rgba(242,183,156,.5), transparent 70%),
+      radial-gradient(closest-side at 75% 35%, rgba(180,166,236,.5), transparent 70%),
+      radial-gradient(closest-side at 45% 60%, rgba(127,196,163,.4), transparent 70%);
+    filter:blur(38px);opacity:.95;animation:drift 22s ease-in-out infinite alternate}
+  @keyframes drift{from{transform:translate(0,0) rotate(0deg) scale(1)}to{transform:translate(4vw,3vh) rotate(8deg) scale(1.08)}}
+  .holo.soft::before{opacity:.5;width:55vw;height:55vw;left:auto;right:-12vw;top:auto;bottom:-25vh;filter:blur(50px)}
+
+  .cover h1{font-size:clamp(42px,7vw,86px);font-weight:800;color:var(--navy);margin-bottom:6px}
+  .cover .sub{font-size:clamp(16px,2.2vw,23px);font-weight:600;color:var(--ink);max-width:680px;margin-top:10px}
+  .cover .rule{height:1px;background:var(--line);margin:34px 0 18px;max-width:760px}
+  .cover .meta{display:flex;justify-content:space-between;max-width:760px;font-weight:700;font-size:15px;color:var(--navy);flex-wrap:wrap;gap:10px}
+  .cover .meta .soft{color:var(--soft);font-weight:600}
+
+  h2.big{font-size:clamp(32px,5.2vw,60px);font-weight:800;color:var(--navy);margin-bottom:16px}
+  h2.big.g{color:transparent}
+  .lead{font-size:clamp(16px,1.9vw,20px);color:var(--ink);max-width:780px;line-height:1.5}
+  .lead.soft{color:var(--soft)}
+  .kicker{font-size:clamp(15px,1.7vw,18px);color:var(--soft);max-width:740px;line-height:1.55;margin-top:14px}
+
+  .divider .num{font-family:'Sora';font-weight:800;font-size:clamp(90px,20vw,230px);line-height:.8;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.05em}
+  .divider h2{font-size:clamp(32px,6vw,66px);font-weight:800;color:var(--navy);margin-top:4px}
+  .divider .dsub{font-size:18px;color:var(--soft);font-weight:600;margin-top:14px;max-width:640px}
+
+  .agenda{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 40px;margin-top:24px}
+  .ag-row{display:flex;gap:16px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}
+  .ag-row .t{font-family:'Space Mono';font-weight:700;color:var(--coral);font-size:13px;min-width:64px;padding-top:3px}
+  .ag-row .b strong{display:block;font-family:'Sora';font-weight:700;font-size:16px;color:var(--navy);margin-bottom:2px}
+  .ag-row .b span{font-size:13.5px;color:var(--soft)}
+
+  .flow{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
+  .flow .step{flex:1;min-width:135px;background:var(--lav-soft);border:1px solid var(--line);border-radius:18px;padding:20px 18px;position:relative}
+  .flow .step .n{font-family:'Space Mono';font-size:12px;color:var(--lav);font-weight:700}
+  .flow .step h3{font-size:18px;color:var(--navy);margin:8px 0 6px}
+  .flow .step p{font-size:13px;color:var(--soft);line-height:1.4}
+  .flow .arr{align-self:center;color:var(--lil);font-size:20px;font-weight:700}
+
+  .numbers{display:flex;gap:10px;align-items:stretch;margin-top:30px;flex-wrap:wrap}
+  .nb{flex:1;min-width:120px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 16px;text-align:center;box-shadow:0 8px 24px rgba(23,37,92,.05)}
+  .nb .big{font-family:'Sora';font-weight:800;font-size:clamp(32px,5vw,52px);color:var(--navy);line-height:1}
+  .nb .lb{font-size:12.5px;color:var(--soft);margin-top:10px;font-weight:600;line-height:1.3}
+  .nb.win .big{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .nbar{align-self:center;color:var(--lil);font-size:24px;font-weight:800}
+
+  .years{display:flex;flex-direction:column;gap:0;margin-top:26px;max-width:780px}
+  .yr{display:flex;gap:22px;align-items:baseline;padding:15px 0;border-bottom:1px solid var(--line)}
+  .yr .y{font-family:'Sora';font-weight:800;font-size:28px;color:var(--navy);min-width:90px}
+  .yr .d{font-size:16px;color:var(--ink);font-weight:500}
+  .yr.hot .y{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .yr.hot .d{font-weight:700;color:var(--navy)}
+
+  .ladder{display:flex;flex-direction:column;gap:12px;margin-top:26px;max-width:900px}
+  .rung{display:flex;gap:18px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px 20px;border-left:5px solid}
+  .rung.lo{border-left-color:var(--red)} .rung.mid{border-left-color:var(--coral)} .rung.hi{border-left-color:var(--mint)}
+  .rung .lvl{font-family:'Space Mono';font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;min-width:118px;padding-top:3px}
+  .rung.lo .lvl{color:var(--red)} .rung.mid .lvl{color:var(--coral)} .rung.hi .lvl{color:var(--mint)}
+  .rung .rb strong{display:block;font-family:'Sora';color:var(--navy);font-size:16px;margin-bottom:3px}
+  .rung .rb span{font-size:14px;color:var(--soft);line-height:1.4}
+
+  .pillars3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:26px}
+  .pcol{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;border-top:4px solid var(--lav)}
+  .pcol:nth-child(2){border-top-color:var(--coral)} .pcol:nth-child(3){border-top-color:var(--mint)}
+  .pcol h3{font-size:18px;color:var(--navy);margin-bottom:6px}
+  .pcol .ph{font-size:12px;color:var(--soft);margin-bottom:14px;font-weight:600}
+  .pcol ul{list-style:none;font-size:13.5px;color:var(--ink);line-height:1.9}
+  .pcol ul li::before{content:"·";color:var(--lav);font-weight:800;margin-right:8px}
+
+  .voice{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+  .qcard{background:var(--lav-soft);border-radius:16px;padding:20px 22px;border-left:4px solid var(--lil)}
+  .qcard p{font-size:15px;font-style:italic;color:var(--ink);line-height:1.5}
+  .qcard .src{font-family:'Space Mono';font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--pur);margin-top:10px;text-transform:uppercase;font-style:normal}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin-top:28px}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px 22px;box-shadow:0 8px 28px rgba(23,37,92,.05)}
+  .stat .v{font-family:'Sora';font-weight:800;font-size:38px;color:var(--coral);line-height:1}
+  .stat .l{font-size:14px;color:var(--soft);margin-top:10px;line-height:1.4}
+
+  .reasons{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:26px}
+  .reason{display:flex;gap:14px;align-items:flex-start;background:var(--coral-soft);border-radius:16px;padding:18px}
+  .reason .rn{font-family:'Sora';font-weight:800;font-size:22px;color:var(--coral);min-width:26px}
+  .reason p{font-size:15px;color:var(--ink);font-weight:600;line-height:1.35}
+
+  .pools{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:14px;margin-top:26px}
+  .pool{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;border-top:4px solid var(--lav);transition:transform .25s,box-shadow .25s}
+  .pool:hover{transform:translateY(-5px);box-shadow:0 16px 36px rgba(23,37,92,.1)}
+  .pool h3{font-size:18px;color:var(--navy);margin-bottom:8px}
+  .pool .need{font-size:13px;color:var(--coral);font-weight:700;margin-bottom:10px}
+  .pool ul{list-style:none;font-size:13px;color:var(--soft);line-height:1.7}
+  .pool ul li::before{content:"·";color:var(--lav);font-weight:800;margin-right:7px}
+  .pool:nth-child(2){border-top-color:var(--pink)} .pool:nth-child(3){border-top-color:var(--coral)}
+  .pool:nth-child(4){border-top-color:var(--mint)} .pool:nth-child(5){border-top-color:var(--peach)}
+
+  .matrix{width:100%;border-collapse:separate;border-spacing:0;margin-top:24px;font-size:14px}
+  .matrix th{font-family:'Space Mono';text-transform:uppercase;font-size:11px;letter-spacing:.1em;color:var(--lav);text-align:left;padding:0 14px 12px;font-weight:700}
+  .matrix td{padding:13px 14px;border-top:1px solid var(--line);vertical-align:top;line-height:1.4}
+  .matrix tr td:first-child{font-family:'Sora';font-weight:700;color:var(--navy);width:20%}
+  .matrix .arg{color:var(--ink);font-weight:500}
+  .matrix .ch{color:var(--coral);font-weight:600;font-size:13px}
+
+  .units{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:26px}
+  .unit{background:#fff;border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 10px 30px rgba(23,37,92,.06)}
+  .unit .id{font-family:'Space Mono';font-weight:700;font-size:13px;color:var(--lav);letter-spacing:.05em}
+  .unit h3{font-size:25px;color:var(--navy);margin:4px 0 16px}
+  .tag{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:7px 13px;border-radius:30px;margin:0 6px 8px 0}
+  .tag.y{background:var(--lav-soft);color:var(--navy)} .tag.n{background:#F4F2F6;color:#A6A2B0;text-decoration:line-through}
+
+  .chips{display:flex;flex-wrap:wrap;gap:11px;margin-top:24px}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 18px;font-size:14px;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:10px;box-shadow:0 4px 14px rgba(23,37,92,.04)}
+  .chip b{font-family:'Sora';color:var(--coral)}
+  .insight{margin-top:24px;background:var(--navy);color:#fff;border-radius:18px;padding:22px 26px;font-size:17px;font-weight:600;max-width:680px;display:flex;align-items:center;gap:16px}
+  .insight .av{font-family:'Sora';font-weight:800;font-size:15px;background:var(--grad-w);-webkit-background-clip:text;background-clip:text;color:transparent;min-width:34px}
+
+  .slide.ws{background:linear-gradient(135deg,#F6F2FD,#FBF1F2)}
+  .ws-card{background:#fff;border-radius:24px;padding:40px;box-shadow:0 24px 60px rgba(23,37,92,.12);max-width:880px;border:1px solid var(--line)}
+  .ws-tag{display:inline-flex;align-items:center;gap:9px;font-family:'Space Mono';font-size:12px;letter-spacing:.16em;color:#fff;background:var(--grad);padding:8px 16px;border-radius:30px;font-weight:700;text-transform:uppercase}
+  .ws-card h2{font-size:clamp(26px,3.6vw,40px);color:var(--navy);margin:18px 0 8px;font-weight:800}
+  .ws-steps{margin-top:20px;display:flex;flex-direction:column;gap:11px}
+  .ws-steps li{list-style:none;display:flex;gap:14px;font-size:16px;color:var(--ink)}
+  .ws-steps li .d{font-family:'Sora';font-weight:800;color:var(--lav)}
+  .ws-time{margin-top:22px;font-family:'Space Mono';font-size:13px;color:var(--coral);font-weight:700}
+
+  .layers{display:flex;gap:0;margin-top:30px;align-items:stretch;flex-wrap:wrap}
+  .layer{flex:1;min-width:200px;padding:24px;border-radius:18px;position:relative}
+  .layer.s1{background:var(--navy);color:#fff} .layer.s2{background:var(--lav-panel)} .layer.s3{background:var(--coral-soft)}
+  .layer .ln{font-family:'Space Mono';font-size:11px;letter-spacing:.15em;font-weight:700;opacity:.8;text-transform:uppercase}
+  .layer h3{font-size:21px;margin:8px 0 8px} .layer.s1 h3{color:#fff} .layer.s2 h3,.layer.s3 h3{color:var(--navy)}
+  .layer p{font-size:14px;line-height:1.45} .layer.s1 p{color:#D5DAEC} .layer.s2 p,.layer.s3 p{color:var(--soft)}
+  .layer .who{margin-top:12px;font-size:12px;font-weight:700;font-family:'Space Mono'}
+  .layer.s1 .who{color:var(--lav)} .layer.s2 .who{color:var(--pur)} .layer.s3 .who{color:var(--coral)}
+  .note{margin-top:22px;font-size:16px;font-weight:700;color:var(--navy)}
+  .note em{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:26px;align-items:start}
+  .qlist{list-style:none;display:flex;flex-direction:column;gap:11px}
+  .qlist li{font-size:16px;color:var(--ink);padding-left:26px;position:relative;line-height:1.4}
+  .qlist li::before{content:"\2192";position:absolute;left:0;color:var(--lav);font-weight:700}
+  .panel{background:var(--lav-soft);border-radius:20px;padding:26px;border:1px solid var(--line)}
+  .panel h3{font-size:18px;color:var(--navy);margin-bottom:14px}
+  .scriptbox{background:#fff;border-radius:14px;padding:16px 18px;font-size:14px;line-height:1.5;color:var(--ink);border:1px solid var(--line);margin-bottom:12px}
+  .scriptbox .who{font-family:'Space Mono';font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px}
+  .scriptbox.ru .who{color:var(--pur)} .scriptbox.tr .who{color:var(--coral)}
+
+  .closing h2{font-size:clamp(32px,5.2vw,58px);font-weight:800;color:var(--navy)}
+  .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:30px}
+  .pillar{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;text-align:left}
+  .pillar .pn{font-family:'Space Mono';font-size:12px;color:var(--lav);font-weight:700}
+  .pillar h3{font-size:19px;color:var(--navy);margin:8px 0 8px}
+  .pillar p{font-size:14px;color:var(--soft);line-height:1.45}
+  .endcard{margin-top:30px;display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid var(--line);padding-top:22px;flex-wrap:wrap;gap:14px}
+  .endcard .big{font-family:'Sora';font-weight:800;font-size:clamp(26px,3.4vw,40px);color:var(--navy)}
+  .endcard .c{font-size:14px;color:var(--soft);line-height:1.7;font-weight:600;text-align:right}
+
+  .nav{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:30px;padding:8px 16px;box-shadow:0 8px 24px rgba(23,37,92,.1)}
+  .nav button{border:none;background:none;cursor:pointer;font-size:18px;color:var(--navy);font-weight:700;line-height:1;padding:4px 8px;border-radius:8px}
+  .nav button:hover{background:var(--lav-soft)}
+  .nav .count{font-family:'Space Mono';font-size:12px;color:var(--soft);font-weight:700;min-width:52px;text-align:center}
+  .prog{position:fixed;top:0;left:0;height:3px;background:var(--grad);z-index:40;transition:width .3s}
+
+  .srcnote{font-family:'Space Mono';font-size:11px;color:var(--soft);margin-top:20px;letter-spacing:.02em}
+  .bignum{font-family:'Sora';font-weight:800;font-size:clamp(30px,4.6vw,48px);line-height:1;color:var(--navy)}
+  .bignum.coral{color:var(--coral)} .bignum.g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .pyramid{display:flex;flex-direction:column;align-items:center;gap:7px;margin:26px auto 0;max-width:780px}
+  .plv{color:#fff;border-radius:8px;padding:11px 16px;text-align:center}
+  .plv .nm{font-family:'Sora';font-weight:800;font-size:15px;line-height:1.15}
+  .plv .q{font-size:12px;opacity:.92;font-weight:500;font-style:italic}
+  .vcol{padding:22px;border-radius:18px}
+  .vcol.no{background:var(--coral-soft);border:1px solid #F3CDBC}
+  .vcol.yes{background:#EAF1F8;border:1px solid #CFE0F0}
+  .vcol h3{font-size:16px;margin-bottom:14px}
+  .vrow{font-size:13.5px;line-height:1.4;padding:9px 0;border-top:1px solid rgba(0,0,0,.06)}
+  .vrow:first-of-type{border-top:none}
+  .mega{font-family:'Sora';font-weight:800;font-size:clamp(40px,7.2vw,86px);color:var(--navy);line-height:1.02;letter-spacing:-.03em}
+  .pin{display:inline-flex;align-items:center;gap:10px;font-family:'Space Mono';font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:30px;padding:10px 20px;margin-top:26px;box-shadow:0 6px 20px rgba(23,37,92,.08)}
+  .fillrow{display:flex;justify-content:space-between;gap:14px;padding:13px 0;border-bottom:1px dashed var(--line);font-size:15px;align-items:baseline}
+  .fillrow .fl{font-family:'Sora';font-weight:700;color:var(--navy);min-width:180px}
+  .fillrow .fv{flex:1;color:#C7C5D2;font-style:italic;text-align:right}
+  .campwrap{margin-top:20px;overflow-x:auto}
+  .campmatrix{display:grid;grid-template-columns:115px repeat(4,1fr);gap:7px;min-width:760px}
+  .campcell{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:11.5px;line-height:1.3;color:var(--ink)}
+  .campcell.head{background:var(--lav-soft);font-family:'Space Mono';font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--navy);display:flex;align-items:center;justify-content:center;text-align:center}
+  .campcell.rowhead{background:var(--navy);color:#fff;font-family:'Sora';font-weight:700;font-size:12.5px;display:flex;align-items:center;padding:10px 12px}
+  .wstwo{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:18px}
+  .wstwo h3{font-family:'Sora';font-size:16px;margin-bottom:12px}
+  @media(max-width:760px){
+    .slide{padding:9vh 7vw}
+    .agenda,.units,.two,.voice,.pillars3,.pillars{grid-template-columns:1fr}
+    .brand{font-size:17px;top:3vh}
+    .matrix{font-size:12px}.matrix td{padding:9px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .holo::before{animation:none}.slide-inner{transition:none;opacity:1;transform:none}
+  }
+</style></head><body><div class="prog" id="prog"></div><div class="brand">Sales<span class="ai">AI</span><span class="spark">&#10022;</span></div><div class="deck" id="deck">
+  <section class="slide cover"><div class="holo"></div><div class="slide-inner"><span class="eyebrow">Babacan GYO &times; SalesAI &middot; &Ccedil;al&#305;&#351;ma oturumu</span><h1>Pazarlama &amp; &#304;&#351; Geli&#351;tirme<br><em class="grad">Yaz Aksiyon Plan&#305;.</em></h1><p class="sub">Ders de&#287;il &mdash; birlikte plan&#305; &ccedil;&#305;kar&#305;yoruz. &Ccedil;&#305;k&#305;&#351;ta elinizde uygulanabilir bir yol haritas&#305; olacak.</p><div class="rule"></div><div class="meta"><span>1,5 saat &middot; &ccedil;al&#305;&#351;ma</span><span>Gizem Burte&ccedil;in &amp; Dr. Hakan Tetik</span></div></div></section>
+  <section class="slide"><div class="holo"></div><div class="slide-inner"><span class="eyebrow">Bug&uuml;n nas&#305;l &ccedil;al&#305;&#351;aca&#287;&#305;z</span><h2 class="mega">Pazarlamay&#305;<br>biliyorsunuz.<br><em class="grad">Plan&#305; kural&#305;m.</em></h2><p class="lead soft" style="margin-top:18px;max-width:740px">Tan&#305;m yok, temel yok. Her b&ouml;l&uuml;m bir karar al&#305;r; her b&ouml;l&uuml;m sonunda sorular&#305; cevaplar, aksiyonu yazar&#305;z. Oturum sonunda <strong style="color:var(--navy)">yaz&#305;n pazarlama + i&#351; geli&#351;tirme plan&#305;</strong> &ccedil;&#305;km&#305;&#351; olur.</p><span class="pin">&Ccedil;&#305;kt&#305;: <span class="grad">tek sayfa yaz aksiyon plan&#305;</span></span></div></section>
+  <section class="slide"><div class="holo soft"></div><div class="slide-inner"><span class="eyebrow">Ak&#305;&#351;</span><h2 class="big">Be&#351; karar, <em class="grad">be&#351; aksiyon.</em></h2><div class="agenda"><div class="ag-row"><span class="t">01</span><div class="b"><strong>Yaz hedefi &amp; oyun alan&#305;</strong><span>Hangi stok, hangi hedef, foreign/domestic dengesi</span></div></div><div class="ag-row"><span class="t">02</span><div class="b"><strong>Hedefleme &amp; kanal</strong><span>Hangi hav&uuml;za y&uuml;kleniyoruz, b&uuml;t&ccedil;e nereye</span></div></div><div class="ag-row"><span class="t">03</span><div class="b"><strong>Kampanya &amp; i&ccedil;erik</strong><span>Hero teklifler, kampanya kanvas&#305;, &uuml;retim h&#305;z&#305;</span></div></div><div class="ag-row"><span class="t">04</span><div class="b"><strong>Marka &amp; i&#351; geli&#351;tirme</strong><span>Konumland&#305;rma, broker a&#287;&#305;, ortakl&#305;klar, etkinlikler</span></div></div><div class="ag-row"><span class="t">05</span><div class="b"><strong>&Ouml;l&ccedil;&uuml;m &amp; aksiyon plan&#305;</strong><span>Skor tablosu + tek sayfa plan</span></div></div></div><p class="kicker">Her b&ouml;l&uuml;m sonunda: <strong>Sorular &amp; Aksiyonlar</strong> &mdash; karar&#305;, sahibini, tarihini yazar&#305;z.</p></div></section>
+  <section class="slide divider"><div class="holo"></div><div class="slide-inner"><div class="num">01</div><h2>Yaz Hedefi &amp; Oyun Alan&#305;</h2><p class="dsub">Neyi oynuyoruz? Bu yaz hangi stok, ne kadar erisin?</p></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow">Bu yaz&#305;n i&#351;i</span><h2 class="big">Pazarlaman&#305;n yaz karnesi: <em class="grad">eriyen daire.</em></h2><p class="lead soft">B&uuml;t&uuml;n kampanya, kanal ve b&uuml;t&ccedil;e tek hedefe hizmet eder: yaz sonunda kalan stoğu azaltmak. Net hedef olmadan plan olmaz.</p><div class="stats"><div class="stat"><div class="v">? daire</div><div class="l">Yaz sonu eritme hedefi (bug&uuml;n karara ba&#287;lan&#305;r)</div></div><div class="stat"><div class="v">? hav&uuml;z</div><div class="l">&Ouml;ncelikli 2-3 al&#305;c&#305; hav&uuml;zu</div></div><div class="stat"><div class="v">? : ?</div><div class="l">Yerli : yabanc&#305; b&uuml;t&ccedil;e dengesi</div></div></div><p class="note">Hedef rakamla konu&#351;ulur: <em>"yaz sonu X daire"</em> &mdash; "daha &ccedil;ok satal&#305;m" de&#287;il.</p></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow coral">Veri ne diyor?</span><h2 class="big">Bu yaz para <em class="grad">nereye akmal&#305;?</em></h2><p class="lead soft">Strateji veriden ba&#351;lar. 2025-26 tablosu net bir y&ouml;n g&ouml;steriyor &mdash; karar bizim.</p><div class="two" style="margin-top:22px"><div class="panel" style="background:var(--mint-soft)"><h3 style="color:var(--mint)">R&uuml;zg&acirc;r&#305; arkadan</h3><ul class="qlist"><li>Konut sat&#305;&#351;&#305; rekor (+%14), ipotekli +%49</li><li>Faiz d&uuml;&#351;&uuml;yor &mdash; yerli talep canlan&#305;yor</li><li>Konut reel ucuzlad&#305; &mdash; giri&#351; an&#305;</li></ul></div><div class="panel" style="background:var(--coral-soft)"><h3 style="color:var(--coral)">R&uuml;zg&acirc;r&#305; kar&#351;&#305;dan</h3><ul class="qlist"><li>Yabanc&#305; pay&#305; %1,3 &mdash; 9 y&#305;l&#305;n dibi</li><li>Vatanda&#351;l&#305;k zorla&#351;t&#305; (400K + uzun ROI)</li><li>Dubai/&#304;spanya/Yunanistan rekabeti</li></ul></div></div><p class="note">&#304;ma: yaz&#305;n <em>hacim motoru yerli</em>; yabanc&#305; se&ccedil;ici &amp; y&uuml;ksek de&#287;er.</p></div></section>
+  <section class="slide ws"><div class="slide-inner" style="display:flex;justify-content:center"><div class="ws-card"><span class="ws-tag">&#10022; B&ouml;l&uuml;m sonu &middot; Sorular &amp; Aksiyonlar</span><h2>Yaz hedefini ba&#287;layal&#305;m</h2><div class="wstwo"><div><h3 style="color:var(--navy)">Cevaplayal&#305;m</h3><ul class="qlist"><li>Yaz sonu eritme hedefi ka&ccedil; daire?</li><li>&Ouml;ncelikli 2-3 hav&uuml;z hangileri?</li><li>Yerli : yabanc&#305; b&uuml;t&ccedil;e dengesi?</li><li>Hangi blok/etap &ouml;nce eritilecek?</li></ul></div><div><h3 style="color:var(--coral)">Aksiyon &middot; sahip &middot; tarih</h3><div class="fillrow"><span class="fl">Aksiyon 1</span><span class="fv">&hellip; / &hellip; / &hellip;</span></div><div class="fillrow"><span class="fl">Aksiyon 2</span><span class="fv">&hellip; / &hellip; / &hellip;</span></div><div class="fillrow" style="border-bottom:none"><span class="fl">Aksiyon 3</span><span class="fv">&hellip; / &hellip; / &hellip;</span></div></div></div></div></div></section>
+  <section class="slide divider"><div class="holo"></div><div class="slide-inner"><div class="num">02</div><h2>Hedefleme &amp; Kanal</h2><p class="dsub">Kime, nereden, ne kadar b&uuml;t&ccedil;eyle? Paray&#305; b&uuml;y&uuml;yen yere koy.</p></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow">Karar tablosu</span><h2 class="big">Hangi hav&uuml;z <em class="grad">hangi kanaldan?</em></h2><table class="matrix"><thead><tr><th>Hav&uuml;z</th><th>Lider kanal</th><th>Mesaj &ccedil;ekirde&#287;i</th></tr></thead><tbody><tr><td>T&uuml;rk Yat&#305;r&#305;mc&#305;</td><td class="ch">sahibinden &middot; emlakjet &middot; Instagram</td><td class="arg">"Reel ucuz, getiri net, metro geliyor."</td></tr><tr><td>&#304;lk Ev / Aile</td><td class="ch">Lokal sosyal &middot; banka kanallar&#305;</td><td class="arg">"Faiz d&uuml;&#351;t&uuml;, taksit belli, yuva haz&#305;r."</td></tr><tr><td>Vatanda&#351;l&#305;k</td><td class="ch">Yurtd&#305;&#351;&#305; broker &middot; dijital &middot; Telegram</td><td class="arg">"Tek daireyle pasaport, garantili s&uuml;re&ccedil;."</td></tr><tr><td>Oturum / Ya&#351;am</td><td class="ch">AB dijital &middot; expat platform</td><td class="arg">"Huzurlu, ye&#351;il bir d&uuml;zen."</td></tr><tr><td>&Uuml;st Segment</td><td class="ch">Davet &middot; referans &middot; PR</td><td class="arg">"Az bulunur, prestijli."</td></tr></tbody></table></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow coral">B&uuml;t&ccedil;e mant&#305;&#287;&#305;</span><h2 class="big">Paray&#305; <em class="grad">b&uuml;y&uuml;yen yere</em> koy.</h2><p class="lead soft">Her hav&uuml;z e&#351;it de&#287;il. &Ouml;l&ccedil;&uuml;t: edinme maliyeti, sat&#305;&#351; h&#305;z&#305;, &ouml;l&ccedil;eklenebilirlik. Test et &mdash; kazanan&#305; b&uuml;y&uuml;t.</p><div class="numbers"><div class="nb"><div class="big">&#8378;X</div><div class="lb">Lead maliyeti / hav&uuml;z</div></div><div class="nbar">&rarr;</div><div class="nb"><div class="big">%</div><div class="lb">Lead &rarr; randevu</div></div><div class="nbar">&rarr;</div><div class="nb"><div class="big">%</div><div class="lb">Randevu &rarr; sat&#305;&#351;</div></div><div class="nbar">&rarr;</div><div class="nb win"><div class="big">&#8378;</div><div class="lb">Sat&#305;&#351; ba&#351;&#305;na maliyet</div></div></div><p class="note">Kural: k&uuml;&ccedil;&uuml;k test &rarr; kazanan&#305; &ouml;l&ccedil;ekle.</p></div></section>
+  <section class="slide ws"><div class="slide-inner" style="display:flex;justify-content:center"><div class="ws-card"><span class="ws-tag">&#10022; B&ouml;l&uuml;m sonu &middot; Sorular &amp; Aksiyonlar</span><h2>Kanal &amp; b&uuml;t&ccedil;eyi ba&#287;layal&#305;m</h2><div class="wstwo"><div><h3 style="color:var(--navy)">Cevaplayal&#305;m</h3><ul class="qlist"><li>Lider 2-3 hav&uuml;z + kanal hangileri?</li><li>Kanal ba&#351;&#305;na ba&#351;lang&#305;&ccedil; b&uuml;t&ccedil;esi?</li><li>Nerede &ouml;nce test, nerede &ouml;l&ccedil;ek?</li><li>Portal &ouml;ne &ccedil;&#305;karma anla&#351;mas&#305; gerekli mi?</li></ul></div><div><h3 style="color:var(--coral)">Aksiyon &middot; sahip &middot; tarih</h3><div class="fillrow"><span class="fl">Aksiyon 1</span><span class="fv">&hellip; / &hellip; / &hellip;</span></div><div class="fillrow"><span class="fl">Aksiyon 2</span><span class="fv">&hellip; / &hellip; / &hellip;</span></div><div class="fillrow" style="border-bottom:none"><span class="fl">Aksiyon 3</span><span class="fv">&hellip; / &hellip; / &hellip;</span></div></div></div></div></div></section>
+  <section class="slide divider"><div class="holo"></div><div class="slide-inner"><div class="num">03</div><h2>Kampanya &amp; &#304;&ccedil;erik</h2><p class="dsub">Yaz&#305;n hero teklifleri, kampanya kanvas&#305;, &uuml;retim h&#305;z&#305;.</p></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow">Yaz&#305;n &ccedil;ekici g&uuml;c&uuml;</span><h2 class="big">Hangi <em class="grad">hero teklif?</em></h2><p class="lead soft">Her hav&uuml;z bir "&#351;imdi al" sebebi ister. Yaz&#305;n hangi teklif tetikler?</p><div class="pools" style="margin-top:22px"><div class="pool"><h3>Yerli yat&#305;r&#305;mc&#305;</h3><ul><li>Faiz d&uuml;&#351;t&uuml; &mdash; uygun &ouml;deme</li><li>Metro &ouml;ncesi giri&#351;</li><li>Erken al&#305;c&#305; fiyat sabitleme</li></ul></div><div class="pool"><h3>&#304;lk ev / aile</h3><ul><li>Banka i&#351; birlikli kredi</li><li>Taksit + teslim garantisi</li><li>&Ouml;rnek daire g&uuml;nleri</li></ul></div><div class="pool"><h3>Vatanda&#351;l&#305;k</h3><ul><li>S&#305;n&#305;rl&#305; kontenjan + h&#305;zl&#305; tapu</li><li>"Endi&#351;esiz s&uuml;re&ccedil;" paketi</li></ul></div><div class="pool"><h3>&Uuml;st segment</h3><ul><li>Davetli lansman</li><li>Az bulunurluk + concierge</li></ul></div></div></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow coral">Kampanya kanvas&#305;</span><h2 class="big">Persona &times; senaryo <em class="grad">&mdash; yaz takvimi</em></h2><p class="lead soft">16 h&uuml;cre = yaz boyu ne &uuml;reteceğinizin haritas&#305;. Bo&#351; h&uuml;creleri birlikte doldural&#305;m.</p><div class="campwrap"><div class="campmatrix"><div class="campcell head"></div><div class="campcell head">Fark&#305;ndal&#305;k</div><div class="campcell head">&#304;lgi</div><div class="campcell head">De&#287;erlendirme</div><div class="campcell head">Karar</div><div class="campcell rowhead">Yat&#305;r&#305;mc&#305;</div><div class="campcell">"Reel ucuz" reels</div><div class="campcell">Getiri hesaplay&#305;c&#305;</div><div class="campcell">Emsal + yield raporu</div><div class="campcell">Opsiyon + &ouml;deme plan&#305;</div><div class="campcell rowhead">&#304;lk ev</div><div class="campcell">"Faiz d&uuml;&#351;t&uuml;" lokal</div><div class="campcell">Taksit sim&uuml;lasyonu</div><div class="campcell">&Ouml;rnek daire g&uuml;n&uuml;</div><div class="campcell">Banka + teslim garantisi</div><div class="campcell rowhead">Vatanda&#351;l&#305;k</div><div class="campcell">"Tek daire = pasaport"</div><div class="campcell">S&uuml;re&ccedil; rehberi</div><div class="campcell">Webinar + broker 1:1</div><div class="campcell">Kontenjan + h&#305;zl&#305; tapu</div><div class="campcell rowhead">Oturum</div><div class="campcell">"Huzurlu ya&#351;am" AB</div><div class="campcell">Ya&#351;am rehberi</div><div class="campcell">Sanal tur + referans</div><div class="campcell">&#304;kamet deste&#287;i</div></div></div></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow">&Uuml;retim h&#305;z&#305;</span><h2 class="big">Strateji sizde, <em class="grad">&uuml;retim 10&times; h&#305;zl&#305;.</em></h2><p class="lead soft">Yarat&#305;c&#305; karar ve marka sizde kal&#305;r; varyant &uuml;retimi h&#305;zlan&#305;r. Tek brief&#39;ten her hav&uuml;za ayr&#305; metin/g&ouml;rsel &mdash; QA sizde.</p><div class="flow" style="margin-top:26px"><div class="step"><span class="n">01</span><h3>Brief</h3><p>Hav&uuml;z + senaryo + teklif</p></div><div class="arr">&rarr;</div><div class="step"><span class="n">02</span><h3>Varyant</h3><p>10 metin + g&ouml;rsel</p></div><div class="arr">&rarr;</div><div class="step"><span class="n">03</span><h3>QA</h3><p>Marka + do&#287;ruluk (siz)</p></div><div class="arr">&rarr;</div><div class="step"><span class="n">04</span><h3>Yay&#305;n</h3><p>Kazanan &ouml;l&ccedil;eklenir</p></div></div></div></section>
+  <section class="slide ws"><div class="slide-inner" style="display:flex;justify-content:center"><div class="ws-card"><span class="ws-tag">&#10022; B&ouml;l&uuml;m sonu &middot; Sorular &amp; Aksiyonlar</span><h2>Kampanyay&#305; ba&#287;layal&#305;m</h2><div class="wstwo"><div><h3 style="color:var(--navy)">Cevaplayal&#305;m</h3><ul class="qlist"><li>Her hav&uuml;z i&ccedil;in hero teklif ne?</li><li>&#304;lk 3 kampanya hangileri?</li><li>&#304;&ccedil;erik takvimi / kadans?</li><li>Kim &uuml;retir, kim QA yapar?</li></ul></div><div><h3 style="color:var(--coral)">Aksiyon &middot; sahip &middot; tarih</h3><div class="fillrow"><span class="fl">Aksiyon 1</span><span class="fv">&hellip; / &hellip; / &hellip;</span></div><div class="fillrow"><span class="fl">Aksiyon 2</span><span class="fv">&hellip; / &hellip; / &hellip;</span></div><div class="fillrow" style="border-bottom:none"><span class="fl">Aksiyon 3</span><span class="fv">&hellip; / &hellip; / &hellip;</span></div></div></div></div></div></section>
+  <section class="slide divider"><div class="holo"></div><div class="slide-inner"><div class="num">04</div><h2>Marka &amp; &#304;&#351; Geli&#351;tirme</h2><p class="dsub">Konumland&#305;rma + talep &ccedil;o&#287;altan yap&#305;sal kanallar.</p></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow">Konumland&#305;rma</span><h2 class="big">Babacan ne <em class="grad">vaat ediyor?</em></h2><p class="lead soft">Marka bir slogan de&#287;il, yap&#305;sal bir vaat. "Yan&#305;n&#305;zday&#305;z" ancak yap&#305;yla inand&#305;r&#305;c&#305; olur &mdash; yabanc&#305; al&#305;c&#305;da g&uuml;ven her &#351;ey.</p><ul class="qlist" style="margin-top:20px;max-width:840px"><li><strong>&#350;effaf all-in fiyat</strong> &mdash; gizli masraf yok</li><li><strong>S&uuml;re&ccedil; tek elden</strong> &mdash; tapu, vatanda&#351;l&#305;k, sat&#305;&#351; sonras&#305;</li><li><strong>Se&ccedil;ilmi&#351; itibar</strong> &mdash; teslim ge&ccedil;mi&#351;i, ger&ccedil;ek referans</li><li><strong>Tek c&uuml;mlelik konumland&#305;rma</strong> &mdash; bug&uuml;n karara ba&#287;lan&#305;r</li></ul></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow coral">&#304;&#351; geli&#351;tirme</span><h2 class="big">Talep yaln&#305;z reklamla gelmez &mdash; <em class="grad">yap&#305; kurarak gelir.</em></h2><p class="lead soft">Pazarlama talebi &ccedil;eker; i&#351; geli&#351;tirme onu &ccedil;o&#287;altan kanallar kurar. Yaz&#305;n hangi yap&#305;lar&#305; kuraca&#287;&#305;z?</p><div class="pools" style="margin-top:22px"><div class="pool"><h3>Broker / acente</h3><ul><li>Yerli + uluslararas&#305; temsilci</li><li>Komisyon + e&#287;itim</li></ul></div><div class="pool"><h3>Referans program&#305;</h3><ul><li>Mevcut al&#305;c&#305; + dan&#305;&#351;man</li><li>&Ouml;d&uuml;ll&uuml; tavsiye</li></ul></div><div class="pool"><h3>Kurumsal / toplu</h3><ul><li>&#350;irket, fon, banka i&#351;tiraki</li><li>Toplu sat&#305;&#351; paketi</li></ul></div><div class="pool"><h3>Etkinlik / fuar</h3><ul><li>Yurtd&#305;&#351;&#305; vatanda&#351;l&#305;k fuarlar&#305;</li><li>Lansman / &ouml;rnek daire g&uuml;nleri</li></ul></div><div class="pool"><h3>Stratejik ortak</h3><ul><li>Banka kredi i&#351; birli&#287;i</li><li>Relocation / expat hizmetleri</li></ul></div></div></div></section>
+  <section class="slide ws"><div class="slide-inner" style="display:flex;justify-content:center"><div class="ws-card"><span class="ws-tag">&#10022; B&ouml;l&uuml;m sonu &middot; Sorular &amp; Aksiyonlar</span><h2>Marka &amp; BD'yi ba&#287;layal&#305;m</h2><div class="wstwo"><div><h3 style="color:var(--navy)">Cevaplayal&#305;m</h3><ul class="qlist"><li>Tek c&uuml;mlelik konumland&#305;rma ne?</li><li>Bu yaz hangi 3 BD hamlesi?</li><li>Hangi broker / acente / ortak hedefleniyor?</li><li>Hangi fuar / etkinlik takvime giriyor?</li></ul></div><div><h3 style="color:var(--coral)">Aksiyon &middot; sahip &middot; tarih</h3><div class="fillrow"><span class="fl">Aksiyon 1</span><span class="fv">&hellip; / &hellip; / &hellip;</span></div><div class="fillrow"><span class="fl">Aksiyon 2</span><span class="fv">&hellip; / &hellip; / &hellip;</span></div><div class="fillrow" style="border-bottom:none"><span class="fl">Aksiyon 3</span><span class="fv">&hellip; / &hellip; / &hellip;</span></div></div></div></div></div></section>
+  <section class="slide divider"><div class="holo"></div><div class="slide-inner"><div class="num">05</div><h2>&Ouml;l&ccedil;&uuml;m &amp; Aksiyon Plan&#305;</h2><p class="dsub">Skor tablosu + her &#351;eyi tek sayfada toplayal&#305;m.</p></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow">Skor tablosu</span><h2 class="big">Pazarlama&ndash;sat&#305;&#351; <em class="grad">tek panoda.</em></h2><p class="lead soft">Hafta hafta tek ekran: hangi kampanya/hav&uuml;z ka&ccedil; daire eritti, lead ka&ccedil; dakikada sat&#305;&#351;a d&uuml;&#351;t&uuml;.</p><div class="two" style="margin-top:22px"><div class="panel"><h3>Pazarlama verir</h3><ul class="qlist"><li>Hav&uuml;z + beklenti etiketli lead</li><li>Kaynak + kampanya bilgisi</li><li>5 dakikada sat&#305;&#351;a d&uuml;&#351;er</li></ul></div><div class="panel" style="background:var(--coral-soft)"><h3>Sat&#305;&#351; geri besler</h3><ul class="qlist"><li>Lead kaliteliydi mi?</li><li>Hangi mesaj d&ouml;n&uuml;&#351;t&uuml;?</li><li>Pazarlama ayar &ccedil;eker</li></ul></div></div></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow coral">&#304;stedi&#287;iniz sistem</span><h2 class="big">Hayalini kurdu&#287;unuz <em class="grad">her &#351;ey kurulabilir.</em></h2><table class="matrix"><thead><tr><th>Dilek</th><th>Bu yap&#305;labilir &mdash; Ali altyap&#305;s&#305;</th></tr></thead><tbody><tr><td>Her hav&uuml;za ayr&#305; i&ccedil;erik, dakikada</td><td class="arg ch">AI i&ccedil;erik fabrikas&#305;</td></tr><tr><td>Hangi kampanya daire eritti g&ouml;reyim</td><td class="arg ch">Hav&uuml;z ba&#351;&#305;na lead&rarr;sat&#305;&#351; panosu</td></tr><tr><td>Sat&#305;lamayan&#305; do&#287;ru kitleye ta&#351;&#305;</td><td class="arg ch">Stok ya&#351;lanma + remarketing</td></tr><tr><td>Broker ve lead&#39;i tek yerde y&ouml;net</td><td class="arg ch">CRM + portal + WhatsApp entegrasyonu</td></tr></tbody></table><p class="note"><em>Bizde bunlar olsa s&uuml;per olur</em> dedi&#287;iniz her &#351;ey &mdash; yaz&#305;n altyap&#305; plan&#305;.</p></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow">&Ccedil;&#305;kt&#305;</span><h2 class="big">Yaz <em class="grad">Aksiyon Plan&#305;</em> &mdash; tek sayfa</h2><div class="panel" style="margin-top:20px;background:#fff;max-width:900px"><div class="fillrow"><span class="fl">Yaz hedefi (daire)</span><span class="fv">&hellip;&hellip;&hellip;</span></div><div class="fillrow"><span class="fl">&Ouml;ncelikli hav&uuml;zlar</span><span class="fv">&hellip;&hellip;&hellip;</span></div><div class="fillrow"><span class="fl">Lider kanallar + b&uuml;t&ccedil;e</span><span class="fv">&hellip;&hellip;&hellip;</span></div><div class="fillrow"><span class="fl">Hero teklifler</span><span class="fv">&hellip;&hellip;&hellip;</span></div><div class="fillrow"><span class="fl">&#304;lk 3 kampanya</span><span class="fv">&hellip;&hellip;&hellip;</span></div><div class="fillrow"><span class="fl">&#304;&#351; geli&#351;tirme hamleleri</span><span class="fv">&hellip;&hellip;&hellip;</span></div><div class="fillrow"><span class="fl">&Ouml;l&ccedil;&uuml;m metri&#287;i</span><span class="fv">eriyen daire / hav&uuml;z maliyeti</span></div><div class="fillrow" style="border-bottom:none"><span class="fl" style="color:var(--coral)">30-60-90 sahibi</span><span class="fv">&hellip;&hellip;&hellip;</span></div></div></div></section>
+  <section class="slide closing"><div class="holo"></div><div class="slide-inner"><span class="eyebrow">Bug&uuml;nden sonra</span><h2 class="mega">Plan haz&#305;r.<br><em class="grad">Hadi eritelim.</em></h2><p class="lead soft" style="margin-top:18px;max-width:700px">Tek sayfa, net sahipler, net tarihler &mdash; ve arkas&#305;nda b&uuml;y&uuml;yen bir altyap&#305;.</p><div class="endcard" style="max-width:760px"><div class="big">Do&#287;ru persona,<br><em class="grad">do&#287;ru kanal, do&#287;ru an.</em></div><div class="c">Gizem Burte&ccedil;in &amp; Dr. Hakan Tetik<br>gizem@alisales.ai</div></div></div></section>
+</div><div class="nav"><button id="prev">&lsaquo;</button><span class="count" id="count">1 / 25</span><button id="next">&rsaquo;</button></div><script>var slides=[].slice.call(document.querySelectorAll(".slide"));var count=document.getElementById("count");var prog=document.getElementById("prog");var total=slides.length;var idx=0;var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");idx=slides.indexOf(e.target);count.textContent=(idx+1)+" / "+total;prog.style.width=((idx+1)/total*100)+"%";}});},{threshold:.5});slides.forEach(function(s){io.observe(s);});function go(i){i=Math.max(0,Math.min(total-1,i));slides[i].scrollIntoView({behavior:"smooth"});}document.getElementById("next").onclick=function(){go(idx+1);};document.getElementById("prev").onclick=function(){go(idx-1);};window.addEventListener("keydown",function(e){if(["ArrowRight","ArrowDown"," ","PageDown"].indexOf(e.key)>-1){e.preventDefault();go(idx+1);}if(["ArrowLeft","ArrowUp","PageUp"].indexOf(e.key)>-1){e.preventDefault();go(idx-1);}});</script></body></html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Babacan &mdash; Sat&#305;&#351; Sistemi &Ccedil;al&#305;&#351;tay&#305;</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"><style>
+  :root{
+    --navy:#17255C; --navy-deep:#0E1844; --ink:#1B2030;
+    --pur:#8E7BE8; --lil:#C6A6DF; --peach:#F2B79C; --pink:#E79DC4;
+    --coral:#F08456; --coral-soft:#FBE4D8;
+    --lav:#B4A6EC; --lav-soft:#F0ECFB; --lav-panel:#EBE5FA;
+    --soft:#6A7088; --line:#E8EAF2; --bg:#FFFFFF; --mint:#7FC4A3; --mint-soft:#E2F2EA;
+    --red:#E06A6A;
+    --grad: linear-gradient(102deg, var(--pur) 0%, var(--lil) 42%, var(--peach) 100%);
+    --grad-w: linear-gradient(102deg,#A89AF0 0%,#D6B6E8 45%,#F4C3AB 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  h1,h2,h3{font-family:'Sora',sans-serif;letter-spacing:-.025em;line-height:1.05}
+  em{font-style:normal}
+  .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  .deck{scroll-snap-type:y mandatory;height:100vh;overflow-y:scroll}
+  .slide{scroll-snap-align:start;min-height:100vh;width:100%;position:relative;
+    display:flex;flex-direction:column;justify-content:center;
+    padding:6vh 7vw;overflow:hidden}
+  .slide-inner{width:100%;max-width:1140px;margin:0 auto;position:relative;z-index:2;
+    opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+  .slide.in .slide-inner{opacity:1;transform:none}
+
+  .brand{position:absolute;top:4.2vh;right:7vw;z-index:5;font-family:'Sora';font-weight:800;font-size:21px;letter-spacing:-.03em;color:var(--navy)}
+  .brand .ai{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .brand .spark{color:var(--lav);font-size:14px;vertical-align:super}
+  .eyebrow{font-family:'Space Mono';font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--lav);font-weight:700;margin-bottom:18px;display:inline-block}
+  .eyebrow.coral{color:var(--coral)}
+
+  .holo{position:absolute;inset:0;z-index:0;overflow:hidden}
+  .holo::before{content:"";position:absolute;width:90vw;height:90vw;left:-10vw;top:-30vh;border-radius:50%;
+    background:
+      radial-gradient(closest-side at 35% 40%, rgba(142,123,232,.55), transparent 70%),
+      radial-gradient(closest-side at 65% 55%, rgba(231,157,196,.5), transparent 70%),
+      radial-gradient(closest-side at 55% 70%, rgba(242,183,156,.5), transparent 70%),
+      radial-gradient(closest-side at 75% 35%, rgba(180,166,236,.5), transparent 70%),
+      radial-gradient(closest-side at 45% 60%, rgba(127,196,163,.4), transparent 70%);
+    filter:blur(38px);opacity:.95;animation:drift 22s ease-in-out infinite alternate}
+  @keyframes drift{from{transform:translate(0,0) rotate(0deg) scale(1)}to{transform:translate(4vw,3vh) rotate(8deg) scale(1.08)}}
+  .holo.soft::before{opacity:.5;width:55vw;height:55vw;left:auto;right:-12vw;top:auto;bottom:-25vh;filter:blur(50px)}
+
+  .cover h1{font-size:clamp(42px,7vw,86px);font-weight:800;color:var(--navy);margin-bottom:6px}
+  .cover .sub{font-size:clamp(16px,2.2vw,23px);font-weight:600;color:var(--ink);max-width:680px;margin-top:10px}
+  .cover .rule{height:1px;background:var(--line);margin:34px 0 18px;max-width:760px}
+  .cover .meta{display:flex;justify-content:space-between;max-width:760px;font-weight:700;font-size:15px;color:var(--navy);flex-wrap:wrap;gap:10px}
+  .cover .meta .soft{color:var(--soft);font-weight:600}
+
+  h2.big{font-size:clamp(32px,5.2vw,60px);font-weight:800;color:var(--navy);margin-bottom:16px}
+  h2.big.g{color:transparent}
+  .lead{font-size:clamp(16px,1.9vw,20px);color:var(--ink);max-width:780px;line-height:1.5}
+  .lead.soft{color:var(--soft)}
+  .kicker{font-size:clamp(15px,1.7vw,18px);color:var(--soft);max-width:740px;line-height:1.55;margin-top:14px}
+
+  .divider .num{font-family:'Sora';font-weight:800;font-size:clamp(90px,20vw,230px);line-height:.8;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.05em}
+  .divider h2{font-size:clamp(32px,6vw,66px);font-weight:800;color:var(--navy);margin-top:4px}
+  .divider .dsub{font-size:18px;color:var(--soft);font-weight:600;margin-top:14px;max-width:640px}
+
+  .agenda{display:grid;grid-template-columns:repeat(2,1fr);gap:10px 40px;margin-top:24px}
+  .ag-row{display:flex;gap:16px;align-items:flex-start;padding:12px 0;border-top:1px solid var(--line)}
+  .ag-row .t{font-family:'Space Mono';font-weight:700;color:var(--coral);font-size:13px;min-width:64px;padding-top:3px}
+  .ag-row .b strong{display:block;font-family:'Sora';font-weight:700;font-size:16px;color:var(--navy);margin-bottom:2px}
+  .ag-row .b span{font-size:13.5px;color:var(--soft)}
+
+  .flow{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
+  .flow .step{flex:1;min-width:135px;background:var(--lav-soft);border:1px solid var(--line);border-radius:18px;padding:20px 18px;position:relative}
+  .flow .step .n{font-family:'Space Mono';font-size:12px;color:var(--lav);font-weight:700}
+  .flow .step h3{font-size:18px;color:var(--navy);margin:8px 0 6px}
+  .flow .step p{font-size:13px;color:var(--soft);line-height:1.4}
+  .flow .arr{align-self:center;color:var(--lil);font-size:20px;font-weight:700}
+
+  .numbers{display:flex;gap:10px;align-items:stretch;margin-top:30px;flex-wrap:wrap}
+  .nb{flex:1;min-width:120px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px 16px;text-align:center;box-shadow:0 8px 24px rgba(23,37,92,.05)}
+  .nb .big{font-family:'Sora';font-weight:800;font-size:clamp(32px,5vw,52px);color:var(--navy);line-height:1}
+  .nb .lb{font-size:12.5px;color:var(--soft);margin-top:10px;font-weight:600;line-height:1.3}
+  .nb.win .big{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .nbar{align-self:center;color:var(--lil);font-size:24px;font-weight:800}
+
+  .years{display:flex;flex-direction:column;gap:0;margin-top:26px;max-width:780px}
+  .yr{display:flex;gap:22px;align-items:baseline;padding:15px 0;border-bottom:1px solid var(--line)}
+  .yr .y{font-family:'Sora';font-weight:800;font-size:28px;color:var(--navy);min-width:90px}
+  .yr .d{font-size:16px;color:var(--ink);font-weight:500}
+  .yr.hot .y{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .yr.hot .d{font-weight:700;color:var(--navy)}
+
+  .ladder{display:flex;flex-direction:column;gap:12px;margin-top:26px;max-width:900px}
+  .rung{display:flex;gap:18px;align-items:flex-start;background:#fff;border:1px solid var(--line);border-radius:16px;padding:17px 20px;border-left:5px solid}
+  .rung.lo{border-left-color:var(--red)} .rung.mid{border-left-color:var(--coral)} .rung.hi{border-left-color:var(--mint)}
+  .rung .lvl{font-family:'Space Mono';font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;min-width:118px;padding-top:3px}
+  .rung.lo .lvl{color:var(--red)} .rung.mid .lvl{color:var(--coral)} .rung.hi .lvl{color:var(--mint)}
+  .rung .rb strong{display:block;font-family:'Sora';color:var(--navy);font-size:16px;margin-bottom:3px}
+  .rung .rb span{font-size:14px;color:var(--soft);line-height:1.4}
+
+  .pillars3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:26px}
+  .pcol{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;border-top:4px solid var(--lav)}
+  .pcol:nth-child(2){border-top-color:var(--coral)} .pcol:nth-child(3){border-top-color:var(--mint)}
+  .pcol h3{font-size:18px;color:var(--navy);margin-bottom:6px}
+  .pcol .ph{font-size:12px;color:var(--soft);margin-bottom:14px;font-weight:600}
+  .pcol ul{list-style:none;font-size:13.5px;color:var(--ink);line-height:1.9}
+  .pcol ul li::before{content:"·";color:var(--lav);font-weight:800;margin-right:8px}
+
+  .voice{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px}
+  .qcard{background:var(--lav-soft);border-radius:16px;padding:20px 22px;border-left:4px solid var(--lil)}
+  .qcard p{font-size:15px;font-style:italic;color:var(--ink);line-height:1.5}
+  .qcard .src{font-family:'Space Mono';font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--pur);margin-top:10px;text-transform:uppercase;font-style:normal}
+
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:16px;margin-top:28px}
+  .stat{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px 22px;box-shadow:0 8px 28px rgba(23,37,92,.05)}
+  .stat .v{font-family:'Sora';font-weight:800;font-size:38px;color:var(--coral);line-height:1}
+  .stat .l{font-size:14px;color:var(--soft);margin-top:10px;line-height:1.4}
+
+  .reasons{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-top:26px}
+  .reason{display:flex;gap:14px;align-items:flex-start;background:var(--coral-soft);border-radius:16px;padding:18px}
+  .reason .rn{font-family:'Sora';font-weight:800;font-size:22px;color:var(--coral);min-width:26px}
+  .reason p{font-size:15px;color:var(--ink);font-weight:600;line-height:1.35}
+
+  .pools{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:14px;margin-top:26px}
+  .pool{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;border-top:4px solid var(--lav);transition:transform .25s,box-shadow .25s}
+  .pool:hover{transform:translateY(-5px);box-shadow:0 16px 36px rgba(23,37,92,.1)}
+  .pool h3{font-size:18px;color:var(--navy);margin-bottom:8px}
+  .pool .need{font-size:13px;color:var(--coral);font-weight:700;margin-bottom:10px}
+  .pool ul{list-style:none;font-size:13px;color:var(--soft);line-height:1.7}
+  .pool ul li::before{content:"·";color:var(--lav);font-weight:800;margin-right:7px}
+  .pool:nth-child(2){border-top-color:var(--pink)} .pool:nth-child(3){border-top-color:var(--coral)}
+  .pool:nth-child(4){border-top-color:var(--mint)} .pool:nth-child(5){border-top-color:var(--peach)}
+
+  .matrix{width:100%;border-collapse:separate;border-spacing:0;margin-top:24px;font-size:14px}
+  .matrix th{font-family:'Space Mono';text-transform:uppercase;font-size:11px;letter-spacing:.1em;color:var(--lav);text-align:left;padding:0 14px 12px;font-weight:700}
+  .matrix td{padding:13px 14px;border-top:1px solid var(--line);vertical-align:top;line-height:1.4}
+  .matrix tr td:first-child{font-family:'Sora';font-weight:700;color:var(--navy);width:20%}
+  .matrix .arg{color:var(--ink);font-weight:500}
+  .matrix .ch{color:var(--coral);font-weight:600;font-size:13px}
+
+  .units{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:26px}
+  .unit{background:#fff;border:1px solid var(--line);border-radius:20px;padding:24px;box-shadow:0 10px 30px rgba(23,37,92,.06)}
+  .unit .id{font-family:'Space Mono';font-weight:700;font-size:13px;color:var(--lav);letter-spacing:.05em}
+  .unit h3{font-size:25px;color:var(--navy);margin:4px 0 16px}
+  .tag{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:7px 13px;border-radius:30px;margin:0 6px 8px 0}
+  .tag.y{background:var(--lav-soft);color:var(--navy)} .tag.n{background:#F4F2F6;color:#A6A2B0;text-decoration:line-through}
+
+  .chips{display:flex;flex-wrap:wrap;gap:11px;margin-top:24px}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 18px;font-size:14px;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:10px;box-shadow:0 4px 14px rgba(23,37,92,.04)}
+  .chip b{font-family:'Sora';color:var(--coral)}
+  .insight{margin-top:24px;background:var(--navy);color:#fff;border-radius:18px;padding:22px 26px;font-size:17px;font-weight:600;max-width:680px;display:flex;align-items:center;gap:16px}
+  .insight .av{font-family:'Sora';font-weight:800;font-size:15px;background:var(--grad-w);-webkit-background-clip:text;background-clip:text;color:transparent;min-width:34px}
+
+  .slide.ws{background:linear-gradient(135deg,#F6F2FD,#FBF1F2)}
+  .ws-card{background:#fff;border-radius:24px;padding:40px;box-shadow:0 24px 60px rgba(23,37,92,.12);max-width:880px;border:1px solid var(--line)}
+  .ws-tag{display:inline-flex;align-items:center;gap:9px;font-family:'Space Mono';font-size:12px;letter-spacing:.16em;color:#fff;background:var(--grad);padding:8px 16px;border-radius:30px;font-weight:700;text-transform:uppercase}
+  .ws-card h2{font-size:clamp(26px,3.6vw,40px);color:var(--navy);margin:18px 0 8px;font-weight:800}
+  .ws-steps{margin-top:20px;display:flex;flex-direction:column;gap:11px}
+  .ws-steps li{list-style:none;display:flex;gap:14px;font-size:16px;color:var(--ink)}
+  .ws-steps li .d{font-family:'Sora';font-weight:800;color:var(--lav)}
+  .ws-time{margin-top:22px;font-family:'Space Mono';font-size:13px;color:var(--coral);font-weight:700}
+
+  .layers{display:flex;gap:0;margin-top:30px;align-items:stretch;flex-wrap:wrap}
+  .layer{flex:1;min-width:200px;padding:24px;border-radius:18px;position:relative}
+  .layer.s1{background:var(--navy);color:#fff} .layer.s2{background:var(--lav-panel)} .layer.s3{background:var(--coral-soft)}
+  .layer .ln{font-family:'Space Mono';font-size:11px;letter-spacing:.15em;font-weight:700;opacity:.8;text-transform:uppercase}
+  .layer h3{font-size:21px;margin:8px 0 8px} .layer.s1 h3{color:#fff} .layer.s2 h3,.layer.s3 h3{color:var(--navy)}
+  .layer p{font-size:14px;line-height:1.45} .layer.s1 p{color:#D5DAEC} .layer.s2 p,.layer.s3 p{color:var(--soft)}
+  .layer .who{margin-top:12px;font-size:12px;font-weight:700;font-family:'Space Mono'}
+  .layer.s1 .who{color:var(--lav)} .layer.s2 .who{color:var(--pur)} .layer.s3 .who{color:var(--coral)}
+  .note{margin-top:22px;font-size:16px;font-weight:700;color:var(--navy)}
+  .note em{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin-top:26px;align-items:start}
+  .qlist{list-style:none;display:flex;flex-direction:column;gap:11px}
+  .qlist li{font-size:16px;color:var(--ink);padding-left:26px;position:relative;line-height:1.4}
+  .qlist li::before{content:"\2192";position:absolute;left:0;color:var(--lav);font-weight:700}
+  .panel{background:var(--lav-soft);border-radius:20px;padding:26px;border:1px solid var(--line)}
+  .panel h3{font-size:18px;color:var(--navy);margin-bottom:14px}
+  .scriptbox{background:#fff;border-radius:14px;padding:16px 18px;font-size:14px;line-height:1.5;color:var(--ink);border:1px solid var(--line);margin-bottom:12px}
+  .scriptbox .who{font-family:'Space Mono';font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:block;margin-bottom:6px}
+  .scriptbox.ru .who{color:var(--pur)} .scriptbox.tr .who{color:var(--coral)}
+
+  .closing h2{font-size:clamp(32px,5.2vw,58px);font-weight:800;color:var(--navy)}
+  .pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:30px}
+  .pillar{background:#fff;border:1px solid var(--line);border-radius:18px;padding:24px;text-align:left}
+  .pillar .pn{font-family:'Space Mono';font-size:12px;color:var(--lav);font-weight:700}
+  .pillar h3{font-size:19px;color:var(--navy);margin:8px 0 8px}
+  .pillar p{font-size:14px;color:var(--soft);line-height:1.45}
+  .endcard{margin-top:30px;display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid var(--line);padding-top:22px;flex-wrap:wrap;gap:14px}
+  .endcard .big{font-family:'Sora';font-weight:800;font-size:clamp(26px,3.4vw,40px);color:var(--navy)}
+  .endcard .c{font-size:14px;color:var(--soft);line-height:1.7;font-weight:600;text-align:right}
+
+  .nav{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:30px;padding:8px 16px;box-shadow:0 8px 24px rgba(23,37,92,.1)}
+  .nav button{border:none;background:none;cursor:pointer;font-size:18px;color:var(--navy);font-weight:700;line-height:1;padding:4px 8px;border-radius:8px}
+  .nav button:hover{background:var(--lav-soft)}
+  .nav .count{font-family:'Space Mono';font-size:12px;color:var(--soft);font-weight:700;min-width:52px;text-align:center}
+  .prog{position:fixed;top:0;left:0;height:3px;background:var(--grad);z-index:40;transition:width .3s}
+
+  .srcnote{font-family:'Space Mono';font-size:11px;color:var(--soft);margin-top:20px;letter-spacing:.02em}
+  .bignum{font-family:'Sora';font-weight:800;font-size:clamp(30px,4.6vw,48px);line-height:1;color:var(--navy)}
+  .bignum.coral{color:var(--coral)} .bignum.g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .pyramid{display:flex;flex-direction:column;align-items:center;gap:7px;margin:26px auto 0;max-width:780px}
+  .plv{color:#fff;border-radius:8px;padding:11px 16px;text-align:center}
+  .plv .nm{font-family:'Sora';font-weight:800;font-size:15px;line-height:1.15}
+  .plv .q{font-size:12px;opacity:.92;font-weight:500;font-style:italic}
+  .vcol{padding:22px;border-radius:18px}
+  .vcol.no{background:var(--coral-soft);border:1px solid #F3CDBC}
+  .vcol.yes{background:#EAF1F8;border:1px solid #CFE0F0}
+  .vcol h3{font-size:16px;margin-bottom:14px}
+  .vrow{font-size:13.5px;line-height:1.4;padding:9px 0;border-top:1px solid rgba(0,0,0,.06)}
+  .vrow:first-of-type{border-top:none}
+  .mega{font-family:'Sora';font-weight:800;font-size:clamp(40px,7.2vw,86px);color:var(--navy);line-height:1.02;letter-spacing:-.03em}
+  .pin{display:inline-flex;align-items:center;gap:10px;font-family:'Space Mono';font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:30px;padding:10px 20px;margin-top:26px;box-shadow:0 6px 20px rgba(23,37,92,.08)}
+  .fillrow{display:flex;justify-content:space-between;gap:14px;padding:13px 0;border-bottom:1px dashed var(--line);font-size:15px;align-items:baseline}
+  .fillrow .fl{font-family:'Sora';font-weight:700;color:var(--navy);min-width:180px}
+  .fillrow .fv{flex:1;color:#C7C5D2;font-style:italic;text-align:right}
+  .journey{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-top:20px;max-width:980px}
+  .jp{background:var(--lav-soft);border:1px solid var(--line);border-radius:20px;padding:7px 12px;font-size:12px;font-weight:600;color:var(--navy)}
+  .jp.key{background:var(--coral-soft);color:var(--coral);border-color:#F3CDBC}
+  .jsep{color:var(--lil);font-weight:800;font-size:12px}
+  .bigline{font-family:'Sora';font-weight:800;line-height:1.18;letter-spacing:-.02em;font-size:clamp(24px,3.6vw,42px)}
+  .chips2{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+  .chip2{background:#fff;border:1px solid var(--line);border-radius:14px;padding:11px 16px;font-size:14px;font-weight:600;color:var(--navy);box-shadow:0 4px 14px rgba(23,37,92,.04)}
+  .chip2.on{background:var(--mint-soft);color:var(--mint);border-color:#BFE2D0}
+  .chip2.off{background:var(--coral-soft);color:var(--coral);border-color:#F3CDBC}
+  .matrix.sm{font-size:12.5px}
+  .matrix.sm td{padding:10px 11px}
+  .matrix.sm tr td:first-child{width:auto}
+  @media(max-width:760px){
+    .slide{padding:9vh 7vw}
+    .agenda,.units,.two,.voice,.pillars3,.pillars{grid-template-columns:1fr}
+    .brand{font-size:17px;top:3vh}
+    .matrix{font-size:12px}.matrix td{padding:9px}
+  }
+  @media(prefers-reduced-motion:reduce){
+    .holo::before{animation:none}.slide-inner{transition:none;opacity:1;transform:none}
+  }
+</style></head><body><div class="prog" id="prog"></div><div class="brand">Sales<span class="ai">AI</span><span class="spark">&#10022;</span></div><div class="deck" id="deck">
+  <section class="slide cover"><div class="holo"></div><div class="slide-inner"><span class="eyebrow">Babacan GYO &times; SalesAI &middot; Sabah &middot; &ccedil;al&#305;&#351;ma oturumu</span><h1>Babacan<br><em class="grad">Sat&#305;&#351; Sistemi.</em></h1><p class="sub">E&#287;itim de&#287;il &mdash; sistemi birlikte tasar&#305;yoruz. Sabah sonunda hepimiz ayn&#305; sayfaday&#305;z.</p><div class="rule"></div><div class="meta"><span>3 saat &middot; &ccedil;al&#305;&#351;tay</span><span>Gizem Burte&ccedil;in</span></div></div></section>
+  <section class="slide"><div class="holo"></div><div class="slide-inner"><span class="eyebrow">Bu sabah</span><h2 class="mega">Bu bir e&#287;itim de&#287;il.<br><em class="grad">Sistemi kuruyoruz.</em></h2><p class="lead soft" style="margin-top:16px;max-width:760px">Bu masada sat&#305;&#351; yapmay&#305; bilen insanlar var. Sorun bilgi de&#287;il &mdash; <strong style="color:var(--navy)">ayn&#305; dili konu&#351;mamak, standart olmayan s&uuml;re&ccedil;, y&ouml;netilemeyen sat&#305;&#351;.</strong></p><div class="chips2"><div class="chip2">Ortak metod</div><div class="chip2">Ortak pipeline</div><div class="chip2">Ortak KPI</div><div class="chip2">Ortak m&uuml;&#351;teri deneyimi</div><div class="chip2">Pazarlama i&ccedil;in net ihtiya&ccedil; listesi</div></div></div></section>
+  <section class="slide"><div class="holo soft"></div><div class="slide-inner"><span class="eyebrow">G&uuml;n&uuml;n ak&#305;&#351;&#305;</span><h2 class="big">Tasar&#305;m <em class="grad">oturumu.</em></h2><div class="agenda"><div class="ag-row"><span class="t">09:00</span><div class="b"><strong>Ana problem &amp; neden buraday&#305;z</strong><span>"Sistem mi var?" &middot; vizyon &amp; sorun haritas&#305;</span></div></div><div class="ag-row"><span class="t">09:30</span><div class="b"><strong>Sat&#305;&#351; nas&#305;l de&#287;i&#351;ti + segmentler</strong><span>Sistem omurgas&#305; &middot; m&uuml;&#351;teri segmentleri &middot; stok eritme haritas&#305;</span></div></div><div class="ag-row"><span class="t">10:00</span><div class="b"><strong>Babacan sat&#305;&#351; yolculu&#287;u</strong><span>Duvar &ccedil;al&#305;&#351;mas&#305; &middot; nerede kaybediyoruz? <em>(kahve dahil)</em></span></div></div><div class="ag-row"><span class="t">10:45</span><div class="b"><strong>&#304;deal standart &amp; ortak dil</strong><span>Lead tan&#305;mlar&#305; &middot; ilk temas standard&#305;</span></div></div><div class="ag-row"><span class="t">11:20</span><div class="b"><strong>&Ccedil;al&#305;&#351;tay &amp; eylem plan&#305;</strong><span>10 aksiyon &middot; sert eylem tablosu &middot; manifesto</span></div></div></div></div></section>
+  <section class="slide"><div class="holo"></div><div class="slide-inner"><span class="eyebrow coral">Babacan, bug&uuml;n</span><h2 class="mega">Stok var. Lead var. Sat&#305;&#351; var.<br><em class="grad">Ama sistem mi var?</em></h2><div class="chips2"><div class="chip2 on">Stok &#10003;</div><div class="chip2 on">Lead &#10003;</div><div class="chip2 on">Sat&#305;&#351; &#10003;</div><div class="chip2 off">Sistem ?</div></div><p class="lead soft" style="margin-top:18px;max-width:780px">500 konut, proje baz&#305;nda sat&#305;&#351;, birden &ccedil;ok ofis, yerli + yabanc&#305; + yat&#305;r&#305;mc&#305; kar&#305;&#351;&#305;m&#305; &mdash; her biri ayr&#305; ayr&#305; iyi &ccedil;al&#305;&#351;&#305;yor ama <strong style="color:var(--navy)">ortak bir sistemde bulu&#351;muyor.</strong> Bug&uuml;n o sistemi kuruyoruz.</p></div></section>
+  <section class="slide ws"><div class="slide-inner" style="display:flex;justify-content:center"><div class="ws-card"><span class="ws-tag">&#10022; Tahtaya &middot; iki soru</span><h2>&Ouml;nce vizyon. Sonra sorun.</h2><div class="wstwo" style="margin-top:16px"><div><h3 style="color:var(--navy)">Soru 1 &middot; vizyon</h3><p class="lead soft" style="font-size:16px">3 y&#305;l sonra Babacan sat&#305;&#351; organizasyonu T&uuml;rkiye&#39;nin en iyisi olsa &mdash; nas&#305;l g&ouml;r&uuml;n&uuml;rd&uuml;? <em>(kimseyi d&uuml;zeltme)</em></p></div><div><h3 style="color:var(--coral)">Soru 2 &middot; engel</h3><p class="lead soft" style="font-size:16px">Bizi oradan uzakla&#351;t&#305;ran en b&uuml;y&uuml;k 5 problem ne? <em>(g&uuml;n boyu referans&#305;m&#305;z)</em></p></div></div><div class="ws-time">&#9201; 20 dakika &middot; tahtaya yaz</div></div></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow">Eskiden &rarr; Bug&uuml;n</span><h2 class="big">Sat&#305;&#351; art&#305;k <em class="grad">tek ki&#351;inin i&#351;i de&#287;il.</em></h2><div class="two" style="margin-top:22px"><div class="panel" style="background:#F4F2F6"><h3 style="color:#A6A2B0">Eskiden</h3><div class="journey"><span class="jp">Lead</span><span class="jsep">&rarr;</span><span class="jp">Sat&#305;&#351;&ccedil;&#305;</span><span class="jsep">&rarr;</span><span class="jp">Sat&#305;&#351;</span></div></div><div class="panel"><h3>Bug&uuml;n</h3><div class="journey"><span class="jp">Marketing</span><span class="jsep">&rarr;</span><span class="jp key">AI</span><span class="jsep">&rarr;</span><span class="jp">Enablement</span><span class="jsep">&rarr;</span><span class="jp">Sat&#305;&#351;</span><span class="jsep">&rarr;</span><span class="jp">Customer Success</span><span class="jsep">&rarr;</span><span class="jp key">Referral</span></div></div></div><p class="note">Sat&#305;&#351;&ccedil;&#305; art&#305;k bilgi veren de&#287;il &mdash; <em>karar verdiren ki&#351;i.</em></p></div></section>
+  <section class="slide"><div class="holo soft"></div><div class="slide-inner"><span class="eyebrow coral">Bug&uuml;n&uuml;n omurgas&#305;</span><div class="bigline" style="margin-top:10px">&#304;yi sat&#305;&#351;&ccedil;&#305; <em class="grad">k&ouml;t&uuml; sistemde kaybeder.</em><br>Orta sat&#305;&#351;&ccedil;&#305; <em class="grad">iyi sistemde kazan&#305;r.</em><br>&Ccedil;ok iyi sat&#305;&#351;&ccedil;&#305; <em class="grad">iyi sistemde u&ccedil;ar.</em></div><p class="kicker" style="margin-top:24px">Bug&uuml;n tek tek sat&#305;&#351;&ccedil;&#305;y&#305; de&#287;il &mdash; <strong style="color:var(--navy)">sat&#305;&#351;&ccedil;&#305;y&#305; u&ccedil;uran sistemi</strong> kuruyoruz.</p></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow">Kime sat&#305;yoruz?</span><h2 class="big">Tek m&uuml;&#351;teri yok &mdash; <em class="grad">be&#351; ayr&#305; d&uuml;nya.</em></h2><p class="lead soft">Her segment ayr&#305; dil, ayr&#305; s&uuml;re&ccedil;, ayr&#305; argüman ister. Ayn&#305; sat&#305;&#351; hepsine i&#351;lemez.</p><div class="pools" style="margin-top:20px"><div class="pool"><h3>Oturumcu</h3><div class="need">Yuva &middot; ya&#351;am</div><ul><li>Kredi &amp; ödeme plan&#305;</li><li>Okul, ferahl&#305;k, teslim</li></ul></div><div class="pool"><h3>Yat&#305;r&#305;mc&#305;</h3><div class="need">Getiri &middot; de&#287;er</div><ul><li>Kira yield, emsal</li><li>&Ccedil;&#305;k&#305;&#351; senaryosu</li></ul></div><div class="pool"><h3>Yabanc&#305;</h3><div class="need">Vatanda&#351;l&#305;k &middot; g&uuml;ven</div><ul><li>400K e&#351;ik, tapu</li><li>S&uuml;re&ccedil; deste&#287;i</li></ul></div><div class="pool"><h3>Ticari kiralama</h3><div class="need">&#304;&#351;yeri &middot; getiri</div><ul><li>Lokasyon, kirac&#305; garantisi</li><li>Kurumsal m&uuml;&#351;teri</li></ul></div><div class="pool"><h3>Kanal-partner</h3><div class="need">Broker &middot; acente</div><ul><li>Komisyon &amp; h&#305;z</li><li>Stok eri&#351;imi</li></ul></div></div></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow coral">Sistemin kalbi</span><h2 class="big">Stok Eritme <em class="grad">Haritas&#305;</em></h2><p class="lead soft">Her etap i&ccedil;in tek bir zincir: hangi stok &rarr; hangi m&uuml;&#351;teri &rarr; hangi argüman &rarr; hangi kampanya &rarr; hangi sat&#305;&#351;&ccedil;&#305;?</p><table class="matrix sm"><thead><tr><th>Stok</th><th>M&uuml;&#351;teri</th><th>Argüman</th><th>Kampanya</th><th>Sat&#305;&#351;&ccedil;&#305;</th></tr></thead><tbody><tr><td>A blok 2+1</td><td>Yat&#305;r&#305;mc&#305;</td><td class="arg">"%X getiri, metro"</td><td class="ch">sahibinden / IG</td><td>Havuz uzman&#305;</td></tr><tr><td>C blok 3+1</td><td>Oturumcu</td><td class="arg">"Okul yak&#305;n, ferah"</td><td class="ch">Lokal / banka</td><td>Dan&#305;&#351;man</td></tr><tr><td>Vatanda&#351;l&#305;k uygun</td><td>Yabanc&#305;</td><td class="arg">"Tek daire = pasaport"</td><td class="ch">Yurtd&#305;&#351;&#305; broker</td><td>Yabanc&#305; uzman&#305;</td></tr><tr><td>Ticari &uuml;niteler</td><td>Ticari kiralama</td><td class="arg">"Lokasyon + kirac&#305; garantisi"</td><td class="ch">Kurumsal</td><td>Ticari m&uuml;d&uuml;r&uuml;</td></tr></tbody></table><p class="note">Bu harita &ouml;&#287;leden sonraki pazarlamaya <em>do&#287;rudan</em> ba&#287;lan&#305;r.</p></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow">Duvar &ccedil;al&#305;&#351;mas&#305; &middot; post-it</span><h2 class="big">M&uuml;&#351;teri <em class="grad">ne ya&#351;&#305;yor?</em></h2><p class="lead soft">&#304;lk reklamdan tapuya kadar t&uuml;m yolculu&#287;u duvara &ccedil;&#305;kar&#305;yoruz.</p><div class="journey"><span class="jp">Instagram</span><span class="jsep">&rarr;</span><span class="jp">Lead</span><span class="jsep">&rarr;</span><span class="jp">&#304;lk arama</span><span class="jsep">&rarr;</span><span class="jp">WhatsApp</span><span class="jsep">&rarr;</span><span class="jp">Randevu</span><span class="jsep">&rarr;</span><span class="jp">Ofis</span><span class="jsep">&rarr;</span><span class="jp">Sunum</span><span class="jsep">&rarr;</span><span class="jp">Proje gezisi</span><span class="jsep">&rarr;</span><span class="jp key">&#304;tiraz</span><span class="jsep">&rarr;</span><span class="jp">Teklif</span><span class="jsep">&rarr;</span><span class="jp">Kapora</span><span class="jsep">&rarr;</span><span class="jp">S&ouml;zle&#351;me</span><span class="jsep">&rarr;</span><span class="jp">Tapu</span><span class="jsep">&rarr;</span><span class="jp key">Referans</span></div><div class="chips2" style="margin-top:18px"><div class="chip2">Nerede kaybediyoruz?</div><div class="chip2">Neden?</div><div class="chip2">Kim sorumlu?</div><div class="chip2">Bug&uuml;n nas&#305;l?</div><div class="chip2">&#304;deal nas&#305;l?</div></div></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow">&#304;deal standart &amp; ortak dil</span><h2 class="big">Ayn&#305; standart, <em class="grad">ayn&#305; dil.</em></h2><div class="flow" style="margin-top:20px"><div class="step"><span class="n">01</span><h3>&#304;lk arama</h3><p>En ge&ccedil; 5 dakika</p></div><div class="arr">&rarr;</div><div class="step"><span class="n">02</span><h3>Israr</h3><p>Min. 3 arama</p></div><div class="arr">&rarr;</div><div class="step"><span class="n">03</span><h3>WhatsApp + video</h3><p>S&#305;cak temas</p></div><div class="arr">&rarr;</div><div class="step"><span class="n">04</span><h3>CRM + follow-up</h3><p>Kay&#305;t &amp; takip</p></div></div><div class="two" style="margin-top:18px"><div class="panel"><h3>Lead A / B / C</h3><div class="fillrow" style="padding:9px 0"><span class="fl">A</span><span class="fv">&hellip; en &ouml;ncelikli</span></div><div class="fillrow" style="padding:9px 0;border-bottom:none"><span class="fl">B / C</span><span class="fv">&hellip;</span></div></div><div class="panel" style="background:var(--coral-soft)"><h3>Hot / Warm / Cold</h3><div class="fillrow" style="padding:9px 0"><span class="fl">Hot</span><span class="fv">&hellip; hemen kapan&#305;r</span></div><div class="fillrow" style="padding:9px 0;border-bottom:none"><span class="fl">Warm / Cold</span><span class="fv">&hellip;</span></div></div></div></div></section>
+  <section class="slide ws"><div class="slide-inner" style="display:flex;justify-content:center"><div class="ws-card"><span class="ws-tag">&#10022; &Ccedil;al&#305;&#351;tay &middot; iki ekip</span><h2>Sat&#305;&#351; d&ouml;n&uuml;&#351;&uuml;m&uuml;n&uuml; %20 art&#305;racak ilk 10 aksiyon?</h2><p class="lead soft" style="margin-top:8px">Ekibi ikiye b&ouml;l, her ekip 10 aksiyon yazar ve sunar. Birlikte gruplar&#305;z:</p><div class="chips2"><div class="chip2">CRM</div><div class="chip2">E&#287;itim</div><div class="chip2">Lead</div><div class="chip2">Pazarlama</div><div class="chip2">Stok</div><div class="chip2">&#304;&ccedil; s&uuml;re&ccedil;</div><div class="chip2">Y&ouml;netim</div></div><div class="ws-time">&#9201; 30 dakika &middot; "Pazarlama" ba&#351;l&#305;&#287;&#305; &rarr; &ouml;&#287;leden sonra Hakan&#39;a</div></div></div></section>
+  <section class="slide"><div class="slide-inner"><span class="eyebrow coral">Ana &ccedil;&#305;kt&#305;</span><h2 class="big">Eylem Plan&#305; &mdash; <em class="grad">neyi &ccedil;&ouml;z&uuml;yor?</em></h2><table class="matrix sm"><thead><tr><th>Problem</th><th>K&ouml;k neden</th><th>Aksiyon</th><th>Sahip</th><th>&#304;lk tarih</th><th>Ba&#351;ar&#305; metri&#287;i</th></tr></thead><tbody><tr><td>Lead&#39;ler d&uuml;&#351;&uuml;yor</td><td>&#304;lk arama ge&ccedil;, standart yok</td><td class="arg">5 dk + min 3 arama standard&#305;</td><td class="ch">Emre</td><td>2 hafta</td><td>&#304;lk-temas %X&rarr;%Y</td></tr><tr><td>Ofisler farkl&#305; sat&#305;yor</td><td>Ortak playbook yok</td><td class="arg">Babacan Sales Playbook v1</td><td class="ch">Sat&#305;&#351; ekibi</td><td>1 ay</td><td>T&uuml;m ofis ayn&#305; script</td></tr><tr><td>Stok k&ouml;rl&uuml;&#287;&uuml;</td><td>Daireler etiketsiz</td><td class="arg">Stok eritme haritas&#305; + etiket</td><td class="ch">&hellip;</td><td>3 hafta</td><td>Her daire segment-etiketli</td></tr><tr><td>&hellip;</td><td>&hellip;</td><td class="arg">&hellip;</td><td class="ch">&hellip;</td><td>&hellip;</td><td>&hellip;</td></tr></tbody></table><p class="note">Sadece "ne yap&#305;laca&#287;&#305;" de&#287;il &mdash; <em>hangi problemi, neden, hangi metrikle</em> &ccedil;&ouml;zd&uuml;&#287;&uuml; g&ouml;r&uuml;n&uuml;r.</p></div></section>
+  <section class="slide"><div class="holo soft"></div><div class="slide-inner"><span class="eyebrow">K&uuml;lt&uuml;r</span><h2 class="big">Babacan 2030 <em class="grad">Sat&#305;&#351; Manifestosu</em></h2><p class="lead soft">Herkes tek c&uuml;mle yazar: "Babacan&#39;da sat&#305;&#351; nas&#305;l yap&#305;lmal&#305;?" Sonra ortak manifestoyu olu&#351;tururuz.</p><div class="two" style="margin-top:20px"><div class="panel"><p style="font-size:17px;font-style:italic;color:var(--navy);font-weight:600;line-height:1.5">"Babacan&#39;da sat&#305;&#351; bask&#305;yla de&#287;il g&uuml;venle yap&#305;l&#305;r."</p></div><div class="panel" style="background:var(--coral-soft)"><p style="font-size:17px;font-style:italic;color:var(--navy);font-weight:600;line-height:1.5">"Biz ev satm&#305;yoruz &mdash; ya&#351;am bi&ccedil;imi se&ccedil;tiriyoruz."</p></div></div><div class="fillrow" style="margin-top:16px;max-width:840px;border-bottom:none"><span class="fl" style="color:var(--coral)">Ortak manifestomuz</span><span class="fv">&hellip;&hellip;&hellip;&hellip;&hellip;</span></div></div></section>
+  <section class="slide closing"><div class="holo"></div><div class="slide-inner"><span class="eyebrow">Bug&uuml;n&uuml;n &ccedil;&#305;kt&#305;s&#305;</span><h2>Babacan <em class="grad">Sat&#305;&#351; &#304;&#351;letim Sistemi</em></h2><div class="pillars"><div class="pillar"><span class="pn">01</span><h3>Sales Playbook</h3><p>Standartlar + ortak m&uuml;&#351;teri dili</p></div><div class="pillar"><span class="pn">02</span><h3>Customer Journey + Stok Haritas&#305;</h3><p>U&ccedil;tan uca s&uuml;re&ccedil; + segment e&#351;le&#351;tirme</p></div><div class="pillar"><span class="pn">03</span><h3>KPI Dashboard + 90 g&uuml;n</h3><p>Y&ouml;netim metrikleri &amp; roadmap</p></div></div><div class="endcard" style="max-width:780px;margin-top:26px"><div class="big">Stok beklemez.<br><em class="grad">Do&#287;ru sistemle do&#287;ru m&uuml;&#351;teriye akar.</em></div><div class="c">Gizem Burte&ccedil;in<br>gizem@alisales.ai</div></div></div></section>
+</div><div class="nav"><button id="prev">&lsaquo;</button><span class="count" id="count">1 / 15</span><button id="next">&rsaquo;</button></div><script>var slides=[].slice.call(document.querySelectorAll(".slide"));var count=document.getElementById("count");var prog=document.getElementById("prog");var total=slides.length;var idx=0;var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");idx=slides.indexOf(e.target);count.textContent=(idx+1)+" / "+total;prog.style.width=((idx+1)/total*100)+"%";}});},{threshold:.5});slides.forEach(function(s){io.observe(s);});function go(i){i=Math.max(0,Math.min(total-1,i));slides[i].scrollIntoView({behavior:"smooth"});}document.getElementById("next").onclick=function(){go(idx+1);};document.getElementById("prev").onclick=function(){go(idx-1);};window.addEventListener("keydown",function(e){if(["ArrowRight","ArrowDown"," ","PageDown"].indexOf(e.key)>-1){e.preventDefault();go(idx+1);}if(["ArrowLeft","ArrowUp","PageUp"].indexOf(e.key)>-1){e.preventDefault();go(idx-1);}});</script></body></html>
