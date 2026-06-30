@@ -159,7 +159,7 @@ interface EmlakNavLink {
 }
 
 // GELİŞİM grubu — Satışçı Kütüphanesi açılış; çoğu öğe stub (yakında).
-// Stok Zekâsı = Ali Satış Zekâsı'na eğitim yüzü derin linki (§9b).
+// Not: Ali Satış Zekâsı ayrı bir ANA bölümdür (EMLAK_NAV) — buraya derin link konmaz (çift kapı olmasın).
 const EMLAK_GELISIM_NAV: EmlakNavLink[] = [
   { href: GELISIM_SLUG, label: 'Satışçı Kütüphanesi', iconId: 'star', lavender: true, star: true },
   { label: 'AI Koçum',                 iconId: 'sparkle',  muted: true },
@@ -169,7 +169,6 @@ const EMLAK_GELISIM_NAV: EmlakNavLink[] = [
   { label: 'Hikâye Kütüphanesi',       iconId: 'book',     muted: true },
   { label: 'Persona Kütüphanesi',      iconId: 'badge',    muted: true },
   { label: 'Proje Akademisi',          iconId: 'cap',      muted: true },
-  { href: SECTION_SLUG, label: 'Stok Zekâsı', iconId: 'building' },
   { label: 'İtiraz Merkezi',           iconId: 'chat',     muted: true },
   { label: 'WhatsApp Kütüphanesi',     iconId: 'chat',     muted: true },
   { href: '/raporlar', label: 'Raporlar', iconId: 'chart' },
