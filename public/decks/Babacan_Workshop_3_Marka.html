@@ -1,0 +1,472 @@
+<!DOCTYPE html><html lang="tr"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Babacan × SalesAI — Marka İşletim Sistemi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"><style>
+  :root{
+    --navy:#17255C; --navy-deep:#0E1844; --ink:#1B2030;
+    --pur:#8E7BE8; --lil:#C6A6DF; --peach:#F2B79C; --pink:#E79DC4;
+    --coral:#F08456; --coral-soft:#FBE4D8;
+    --lav:#B4A6EC; --lav-soft:#F0ECFB; --lav-panel:#EBE5FA;
+    --soft:#6A7088; --line:#E8EAF2; --bg:#FFFFFF; --mint:#7FC4A3; --mint-soft:#E2F2EA;
+    --red:#E06A6A;
+    --grad: linear-gradient(102deg, var(--pur) 0%, var(--lil) 42%, var(--peach) 100%);
+    --grad-w: linear-gradient(102deg,#A89AF0 0%,#D6B6E8 45%,#F4C3AB 100%);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  h1,h2,h3{font-family:'Sora',sans-serif;letter-spacing:-.025em;line-height:1.05}
+  em{font-style:normal}
+  .grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .deck{scroll-snap-type:y mandatory;height:100vh;overflow-y:scroll}
+  .slide{scroll-snap-align:start;min-height:100vh;width:100%;position:relative;display:flex;flex-direction:column;justify-content:center;padding:6vh 7vw;overflow:hidden}
+  .slide-inner{width:100%;max-width:1140px;margin:0 auto;position:relative;z-index:2;opacity:0;transform:translateY(22px);transition:opacity .7s ease,transform .7s ease}
+  .slide.in .slide-inner{opacity:1;transform:none}
+  .brand{position:absolute;top:4.2vh;right:7vw;z-index:5;font-family:'Sora';font-weight:800;font-size:21px;letter-spacing:-.03em;color:var(--navy)}
+  .brand .ai{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .brand .spark{color:var(--lav);font-size:14px;vertical-align:super}
+  .eyebrow{font-family:'Space Mono';font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--lav);font-weight:700;margin-bottom:18px;display:inline-block}
+  .eyebrow.coral{color:var(--coral)}
+  .holo{position:absolute;inset:0;z-index:0;overflow:hidden}
+  .holo::before{content:"";position:absolute;width:90vw;height:90vw;left:-10vw;top:-30vh;border-radius:50%;
+    background:radial-gradient(closest-side at 35% 40%,rgba(142,123,232,.55),transparent 70%),radial-gradient(closest-side at 65% 55%,rgba(231,157,196,.5),transparent 70%),radial-gradient(closest-side at 55% 70%,rgba(242,183,156,.5),transparent 70%),radial-gradient(closest-side at 75% 35%,rgba(180,166,236,.5),transparent 70%),radial-gradient(closest-side at 45% 60%,rgba(127,196,163,.4),transparent 70%);
+    filter:blur(38px);opacity:.95;animation:drift 22s ease-in-out infinite alternate}
+  @keyframes drift{from{transform:translate(0,0) rotate(0deg) scale(1)}to{transform:translate(4vw,3vh) rotate(8deg) scale(1.08)}}
+  .holo.soft::before{opacity:.5;width:55vw;height:55vw;left:auto;right:-12vw;top:auto;bottom:-25vh;filter:blur(50px)}
+
+  .cover h1{font-size:clamp(42px,7vw,84px);font-weight:800;color:var(--navy);margin-bottom:6px}
+  .cover .sub{font-size:clamp(16px,2.2vw,23px);font-weight:600;color:var(--ink);max-width:700px;margin-top:12px}
+  .cover .rule{height:1px;background:var(--line);margin:34px 0 18px;max-width:760px}
+  .cover .meta{display:flex;justify-content:space-between;max-width:760px;font-weight:700;font-size:15px;color:var(--navy);flex-wrap:wrap;gap:10px}
+  .cover .meta .soft{color:var(--soft);font-weight:600}
+
+  h2.big{font-size:clamp(30px,5vw,58px);font-weight:800;color:var(--navy);margin-bottom:16px}
+  .mega{font-family:'Sora';font-weight:800;font-size:clamp(38px,7vw,80px);color:var(--navy);line-height:1.04;letter-spacing:-.03em}
+  .lead{font-size:clamp(16px,1.9vw,20px);color:var(--ink);max-width:820px;line-height:1.5}
+  .lead.soft{color:var(--soft)}
+  .note{margin-top:22px;font-size:16px;font-weight:700;color:var(--navy);max-width:820px}
+  .note em{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .pin{display:inline-flex;align-items:center;gap:10px;font-family:'Space Mono';font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:30px;padding:10px 20px;margin-top:24px;box-shadow:0 6px 20px rgba(23,37,92,.08)}
+
+  .divider .num{font-family:'Sora';font-weight:800;font-size:clamp(90px,20vw,230px);line-height:1.04;padding-top:.06em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;letter-spacing:-.05em;overflow:visible}
+  .divider h2{font-size:clamp(32px,6vw,64px);font-weight:800;color:var(--navy);margin-top:4px}
+  .divider .dsub{font-size:18px;color:var(--soft);font-weight:600;margin-top:14px;max-width:680px}
+
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px;align-items:start}
+  .panel{background:var(--lav-soft);border-radius:20px;padding:26px;border:1px solid var(--line)}
+  .panel h3{font-size:19px;color:var(--navy);margin-bottom:14px}
+  .qlist{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .qlist li{font-size:15px;color:var(--ink);padding-left:24px;position:relative;line-height:1.4}
+  .qlist li::before{content:"\2192";position:absolute;left:0;color:var(--lav);font-weight:700}
+  .qlist li b{color:var(--navy)}
+
+  .roles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}
+  .role{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;border-top:4px solid var(--lav)}
+  .role:nth-child(2){border-top-color:var(--coral)} .role:nth-child(3){border-top-color:var(--mint)}
+  .role .loc{font-family:'Sora';font-weight:800;font-size:20px;color:var(--navy)}
+  .role .tg{font-family:'Space Mono';font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--soft);font-weight:700;margin:6px 0 12px;display:block}
+  .role p{font-size:13.5px;color:var(--soft);line-height:1.45}
+
+  .ig-title{font-size:clamp(26px,4vw,46px);font-weight:800;color:var(--navy);line-height:1.05;margin-bottom:18px}
+  .pillars3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
+  .pcol{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;border-top:4px solid var(--coral)}
+  .pcol:nth-child(2){border-top-color:var(--pur)} .pcol:nth-child(3){border-top-color:var(--mint)}
+  .pcol h3{font-size:17px;margin-bottom:2px}
+  .pcol:nth-child(1) h3{color:var(--coral)} .pcol:nth-child(2) h3{color:var(--pur)} .pcol:nth-child(3) h3{color:#4FA37E}
+  .pcol .ph{font-size:12px;color:var(--soft);margin-bottom:12px;font-weight:600;font-family:'Space Mono';letter-spacing:.04em}
+  .pcol ul{list-style:none;font-size:13px;color:var(--ink);line-height:1.75}
+  .pcol ul li::before{content:"·";color:var(--lav);font-weight:800;margin-right:8px}
+  .pcol ul li b{color:var(--navy);font-weight:700}
+  .osrow{margin-top:14px;background:var(--lav-soft);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+  .osrow .ttl{font-family:'Space Mono';font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--navy);text-transform:uppercase;text-align:center;margin-bottom:10px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+  .chip{background:#fff;border:1px solid var(--line);border-radius:11px;padding:7px 12px;font-size:12px;font-weight:600;color:var(--navy)}
+  .flywheel{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center;justify-content:center}
+  .fw{font-family:'Sora';font-weight:800;font-size:13px;color:var(--navy);background:#fff;border:1px solid var(--line);border-radius:30px;padding:9px 16px}
+  .fw.hot{background:var(--grad);color:#fff;border:none}
+  .fwar{color:var(--lil);font-weight:800}
+
+  /* designed infographic (ref image) */
+  .ightop{display:flex;justify-content:space-between;align-items:flex-start;gap:26px;flex-wrap:wrap;margin-bottom:14px}
+  .ig-title{font-size:clamp(24px,3.4vw,40px);font-weight:800;color:var(--navy);line-height:1.06;flex:1;min-width:300px;margin:0}
+  .ig-title .s{display:block;font-size:13px;font-weight:600;color:var(--soft);margin-top:10px;max-width:420px;line-height:1.45;font-family:'Inter'}
+  .ighier{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .hbox{border-radius:14px;padding:12px 18px;display:flex;align-items:center;gap:11px;color:#fff}
+  .hbox.holding{background:var(--navy-deep)} .hbox.marka{background:var(--navy)}
+  .hbox svg{width:24px;height:24px;flex:none;stroke:#fff;fill:none;stroke-width:1.7}
+  .hbox .ht{font-family:'Sora';font-weight:800;font-size:14px;line-height:1.15}
+  .hbox .ht small{display:block;font-family:'Inter';font-weight:500;font-size:11px;color:#C9CFEA;margin-top:2px}
+  .harrow{color:var(--lav);font-weight:800;font-size:18px}
+  .igcols{display:grid;grid-template-columns:repeat(3,1fr) .92fr;gap:12px}
+  .igcol{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px 16px}
+  .igcol .ico{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 10px;color:#fff}
+  .igcol .ico svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.8}
+  .igcol.g .ico{background:var(--coral)} .igcol.a .ico{background:var(--pur)} .igcol.d .ico{background:var(--mint)}
+  .igcol h3{text-align:center;font-size:16px;font-weight:800}
+  .igcol.g h3{color:var(--coral)} .igcol.a h3{color:var(--pur)} .igcol.d h3{color:#4FA37E}
+  .igcol .qh{text-align:center;font-size:12px;font-weight:700;color:var(--soft);margin:2px 0 12px}
+  .igcol ul{list-style:none;font-size:12.5px;color:var(--ink);line-height:1.55}
+  .igcol ul li{padding:3px 0 3px 16px;position:relative}
+  .igcol ul li::before{content:"·";position:absolute;left:2px;color:var(--lav);font-weight:800}
+  .igcol ul li b{color:var(--navy);font-weight:700}
+  .qcard{background:var(--lav-soft);border:1px solid var(--line);border-radius:18px;padding:20px;display:flex;flex-direction:column;justify-content:center}
+  .qcard .qm{font-family:'Sora';font-weight:800;font-size:34px;color:var(--lav);line-height:.4}
+  .qcard p{font-size:13.5px;font-style:italic;color:var(--navy);font-weight:600;line-height:1.4;margin-top:10px}
+  .osband{margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px 16px}
+  .osband .ttl{text-align:center;font-family:'Space Mono';font-size:11px;font-weight:700;letter-spacing:.16em;color:var(--navy);text-transform:uppercase;margin-bottom:10px}
+  .oschips{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
+  .oschip{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;color:var(--navy);background:var(--lav-soft);border:1px solid var(--line);border-radius:9px;padding:6px 11px}
+  .oschip i{width:6px;height:6px;border-radius:50%;background:var(--pur);flex:none}
+  .fwrow{display:flex;gap:6px;margin-top:12px;align-items:stretch;flex-wrap:wrap}
+  .fwb{flex:1;min-width:120px;border-radius:14px;padding:14px 10px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:7px}
+  .fwb svg{width:24px;height:24px;stroke-width:1.8;fill:none}
+  .fwb span{font-family:'Sora';font-weight:800;font-size:11.5px;line-height:1.15}
+  .fwb.c1{background:var(--coral-soft)} .fwb.c1 svg{stroke:var(--coral)} .fwb.c1 span{color:var(--coral)}
+  .fwb.c2{background:var(--lav-soft)} .fwb.c2 svg{stroke:var(--pur)} .fwb.c2 span{color:var(--pur)}
+  .fwb.c3{background:var(--lav-panel)} .fwb.c3 svg{stroke:#7A68D8} .fwb.c3 span{color:#6B5BC4}
+  .fwb.c4{background:#FBE7F1} .fwb.c4 svg{stroke:var(--pink)} .fwb.c4 span{color:#C76BA0}
+  .fwb.c5{background:var(--coral-soft)} .fwb.c5 svg{stroke:var(--coral)} .fwb.c5 span{color:var(--coral)}
+  .fwa{align-self:center;color:var(--lil);font-weight:800;font-size:16px}
+  .vchain{margin-top:14px;text-align:center;font-family:'Space Mono';font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--navy)}
+  .vchain .ar{color:var(--lil);margin:0 6px}
+
+  .balance{display:grid;grid-template-columns:140px 1fr 1fr;gap:12px;margin-top:26px}
+  .bcell{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;min-height:130px}
+  .bcell.head{min-height:0;display:flex;align-items:center;justify-content:center;background:var(--lav-soft);font-family:'Space Mono';font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--navy)}
+  .bcell.rowhead{min-height:0;display:flex;align-items:center;background:var(--navy);color:#fff;font-family:'Sora';font-weight:800;font-size:18px}
+  .bcell .ln{display:flex;gap:8px;font-size:14px;padding:6px 0;color:var(--soft)}
+  .bcell .ln b{font-family:'Space Mono';font-size:11px;font-weight:700;color:var(--lav);min-width:78px;text-transform:uppercase;letter-spacing:.03em}
+  .bcell .ln span{color:#C7C5D2;font-style:italic}
+
+  .units{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:24px}
+  .unit{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px;border-top:5px solid var(--navy)}
+  .unit:nth-child(2){border-top-color:var(--pur)} .unit:nth-child(3){border-top-color:var(--coral)} .unit:nth-child(4){border-top-color:var(--mint)}
+  .unit h3{font-size:19px;color:var(--navy);margin-bottom:2px}
+  .unit .uv{font-family:'Space Mono';font-size:12px;font-weight:700;color:var(--lav);margin-bottom:12px}
+  .unit .ur{font-size:13px;color:var(--soft);line-height:1.4}
+  .unit .ur b{color:var(--navy)}
+
+  .campwrap{margin-top:22px;overflow-x:auto}
+  .campmatrix{display:grid;grid-template-columns:140px repeat(3,1fr);gap:7px;min-width:820px}
+  .cc{background:#fff;border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:12px;line-height:1.35;color:var(--ink)}
+  .cc.head{background:var(--lav-soft);font-family:'Space Mono';font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--navy);display:flex;align-items:center;justify-content:center;text-align:center}
+  .cc.rowhead{background:var(--navy);color:#fff;font-family:'Sora';font-weight:700;font-size:13px;display:flex;align-items:center;padding:10px 12px}
+  .cc b{color:var(--coral);font-weight:700}
+
+  .slide.ws{background:linear-gradient(135deg,#F6F2FD,#FBF1F2)}
+  .ws-card{background:#fff;border-radius:24px;padding:40px;box-shadow:0 24px 60px rgba(23,37,92,.12);max-width:880px;border:1px solid var(--line)}
+  .ws-tag{display:inline-flex;align-items:center;gap:9px;font-family:'Space Mono';font-size:12px;letter-spacing:.16em;color:#fff;background:var(--grad);padding:8px 16px;border-radius:30px;font-weight:700;text-transform:uppercase}
+  .ws-card h2{font-size:clamp(26px,3.6vw,40px);color:var(--navy);margin:18px 0 8px;font-weight:800}
+  .wstwo{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:18px}
+  .wstwo h3{font-family:'Sora';font-size:16px;margin-bottom:12px}
+  .fillrow{display:flex;justify-content:space-between;gap:14px;padding:12px 0;border-bottom:1px dashed var(--line);font-size:15px;align-items:baseline}
+  .fillrow .fl{font-family:'Sora';font-weight:700;color:var(--navy);min-width:120px}
+  .fillrow .fv{flex:1;color:#C7C5D2;font-style:italic;text-align:right}
+
+  .closing h2{font-size:clamp(32px,5.2vw,58px);font-weight:800;color:var(--navy)}
+  .endcard{margin-top:30px;display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid var(--line);padding-top:22px;flex-wrap:wrap;gap:14px;max-width:820px}
+  .linkcards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:28px}
+  .lcard{display:block;text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:0 10px 30px rgba(23,37,92,.05);border-left:6px solid var(--pur);transition:transform .25s,box-shadow .25s}
+  .lcard:nth-child(2){border-left-color:var(--coral)}
+  .lcard:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(23,37,92,.12)}
+  .lcard .lk{font-family:'Space Mono';font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--lav)}
+  .lcard:nth-child(2) .lk{color:var(--coral)}
+  .lcard h3{font-size:24px;color:var(--navy);margin:8px 0 8px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .lcard h3 .ar{color:var(--lil);font-weight:800}
+  .lcard p{font-size:14px;color:var(--soft);line-height:1.5}
+  .lcard .meta{font-family:'Space Mono';font-size:11px;color:#A7A2B8;margin-top:14px;letter-spacing:.02em}
+  .endcard .big{font-family:'Sora';font-weight:800;font-size:clamp(24px,3.2vw,38px);color:var(--navy)}
+  .endcard .c{font-size:14px;color:var(--soft);line-height:1.7;font-weight:600;text-align:right}
+
+  .nav{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);z-index:30;display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border:1px solid var(--line);border-radius:30px;padding:8px 16px;box-shadow:0 8px 24px rgba(23,37,92,.1)}
+  .nav button{border:none;background:none;cursor:pointer;font-size:18px;color:var(--navy);font-weight:700;line-height:1;padding:4px 8px;border-radius:8px}
+  .nav button:hover{background:var(--lav-soft)}
+  .nav .count{font-family:'Space Mono';font-size:12px;color:var(--soft);font-weight:700;min-width:60px;text-align:center}
+  .prog{position:fixed;top:0;left:0;height:3px;background:var(--grad);z-index:40;transition:width .3s}
+
+  @media(max-width:760px){
+    .slide{padding:9vh 7vw}
+    .two,.roles,.pillars3,.units{grid-template-columns:1fr}
+    .igcols{grid-template-columns:1fr 1fr} .ightop{flex-direction:column}
+    .linkcards{grid-template-columns:1fr}
+    .wstwo{grid-template-columns:1fr}
+    .balance{grid-template-columns:96px 1fr 1fr} .bcell{padding:14px;min-height:108px}
+    .brand{font-size:17px;top:3vh}
+    .flywheel .fw{font-size:11px;padding:7px 11px}
+  }
+  @media(prefers-reduced-motion:reduce){.holo::before{animation:none}.slide-inner{transition:none;opacity:1;transform:none}}
+</style></head><body><div class="prog" id="prog"></div><div class="brand">Babacan <span style="opacity:.45">×</span> Sales<span class="ai">AI</span><span class="spark">✦</span></div>
+<div class="deck" id="deck">
+
+  <!-- 1 COVER -->
+  <section class="slide cover"><div class="holo"></div><div class="slide-inner">
+    <span class="eyebrow">Babacan GYO × SalesAI · Marka çalışma oturumu</span>
+    <h1>Marka İşletim<br>Sistemi<em class="grad">.</em></h1>
+    <p class="sub">Marka logo değil — güven kanıtı. Pazarlama kampanya değil, marka sermayesi yönetir. Çıkışta elimizde uygulanabilir bir marka kararı olacak.</p>
+    <div class="rule"></div>
+    <div class="meta"><span>3 bölüm · çalışma oturumu</span><span>Gizem Burteçin &amp; Dr. Hakan Tetik</span></div>
+  </div></section>
+
+  <!-- 2 BÖLÜM 1 DIVIDER -->
+  <section class="slide divider"><div class="holo"></div><div class="slide-inner">
+    <div class="num">01</div>
+    <h2>Marka Ekseni</h2>
+    <p class="dsub">Yerli ve yabancı bize <em class="grad">neden</em> ve <em class="grad">nasıl</em> güvensin?</p>
+  </div></section>
+
+  <!-- 3 TRUST: domestic vs foreign -->
+  <section class="slide"><div class="holo soft"></div><div class="slide-inner">
+    <span class="eyebrow">Marka = güven kanıtı</span>
+    <h2 class="big">İki müşteri, <em class="grad">aynı soru:</em> neden güveneyim?</h2>
+    <p class="lead soft">Yerli ve yabancı alıcı aynı şeyi sormaz — ama ikisi de güven arar. Güven logodan değil, kanıttan gelir.</p>
+    <div class="two">
+      <div class="panel"><h3>Yerli neden güvensin?</h3>
+        <ul class="qlist">
+          <li><b>Zamanında teslim</b> · teslim geçmişi</li>
+          <li><b>Güçlü holding</b> · 20+ yıl · finansal güç</li>
+          <li><b>Yaşayan referans</b> · Esenyurt'ta 4000+ aile</li>
+          <li><b>Site yönetimi</b> · teslim sonrası yaşam</li>
+        </ul></div>
+      <div class="panel" style="background:var(--coral-soft)"><h3 style="color:var(--coral)">Yabancı neden güvensin?</h3>
+        <ul class="qlist">
+          <li><b>Geliştirici markası</b> — proje değil, kurum güveni</li>
+          <li><b>Güvenilir Türk geliştirici</b> kimliği</li>
+          <li><b>Süreç güvencesi</b> · vergi · vatandaşlık · kiralama</li>
+          <li><b>Görünürlük</b> · "Turkish property developer" bizi buluyor mu?</li>
+        </ul></div>
+    </div>
+    <p class="note">Dubai'de Emaar'a, Londra'da Berkeley'e güvenilir. Yabancı için proje değil — <em>geliştirici markası</em> önemli.</p>
+  </div></section>
+
+  <!-- 4 INFOGRAPHIC (designed, ref image) -->
+  <section class="slide"><div class="slide-inner">
+    <div class="ightop">
+      <h2 class="ig-title">Babacan bir proje markası değil.<br><em class="grad">Bir güven markasıdır.</em>
+        <span class="s">Güçlü marka satışı kolaylaştırır, portföy değerini artırır ve her yeni projeyi bir öncekinden daha güçlü başlatır.</span></h2>
+      <div class="ighier">
+        <div class="hbox holding"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M8 7h2M8 11h2M8 15h2M14 7h2M14 11h2M14 15h2"/></svg><div class="ht">BABACAN HOLDING<small>Finansal Güç · İtibar · 20+ Yıl</small></div></div>
+        <span class="harrow">→</span>
+        <div class="hbox marka"><svg viewBox="0 0 24 24"><path d="M3 8l4 4 5-7 5 7 4-4v9H3z"/></svg><div class="ht">BABACAN MARKASI<small>Güvenilir Gayrimenkul Geliştiricisi</small></div></div>
+      </div>
+    </div>
+
+    <div class="igcols">
+      <div class="igcol g"><div class="ico"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
+        <h3>GÜVEN</h3><div class="qh">Neden inanayım?</div>
+        <ul><li><b>Zamanında teslim</b></li><li>Teslim geçmişi</li><li>Güçlü holding</li><li>Referanslar</li><li>Finansal güç</li></ul></div>
+      <div class="igcol a"><div class="ico"><svg viewBox="0 0 24 24"><path d="M6 9l6-6 6 6-6 12z"/></svg></div>
+        <h3>AYRIŞMA</h3><div class="qh">Neden Babacan?</div>
+        <ul><li><b>Esenyurt</b> · bölgesel lider</li><li><b>Beşiktaş</b> · premium şehir yaşamı</li><li><b>Yurt dışı</b> · güvenilir geliştirici</li><li>Her lokasyona farklı hikâye</li></ul></div>
+      <div class="igcol d"><div class="ico"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.3"/><path d="M4 19c0-3 2.5-5 5-5s5 2 5 5M15 18c.2-2 1.6-3.4 3.5-3.4S21.8 16 22 18"/></svg></div>
+        <h3>DENEYİM</h3><div class="qh">Neden tekrar?</div>
+        <ul><li>Satış sonrası deneyim</li><li>Mülk yönetimi</li><li>Sakin kulübü</li><li><b>Referans sistemi</b></li></ul></div>
+      <div class="qcard"><div class="qm">"</div><p>Her teslim edilen proje, bir sonraki projenin en güçlü satış ofisi olmalıdır.</p></div>
+    </div>
+
+    <div class="osband"><div class="ttl">Marka İşletim Sistemi</div>
+      <div class="oschips">
+        <span class="oschip"><i></i>Web Sitesi</span><span class="oschip"><i></i>Sosyal Medya</span><span class="oschip"><i></i>CRM</span><span class="oschip"><i></i>Yapay Zekâ</span><span class="oschip"><i></i>Halkla İlişkiler</span><span class="oschip"><i></i>İçerik</span><span class="oschip"><i></i>Topluluk</span><span class="oschip"><i></i>Sakinler</span><span class="oschip"><i></i>Google Yorumları</span><span class="oschip"><i></i>Tavsiye</span><span class="oschip"><i></i>Etkinlikler</span>
+      </div>
+    </div>
+
+    <div class="fwrow">
+      <div class="fwb c1"><svg viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V6z"/></svg><span>GÜVEN</span></div>
+      <span class="fwa">→</span>
+      <div class="fwb c2"><svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M4 19c0-3 2.5-5 5-5s5 2 5 5"/><circle cx="17" cy="9" r="2.3"/></svg><span>MARKA TERCİHİ</span></div>
+      <span class="fwa">→</span>
+      <div class="fwb c3"><svg viewBox="0 0 24 24"><path d="M3 11l13-5v12L3 13zM16 8c2 0 3 1.5 3 4s-1 4-3 4"/></svg><span>REFERANS SATIŞ</span></div>
+      <span class="fwa">→</span>
+      <div class="fwb c4"><svg viewBox="0 0 24 24"><path d="M4 19V5M4 19h16M8 16l3-4 3 2 4-6"/></svg><span>PORTFÖY DEĞERİ</span></div>
+      <span class="fwa">→</span>
+      <div class="fwb c5"><svg viewBox="0 0 24 24"><path d="M7 4h10v4a5 5 0 01-10 0zM5 6H3v1a3 3 0 003 3M19 6h2v1a3 3 0 01-3 3M9 18h6M10 18v-3M14 18v-3"/></svg><span>YATIRIMCI GÜVENİ</span></div>
+    </div>
+
+    <div class="vchain">ARSA<span class="ar">→</span>PROJE<span class="ar">→</span>TESLİM<span class="ar">→</span>YAŞAM<span class="ar">→</span>GÜVEN<span class="ar">→</span>MARKA<span class="ar">→</span>PORTFÖY DEĞERİ</div>
+  </div></section>
+
+  <!-- 5 WS CARD 1 -->
+  <section class="slide ws"><div class="slide-inner" style="display:flex;justify-content:center"><div class="ws-card">
+    <span class="ws-tag">✦ Bölüm sonu · Sorular &amp; Aksiyonlar</span>
+    <h2>Marka eksenini bağlayalım</h2>
+    <div class="wstwo">
+      <div><h3 style="color:var(--navy)">Cevaplayalım</h3>
+        <ul class="qlist">
+          <li>Yerli için en güçlü güven kanıtımız ne?</li>
+          <li>Yabancı için developer markası vaadi ne?</li>
+          <li>"Neden Babacan?" tek cümle nedir?</li>
+          <li>Hangi kanıtı bugün gösteremiyoruz?</li>
+        </ul></div>
+      <div><h3 style="color:var(--coral)">Aksiyon · sahip · tarih</h3>
+        <div class="fillrow"><span class="fl">Aksiyon 1</span><span class="fv">… / … / …</span></div>
+        <div class="fillrow"><span class="fl">Aksiyon 2</span><span class="fv">… / … / …</span></div>
+        <div class="fillrow" style="border-bottom:none"><span class="fl">Aksiyon 3</span><span class="fv">… / … / …</span></div>
+      </div>
+    </div>
+  </div></div></section>
+
+  <!-- 6 BÖLÜM 2 DIVIDER -->
+  <section class="slide divider"><div class="holo"></div><div class="slide-inner">
+    <div class="num">02</div>
+    <h2>Yerli &amp; Yabancı Dengesi</h2>
+    <p class="dsub">Hedef yabancı — ama hacim, marj ve veri dengesi nasıl kurulur?</p>
+  </div></section>
+
+  <!-- 7 DATA TENSION -->
+  <section class="slide"><div class="slide-inner">
+    <span class="eyebrow coral">Veri ne diyor?</span>
+    <h2 class="big">İki rüzgâr <em class="grad">aynı anda esiyor.</em></h2>
+    <div class="two">
+      <div class="panel" style="background:var(--mint-soft)"><h3 style="color:#4FA37E">Yerliyi büyüten</h3>
+        <ul class="qlist"><li>Faiz düşüyor — yerli talep canlanıyor</li><li>Konut reel ucuzladı — giriş anı</li><li>Hacim motoru burada</li></ul></div>
+      <div class="panel" style="background:var(--coral-soft)"><h3 style="color:var(--coral)">Yabancıyı zorlaştıran</h3>
+        <ul class="qlist"><li>Yabancı payı %1,3 — 9 yılın dibi</li><li>Vatandaşlık zorlaştı (400K + uzun ROI)</li><li>Dubai / İspanya / Yunanistan rekabeti</li></ul></div>
+    </div>
+    <p class="note">İma: yabancı = <em>yüksek değer, ince kanal</em>; yerli = <em>hacim motoru</em>. Hedef yabancı ama yola yerliyle çıkılır — ve yabancı için önce developer markası gerekir.</p>
+  </div></section>
+
+  <!-- 8 BALANCE 2x2 -->
+  <section class="slide"><div class="slide-inner">
+    <span class="eyebrow">Karar tablosu</span>
+    <h2 class="big">Hedef yabancı, <em class="grad">denge nasıl kurulur?</em></h2>
+    <p class="lead soft">İki eksen, dört hücre: her havuz hangi kanaldan satılır, müşteri verisi kimde kalır, bütçe payı ne?</p>
+    <div class="balance">
+      <div class="bcell head"></div>
+      <div class="bcell head">In-house satış</div>
+      <div class="bcell head">Outsource / ağ</div>
+      <div class="bcell rowhead">Yerli</div>
+      <div class="bcell"><div class="ln"><b>kanal</b><span>…</span></div><div class="ln"><b>veri kimde</b><span>…</span></div><div class="ln"><b>bütçe payı</b><span>…</span></div></div>
+      <div class="bcell"><div class="ln"><b>kanal</b><span>…</span></div><div class="ln"><b>veri kimde</b><span>…</span></div><div class="ln"><b>bütçe payı</b><span>…</span></div></div>
+      <div class="bcell rowhead">Yabancı</div>
+      <div class="bcell"><div class="ln"><b>kanal</b><span>…</span></div><div class="ln"><b>veri kimde</b><span>…</span></div><div class="ln"><b>bütçe payı</b><span>…</span></div></div>
+      <div class="bcell"><div class="ln"><b>kanal</b><span>…</span></div><div class="ln"><b>veri kimde</b><span>…</span></div><div class="ln"><b>bütçe payı</b><span>…</span></div></div>
+    </div>
+  </div></section>
+
+  <!-- 9 WS CARD 2 -->
+  <section class="slide ws"><div class="slide-inner" style="display:flex;justify-content:center"><div class="ws-card">
+    <span class="ws-tag">✦ Bölüm sonu · Sorular &amp; Aksiyonlar</span>
+    <h2>Dengeyi bağlayalım</h2>
+    <div class="wstwo">
+      <div><h3 style="color:var(--navy)">Cevaplayalım</h3>
+        <ul class="qlist">
+          <li>Yerli : yabancı bütçe dengesi ne?</li>
+          <li>Hangi havuzda in-house, hangisinde ağ?</li>
+          <li>Outsource'ta müşteri verisi kimde kalıyor?</li>
+          <li>Developer markası için ilk 3 hamle?</li>
+        </ul></div>
+      <div><h3 style="color:var(--coral)">Aksiyon · sahip · tarih</h3>
+        <div class="fillrow"><span class="fl">Aksiyon 1</span><span class="fv">… / … / …</span></div>
+        <div class="fillrow"><span class="fl">Aksiyon 2</span><span class="fv">… / … / …</span></div>
+        <div class="fillrow" style="border-bottom:none"><span class="fl">Aksiyon 3</span><span class="fv">… / … / …</span></div>
+      </div>
+    </div>
+  </div></div></section>
+
+  <!-- 10 BÖLÜM 3 DIVIDER -->
+  <section class="slide divider"><div class="holo"></div><div class="slide-inner">
+    <div class="num">03</div>
+    <h2>Konumlama &amp; Satış Haritası</h2>
+    <p class="dsub">Projelerin konumlaması + persona ve ekonomik senaryoya göre satış haritası.</p>
+  </div></section>
+
+  <!-- 11 PROJECT POSITIONING -->
+  <section class="slide"><div class="slide-inner">
+    <span class="eyebrow">Konumlama</span>
+    <h2 class="big">Dört proje, <em class="grad">dört rol.</em></h2>
+    <p class="lead soft">Tümü Esenyurt'ta — ama her biri farklı persona ve farklı marka rolü taşıyor.</p>
+    <div class="units">
+      <div class="unit"><h3>Lagoon</h3><div class="uv">$64,0M · %49,5</div><div class="ur"><b>Hacim & yatırımcı.</b> 251 daire, 1+1 ağırlıklı. Portföyün yarısı — eritme planının merkezi.</div></div>
+      <div class="unit"><h3>Port Royal</h3><div class="uv">$39,5M · en yüksek $/m²</div><div class="ur"><b>Hızlı kazanç.</b> Kanıtlı satış. 1+0'lar hızlı nakit; üst-orta segment.</div></div>
+      <div class="unit"><h3>Central</h3><div class="uv">$15,5M · %12</div><div class="ur"><b>İlk ev & aile.</b> Küçük satılabilir stok; konum avantajı.</div></div>
+      <div class="unit"><h3>Premium</h3><div class="uv">$10,3M · %8</div><div class="ur"><b>Fiyat avantajı.</b> En düşük $/m² — değer/giriş hikâyesi.</div></div>
+    </div>
+  </div></section>
+
+  <!-- 12 PERSONA x SCENARIO SALES MAP -->
+  <section class="slide"><div class="slide-inner">
+    <span class="eyebrow coral">Satış haritası</span>
+    <h2 class="big">Persona × ekonomik senaryo <em class="grad">— hangi proje, hangi mesaj?</em></h2>
+    <p class="lead soft">Boş hücreler oturumda doldurulur: her persona, her senaryoda hangi projeye, hangi mesajla yönlenir.</p>
+    <div class="campwrap"><div class="campmatrix">
+      <div class="cc head"></div>
+      <div class="cc head">Faiz düşüyor</div>
+      <div class="cc head">TL zayıf / döviz güçlü</div>
+      <div class="cc head">Vatandaşlık zorlaştı</div>
+
+      <div class="cc rowhead">Yerli yatırımcı</div>
+      <div class="cc">Lagoon · <b>"reel ucuz, getiri net"</b></div>
+      <div class="cc">…</div>
+      <div class="cc">…</div>
+
+      <div class="cc rowhead">İlk ev / aile</div>
+      <div class="cc">Central · <b>"taksit belli, yuva hazır"</b></div>
+      <div class="cc">…</div>
+      <div class="cc">…</div>
+
+      <div class="cc rowhead">Yabancı yatırımcı</div>
+      <div class="cc">…</div>
+      <div class="cc">Port Royal · <b>"döviz avantajı"</b></div>
+      <div class="cc">…</div>
+
+      <div class="cc rowhead">Üst segment</div>
+      <div class="cc">…</div>
+      <div class="cc">…</div>
+      <div class="cc">Premium · <b>"değer & prestij"</b></div>
+    </div></div>
+  </div></section>
+
+  <!-- 13 WS CARD 3 -->
+  <section class="slide ws"><div class="slide-inner" style="display:flex;justify-content:center"><div class="ws-card">
+    <span class="ws-tag">✦ Bölüm sonu · Sorular &amp; Aksiyonlar</span>
+    <h2>Konumlama &amp; haritayı bağlayalım</h2>
+    <div class="wstwo">
+      <div><h3 style="color:var(--navy)">Cevaplayalım</h3>
+        <ul class="qlist">
+          <li>Her projenin tek cümlelik konumu ne?</li>
+          <li>Hangi persona hangi projeye öncelikli?</li>
+          <li>Bu yaz hangi senaryo baskın — mesaj ona göre?</li>
+          <li>Hangi proje hangi kanala (yerli/yabancı) düşer?</li>
+        </ul></div>
+      <div><h3 style="color:var(--coral)">Aksiyon · sahip · tarih</h3>
+        <div class="fillrow"><span class="fl">Aksiyon 1</span><span class="fv">… / … / …</span></div>
+        <div class="fillrow"><span class="fl">Aksiyon 2</span><span class="fv">… / … / …</span></div>
+        <div class="fillrow" style="border-bottom:none"><span class="fl">Aksiyon 3</span><span class="fv">… / … / …</span></div>
+      </div>
+    </div>
+  </div></div></section>
+
+  <!-- 14 CLOSING -->
+  <section class="slide closing"><div class="holo"></div><div class="slide-inner">
+    <span class="eyebrow">Bugünden sonra</span>
+    <h2 class="mega">Arsadan değere,<br>değerden güvene,<br><em class="grad">güvenden markaya.</em></h2>
+    <p class="lead soft" style="margin-top:18px;max-width:720px">Her teslim edilen proje, bir sonraki projenin en güçlü satış ofisidir. Marka lead üretmez — portföy değerini ve yatırımcı güvenini büyütür.</p>
+    <div class="endcard">
+      <div class="big">Marka kampanya değil,<br><em class="grad">bir işletim sistemidir.</em></div>
+      <div class="c">Gizem Burteçin &amp; Dr. Hakan Tetik<br>gizem@alisales.ai</div>
+    </div>
+  </div></section>
+
+  <!-- 15 DEVAMI / RELATED SYSTEMS -->
+  <section class="slide"><div class="holo soft"></div><div class="slide-inner">
+    <span class="eyebrow">Devamı · İlgili sistemler</span>
+    <h2 class="big">Marka tek başına çalışmaz — <em class="grad">gelir ve stok sistemine bağlanır.</em></h2>
+    <p class="lead soft">Marka sermayesi, gelir motoruna ve stok zekâsına bağlandığında işletim sistemi tamamlanır. İki çalışma bu deck'in devamıdır.</p>
+    <div class="linkcards">
+      <a class="lcard" href="Babacan_Revenue_OS.html" target="_blank" rel="noopener">
+        <div class="lk">Gelir İşletim Sistemi</div>
+        <h3>Revenue OS <span class="ar">→</span></h3>
+        <p>6 motorlu gelir çarkı (Strateji · Talep · Satış · Deneyim · Sadakat · Marka) + AI çekirdek · tek CRM, üç görünüm · %70→%30 verimlilik · 90 günlük takvim.</p>
+        <div class="meta">Babacan_Revenue_OS.html</div>
+      </a>
+      <a class="lcard" href="Babacan_Stok_Zekasi.html" target="_blank" rel="noopener">
+        <div class="lk">Stok Dönüşüm Merkezi</div>
+        <h3>Stok Zekâsı <span class="ar">→</span></h3>
+        <p>"Neden satılmadı → nasıl satılır" matrisi · alıcı–daire eşleştirme · 5 alıcı havuzu · daire bazında etiketleme · stok→nakit dönüşümü.</p>
+        <div class="meta">Babacan_Stok_Zekasi.html</div>
+      </a>
+    </div>
+  </div></section>
+
+</div>
+<div class="nav"><button id="prev">‹</button><span class="count" id="count">1 / 15</span><button id="next">›</button></div>
+<script>var slides=[].slice.call(document.querySelectorAll(".slide"));var count=document.getElementById("count");var prog=document.getElementById("prog");var total=slides.length;var idx=0;var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");idx=slides.indexOf(e.target);count.textContent=(idx+1)+" / "+total;prog.style.width=((idx+1)/total*100)+"%";}});},{threshold:.5});slides.forEach(function(s){io.observe(s);});function go(i){i=Math.max(0,Math.min(total-1,i));slides[i].scrollIntoView({behavior:"smooth"});}document.getElementById("next").onclick=function(){go(idx+1);};document.getElementById("prev").onclick=function(){go(idx-1);};window.addEventListener("keydown",function(e){if(["ArrowRight","ArrowDown"," ","PageDown"].indexOf(e.key)>-1){e.preventDefault();go(idx+1);}if(["ArrowLeft","ArrowUp","PageUp"].indexOf(e.key)>-1){e.preventDefault();go(idx-1);}});</script>
+</body></html>

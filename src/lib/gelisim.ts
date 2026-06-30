@@ -214,6 +214,15 @@ export const AKADEMI: Content[] = [
     src: '/decks/Babacan_Workshop_2_Pazarlama.html',
   },
   {
+    id: 'cont_marka',
+    tip: 'ders',
+    baslik: 'Marka İşletim Sistemi',
+    altMetin: 'Workshop 3 — marka ekseni & konumlama',
+    etiket: 'Yeni',
+    canli: true,
+    src: '/decks/Babacan_Workshop_3_Marka.html',
+  },
+  {
     id: 'cont_alici_yolculugu',
     tip: 'persona',
     baslik: 'Alıcı Yolculuğu Haritası',

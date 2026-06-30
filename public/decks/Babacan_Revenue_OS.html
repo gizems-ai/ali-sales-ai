@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Babacan GYO — Gelir Yaratan Organizasyon Modeli</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --aksiyon:#1E3A6B;--mor:#14294F;--deep:#102444;
+    --bordo:#8A2A43;--bordo2:#A4374F;--bordo-deep:#6E1E33;
+    --navy-soft:#EEF2F9;--bordo-soft:#F8EBEF;--paper:#FFFFFF;
+    --ink:#16233D;--soft:#67708A;--line:#E3E7F0;
+    --c-strat:#1E3A6B;--c-talep:#2B5285;--c-satis:#14294F;
+    --c-deneyim:#9A4257;--c-sadakat:#8A2A43;--c-marka:#6E1E33;
+    --glow:rgba(30,58,107,.30);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:#FFFFFF;min-height:100vh;-webkit-font-smoothing:antialiased}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;background:#FFFFFF}
+  h1,h2,h3{font-family:'Sora',sans-serif;letter-spacing:-.02em;line-height:1.08}
+  .page{max-width:1240px;margin:0 auto;padding:40px 5vw 54px}
+  .sec-eye{font-family:'Space Mono';font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--bordo)}
+
+  .top{text-align:center;max-width:780px;margin:0 auto 28px}
+  .badge{display:inline-flex;align-items:center;gap:9px;font-family:'Space Mono';font-size:12px;letter-spacing:.16em;color:var(--aksiyon);background:#fff;border:1px solid var(--line);padding:8px 16px;border-radius:30px;box-shadow:0 4px 16px rgba(30,58,107,.08)}
+  .badge img{height:15px;width:auto;display:block;border-radius:3px}
+  .top h1{font-size:clamp(28px,4.6vw,47px);font-weight:800;margin:18px 0 12px}
+  .top h1 em{font-style:normal;background:linear-gradient(120deg,var(--aksiyon),var(--bordo));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .top .slogan{color:var(--soft);font-size:15px;line-height:1.6;max-width:64ch;margin:0 auto}
+  .top .slogan b{color:var(--deep);font-weight:600}
+
+  .stage{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;margin-top:14px}
+  @media(max-width:920px){.stage{grid-template-columns:1fr;gap:24px}}
+  .wheel{position:relative;width:min(560px,92vw);aspect-ratio:1;margin:0 auto}
+  .spokes{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+  .spokes line{stroke:rgba(30,58,107,.20);stroke-width:.5}
+  .ringdash{position:absolute;left:50%;top:50%;width:76%;height:76%;transform:translate(-50%,-50%);border:1.5px dashed rgba(138,42,67,.28);border-radius:50%;z-index:0;animation:spin 60s linear infinite}
+  @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+  @media(prefers-reduced-motion:reduce){.ringdash{animation:none}}
+  .hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:clamp(124px,27vw,170px);aspect-ratio:1;border-radius:50%;z-index:3;background:linear-gradient(155deg,var(--bordo),var(--bordo-deep));color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:0 0 0 8px #fff, 0 14px 50px rgba(138,42,67,.4);animation:pulse 3.8s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 8px #fff,0 14px 45px rgba(138,42,67,.32)}50%{box-shadow:0 0 0 8px #fff,0 14px 75px rgba(138,42,67,.45)}}
+  .hub .gl{font-family:'Sora';font-weight:800;font-size:clamp(22px,4vw,30px)}
+  .hub .core{margin-top:6px;font-family:'Space Mono';font-size:11px;letter-spacing:.14em;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:20px}
+  .hub small{font-size:10px;color:rgba(255,255,255,.85);margin-top:5px}
+  .motor{position:absolute;transform:translate(-50%,-50%);width:clamp(98px,20vw,128px);aspect-ratio:1;border-radius:50%;z-index:2;background:#fff;border:2px solid var(--c);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px;padding:8px;box-shadow:0 8px 24px rgba(30,58,107,.12);transition:transform .25s,box-shadow .25s,background .25s}
+  .motor:hover{transform:translate(-50%,-50%) scale(1.06);box-shadow:0 14px 34px rgba(30,58,107,.25)}
+  .motor:focus-visible{outline:2px solid var(--c);outline-offset:3px}
+  .motor .mi{font-family:'Space Mono';font-size:10px;color:var(--c);letter-spacing:.1em}
+  .motor b{font-family:'Sora';font-weight:700;font-size:clamp(12px,2.4vw,15px);color:var(--ink);line-height:1}
+  .motor small{font-size:10px;color:var(--soft);line-height:1.1}
+  .motor.active{background:linear-gradient(155deg,var(--c),var(--deep));border-color:transparent;box-shadow:0 16px 40px var(--glow)}
+  .motor.active .mi{color:rgba(255,255,255,.85)}.motor.active b,.motor.active small{color:#fff}
+  .m-strat{--c:var(--c-strat)}.m-marka{--c:var(--c-marka)}.m-talep{--c:var(--c-talep)}
+  .m-satis{--c:var(--c-satis)}.m-deneyim{--c:var(--c-deneyim)}.m-sadakat{--c:var(--c-sadakat)}
+
+  .panel{background:#fff;border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:0 18px 50px rgba(30,58,107,.1);transition:opacity .3s}
+  .panel .pe{display:flex;align-items:center;gap:10px;font-family:'Space Mono';font-size:11px;letter-spacing:.16em;color:var(--pc);text-transform:uppercase}
+  .panel .pe i{width:10px;height:10px;border-radius:3px;background:var(--pc);display:inline-block}
+  .panel h2{font-size:clamp(21px,3vw,28px);font-weight:800;margin:12px 0 6px}
+  .panel .q{font-size:15.5px;color:var(--soft);margin-bottom:20px;font-style:italic}
+  .ol{font-family:'Space Mono';font-size:11px;letter-spacing:.14em;color:var(--soft);text-transform:uppercase;margin-bottom:11px}
+  .outs{display:flex;flex-wrap:wrap;gap:9px}
+  .outs span{font-size:13.5px;font-weight:500;color:var(--deep);background:var(--navy-soft);border:1px solid var(--line);padding:8px 13px;border-radius:9px}
+  .aliblock{margin-top:22px;background:linear-gradient(160deg,#FBF4F6,#F6EEF1);border:1px solid var(--line);border-left:3px solid var(--bordo);border-radius:14px;padding:18px}
+  .aliblock .ah{display:flex;align-items:center;gap:9px;margin-bottom:12px}
+  .aliblock .ah svg{width:22px;height:22px}
+  .aliblock .ah b{font-family:'Sora';font-weight:700;font-size:13.5px;color:var(--bordo-deep)}
+  .aliblock ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+  .aliblock li{display:flex;gap:10px;font-size:13.5px;color:var(--ink);align-items:flex-start}
+  .aliblock li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--bordo);margin-top:7px;flex:none}
+
+  .block{margin-top:34px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:30px;box-shadow:0 12px 40px rgba(30,58,107,.07)}
+  .block > h2{font-size:clamp(20px,2.8vw,28px);font-weight:800;margin:8px 0 4px}
+  .block > .bsub{color:var(--soft);font-size:14.5px;margin-bottom:24px}
+
+  /* hedef matematiği */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:780px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(30,58,107,.07)}
+  .stat::before{content:"";position:absolute;top:0;left:0;width:100%;height:3px;background:var(--bordo2)}
+  .stat .sl{font-family:'Space Mono';font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);margin-bottom:8px}
+  .stat .sv{font-family:'Sora';font-size:30px;font-weight:800;line-height:1;color:var(--aksiyon)}
+  .stat .sn{font-size:11.5px;color:var(--soft);margin-top:7px;line-height:1.3}
+  .statsnote{margin-top:16px;font-size:12.5px;color:var(--soft);line-height:1.45}
+  .statsnote b{color:var(--deep);font-weight:600}
+
+  .chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
+  .chip{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;background:linear-gradient(160deg,#fff,#F2F5FB);border:1px solid var(--line);padding:10px 16px;border-radius:30px;box-shadow:0 3px 10px rgba(30,58,107,.06)}
+  .chip svg{width:17px;height:17px;color:var(--aksiyon)}
+  .arrowdown{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--soft);font-size:12.5px;margin:18px 0}
+  .arrowdown svg{color:var(--bordo)}
+  .crmbar{display:flex;align-items:center;justify-content:center;gap:12px;background:linear-gradient(155deg,var(--aksiyon),var(--deep));color:#fff;border-radius:16px;padding:18px 24px;text-align:center;flex-wrap:wrap}
+  .crmbar b{font-family:'Sora';font-weight:800;font-size:18px}
+  .crmbar span{font-size:13px;color:rgba(255,255,255,.9)}
+  .roles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:6px}
+  @media(max-width:740px){.roles{grid-template-columns:1fr}}
+  .role{border:1px solid var(--line);border-radius:16px;padding:22px;background:linear-gradient(165deg,#fff,#F6F8FC)}
+  .role .rt{display:flex;align-items:center;gap:9px;margin-bottom:6px}
+  .role .rt b{font-family:'Sora';font-weight:700;font-size:16px}
+  .role .rq{font-size:13.5px;color:var(--soft);font-style:italic;margin-bottom:14px}
+  .role ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+  .role li{display:flex;gap:9px;font-size:13.5px;color:var(--ink);align-items:flex-start}
+  .role li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--rc);margin-top:7px;flex:none}
+  .r-sat{--rc:var(--c-satis)}.r-yon{--rc:var(--c-talep)}.r-pat{--rc:var(--bordo)}
+  .role .ricon{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--rc)}
+
+  .eff{display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:24px}
+  @media(max-width:860px){.eff{grid-template-columns:1fr}}
+  .eff h3{font-size:15px;font-weight:700;margin-bottom:14px}
+  .eff ul{list-style:none;display:flex;flex-direction:column;gap:10px}
+  .eff li{display:flex;gap:10px;font-size:14px;color:var(--ink);align-items:flex-start}
+  .eff .c1 li::before{content:"⚙";color:var(--aksiyon);flex:none}
+  .eff .c3 li::before{content:"★";color:var(--bordo);flex:none}
+  .shift{display:flex;flex-direction:column;gap:18px;justify-content:center}
+  .shift .sl{font-family:'Space Mono';font-size:11px;letter-spacing:.12em;color:var(--soft);text-transform:uppercase;margin-bottom:8px}
+  .splitbar{display:flex;height:40px;border-radius:10px;overflow:hidden;border:1px solid var(--line)}
+  .splitbar .adm{background:repeating-linear-gradient(45deg,#D7DEEC,#D7DEEC 8px,#CBD4E6 8px,#CBD4E6 16px);color:var(--deep);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+  .splitbar .sell{background:linear-gradient(90deg,var(--bordo),var(--bordo-deep));color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600}
+  .shift .note{font-size:12px;color:var(--soft);text-align:center}
+
+  .found .fh{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+  .found .fh b{font-family:'Sora';font-weight:700;font-size:17px}
+  .found .fh span{font-size:13px;color:var(--soft)}
+  .layers{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  @media(max-width:680px){.layers{grid-template-columns:repeat(2,1fr)}}
+  .layer{text-align:center;padding:16px 10px;border-radius:14px;background:linear-gradient(160deg,#fff,#F4F7FC);border:1px solid var(--line)}
+  .layer .li{width:34px;height:34px;margin:0 auto 10px;border-radius:10px;background:linear-gradient(135deg,var(--aksiyon),var(--deep));display:grid;place-items:center}
+  .layer b{font-family:'Sora';font-weight:700;font-size:14px;display:block;color:var(--ink)}
+  .layer small{font-size:11.5px;color:var(--soft)}
+
+  .cal{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;position:relative;margin-top:8px}
+  @media(max-width:820px){.cal{grid-template-columns:1fr}}
+  .cal::before{content:"";position:absolute;top:28px;left:8%;right:8%;height:3px;background:linear-gradient(90deg,var(--c-strat),var(--c-talep),var(--bordo));border-radius:3px;z-index:0}
+  @media(max-width:820px){.cal::before{display:none}}
+  .month{position:relative;z-index:1;background:linear-gradient(165deg,#fff,#F6F8FC);border:1px solid var(--line);border-radius:18px;padding:24px 22px}
+  .month .dot{width:18px;height:18px;border-radius:50%;background:var(--mc);border:4px solid #fff;box-shadow:0 0 0 2px var(--mc);margin:0 auto 14px}
+  .month .mtag{font-family:'Space Mono';font-size:11px;letter-spacing:.14em;color:var(--mc);text-align:center;text-transform:uppercase}
+  .month h3{font-size:19px;font-weight:800;text-align:center;margin:6px 0 4px}
+  .month .mph{font-size:12.5px;color:var(--soft);text-align:center;margin-bottom:16px}
+  .month ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+  .month li{display:flex;gap:9px;font-size:13.5px;color:var(--ink);align-items:flex-start}
+  .month li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--mc);margin-top:7px;flex:none}
+  .month .mout{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--deep)}
+  .month .mout b{font-family:'Space Mono';font-size:10px;letter-spacing:.12em;color:var(--soft);display:block;margin-bottom:4px;text-transform:uppercase}
+  .m1{--mc:var(--c-strat)}.m2{--mc:var(--c-talep)}.m3{--mc:var(--bordo)}
+
+  .foot{margin-top:26px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;color:var(--soft);font-size:12px;font-family:'Space Mono'}
+  .foot b{color:var(--ink)}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top">
+    <span class="badge"><img src="https://babacangyo.com/wp-content/uploads/2026/03/GYO-white-logo-150x67.png" alt="" style="background:#16233D;padding:2px 4px">Revenue OS · Babacan GYO × Ali</span>
+    <h1>Gelir Yaratan <em>Organizasyon Modeli</em></h1>
+    <p class="slogan">Doğru alıcıyı bul. Güven kur. Talep yarat. Satışı kapat. Teslim sonrası deneyimi yönet. Sadakat ve tavsiye üret. <b>Hepsini veri ve yapay zekâ ile çalıştır — stoğu ucuzlatmadan nakde çevir.</b></p>
+  </div>
+
+  <!-- ÇARK + PANEL -->
+  <div class="stage">
+    <div class="wheel">
+      <svg class="spokes" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="50" y1="50" x2="50"   y2="12"/>
+        <line x1="50" y1="50" x2="82.9" y2="31"/>
+        <line x1="50" y1="50" x2="82.9" y2="69"/>
+        <line x1="50" y1="50" x2="50"   y2="88"/>
+        <line x1="50" y1="50" x2="17.1" y2="69"/>
+        <line x1="50" y1="50" x2="17.1" y2="31"/>
+      </svg>
+      <div class="ringdash"></div>
+      <div class="hub"><span class="gl">GELİR</span><span class="core">YZ</span><small>sinir sistemi</small></div>
+      <button class="motor m-strat active" style="left:50%;top:12%" data-k="strateji"><span class="mi">01</span><b>STRATEJİ</b><small>Ne satıyoruz?</small></button>
+      <button class="motor m-talep" style="left:82.9%;top:31%" data-k="talep"><span class="mi">02</span><b>TALEP</b><small>Nasıl bulacaklar?</small></button>
+      <button class="motor m-satis" style="left:82.9%;top:69%" data-k="satis"><span class="mi">03</span><b>SATIŞ</b><small>Nasıl alacaklar?</small></button>
+      <button class="motor m-deneyim" style="left:50%;top:88%" data-k="deneyim"><span class="mi">04</span><b>DENEYİM</b><small>Ne yaşayacak?</small></button>
+      <button class="motor m-sadakat" style="left:17.1%;top:69%" data-k="sadakat"><span class="mi">05</span><b>SADAKAT</b><small>Nasıl dönecek?</small></button>
+      <button class="motor m-marka" style="left:17.1%;top:31%" data-k="marka"><span class="mi">06</span><b>MARKA</b><small>Neden güvensinler?</small></button>
+    </div>
+    <div class="panel" id="panel"></div>
+  </div>
+
+  <!-- HEDEF MATEMATİĞİ -->
+  <div class="block">
+    <span class="sec-eye">Hedef Matematiği</span>
+    <h2>Model neyi hareket ettiriyor?</h2>
+    <p class="bsub">Soyut değil; Babacan'ın gerçek stoğuna ve nakit hedefine bağlı.</p>
+    <div class="stats">
+      <div class="stat"><div class="sl">Satılabilir stok</div><div class="sv">129M$</div><div class="sn">507 daire · Central · Lagoon · Port Royal · Vista</div></div>
+      <div class="stat"><div class="sl">6 ay hedefi</div><div class="sv">%30</div><div class="sn">~39M$ nakit · stoğu ucuzlatmadan</div></div>
+      <div class="stat"><div class="sl">Tek sistem</div><div class="sv">25</div><div class="sn">satışçı · tek CRM · emlak.alisales.ai</div></div>
+      <div class="stat"><div class="sl">Pazarlama-satış maliyeti</div><div class="sv">~½</div><div class="sn">ajans + kalabalık ekip yerine yalın yapı (hedef)</div></div>
+    </div>
+    <p class="statsnote"><b>%30 / 6 ay</b>, 90 gün baz (%25) ile 12 ay baz (%60) eğrisinin altında — savunulabilir. Maliyet tarafı 6. ay çıkış hızı olarak hedeflenir; ajans ve legacy sistem harcaması yerini yalın ekip + AI alır.</p>
+  </div>
+
+  <!-- VERİ AKIŞI -->
+  <div class="block">
+    <span class="sec-eye">Veri Akışı</span>
+    <h2>Tek veri, üç görünüm.</h2>
+    <p class="bsub">Tüm kanallar tek CRM'e akar. Aynı veriyi satışçı, yönetici ve patron farklı şekilde kullanır.</p>
+
+    <div class="chips">
+      <div class="chip"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a10 10 0 00-8.6 15l-1.4 5 5.1-1.3A10 10 0 1012 2z"/></svg>WhatsApp</div>
+      <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>Instagram</div>
+      <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>Web formu</div>
+      <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4h4l2 5-3 2a11 11 0 005 5l2-3 5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></svg>Çağrı merkezi</div>
+      <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M5 21V8l7-5 7 5v13M9 21v-6h6v6"/></svg>Emlak portalları</div>
+      <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="6" width="16" height="11" rx="3"/><path d="M9 11h.01M15 11h.01M9 20l3-3 3 3"/></svg>Satış ofisi & bot</div>
+    </div>
+
+    <div class="arrowdown"><svg width="20" height="22" viewBox="0 0 20 22" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v16M4 13l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>her temas otomatik kaydedilir</span></div>
+
+    <div class="crmbar"><b>CRM — Tek Veri Kaynağı</b><span>· tüm geçmiş, tüm kanallar, tek yerde</span></div>
+
+    <div class="arrowdown"><svg width="20" height="22" viewBox="0 0 20 22" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 2v16M4 13l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>aynı veri, üç farklı görünüm</span></div>
+
+    <div class="roles">
+      <div class="role r-sat">
+        <div class="rt"><div class="ricon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-width="1.8"><path d="M3 9l4 4 8-9" stroke-linecap="round" stroke-linejoin="round"/></svg></div><b>Satışçı</b></div>
+        <p class="rq">"Bugün hangi alıcıyı arayacağım?"</p>
+        <ul><li>Günlük görev listesi</li><li>Sıcak yatırımcı önce</li><li>Takip hatırlatmaları</li><li>Müşteri & daire geçmişi hazır</li></ul>
+      </div>
+      <div class="role r-yon">
+        <div class="rt"><div class="ricon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-width="1.8"><path d="M3 14V8M8 14V4M13 14v-4" stroke-linecap="round"/></svg></div><b>Yönetici</b></div>
+        <p class="rq">"Ekip ve stok nasıl gidiyor?"</p>
+        <ul><li>Satış hattı & stok durumu</li><li>Ekip performansı</li><li>Proje bazlı dönüşüm</li><li>Tıkanma noktaları</li></ul>
+      </div>
+      <div class="role r-pat">
+        <div class="rt"><div class="ricon"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-width="1.8"><path d="M3 12l4-5 3 3 5-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div><b>Patron</b></div>
+        <p class="rq">"Stok nakde dönüyor mu?"</p>
+        <ul><li>Stok eritme & nakit</li><li>Faiz yükü etkisi</li><li>Gelir tahmini & reklam getirisi</li><li>Özet göstergeler</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- VERİMLİLİK -->
+  <div class="block">
+    <span class="sec-eye">Verimlilik</span>
+    <h2>Otomasyon devralır, satışçı satışa döner.</h2>
+    <p class="bsub">Elle yapılan işler sistemin sırtına biner; 25 satışçı zamanını insanla geçirir.</p>
+    <div class="eff">
+      <div class="c1">
+        <h3>Otomasyon devralır</h3>
+        <ul><li>Veri girişi & kanal birleştirme</li><li>Aday puanlama & önceliklendirme</li><li>Takip mesajları & yeniden pazarlama</li><li>Randevu & hatırlatma</li><li>Günlük ajanda & raporlar</li></ul>
+      </div>
+      <div class="shift">
+        <div>
+          <div class="sl">Önce — satışçının günü</div>
+          <div class="splitbar"><div class="adm" style="flex:70">Elle iş %70</div><div class="sell" style="flex:30">Satış %30</div></div>
+        </div>
+        <div>
+          <div class="sl">Sonra — Revenue OS ile (hedef)</div>
+          <div class="splitbar"><div class="adm" style="flex:30">Elle iş %30</div><div class="sell" style="flex:70">Satış %70</div></div>
+        </div>
+        <p class="note">Elle iş ~%70'ten ~%30'a (hedef). Kazanılan zaman → sıcak alıcıya.</p>
+      </div>
+      <div class="c3">
+        <h3>Satışçı buraya odaklanır</h3>
+        <ul><li>İlişki & güven kurma</li><li>Satış ofisi & kapanış görüşmeleri</li><li>Yatırımcı & yabancı alıcı</li><li>Yüz yüze & telefon teması</li><li>İtiraz & ödeme planı yönetimi</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- GÖRÜNMEYEN KATMAN -->
+  <div class="block found">
+    <div class="fh"><b>Revenue OS — görünmeyen katman</b><span>6 motoru çalıştıran altyapı. Eskiden ayrı bölümler; 2026'da tek işletim sistemi.</span></div>
+    <div class="layers">
+      <div class="layer"><div class="li"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="#fff" stroke-width="1.6"/><path d="M3.5 15c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div><b>İnsan</b><small>ekip & roller</small></div>
+      <div class="layer"><div class="li"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 5h12M3 9h12M3 13h8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div><b>Süreç</b><small>iş akışları</small></div>
+      <div class="layer"><div class="li"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><ellipse cx="9" cy="5" rx="5" ry="2.2" stroke="#fff" stroke-width="1.6"/><path d="M4 5v8c0 1.2 2.2 2.2 5 2.2s5-1 5-2.2V5" stroke="#fff" stroke-width="1.6"/></svg></div><b>Veri</b><small>tek kaynak</small></div>
+      <div class="layer"><div class="li"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="5" y="5" width="8" height="8" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M9 2v3M9 13v3M2 9h3M13 9h3" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div><b>Yapay Zekâ</b><small>sinir sistemi</small></div>
+      <div class="layer"><div class="li"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3v6l4 2" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="9" cy="9" r="6" stroke="#fff" stroke-width="1.6"/></svg></div><b>Otomasyon</b><small>7/24 çalışır</small></div>
+    </div>
+  </div>
+
+  <!-- TAKVİM -->
+  <div class="block">
+    <span class="sec-eye">90 Günlük Takvim · 14 Haz → 1 Eyl</span>
+    <h2>Kurulumdan canlıya, üç ayda.</h2>
+    <p class="bsub">Modeli sahaya indiren yol haritası. Her ay sonunda elinizde çalışan bir parça olur; 1 Eylül'de tam canlı.</p>
+    <div class="cal">
+      <div class="month m1">
+        <div class="dot"></div>
+        <div class="mtag">Ay 1 · Haziran–Temmuz</div>
+        <h3>Temel</h3>
+        <p class="mph">Strateji + Sistem</p>
+        <ul>
+          <li>Durum & rakip incelemesi, hedef matematiği</li>
+          <li>Hedef alıcı & persona, konumlandırma</li>
+          <li>emlak.alisales.ai uyarlama · 2 → 25 koltuk</li>
+          <li>Tüm kanalların CRM'e bağlanması</li>
+          <li>Pazarlama–satış aynı masada</li>
+        </ul>
+        <div class="mout"><b>Ay sonu çıktısı</b>Net hedef, çalışan altyapı.</div>
+      </div>
+      <div class="month m2">
+        <div class="dot"></div>
+        <div class="mtag">Ay 2 · Temmuz–Ağustos</div>
+        <h3>Motor</h3>
+        <p class="mph">Talep + Satış canlı</p>
+        <ul>
+          <li>Aday üretimi & yapay zekâ puanlama</li>
+          <li>Sabah Ajandası + Akşam Brifingi</li>
+          <li>Takip akışları otomatikleşir</li>
+          <li>Uyuyan kayda dönüş · yabancı yatırımcı kanalı</li>
+          <li>Satış eğitimi & el kitabı</li>
+        </ul>
+        <div class="mout"><b>Ay sonu çıktısı</b>Kendi kendine dönen günlük operasyon.</div>
+      </div>
+      <div class="month m3">
+        <div class="dot"></div>
+        <div class="mtag">Ay 3 · Ağustos → 1 Eylül</div>
+        <h3>Büyüme</h3>
+        <p class="mph">Deneyim + Sadakat + Ölçek</p>
+        <ul>
+          <li>Karşılama, SSH & topluluk akışları</li>
+          <li>Sadakat, referans, tekrar yatırım</li>
+          <li>Satışçı / yönetici / patron panoları</li>
+          <li>GYO/yatırımcı & sürdürülebilirlik anlatısı</li>
+          <li>Sürekli iyileştirme döngüsü → canlı</li>
+        </ul>
+        <div class="mout"><b>Ay sonu çıktısı</b>Ölçeklenen, kendini büyüten sistem.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <span>Revenue OS · Babacan GYO'ya özel</span>
+    <span><b>Ali motoru</b> ile çalışır · Gizli</span>
+  </div>
+
+</div>
+
+<script>
+  const aliMark='<svg viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="11" fill="#8A2A43"/><path d="M12 28L19 12h2.5L28.5 28h-3.4l-1.5-3.7h-6.2L14.4 28H12zm5.6-6.2h4.8L20 15.9l-2.4 5.9z" fill="#fff"/></svg>';
+  const data={
+    strateji:{e:"01 · STRATEJİ",t:"Strateji",q:"Ne satıyoruz? Kime? Neden Babacan?",c:"var(--c-strat)",
+      out:["Hedef alıcı profili","Konumlandırma (GYO)","Fiyat & ödeme planı","Stok segmentasyonu"],
+      ali:["İdeal alıcı profili: yatırımcı / oturumcu / yabancı / kurumsal","Stok→nakit hedef matematiği (129M$, %30/6 ay)","Konumlandırma: inşaatçıdan güvenilir GYO'ya","Proje bazlı fiyat & kampanya stratejisi"]},
+    marka:{e:"06 · MARKA",t:"Marka & Güven",q:"Neden Babacan'a güvensinler?",c:"var(--c-marka)",
+      out:["Güven","GYO hikayesi","Sürdürülebilirlik","Yatırımcı anlatısı","Sosyal kanıt"],
+      ali:["Marka sesi: 'Güvenilir Yatırımlar, Güçlü Gelecek'","Zamanında teslim = güven kanıtı içeriği","Sürdürülebilirlik = değer (prim, ucuz sermaye)","GYO/BIST yatırımcı hikayesi & sosyal kanıt"]},
+    talep:{e:"02 · TALEP",t:"Talep",q:"Bizi nasıl bulacaklar?",c:"var(--c-talep)",
+      out:["Arama & emlak portalları","Yapay zekâ görünürlüğü","Reklam","Sosyal medya","Yabancı yatırımcı kanalı","Broker ağı","Referans","Yeniden pazarlama"],
+      ali:["Çok kanallı aday üretimi (portal, sosyal, reklam, broker)","Sinyal Motoru: AI ile kademeli aday puanlama","Yabancı yatırımcı için çok dilli kanal","Uyuyan/ulaşılamayan kayda sistematik yeniden temas"]},
+    satis:{e:"03 · SATIŞ",t:"Satış",q:"Nasıl satın alacaklar?",c:"var(--c-satis)",
+      out:["Aday yönetimi","CRM (25 satışçı)","Satış ofisi randevusu","Teklif & ödeme planı","Kapanış & tapu"],
+      ali:["CRM: 25 koltuk, tek satış hattı","Sabah Ajandası + Akşam Brifingi (günlük kota)","Sıcak alıcıyı doğru satışçıya yönlendirme","Otomatik takip + teklif/ödeme planı üretimi"]},
+    deneyim:{e:"04 · DENEYİM",t:"Deneyim",q:"Satın aldıktan sonra ne yaşayacak?",c:"var(--c-deneyim)",
+      out:["Teslim öncesi süreç","İlk 90 gün","Satış sonrası hizmet","Yaşam deneyimi"],
+      ali:["WhatsApp / sohbet botu + devir bildirimleri","İlk 90 gün karşılama akışı","SSH / talep triyajı (SLA ile)","Yaşam deneyimi & topluluk akışları"]},
+    sadakat:{e:"05 · SADAKAT",t:"Sadakat",q:"Nasıl geri dönecek / tavsiye edecek?",c:"var(--c-sadakat)",
+      out:["Referans","Tekrar yatırım","Portföy büyütme","Tavsiye"],
+      ali:["Referans otomasyonu — en ucuz talep","Yatırımcı tekrar-alım tetikleyicileri","Memnun sakin → tavsiye akışı"]}
+  };
+  const panel=document.getElementById('panel');
+  function render(k){
+    const d=data[k];
+    panel.style.setProperty('--pc',d.c);
+    panel.innerHTML=`<div class="pe"><i></i>${d.e}</div><h2>${d.t}</h2><p class="q">"${d.q}"</p>`
+      +`<div class="ol">İdeal çıktı</div><div class="outs">${d.out.map(o=>`<span>${o}</span>`).join('')}</div>`
+      +`<div class="aliblock"><div class="ah">${aliMark}<b>Ali altyapısında ne yapıyorum</b></div><ul>${d.ali.map(a=>`<li>${a}</li>`).join('')}</ul></div>`;
+  }
+  render('strateji');
+  document.querySelectorAll('.motor').forEach(m=>{
+    m.addEventListener('click',()=>{
+      document.querySelectorAll('.motor').forEach(x=>x.classList.remove('active'));
+      m.classList.add('active');panel.style.opacity=0;
+      setTimeout(()=>{render(m.dataset.k);panel.style.opacity=1;},160);
+    });
+  });
+</script>
+</body>
+</html>
