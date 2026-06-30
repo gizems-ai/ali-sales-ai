@@ -58,7 +58,7 @@ export function ContentViewer({
         onClick={e => e.stopPropagation()}
         style={{
           margin: 'auto',
-          width: 'min(1180px, 100%)',
+          width: 'min(1300px, 100%)',
           height: '100%',
           maxHeight: 'calc(100vh - 2 * clamp(8px,2vw,26px))',
           display: 'flex',
