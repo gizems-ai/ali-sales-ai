@@ -33,14 +33,14 @@ export async function Topbar() {
     return (
       <header style={{
         position: 'sticky',
-        top: 16,
+        top: 14,
         zIndex: 20,
-        // Sidebar gibi yüzen frosted kart — 16px üst hizası tuttur, tam-genişlik sert şerit görünmesin ("kayık" fix)
-        margin: '16px 24px 0 0',
-        padding: '14px 22px',
+        // Yüzen frosted kart — sol boşluk (sidebar'a taşmasın) + kompakt
+        margin: '14px 20px 0 8px',
+        padding: '9px 18px',
         display: 'flex',
         alignItems: 'center',
-        gap: 22,
+        gap: 18,
         background: 'rgba(255,255,255,.62)',
         backdropFilter: 'blur(24px) saturate(165%)',
         WebkitBackdropFilter: 'blur(24px) saturate(165%)',
@@ -50,10 +50,10 @@ export async function Topbar() {
       }}>
         {/* Greeting */}
         <div>
-          <h1 style={{ fontSize: 20, fontWeight: 800, letterSpacing: '-0.01em', margin: 0, color: '#1c2a22' }}>
+          <h1 style={{ fontSize: 15.5, fontWeight: 800, letterSpacing: '-0.01em', margin: 0, color: '#1c2a22' }}>
             {text}, {firstName} {emoji}
           </h1>
-          <p style={{ fontSize: 12.5, fontWeight: 600, color: '#57655b', margin: '2px 0 0' }}>
+          <p style={{ fontSize: 11, fontWeight: 600, color: '#57655b', margin: '1px 0 0' }}>
             {getTurkishDate()}
           </p>
         </div>
