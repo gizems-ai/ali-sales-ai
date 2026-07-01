@@ -9,29 +9,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --navy:#1E3A6B;--navy2:#2B5285;--deep:#14294F;--ink:#16233D;
-    --bordo:#F08456;--bordo2:#A4374F;--bordo-deep:#C9683E;
-    --navy-soft:#EEF2F9;--bordo-soft:#FBE4D8;--soft:#67708A;--line:#E3E7F0;
+    --navy:#17255C;--navy2:#5848A6;--deep:#0E1844;--ink:#1B2030;--lav:#B4A6EC;--pur:#8E7BE8;--lil:#C6A6DF;--peach:#F2B79C;--grad:linear-gradient(102deg,#8E7BE8,#C6A6DF 42%,#F2B79C);
+    --bordo:#F08456;--bordo2:#F4A077;--bordo-deep:#C9683E;
+    --navy-soft:#F0ECFB;--bordo-soft:#FBE4D8;--soft:#6A7088;--line:#E8EAF2;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:#fff;-webkit-font-smoothing:antialiased;position:relative}
-  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(820px 460px at 50% -8%,rgba(30,58,107,.07),transparent 70%),linear-gradient(rgba(30,58,107,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(30,58,107,.022) 1px,transparent 1px);background-size:100% 100%,32px 32px,32px 32px}
+  body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(820px 460px at 50% -8%,rgba(142,123,232,.07),transparent 70%),linear-gradient(rgba(142,123,232,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(142,123,232,.022) 1px,transparent 1px);background-size:100% 100%,32px 32px,32px 32px}
   h1,h2,h3{font-family:'Sora',sans-serif;letter-spacing:-.02em;line-height:1.1}
   .page{max-width:1180px;margin:0 auto;padding:42px 5vw 56px}
-  .sec-eye{font-family:'Space Mono';font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--bordo);display:inline-flex;align-items:center;gap:10px}
-  .sec-eye::before{content:"";width:22px;height:2px;background:var(--bordo);border-radius:2px;flex:none}
+  .sec-eye{font-family:'Space Mono';font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--lav);display:inline-flex;align-items:center;gap:10px}
+  .sec-eye::before{content:"";width:22px;height:2px;background:var(--lav);border-radius:2px;flex:none}
 
   .top{max-width:880px;margin:0 auto 30px;text-align:center}
-  .badge{display:inline-flex;align-items:center;gap:9px;font-family:'Space Mono';font-size:12px;letter-spacing:.16em;color:var(--navy);background:#fff;border:1px solid var(--line);padding:8px 16px;border-radius:30px;box-shadow:0 4px 16px rgba(30,58,107,.08)}
-  .badge img{height:15px;background:#16233D;padding:2px 4px;border-radius:3px}
+  .badge{display:inline-flex;align-items:center;gap:9px;font-family:'Space Mono';font-size:12px;letter-spacing:.16em;color:var(--navy);background:#fff;border:1px solid var(--line);padding:8px 16px;border-radius:30px;box-shadow:0 4px 16px rgba(142,123,232,.08)}
+  .badge img{height:15px;background:#1B2030;padding:2px 4px;border-radius:3px}
   .top h1{font-size:clamp(29px,4.8vw,48px);font-weight:800;margin:18px 0 8px}
-  .top h1 em{font-style:normal;background:linear-gradient(120deg,var(--navy),var(--bordo));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .top h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
   .top .sub{font-size:16px;color:var(--soft);font-weight:600}
   .thesis{max-width:780px;margin:18px auto 0;font-size:14.5px;color:var(--ink);line-height:1.55;background:var(--navy-soft);border:1px solid var(--line);border-radius:14px;padding:16px 22px}
   .thesis b{color:var(--navy)}
 
   .block{margin-top:30px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:30px;box-shadow:0 18px 48px -14px rgba(20,41,82,.18);position:relative;overflow:hidden}
-  .block::after{content:"";position:absolute;top:0;left:24px;right:24px;height:2px;background:linear-gradient(90deg,var(--navy),var(--bordo) 55%,transparent);opacity:.55;border-radius:2px}
+  .block::after{content:"";position:absolute;top:0;left:24px;right:24px;height:2px;background:linear-gradient(90deg,var(--navy),var(--lav) 55%,transparent);opacity:.55;border-radius:2px}
   .block>h2{font-size:clamp(20px,2.8vw,27px);font-weight:800;margin:8px 0 4px}
   .block>.bsub{color:var(--soft);font-size:14px;margin-bottom:20px;max-width:80ch}
 
@@ -66,11 +66,11 @@
   .icase{text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;font-family:'Inter';transition:transform .15s,box-shadow .15s,background .15s,border-color .15s}
   .icase .ce{font-family:'Space Mono';font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--bordo);display:block;margin-bottom:3px}
   .icase b{font-size:13px;font-weight:700;color:var(--ink);line-height:1.25}
-  .icase:hover{border-color:var(--navy);transform:translateX(2px);box-shadow:0 8px 18px rgba(30,58,107,.12)}
+  .icase:hover{border-color:var(--navy);transform:translateX(2px);box-shadow:0 8px 18px rgba(142,123,232,.12)}
   .icase.active{background:linear-gradient(155deg,var(--bordo),var(--bordo-deep));border-color:transparent}
   .icase.active .ce{color:#F1B8C6}.icase.active b{color:#fff}
 
-  .idetail{border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 12px 34px rgba(30,58,107,.1);transition:opacity .25s}
+  .idetail{border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 12px 34px rgba(142,123,232,.1);transition:opacity .25s}
   .id-head{background:linear-gradient(155deg,var(--navy),var(--deep));color:#fff;padding:13px 20px;font-family:'Sora';font-weight:700;font-size:14.5px}
   .id-body{padding:18px 20px}
   .id-flow{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch;margin-bottom:14px}
@@ -126,7 +126,7 @@
   .chip{font-size:13px;font-weight:600;color:var(--navy);background:var(--navy-soft);border:1px solid #DCE4F1;padding:9px 15px;border-radius:30px}
 
   .rcard,.pool,.mod{transition:transform .16s,box-shadow .16s}
-  .rcard:hover,.pool:hover,.mod:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(30,58,107,.13)}
+  .rcard:hover,.pool:hover,.mod:hover{transform:translateY(-3px);box-shadow:0 12px 26px rgba(142,123,232,.13)}
 
   /* MATCHING DEMO */
   .match{display:grid;grid-template-columns:262px 1fr;gap:16px;margin-top:6px}
@@ -135,7 +135,7 @@
   .mcase{text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;font-family:'Inter';transition:transform .15s,box-shadow .15s,background .15s,border-color .15s}
   .mcase .ce{font-family:'Space Mono';font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--bordo);display:block;margin-bottom:3px}
   .mcase b{font-size:13px;font-weight:700;color:var(--ink);line-height:1.25}
-  .mcase:hover{border-color:var(--navy);transform:translateX(2px);box-shadow:0 8px 18px rgba(30,58,107,.12)}
+  .mcase:hover{border-color:var(--navy);transform:translateX(2px);box-shadow:0 8px 18px rgba(142,123,232,.12)}
   .mcase.active{background:linear-gradient(155deg,var(--navy),var(--deep));border-color:transparent}
   .mcase.active .ce{color:#9DB3C6}.mcase.active b{color:#fff}
   .mres{display:flex;flex-direction:column;gap:10px;transition:opacity .25s}
@@ -151,31 +151,6 @@
   .mr-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--navy),var(--bordo));border-radius:4px}
   .mr-lab{font-family:'Space Mono';font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
 
-  /* SENARYO MATRİSİ */
-  .mxwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
-  .matrix{display:grid;grid-template-columns:124px repeat(4,minmax(146px,1fr));gap:8px;min-width:720px}
-  .mx-corner{font-family:'Space Mono';font-size:9.5px;color:var(--soft);display:flex;align-items:flex-end;padding:4px 6px;line-height:1.3}
-  .mx-col{background:var(--deep);color:#fff;border-radius:10px;padding:11px 8px;text-align:center;font-family:'Sora';font-weight:700;font-size:12.5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
-  .mx-col .ar{font-size:14px;color:#F1B8C6;font-weight:700}
-  .mx-row{background:var(--navy-soft);color:var(--navy);border-radius:10px;padding:10px 12px;font-family:'Sora';font-weight:700;font-size:12.5px;display:flex;flex-direction:column;justify-content:center}
-  .mx-row small{font-family:'Inter';font-weight:500;font-size:10px;color:var(--soft);margin-top:2px}
-  .mx-cell{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:11.8px;color:var(--ink);line-height:1.32;cursor:pointer;text-align:left;transition:transform .16s,box-shadow .16s,background .16s,border-color .16s;display:flex;align-items:center;min-height:60px;font-family:'Inter'}
-  .mx-cell:hover{border-color:var(--navy);transform:translateY(-2px);box-shadow:0 8px 20px rgba(30,58,107,.14)}
-  .mx-cell.active{background:linear-gradient(155deg,var(--bordo),var(--bordo-deep));color:#fff;border-color:transparent;box-shadow:0 10px 26px rgba(138,42,67,.3)}
-  .mx-cell:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
-  .mx-detail{margin-top:16px;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 12px 34px rgba(30,58,107,.1);transition:opacity .25s}
-  .mx-detail .dh{display:flex;align-items:center;gap:11px;background:linear-gradient(155deg,var(--navy),var(--deep));color:#fff;padding:14px 22px;flex-wrap:wrap}
-  .dh .dp{font-family:'Sora';font-weight:700;font-size:14.5px}
-  .dh .dx{color:#9DB3C6;font-size:13px}
-  .dh .ds{background:var(--bordo);color:#fff;padding:4px 11px;border-radius:20px;font-family:'Space Mono';font-size:10.5px;letter-spacing:.08em}
-  .mx-detail .dbody{padding:20px 22px}
-  .dbody .dt{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:9px}
-  .dbody .dn{font-size:13.5px;color:var(--ink);line-height:1.55;margin-bottom:13px}
-  .dbody .dk{font-size:12.5px;color:var(--soft);margin-bottom:14px}
-  .dbody .dk b{color:var(--navy)}
-  .dbody .do{background:var(--bordo-soft);border-left:3px solid var(--bordo);border-radius:10px;padding:12px 16px;font-size:14.5px;font-style:italic;color:var(--bordo-deep);font-weight:500}
-  .dbody .do span{display:block;font-family:'Space Mono';font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-style:normal;font-weight:400;margin-bottom:6px}
-
   .foot{margin-top:28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;color:var(--soft);font-size:12px;font-family:'Space Mono'}
   .foot b{color:var(--ink)}
 </style>
@@ -184,10 +159,10 @@
 <div class="page">
 
   <div class="top">
-    <span class="badge"><img src="https://babacangyo.com/wp-content/uploads/2026/03/GYO-white-logo-150x67.png" alt="">Babacan GYO × Ali · AI Stok Zekâsı</span>
+    <span class="badge"><img src="https://babacangyo.com/wp-content/uploads/2026/03/GYO-white-logo-150x67.png" alt="">Babacan GYO · AI Stok Zekâsı</span>
     <h1>Stok Dönüşüm <em>Merkezi</em></h1>
-    <p class="sub">Ali Inventory OS — neden satılmadı, nasıl satılır</p>
-    <p class="thesis">500 daire satılmıyorsa sorun çoğu zaman <b>satış ekibi değildir</b> — yanlış fiyat, yanlış ürün, yanlış hedef kitle, yanlış kanal ya da stoğun anlatılamamasıdır. Ali bunu <b>daire daire teşhis eder ve nakde çevirir.</b> Asıl KPI "lead yönetimi" değil — <b>stok eritme hızı.</b></p>
+    <p class="sub">AI Stok Zekâsı — neden satılmadı, nasıl satılır</p>
+    <p class="thesis">500 daire satılmıyorsa sorun çoğu zaman <b>satış ekibi değildir</b> — yanlış fiyat, yanlış ürün, yanlış hedef kitle, yanlış kanal ya da stoğun anlatılamamasıdır. Sistem bunu <b>daire daire teşhis eder ve nakde çevirir.</b> Asıl KPI "lead yönetimi" değil — <b>stok eritme hızı.</b></p>
   </div>
 
   <!-- 01 NEDEN SATILMADI -->
@@ -208,7 +183,7 @@
   <div class="block">
     <span class="sec-eye">02 · Asıl KPI</span>
     <h2>Geliştiricinin gerçek problemi CRM değil.</h2>
-    <p class="bsub">Yönetim kurulunda konuşulan şey CRM kullanımı değil; 500 dairenin kaç ayda nakde döneceğidir. Ali'nin ekranı da tam bunu göstermeli.</p>
+    <p class="bsub">Yönetim kurulunda konuşulan şey CRM kullanımı değil; 500 dairenin kaç ayda nakde döneceğidir. Sistemin ekranı da tam bunu göstermeli.</p>
     <div class="kpi">
       <div class="old"><div class="lab">Eski odak</div><h3>Lead yönetimi · CRM kullanımı</h3></div>
       <div class="ar">→</div>
@@ -220,7 +195,7 @@
   <div class="block">
     <span class="sec-eye">03 · AI Stok Zekâsı Matrisi</span>
     <h2>Neden satılmadı → nasıl satılır.</h2>
-    <p class="bsub">Soldaki takılı stoğa tıkla; Ali'nin teşhisini ve tam çözüm zincirini gör: neden satılmadı → nasıl satılır → hangi persona → hangi kanal → hangi remarketing/yeni alıcı → AI satış scripti.</p>
+    <p class="bsub">Soldaki takılı stoğa tıkla; sistemin teşhisini ve tam çözüm zincirini gör: neden satılmadı → nasıl satılır → hangi persona → hangi kanal → hangi remarketing/yeni alıcı → AI satış scripti.</p>
     <div class="imx">
       <div class="icases" id="icases">
         <button class="icase" data-k="a"><span class="ce">Yanlış hedef kitle</span><b>Daire 12A — 240 gün, 0 teklif</b></button>
@@ -232,14 +207,27 @@
       </div>
       <div class="idetail" id="idetail"></div>
     </div>
-    <p class="imx-hint">↑ örnek senaryolar — Ali her daireyi gerçek veriyle (stok yaşı, gösterim, teklif, favori) bu zincire oturtur.</p>
+    <p class="imx-hint">↑ örnek senaryolar — Sistem her daireyi gerçek veriyle (stok yaşı, gösterim, teklif, favori) bu zincire oturtur.</p>
   </div>
 
-  <!-- 04 DAİRE BAŞI ZEKÂ -->
+  <!-- 04 HAVUZLAR -->
   <div class="block">
-    <span class="sec-eye">04 · Daire Başı Zekâ</span>
+    <span class="sec-eye">04 · 500 Konutu 5 Havuza Böl</span>
+    <h2>Aynı satış dili herkese kullanılmaz.</h2>
+    <div class="grid g5">
+      <div class="pool"><div class="pn">Havuz 1</div><b>Vatandaşlık · 400K USD+</b><p>Rus · İran · Kazakistan · Çin · Pakistan</p></div>
+      <div class="pool"><div class="pn">Havuz 2</div><b>Oturum isteyen yabancı</b><p>Almanya · Hollanda · İngiltere</p></div>
+      <div class="pool"><div class="pn">Havuz 3</div><b>Türk yatırımcı</b><p>Kira getirisi · değer artışı</p></div>
+      <div class="pool"><div class="pn">Havuz 4</div><b>İlk evini alan aile</b><p>Kredi odaklı</p></div>
+      <div class="pool"><div class="pn">Havuz 5</div><b>Üst segment yaşam alıcısı</b><p>Lifestyle · prestij</p></div>
+    </div>
+  </div>
+
+  <!-- 05 DAİRE BAŞI ZEKÂ -->
+  <div class="block">
+    <span class="sec-eye">05 · Daire Başı Zekâ</span>
     <h2>Satışçı katalog değil, çözüm satar.</h2>
-    <p class="bsub">Ali her daireyi AI ile etiketler; satışçı "hangi daire kime uygun"u bilir.</p>
+    <p class="bsub">Her daire AI ile etiketlenir; satışçı "hangi daire kime uygun"u bilir.</p>
     <div class="units">
       <div class="unit">
         <div class="uh">Daire 12A <small>stok 240 gün</small></div>
@@ -261,11 +249,11 @@
     </div>
   </div>
 
-  <!-- 05 ALICI HAVUZLARI & EŞLEŞTİRME -->
+  <!-- 06 EŞLEŞTİRME DEMOSU -->
   <div class="block">
-    <span class="sec-eye">05 · Alıcı Havuzları &amp; Eşleştirme</span>
-    <h2>500 konutu 5 havuza böl — aynı satış dili herkese kullanılmaz.</h2>
-    <p class="bsub">Stok beş alıcı havuzuna ayrılır; satışçı katalog taramaz, havuzu seçer. Ali stoğu uyum skoruna göre eşleştirir ve nedenini gösterir.</p>
+    <span class="sec-eye">06 · Eşleştirme Demosu</span>
+    <h2>Alıcıyı seç — sistem uygun daireleri sıralasın.</h2>
+    <p class="bsub">Satışçı katalog taramaz. Personayı seçer; sistem stoğu uyum skoruna göre eşleştirir ve nedenini gösterir.</p>
     <div class="match">
       <div class="mcases" id="mcases">
         <button class="mcase" data-k="vat"><span class="ce">Havuz 1</span><b>Vatandaşlık alıcısı</b></button>
@@ -281,7 +269,7 @@
 
   <!-- 07 MODÜLLER -->
   <div class="block">
-    <span class="sec-eye">06 · Olmazsa Olmaz Modüller</span>
+    <span class="sec-eye">07 · Olmazsa Olmaz Modüller</span>
     <h2>CRM değil — satış operasyon sistemi.</h2>
     <div class="grid g3">
       <div class="mod"><b>Portföy Skoru</b><p>Fiyat, emsal, lokasyon, kira getirisi, deprem/iskan/tapu riski.</p></div>
@@ -295,9 +283,8 @@
 
   <!-- 07 SİNYALLER -->
   <div class="block">
-    <span class="sec-eye">07 · Eylül'e Kadar İzlenecek Sinyaller</span>
+    <span class="sec-eye">08 · Eylül'e Kadar İzlenecek Sinyaller</span>
     <h2>Piyasayı önden okuyup kampanyayı tetikleriz.</h2>
-    <p class="bsub">Bu sinyallerden biri gerçekleştiğinde, aşağıdaki kampanya matrisi devreye girer.</p>
     <div class="chips">
       <span class="chip">Faiz indirimi sinyali</span>
       <span class="chip">Konut kredisi faizleri</span>
@@ -307,51 +294,9 @@
     </div>
   </div>
 
-  <!-- 08 SENARYO MATRİSİ -->
-  <div class="block">
-    <span class="sec-eye">08 · Senaryo × Persona Kampanya Matrisi</span>
-    <h2>Sinyal gerçekleşince devreye giren kampanya.</h2>
-    <p class="bsub">Yukarıdaki sinyallerden biri tetiklendiğinde her alıcı tipi için mesaj hazırdır. <b>Bunu AI otomatik üretmez:</b> strateji insan önderliğinde, içerik AI ile hızlanır, üretim AI + insan QA ile çıkar — ajansın yerini alan katman budur. Bir hücreye tıkla.</p>
-    <div class="mxwrap">
-      <div class="matrix">
-        <div class="mx-corner">Persona ↓ / Senaryo →</div>
-        <div class="mx-col">Faiz <span class="ar">↓</span></div>
-        <div class="mx-col">Altın <span class="ar">↑</span></div>
-        <div class="mx-col">Savaş / Kriz</div>
-        <div class="mx-col">Piyasa <span class="ar">↗</span></div>
-
-        <div class="mx-row">Türk yatırımcı<small>getiri / değer</small></div>
-        <button class="mx-cell" data-k="ty-f">Düşük faizle kaldıraç + kira</button>
-        <button class="mx-cell" data-k="ty-a">Altından gayrimenkule geç</button>
-        <button class="mx-cell" data-k="ty-s">Döviz kira, sabit varlık</button>
-        <button class="mx-cell" data-k="ty-p">Değer artışı — erken gir</button>
-
-        <div class="mx-row">Yabancı yatırımcı<small>döviz / vatandaşlık</small></div>
-        <button class="mx-cell" data-k="yy-f">TL ucuz — döviz fırsatı</button>
-        <button class="mx-cell" data-k="yy-a">Hard-currency değer saklama</button>
-        <button class="mx-cell" data-k="yy-s">Güvenli liman + vatandaşlık</button>
-        <button class="mx-cell" data-k="yy-p">Premium İstanbul + getiri</button>
-
-        <div class="mx-row">Gurbetçi<small>Avrupalı Türk</small></div>
-        <button class="mx-cell" data-k="g-f">Memlekette fırsat + döviz</button>
-        <button class="mx-cell" data-k="g-a">Birikimi gayrimenkule çevir</button>
-        <button class="mx-cell" data-k="g-s">Döviz varlık, aileye yuva</button>
-        <button class="mx-cell" data-k="g-p">Değerlenen yatırım</button>
-
-        <div class="mx-row">Türk oturumcu<small>aile / yaşam</small></div>
-        <button class="mx-cell" data-k="to-f">Uygun kredi + hazır yuva</button>
-        <button class="mx-cell" data-k="to-a">Birikimi yaşanacak eve</button>
-        <button class="mx-cell" data-k="to-s">Güvenli, yönetimli yuva</button>
-        <button class="mx-cell" data-k="to-p">Kozmopolit-premium, sınırlı daire</button>
-      </div>
-    </div>
-    <p class="imx-hint">↑ örnek kampanya anlatıları — gerçek mesaj ve görsel, marka QA'inden geçerek üretilir.</p>
-    <div class="mx-detail" id="mxdetail"></div>
-  </div>
-
   <div class="foot">
     <span>Stok Dönüşüm Merkezi · Babacan GYO'ya özel</span>
-    <span><b>Ali motoru</b> ile çalışır · Gizli</span>
+    <span><b>Sistem altyapısı</b> · Gizli</span>
   </div>
 
 </div>
@@ -446,44 +391,6 @@
     });
   });
   const mfirst=document.querySelector('.mcase[data-k="vat"]');mfirst.classList.add('active');showM('vat');
-
-  const SM={
-    "ty-f":{p:"Türk yatırımcı",s:"Faiz düşerse",baslik:"Ucuz krediyle kaldıraçlı getiri",neden:"Faiz düşünce kredili alım kârlı hale gelir; yatırımcı düşük peşinatla girer, kira geliri ve değer artışıyla kazanır.",kanal:"Broker · yatırımcı içeriği · e-posta",ornek:"Faiz düştü: peşinatın aynı, getirin katlanıyor."},
-    "ty-a":{p:"Türk yatırımcı",s:"Altın fırlarsa",baslik:"Altından gayrimenkule rotasyon",neden:"Altın zirvedeyken yatırımcı kârını realize edip kira getiren sabit bir varlığa geçmek ister; gayrimenkul bu rotasyonun doğal adresidir.",kanal:"Yatırımcı içerik · e-posta · broker",ornek:"Altın zirvede — kâr realize et, kira getiren m²'ye geç."},
-    "ty-s":{p:"Türk yatırımcı",s:"Savaş / kriz",baslik:"Belirsizlikte sabit varlık + döviz kira",neden:"Kur ve piyasa oynaklığında gayrimenkul + döviz kira, enflasyon ve kur riskine karşı koruma sağlar.",kanal:"Yatırımcı içerik · e-posta",ornek:"Kur oynarken değerini koru, döviz kira kazan."},
-    "ty-p":{p:"Türk yatırımcı",s:"Piyasa iyiyse",baslik:"Yükselen piyasada erken pozisyon",neden:"Piyasa iyiyken momentum vardır; erken giren değer artışını yakalar. Aciliyet ve kıtlık mesajı işler.",kanal:"Marka · sosyal · broker",ornek:"Fiyatlar dönmeden — son yatırımlık daireler."},
-    "yy-f":{p:"Yabancı yatırımcı",s:"Faiz düşerse",baslik:"Döviz alıcı için kur avantajı penceresi",neden:"TL zayıfken döviz sahibi yabancı için giriş ucuzdur; faiz ortamı yerel talebi de canlandırır, çıkışı kolaylaştırır.",kanal:"Çok dilli · vatandaşlık kanalı",ornek:"Your currency buys more in Istanbul — right now."},
-    "yy-a":{p:"Yabancı yatırımcı",s:"Altın fırlarsa",baslik:"Döviz bazlı değer saklama aracı",neden:"Güvenli liman arayan yabancı için altına alternatif: döviz kira getiren, elle tutulur bir varlık.",kanal:"Çok dilli · yatırımcı içerik",ornek:"A hard asset that pays rent in hard currency."},
-    "yy-s":{p:"Yabancı yatırımcı",s:"Savaş / kriz",baslik:"Güvenli liman + Türk vatandaşlığı",neden:"Jeopolitik krizde yabancı hem güvenli varlık hem ikinci pasaport/oturum arar; ikisini tek pakette sunarız.",kanal:"Çok dilli · vatandaşlık danışmanı",ornek:"Safe asset today, a second passport tomorrow."},
-    "yy-p":{p:"Yabancı yatırımcı",s:"Piyasa iyiyse",baslik:"Premium İstanbul + getiri + vatandaşlık",neden:"Piyasa iyiyken premium lokasyon, lifestyle ve vatandaşlık paketi en güçlü konumlamadır.",kanal:"Çok dilli · lifestyle içerik",ornek:"Own a piece of Istanbul's skyline."},
-    "g-f":{p:"Gurbetçi",s:"Faiz düşerse",baslik:"Döviz avantajıyla memlekette fırsat",neden:"Avrupalı Türk döviz kazanır; faiz düşünce ve kur avantajıyla memlekette alım çok cazip hale gelir.",kanal:"Avrupa kanalları · WhatsApp · fuar",ornek:"Euro'nla memlekette daire — bu yaz tam zamanı."},
-    "g-a":{p:"Gurbetçi",s:"Altın fırlarsa",baslik:"Birikimini hem yatırıma hem memlekete bağla",neden:"Gurbetçi için gayrimenkul sadece yatırım değil, memlekete duygusal ve ailevi bir bağdır.",kanal:"Avrupa kanalları · sosyal",ornek:"Birikimin memlekette değerlensin, kökün burada kalsın."},
-    "g-s":{p:"Gurbetçi",s:"Savaş / kriz",baslik:"Güvenli döviz varlık + ailene yuva",neden:"Krizde güvenlik arayışı + memlekette aile için bir yuva ihtiyacı birleşir.",kanal:"Avrupa kanalları · WhatsApp",ornek:"Aileni güvenceye al, memlekette yuvan hazır olsun."},
-    "g-p":{p:"Gurbetçi",s:"Piyasa iyiyse",baslik:"Yükselen piyasada döviz avantajlı yatırım",neden:"Piyasa iyiyken gurbetçi, döviz avantajıyla değer artışını ekstra kârla yakalar.",kanal:"Avrupa kanalları · sosyal",ornek:"Euro avantajınla değerlenen İstanbul'a ortak ol."},
-    "to-f":{p:"Türk oturumcu",s:"Faiz düşerse",baslik:"Uygun krediyle hazır, premium yuva",neden:"Faiz düşünce Türk aile kredili alıma yönelir; hazır teslim ve net taksit güven verir, kararı hızlandırır.",kanal:"Arama · sosyal · portal · satış ofisi",ornek:"Düşük taksitle, hayalindeki eve hemen taşın."},
-    "to-a":{p:"Türk oturumcu",s:"Altın fırlarsa",baslik:"Birikimini değer kaybetmeyen bir yuvaya",neden:"Altın/birikim oynaklığında aile, hem oturacağı hem değerini koruyacağı bir eve yönelebilir.",kanal:"Arama · sosyal · portal",ornek:"Paran erimesin — yaşayacağın bir değere dönüşsün."},
-    "to-s":{p:"Türk oturumcu",s:"Savaş / kriz",baslik:"Güvenli, profesyonel yönetimli topluluk",neden:"Belirsizlikte aile güvenlik, yönetim kalitesi ve istikrar arar. Reputasyon reframe'i tam burada devreye girer: kozmopolit ama güvenli, yönetimli yaşam.",kanal:"Arama · satış ofisi · sosyal kanıt",ornek:"Güvenli, yönetimli, kozmopolit bir yaşam alanı."},
-    "to-p":{p:"Türk oturumcu",s:"Piyasa iyiyse",baslik:"Kozmopolit-premium yaşam, sınırlı fırsat",neden:"Piyasa iyiyken premium lifestyle + kıtlık mesajı işler; algıyı 'Arap sitesi'nden 'uluslararası prestij'e çeviririz.",kanal:"Marka · sosyal · satış ofisi",ornek:"Uluslararası bir yaşam — geriye sınırlı sayıda daire."}
-  };
-  const sdet=document.getElementById('mxdetail');
-  function showS(k){
-    const d=SM[k];
-    sdet.style.opacity=0;
-    setTimeout(()=>{
-      sdet.innerHTML=`<div class="dh"><span class="dp">${d.p}</span><span class="dx">×</span><span class="ds">${d.s}</span></div>`
-        +`<div class="dbody"><div class="dt">${d.baslik}</div><div class="dn">${d.neden}</div>`
-        +`<div class="dk"><b>Kanal:</b> ${d.kanal}</div>`
-        +`<div class="do"><span>Örnek mesaj</span>${d.ornek}</div></div>`;
-      sdet.style.opacity=1;
-    },140);
-  }
-  document.querySelectorAll('.mx-cell').forEach(c=>{
-    c.addEventListener('click',()=>{
-      document.querySelectorAll('.mx-cell').forEach(x=>x.classList.remove('active'));
-      c.classList.add('active');showS(c.dataset.k);
-    });
-  });
-  const sfirst=document.querySelector('.mx-cell[data-k="to-s"]');sfirst.classList.add('active');showS('to-s');
 </script>
 </body>
 </html>

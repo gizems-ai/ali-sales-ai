@@ -25,7 +25,7 @@ const KAYNAK_DATA = [
 ]
 
 export function EmlakRapor() {
-  const [panoAcik, setPanoAcik] = useState(false)
+  const [viewer, setViewer] = useState<{ src: string; baslik: string } | null>(null)
   const toplamCiro   = TEMSILCI_SKORU.reduce((s, t) => s + t.ciro, 0)
   const toplamSatis  = TEMSILCI_SKORU.reduce((s, t) => s + t.satisAdedi, 0)
   const komisyonOrani = 0.025
@@ -73,7 +73,7 @@ export function EmlakRapor() {
       </div>
 
       {/* Stok Durumu Analizi — gömülü canlı pano */}
-      <button onClick={() => setPanoAcik(true)}
+      <button onClick={() => setViewer({ src: '/decks/Babacan_Portfoy_Durum_Panosu.html', baslik: 'Portföy Durum Panosu' })}
         className="w-full text-left rounded-[22px] border bg-white p-[16px] shadow-sm flex items-center gap-[14px] transition-shadow hover:shadow-md"
         style={{ borderColor: E.line }}>
         <span className="grid place-items-center rounded-[13px] text-white shrink-0" style={{ width: 44, height: 44, background: 'linear-gradient(135deg,#6D5BE0,#8c97d8)' }}>
@@ -223,11 +223,48 @@ export function EmlakRapor() {
         </div>
       </div>
 
+      {/* Sistem deck'leri — Raporlar sonu */}
+      <button onClick={() => setViewer({ src: '/decks/Babacan_Revenue_OS.html', baslik: 'Revenue OS — Gelir & Satış Motoru' })}
+        className="w-full text-left rounded-[22px] border bg-white p-[16px] shadow-sm flex items-center gap-[14px] transition-shadow hover:shadow-md"
+        style={{ borderColor: E.line }}>
+        <span className="grid place-items-center rounded-[13px] text-white shrink-0" style={{ width: 44, height: 44, background: 'linear-gradient(135deg,#6D5BE0,#8c97d8)' }}>
+          <TrendingUp size={20} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-[8px] flex-wrap">
+            <p className="text-[15px] font-black" style={{ color: E.text }}>Revenue OS — Gelir &amp; Satış Motoru</p>
+            <span className="inline-flex items-center gap-[5px] rounded-full px-[8px] py-[2px] text-[10px] font-bold" style={{ background: '#D1FAE5', color: '#065F46' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />Canlı içerik
+            </span>
+          </div>
+          <p className="text-[12px] text-slate-400 mt-[2px] truncate">Sistem · 6 motorlu gelir çarkı · CRM · temas noktaları matrisi</p>
+        </div>
+        <ChevronRight size={18} className="text-slate-300 shrink-0" />
+      </button>
+
+      <button onClick={() => setViewer({ src: '/decks/Babacan_Stok_Zekasi.html', baslik: 'Stok Dönüşüm Merkezi' })}
+        className="w-full text-left rounded-[22px] border bg-white p-[16px] shadow-sm flex items-center gap-[14px] transition-shadow hover:shadow-md"
+        style={{ borderColor: E.line }}>
+        <span className="grid place-items-center rounded-[13px] text-white shrink-0" style={{ width: 44, height: 44, background: 'linear-gradient(135deg,#2c8a52,#4f9f6c)' }}>
+          <Home size={20} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-[8px] flex-wrap">
+            <p className="text-[15px] font-black" style={{ color: E.text }}>Stok Dönüşüm Merkezi</p>
+            <span className="inline-flex items-center gap-[5px] rounded-full px-[8px] py-[2px] text-[10px] font-bold" style={{ background: '#D1FAE5', color: '#065F46' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />Canlı içerik
+            </span>
+          </div>
+          <p className="text-[12px] text-slate-400 mt-[2px] truncate">Sistem · neden satılmadı → nasıl satılır · alıcı-daire eşleştirme</p>
+        </div>
+        <ChevronRight size={18} className="text-slate-300 shrink-0" />
+      </button>
+
       <ContentViewer
-        open={panoAcik}
-        baslik="Portföy Durum Panosu"
-        src="/decks/Babacan_Portfoy_Durum_Panosu.html"
-        onClose={() => setPanoAcik(false)}
+        open={!!viewer}
+        baslik={viewer?.baslik ?? ''}
+        src={viewer?.src ?? ''}
+        onClose={() => setViewer(null)}
       />
     </div>
   )

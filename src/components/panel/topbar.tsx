@@ -33,17 +33,20 @@ export async function Topbar() {
     return (
       <header style={{
         position: 'sticky',
-        top: 0,
+        top: 16,
         zIndex: 20,
-        padding: '18px 32px',
+        // Sidebar gibi yüzen frosted kart — 16px üst hizası tuttur, tam-genişlik sert şerit görünmesin ("kayık" fix)
+        margin: '16px 24px 0 0',
+        padding: '14px 22px',
         display: 'flex',
         alignItems: 'center',
         gap: 22,
-        // Frosted glass — sticky'ken altından kayan içerik bulanıklaşır, selamlama okunur kalır
-        background: 'rgba(247, 246, 251, .72)',
-        backdropFilter: 'blur(22px) saturate(165%)',
-        WebkitBackdropFilter: 'blur(22px) saturate(165%)',
-        borderBottom: '1px solid rgba(255,255,255,.6)',
+        background: 'rgba(255,255,255,.62)',
+        backdropFilter: 'blur(24px) saturate(165%)',
+        WebkitBackdropFilter: 'blur(24px) saturate(165%)',
+        border: '1px solid rgba(255,255,255,.72)',
+        borderRadius: 20,
+        boxShadow: '0 2px 6px rgba(40,60,45,.05),0 22px 46px -26px rgba(40,70,50,.30)',
       }}>
         {/* Greeting */}
         <div>

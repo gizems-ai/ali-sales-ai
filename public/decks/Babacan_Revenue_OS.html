@@ -208,19 +208,17 @@
 
   .mxnote{margin-top:16px;font-size:12.5px;color:var(--soft);line-height:1.5}
   .mxnote b{color:var(--navy)}
-
-  .tpgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-  @media(max-width:840px){.tpgrid{grid-template-columns:1fr}}
-  .tpcol{border:1px solid var(--line);border-radius:16px;padding:20px;background:linear-gradient(165deg,#fff,#F7F8FC);border-top:4px solid var(--c-strat)}
-  .tpcol:nth-child(2){border-top-color:var(--c-talep)}.tpcol:nth-child(3){border-top-color:var(--bordo)}
-  .tpcol h3{font-size:15px;font-weight:800;margin-bottom:3px}
-  .tpcol .tph{font-family:'Space Mono';font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin-bottom:12px}
-  .tpcol ul{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
-  .tpcol li{display:flex;gap:9px;font-size:13.5px;color:var(--ink);align-items:flex-start}
-  .tpcol li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--soft);margin-top:7px;flex:none}
-  .tpfill{border-top:1px dashed var(--line);padding-top:11px;font-size:12.5px;display:flex;justify-content:space-between;align-items:baseline}
-  .tpfill b{font-family:'Space Mono';font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--bordo)}
-  .tpfill span{color:#C7C5D2;font-style:italic}
+  .tpmx{display:grid;grid-template-columns:118px 1fr 1fr;gap:10px;margin-top:24px}
+  .tpmx .h{background:var(--lav-soft);border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;font-family:'Space Mono';font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--navy);padding:12px}
+  .tpmx .rh{background:var(--navy);color:#fff;border-radius:12px;display:flex;align-items:center;padding:14px;font-family:'Sora';font-weight:800;font-size:15px}
+  .tpmx .cell{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}
+  .tpmx .cell ul{list-style:none;display:flex;flex-direction:column;gap:7px}
+  .tpmx .cell li{font-size:13px;color:var(--ink);padding-left:14px;position:relative;line-height:1.35}
+  .tpmx .cell li::before{content:"·";position:absolute;left:2px;color:var(--lav);font-weight:800}
+  .tpmx .cell li b{color:var(--navy)}
+  .tpxcut{margin-top:12px;background:var(--lav-soft);border:1px solid var(--line);border-radius:14px;padding:14px 18px;font-size:13.5px;color:var(--ink);line-height:1.5}
+  .tpxcut b{color:var(--navy);font-family:'Space Mono';font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+  @media(max-width:760px){.tpmx{grid-template-columns:70px 1fr 1fr}.tpmx .cell{padding:11px}.tpmx .cell li{font-size:12px}}
 </style>
 </head>
 <body>
@@ -414,18 +412,21 @@
   <div class="block">
     <span class="sec-eye">Temas Noktaları</span>
     <h2>Tüm satış-pazarlama temas noktaları — en son önceliklendirilir.</h2>
-    <p class="bsub">Strateji, persona ve senaryo netleşmeden kanal seçilmez. Tüm temas noktaları burada gruplanır; ekip önceliği en son, birlikte koyar.</p>
-    <div class="tpgrid">
-      <div class="tpcol"><h3>Pazarlama temas noktaları</h3><div class="tph">talep yaratan</div>
-        <ul><li>Marka websitesi (çok dilli · ayrı yatırımcı/yabancı cephe)</li><li>Online broşür &amp; proje tanıtımları</li><li>Sosyal medya &amp; reklam</li><li>Emlak portalları · broker ağı</li><li>PR &amp; görünürlük</li></ul>
-        <div class="tpfill"><b>Öncelik</b><span>ekip · en son</span></div></div>
-      <div class="tpcol"><h3>Satış temas noktaları</h3><div class="tph">talebi kapatan</div>
-        <ul><li>AI agent satış ekibi (7/24 ilk yanıt, tüm kanallar)</li><li>Satış ofisi &amp; bot</li><li>Inbound akış (nitele → yönlendir → randevu)</li><li>Outbound akış (hedef liste → sekans → devir)</li><li>Çağrı merkezi · WhatsApp / DM</li></ul>
-        <div class="tpfill"><b>Öncelik</b><span>ekip · en son</span></div></div>
-      <div class="tpcol"><h3>Veri &amp; sistem</h3><div class="tph">hepsini bağlayan</div>
-        <ul><li>CRM — tek veri kaynağı</li><li>AI lead skorlama &amp; yönlendirme</li><li>Sabah Ajandası + Akşam Brifingi</li><li>Günlük ajanda &amp; raporlar</li></ul>
-        <div class="tpfill"><b>Öncelik</b><span>ekip · en son</span></div></div>
+    <p class="bsub">Strateji, persona ve senaryo netleşmeden kanal seçilmez. Tüm temas noktaları online/offline × yerli/yabancı matrisinde haritalanır; <b>önceliği ekip en son, birlikte koyar.</b></p>
+    <div class="tpmx">
+      <div class="h"></div>
+      <div class="h">Yerli</div>
+      <div class="h">Yabancı</div>
+
+      <div class="rh">Online</div>
+      <div class="cell"><ul><li>Marka websitesi (TR)</li><li>Emlak portalları (sahibinden · emlakjet · hepsiemlak)</li><li>Sosyal medya &amp; reklam (TR)</li><li>Google / SEO (TR)</li><li>WhatsApp / Instagram DM</li></ul></div>
+      <div class="cell"><ul><li>Çok dilli website (EN · AR · RU · FA)</li><li>Uluslararası portallar</li><li>Çok dilli AI agent (7/24 ilk yanıt)</li><li>Yurt dışı dijital reklam · SEO</li><li>Yabancı sosyal kanallar</li></ul></div>
+
+      <div class="rh">Offline</div>
+      <div class="cell"><ul><li>Satış ofisi &amp; örnek daire</li><li>Broker / acente ağı (TR)</li><li>Yerel etkinlik &amp; fuar</li><li>Çağrı merkezi</li><li>Referans / tavsiye</li></ul></div>
+      <div class="cell"><ul><li>Yurt dışı vatandaşlık fuarları</li><li>Uluslararası broker ağı</li><li>Relocation / expat ortakları</li><li>Görme gezisi &amp; ofis ziyareti</li><li>Vatandaşlık acenteleri</li></ul></div>
     </div>
+    <div class="tpxcut"><b>Hepsini bağlayan</b> · CRM (tek veri kaynağı) · AI lead skorlama &amp; yönlendirme · Sabah Ajandası + Akşam Brifingi — online/offline ve yerli/yabancı fark etmeksizin her temas tek hatta düşer.</div>
     <p class="statsnote" style="margin-top:18px"><b>Kural:</b> önce strateji ve persona; temas noktası önceliği en son, ekip birlikte koyar.</p>
   </div>
 
