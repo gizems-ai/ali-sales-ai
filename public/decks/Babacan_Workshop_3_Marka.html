@@ -194,7 +194,65 @@
     .flywheel .fw{font-size:11px;padding:7px 11px}
   }
   @media(prefers-reduced-motion:reduce){.holo::before{animation:none}.slide-inner{transition:none;opacity:1;transform:none}}
-</style></head><body><div class="prog" id="prog"></div><div class="brand">Babacan <span style="opacity:.45">×</span> Sales<span class="ai">AI</span><span class="spark">✦</span></div>
+  .matrix{width:100%;border-collapse:separate;border-spacing:0;margin-top:24px;font-size:14px}
+  .matrix th{font-family:'Space Mono';text-transform:uppercase;font-size:11px;letter-spacing:.1em;color:var(--lav);text-align:left;padding:0 14px 12px;font-weight:700}
+  .matrix td{padding:13px 14px;border-top:1px solid var(--line);vertical-align:top;line-height:1.4}
+  .matrix tr td:first-child{font-family:'Sora';font-weight:700;color:var(--navy);width:20%}
+  .matrix .arg{color:var(--ink);font-weight:500}
+  .matrix .ch{color:var(--coral);font-weight:600;font-size:13px}
+  @media(max-width:760px){.matrix{font-size:12px}.matrix td{padding:9px}}
+  /* positioning 2x2 (elevated) */
+  .posq{max-width:660px;margin:24px auto 0}
+  .poslegend{display:flex;gap:24px;justify-content:center;margin-top:4px;font-size:13px;color:var(--soft);font-weight:600}
+  .poslegend span{display:flex;align-items:center;gap:8px}
+  .poslegend .d1{width:13px;height:13px;border-radius:50%;border:3px solid var(--coral)}
+  .poslegend .d2{color:var(--pur);font-size:17px;line-height:1}
+  /* location cards (elevated) */
+  .locgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:26px}
+  .loccard2{background:#fff;border:1px solid var(--line);border-radius:18px;padding:22px;box-shadow:0 8px 24px rgba(23,37,92,.05);display:flex;flex-direction:column;gap:10px;border-left:5px solid var(--mint)}
+  .loccard2:nth-child(2){border-left-color:var(--pur)}.loccard2:nth-child(3){border-left-color:var(--coral)}.loccard2:nth-child(4){border-left-color:var(--pink)}.loccard2:nth-child(5){border-left-color:var(--navy)}
+  .loccard2.span2{grid-column:1/-1}
+  .loccard2 .lh{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+  .loccard2 h3{font-family:'Sora';font-size:21px;color:var(--navy)}
+  .loccard2 .rolepill{font-family:'Space Mono';font-size:11px;font-weight:700;letter-spacing:.03em;padding:6px 12px;border-radius:30px;background:var(--mint-soft);color:#4FA37E;white-space:nowrap}
+  .loccard2:nth-child(2) .rolepill{background:var(--lav-soft);color:var(--pur)}
+  .loccard2:nth-child(3) .rolepill{background:var(--coral-soft);color:var(--coral)}
+  .loccard2:nth-child(4) .rolepill{background:#FBE7F1;color:#C76BA0}
+  .loccard2:nth-child(5) .rolepill{background:#EAF0FB;color:var(--navy)}
+  .loccard2 p{font-size:13.5px;color:var(--soft);line-height:1.45}
+  /* website before/after (elevated) */
+  .waf{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:24px;align-items:stretch}
+  .wcard{border-radius:20px;padding:24px;position:relative}
+  .wcard.bad{background:#F5F4F7;border:1px solid var(--line)}
+  .wcard.good{background:linear-gradient(160deg,#fff,var(--lav-soft));box-shadow:0 14px 40px rgba(142,123,232,.16)}
+  .wcard.good::before{content:"";position:absolute;inset:0;border-radius:20px;padding:1.5px;background:var(--grad);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
+  .wcard .wbadge{display:inline-flex;align-items:center;gap:10px;font-family:'Sora';font-weight:800;font-size:15px;margin-bottom:15px}
+  .wcard.bad .wbadge{color:#A6A2B0}.wcard.good .wbadge{color:var(--navy)}
+  .wcard .wbadge i{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-style:normal}
+  .wcard.bad .wbadge i{background:#C2BECC}.wcard.good .wbadge i{background:var(--grad)}
+  .wcard ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+  .wcard li{font-size:14px;line-height:1.4;padding-left:18px;position:relative}
+  .wcard.bad li{color:#9A96A6}.wcard.good li{color:var(--ink)}
+  .wcard li::before{content:"";position:absolute;left:2px;top:7px;width:6px;height:6px;border-radius:50%}
+  .wcard.bad li::before{background:#C2BECC}.wcard.good li::before{background:var(--pur)}
+  /* touchpoints matrix + output */
+  .tpmx2{display:grid;grid-template-columns:118px 1fr 1fr;gap:10px;margin-top:22px}
+  .tpmx2 .h{background:var(--lav-soft);border-radius:12px;display:flex;align-items:center;justify-content:center;text-align:center;font-family:'Space Mono';font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--navy);padding:12px}
+  .tpmx2 .rh{background:var(--navy);color:#fff;border-radius:12px;display:flex;align-items:center;padding:14px;font-family:'Sora';font-weight:800;font-size:15px}
+  .tpmx2 .cell{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px}
+  .tpmx2 .cell ul{list-style:none;display:flex;flex-direction:column;gap:6px}
+  .tpmx2 .cell li{font-size:12.5px;color:var(--ink);padding-left:13px;position:relative;line-height:1.3}
+  .tpmx2 .cell li::before{content:"·";position:absolute;left:2px;color:var(--lav);font-weight:800}
+  .tpout{margin-top:14px;background:var(--navy);border-radius:18px;padding:22px 24px}
+  .tpout .tt{font-family:'Space Mono';font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--lav);font-weight:700;margin-bottom:8px}
+  .tpout h3{font-family:'Sora';font-size:20px;color:#fff;margin-bottom:14px}
+  .tpout .tprow{display:flex;justify-content:space-between;gap:14px;padding:10px 0;border-bottom:1px dashed rgba(255,255,255,.18);font-size:14px;align-items:baseline}
+  .tpout .tprow:last-child{border-bottom:none}
+  .tpout .tprow .l{font-family:'Sora';font-weight:700;color:#fff;min-width:170px}
+  .tpout .tprow .v{flex:1;color:#9FA8CF;font-style:italic;text-align:right}
+  @media(max-width:760px){.locgrid,.waf{grid-template-columns:1fr}.tpmx2{grid-template-columns:64px 1fr 1fr}.tpmx2 .cell{padding:10px}.tpmx2 .cell li{font-size:11px}}
+</style></head><body>
+<div style="position:fixed;top:16px;left:24px;z-index:60;background:#EF6B4F;color:#fff;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;padding:6px 13px;border-radius:30px;box-shadow:0 6px 18px -6px rgba(239,107,79,.55)">Workshop</div><div class="prog" id="prog"></div><div class="brand">Babacan <span style="opacity:.45">×</span> Sales<span class="ai">AI</span><span class="spark">✦</span></div>
 <div class="deck" id="deck">
 
   <!-- 1 COVER -->
@@ -206,11 +264,49 @@
     <div class="meta"><span>3 bölüm · çalışma oturumu</span><span>Gizem Burteçin &amp; Dr. Hakan Tetik</span></div>
   </div></section>
 
+  <!-- NEDEN ŞİMDİ -->
+  <section class="slide"><div class="holo"></div><div class="slide-inner">
+    <span class="eyebrow coral">Neden şimdi?</span>
+    <h2 class="mega">Faizler düşünce<br><em class="grad">herkes satar.</em></h2>
+    <p class="lead soft" style="margin-top:16px;max-width:760px">İki soru, baştan: <strong style="color:var(--navy)">Bir müşteri bugün neden Babacan'dan ev alsın?</strong> Ve o gün gelene kadar biz ne inşa etmiş olacağız?</p>
+    <p class="note" style="margin-top:18px">Bunu çözemeyen marka, faiz düşünce <em>yalnızca fiyatla yarışır.</em> Pazarın zor olması, tam da bizim fırsatımız.</p>
+  </div></section>
+
   <!-- 2 BÖLÜM 1 DIVIDER -->
   <section class="slide divider"><div class="holo"></div><div class="slide-inner">
     <div class="num">01</div>
     <h2>Marka Ekseni</h2>
     <p class="dsub">Yerli ve yabancı bize <em class="grad">neden</em> ve <em class="grad">nasıl</em> güvensin?</p>
+  </div></section>
+
+  <!-- MARKA KONUMLANDIRMA -->
+  <section class="slide"><div class="holo soft"></div><div class="slide-inner">
+    <span class="eyebrow">Marka konumlandırma</span>
+    <h2 class="big">Babacan bugün <em class="grad">nerede?</em></h2>
+    <p class="lead soft">İki eksen: ucuz ↔ güvenilir, emtia ↔ premium. Bir işaret koyalım — bugün neredeyiz, 5 yıl sonra nerede olmalıyız?</p>
+    <div class="posq">
+      <svg viewBox="0 0 660 440" style="width:100%;height:auto">
+        <defs>
+          <radialGradient id="tgt" cx="50%" cy="50%" r="60%"><stop offset="0" stop-color="#7FC4A3" stop-opacity=".22"/><stop offset="1" stop-color="#7FC4A3" stop-opacity="0"/></radialGradient>
+          <linearGradient id="star" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8E7BE8"/><stop offset="1" stop-color="#C6A6DF"/></linearGradient>
+        </defs>
+        <rect x="340" y="60" width="285" height="155" rx="14" fill="url(#tgt)"/>
+        <rect x="340" y="60" width="285" height="155" rx="14" fill="none" stroke="#7FC4A3" stroke-width="1.5" stroke-dasharray="6 6" opacity=".55"/>
+        <line x1="55" y1="220" x2="615" y2="220" stroke="#D7DAEA" stroke-width="2"/>
+        <line x1="340" y1="48" x2="340" y2="400" stroke="#D7DAEA" stroke-width="2"/>
+        <text x="340" y="36" text-anchor="middle" font-family="Sora" font-weight="800" font-size="15" fill="#17255C">Premium</text>
+        <text x="340" y="420" text-anchor="middle" font-family="Sora" font-weight="800" font-size="15" fill="#6A7088">Emtia</text>
+        <text x="36" y="225" font-family="Sora" font-weight="800" font-size="15" fill="#6A7088">Ucuz</text>
+        <text x="624" y="225" text-anchor="end" font-family="Sora" font-weight="800" font-size="15" fill="#17255C">Güvenilir</text>
+        <text x="482" y="84" text-anchor="middle" font-family="Space Mono" font-size="11" fill="#4FA37E" letter-spacing="1.5">HEDEF BÖLGE</text>
+        <circle cx="245" cy="288" r="11" fill="#fff" stroke="#F08456" stroke-width="3.5"/>
+        <circle cx="245" cy="288" r="20" fill="none" stroke="#F08456" stroke-width="1.5" opacity=".35"/>
+        <text x="245" y="322" text-anchor="middle" font-family="Inter" font-weight="700" font-size="13" fill="#F08456">Bugün?</text>
+        <path d="M482 104 l10 21 23 3 -17 16 4 23 -20 -11 -20 11 4 -23 -17 -16 23 -3z" fill="url(#star)"/>
+        <text x="482" y="196" text-anchor="middle" font-family="Inter" font-weight="700" font-size="13" fill="#7A68D8">5 yıl: Premium + Güvenilir</text>
+      </svg>
+    </div>
+    <div class="poslegend"><span><i class="d1"></i>Bugün</span><span><i class="d2">★</i>5 yıl hedef</span></div>
   </div></section>
 
   <!-- 3 TRUST: domestic vs foreign -->
@@ -368,16 +464,31 @@
     <p class="dsub">Projelerin konumlaması + persona ve ekonomik senaryoya göre satış haritası.</p>
   </div></section>
 
+  <!-- HER LOKASYON -->
+  <section class="slide"><div class="slide-inner">
+    <span class="eyebrow coral">Ayrışma</span>
+    <h2 class="big">Her lokasyon <em class="grad">aynı konuşmaz.</em></h2>
+    <p class="lead soft">Babacan tek ilçeye sıkışmış değil — Esenyurt'tan Beşiktaş'a, 5. Levent-Beylikdüzü-Sefaköy-Bahçelievler'den Gaziantep'e. Aynı marka her yerde aynı şeyi söylerse, hiçbir yerde ayrışmaz.</p>
+    <div class="locgrid">
+      <div class="loccard2"><div class="lh"><h3>Esenyurt</h3><span class="rolepill">Bölgenin güven markası</span></div><p>Yıllardır yaşayan topluluk, kanıtlanmış teslim — markanın güven tabanı (Crown).</p></div>
+      <div class="loccard2"><div class="lh"><h3>Beşiktaş</h3><span class="rolepill">Premium şehir yaşamı</span></div><p>Merkezi prestij (Meridian); butik · tasarım · concierge · yürünebilir. "Premium" = pahalı değil, net karakter.</p></div>
+      <div class="loccard2"><div class="lh"><h3>5. Levent · Beylikdüzü · Sefaköy · Bahçelievler</h3><span class="rolepill">Yatırım &amp; erişilebilir İstanbul</span></div><p>Yükselen değer ve yerleşik bölgeler; yatırım, aile &amp; ilk ev, fiyat-değer. Hacmin geldiği yer.</p></div>
+      <div class="loccard2"><div class="lh"><h3>Gaziantep</h3><span class="rolepill">Anadolu · bölgesel pazar</span></div><p>İstanbul dışında yerel güç; farklı dinamik, bölgesel güven ve talep.</p></div>
+      <div class="loccard2 span2"><div class="lh"><h3>Yurt dışı</h3><span class="rolepill">Güvenilir Türk geliştirici</span></div><p>Developer markası — proje değil, kurum güveni. Yabancı alıcı projeyi değil geliştiriciyi arar.</p></div>
+    </div>
+    <p class="note">Tek marka, her lokasyonda farklı karakter — <em>ama hepsinde aynı güven.</em></p>
+  </div></section>
+
   <!-- 11 PROJECT POSITIONING -->
   <section class="slide"><div class="slide-inner">
     <span class="eyebrow">Konumlama</span>
     <h2 class="big">Dört proje, <em class="grad">dört rol.</em></h2>
-    <p class="lead soft">Tümü Esenyurt'ta — ama her biri farklı persona ve farklı marka rolü taşıyor.</p>
+    <p class="lead soft">Farklı ilçelerde, farklı segmentlerde — her biri farklı persona ve marka rolü taşıyor.</p>
     <div class="units">
-      <div class="unit"><h3>Lagoon</h3><div class="uv">$64,0M · %49,5</div><div class="ur"><b>Hacim & yatırımcı.</b> 251 daire, 1+1 ağırlıklı. Portföyün yarısı — eritme planının merkezi.</div></div>
-      <div class="unit"><h3>Port Royal</h3><div class="uv">$39,5M · en yüksek $/m²</div><div class="ur"><b>Hızlı kazanç.</b> Kanıtlı satış. 1+0'lar hızlı nakit; üst-orta segment.</div></div>
-      <div class="unit"><h3>Central</h3><div class="uv">$15,5M · %12</div><div class="ur"><b>İlk ev & aile.</b> Küçük satılabilir stok; konum avantajı.</div></div>
-      <div class="unit"><h3>Premium</h3><div class="uv">$10,3M · %8</div><div class="ur"><b>Fiyat avantajı.</b> En düşük $/m² — değer/giriş hikâyesi.</div></div>
+      <div class="unit"><h3>Lagoon</h3><div class="uv">5. Levent · $64,0M · %49,5</div><div class="ur"><b>Hacim & yatırımcı.</b> 251 daire, 1+1 ağırlıklı. Portföyün yarısı — eritme planının merkezi.</div></div>
+      <div class="unit"><h3>Port Royal</h3><div class="uv">Sefaköy · $39,5M · en yüksek $/m²</div><div class="ur"><b>Hızlı kazanç.</b> Kanıtlı satış. 1+0'lar hızlı nakit; üst-orta segment.</div></div>
+      <div class="unit"><h3>Central</h3><div class="uv">Beylikdüzü · $15,5M · %12</div><div class="ur"><b>İlk ev & aile.</b> Küçük satılabilir stok; konum avantajı.</div></div>
+      <div class="unit"><h3>Premium</h3><div class="uv">Esenyurt · $10,3M · %8</div><div class="ur"><b>Fiyat avantajı.</b> En düşük $/m² — değer/giriş hikâyesi.</div></div>
     </div>
   </div></section>
 
@@ -412,6 +523,42 @@
       <div class="cc">…</div>
       <div class="cc">Premium · <b>"değer & prestij"</b></div>
     </div></div>
+  </div></section>
+
+  <!-- TEMAS NOKTALARI MATRİSİ -->
+  <section class="slide"><div class="slide-inner">
+    <span class="eyebrow">Temas noktaları</span>
+    <h2 class="big">Müşteriye <em class="grad">nereden dokunuyoruz?</em></h2>
+    <p class="lead soft">Her temas noktası online/offline ve yerli/yabancı ekseninde farklı rol oynar. Önce haritayı çıkar — sonra birini seç.</p>
+    <div class="tpmx2">
+      <div class="h"></div><div class="h">Yerli</div><div class="h">Yabancı</div>
+      <div class="rh">Online</div>
+      <div class="cell"><ul><li>Marka websitesi (TR)</li><li>Portallar (sahibinden · emlakjet)</li><li>Sosyal &amp; reklam (TR)</li><li>WhatsApp / DM</li></ul></div>
+      <div class="cell"><ul><li>Çok dilli website</li><li>Uluslararası portallar</li><li>Çok dilli AI sohbet (7/24)</li><li>Yurt dışı dijital reklam</li></ul></div>
+      <div class="rh">Offline</div>
+      <div class="cell"><ul><li>Satış ofisi &amp; örnek daire</li><li>Broker / acente ağı</li><li>Yerel etkinlik &amp; fuar</li><li>Referans / tavsiye</li></ul></div>
+      <div class="cell"><ul><li>Vatandaşlık fuarları</li><li>Uluslararası broker ağı</li><li>Relocation / expat ortakları</li><li>Görme gezisi &amp; ofis ziyareti</li></ul></div>
+    </div>
+    <div class="tpout">
+      <div class="tt">✦ Çalıştay çıktısı</div>
+      <h3>Bu yaz hangi temas noktası önce gelişmeli?</h3>
+      <div class="tprow"><span class="l">Seçilen temas noktası</span><span class="v">…</span></div>
+      <div class="tprow"><span class="l">Neden öncelik?</span><span class="v">…</span></div>
+      <div class="tprow"><span class="l">Sahip · ilk adım · tarih</span><span class="v">… / … / …</span></div>
+    </div>
+  </div></section>
+
+  <!-- WEB SİTESİ -->
+  <section class="slide"><div class="slide-inner">
+    <span class="eyebrow coral">İkna sistemi</span>
+    <h2 class="big">Web sitesi broşür değil — <em class="grad">yaşam platformu.</em></h2>
+    <div class="waf">
+      <div class="wcard bad"><div class="wbadge"><i>✕</i>Bugün: proje broşürü</div>
+        <ul><li>Render galerisi + fiyat</li><li>Eski nesil, işlevsiz</li><li>Teslim sonrası yaşam yok</li></ul></div>
+      <div class="wcard good"><div class="wbadge"><i>✓</i>Olması gereken: yaşam platformu</div>
+        <ul><li>Gerçek yaşam, yaşayan aileler, çocuklar</li><li>Sakin portalı · bölge rehberi · yatırım hikâyeleri</li><li>Yabancı yatırım rehberi · AI sohbet · teslim sonrası</li><li>Ödüller · CEO · holding · sürdürülebilirlik · "neden Babacan"</li></ul></div>
+    </div>
+    <p class="note">Web sitesi bir katalog değil — <em>müşteriyi ikna eden bir sistem</em> olmalı.</p>
   </div></section>
 
   <!-- 13 WS CARD 3 -->
@@ -467,6 +614,6 @@
   </div></section>
 
 </div>
-<div class="nav"><button id="prev">‹</button><span class="count" id="count">1 / 15</span><button id="next">›</button></div>
+<div class="nav"><button id="prev">‹</button><span class="count" id="count">1 / 20</span><button id="next">›</button></div>
 <script>var slides=[].slice.call(document.querySelectorAll(".slide"));var count=document.getElementById("count");var prog=document.getElementById("prog");var total=slides.length;var idx=0;var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add("in");idx=slides.indexOf(e.target);count.textContent=(idx+1)+" / "+total;prog.style.width=((idx+1)/total*100)+"%";}});},{threshold:.5});slides.forEach(function(s){io.observe(s);});function go(i){i=Math.max(0,Math.min(total-1,i));slides[i].scrollIntoView({behavior:"smooth"});}document.getElementById("next").onclick=function(){go(idx+1);};document.getElementById("prev").onclick=function(){go(idx-1);};window.addEventListener("keydown",function(e){if(["ArrowRight","ArrowDown"," ","PageDown"].indexOf(e.key)>-1){e.preventDefault();go(idx+1);}if(["ArrowLeft","ArrowUp","PageUp"].indexOf(e.key)>-1){e.preventDefault();go(idx-1);}});</script>
 </body></html>

@@ -217,7 +217,7 @@ export const AKADEMI: Content[] = [
     id: 'cont_marka',
     tip: 'ders',
     baslik: 'Marka İşletim Sistemi',
-    altMetin: 'Workshop 3 — marka ekseni & konumlama',
+    altMetin: 'Workshop · 3 bölüm · marka ekseni · denge · konumlama & temas noktaları',
     etiket: 'Yeni',
     canli: true,
     src: '/decks/Babacan_Workshop_3_Marka.html',

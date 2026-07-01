@@ -3,32 +3,32 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Babacan GYO — Gelir Yaratan Organizasyon Modeli</title>
+<title>Babacan GYO — Gelir & Satış Motoru</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --aksiyon:#1E3A6B;--mor:#14294F;--deep:#102444;
-    --bordo:#8A2A43;--bordo2:#A4374F;--bordo-deep:#6E1E33;
-    --navy-soft:#EEF2F9;--bordo-soft:#F8EBEF;--paper:#FFFFFF;
-    --ink:#16233D;--soft:#67708A;--line:#E3E7F0;
-    --c-strat:#1E3A6B;--c-talep:#2B5285;--c-satis:#14294F;
-    --c-deneyim:#9A4257;--c-sadakat:#8A2A43;--c-marka:#6E1E33;
-    --glow:rgba(30,58,107,.30);
+    --aksiyon:#17255C;--mor:#0E1844;--deep:#0E1844;
+    --bordo:#F08456;--bordo2:#F4A077;--bordo-deep:#C9683E;
+    --navy-soft:#F0ECFB;--bordo-soft:#FBE4D8;--paper:#FFFFFF;
+    --ink:#1B2030;--soft:#6A7088;--line:#E8EAF2;
+    --c-strat:#17255C;--c-talep:#5848A6;--c-satis:#0E1844;
+    --c-deneyim:#E79DC4;--c-sadakat:#F08456;--c-marka:#C9683E;
+    --glow:rgba(142,123,232,.30);--navy:#17255C;--navy2:#5848A6;--lav:#B4A6EC;--pur:#8E7BE8;--lil:#C6A6DF;--peach:#F2B79C;--grad:linear-gradient(102deg,#8E7BE8,#C6A6DF 42%,#F2B79C);
   }
   *{box-sizing:border-box;margin:0;padding:0}
   body{font-family:'Inter',system-ui,sans-serif;color:var(--ink);background:#FFFFFF;min-height:100vh;-webkit-font-smoothing:antialiased}
   body::before{content:"";position:fixed;inset:0;z-index:-1;background:#FFFFFF}
   h1,h2,h3{font-family:'Sora',sans-serif;letter-spacing:-.02em;line-height:1.08}
   .page{max-width:1240px;margin:0 auto;padding:40px 5vw 54px}
-  .sec-eye{font-family:'Space Mono';font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--bordo)}
+  .sec-eye{font-family:'Space Mono';font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--lav)}
 
   .top{text-align:center;max-width:780px;margin:0 auto 28px}
-  .badge{display:inline-flex;align-items:center;gap:9px;font-family:'Space Mono';font-size:12px;letter-spacing:.16em;color:var(--aksiyon);background:#fff;border:1px solid var(--line);padding:8px 16px;border-radius:30px;box-shadow:0 4px 16px rgba(30,58,107,.08)}
+  .badge{display:inline-flex;align-items:center;gap:9px;font-family:'Space Mono';font-size:12px;letter-spacing:.16em;color:var(--aksiyon);background:#fff;border:1px solid var(--line);padding:8px 16px;border-radius:30px;box-shadow:0 4px 16px rgba(142,123,232,.08)}
   .badge img{height:15px;width:auto;display:block;border-radius:3px}
   .top h1{font-size:clamp(28px,4.6vw,47px);font-weight:800;margin:18px 0 12px}
-  .top h1 em{font-style:normal;background:linear-gradient(120deg,var(--aksiyon),var(--bordo));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .top h1 em{font-style:normal;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
   .top .slogan{color:var(--soft);font-size:15px;line-height:1.6;max-width:64ch;margin:0 auto}
   .top .slogan b{color:var(--deep);font-weight:600}
 
@@ -36,17 +36,17 @@
   @media(max-width:920px){.stage{grid-template-columns:1fr;gap:24px}}
   .wheel{position:relative;width:min(560px,92vw);aspect-ratio:1;margin:0 auto}
   .spokes{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
-  .spokes line{stroke:rgba(30,58,107,.20);stroke-width:.5}
-  .ringdash{position:absolute;left:50%;top:50%;width:76%;height:76%;transform:translate(-50%,-50%);border:1.5px dashed rgba(138,42,67,.28);border-radius:50%;z-index:0;animation:spin 60s linear infinite}
+  .spokes line{stroke:rgba(142,123,232,.20);stroke-width:.5}
+  .ringdash{position:absolute;left:50%;top:50%;width:76%;height:76%;transform:translate(-50%,-50%);border:1.5px dashed rgba(142,123,232,.28);border-radius:50%;z-index:0;animation:spin 60s linear infinite}
   @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
   @media(prefers-reduced-motion:reduce){.ringdash{animation:none}}
-  .hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:clamp(124px,27vw,170px);aspect-ratio:1;border-radius:50%;z-index:3;background:linear-gradient(155deg,var(--bordo),var(--bordo-deep));color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:0 0 0 8px #fff, 0 14px 50px rgba(138,42,67,.4);animation:pulse 3.8s ease-in-out infinite}
-  @keyframes pulse{0%,100%{box-shadow:0 0 0 8px #fff,0 14px 45px rgba(138,42,67,.32)}50%{box-shadow:0 0 0 8px #fff,0 14px 75px rgba(138,42,67,.45)}}
+  .hub{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:clamp(124px,27vw,170px);aspect-ratio:1;border-radius:50%;z-index:3;background:linear-gradient(155deg,var(--pur),var(--aksiyon));color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:0 0 0 8px #fff, 0 14px 50px rgba(142,123,232,.4);animation:pulse 3.8s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 8px #fff,0 14px 45px rgba(142,123,232,.32)}50%{box-shadow:0 0 0 8px #fff,0 14px 75px rgba(142,123,232,.45)}}
   .hub .gl{font-family:'Sora';font-weight:800;font-size:clamp(22px,4vw,30px)}
   .hub .core{margin-top:6px;font-family:'Space Mono';font-size:11px;letter-spacing:.14em;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:20px}
   .hub small{font-size:10px;color:rgba(255,255,255,.85);margin-top:5px}
-  .motor{position:absolute;transform:translate(-50%,-50%);width:clamp(98px,20vw,128px);aspect-ratio:1;border-radius:50%;z-index:2;background:#fff;border:2px solid var(--c);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px;padding:8px;box-shadow:0 8px 24px rgba(30,58,107,.12);transition:transform .25s,box-shadow .25s,background .25s}
-  .motor:hover{transform:translate(-50%,-50%) scale(1.06);box-shadow:0 14px 34px rgba(30,58,107,.25)}
+  .motor{position:absolute;transform:translate(-50%,-50%);width:clamp(98px,20vw,128px);aspect-ratio:1;border-radius:50%;z-index:2;background:#fff;border:2px solid var(--c);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:3px;padding:8px;box-shadow:0 8px 24px rgba(142,123,232,.12);transition:transform .25s,box-shadow .25s,background .25s}
+  .motor:hover{transform:translate(-50%,-50%) scale(1.06);box-shadow:0 14px 34px rgba(142,123,232,.25)}
   .motor:focus-visible{outline:2px solid var(--c);outline-offset:3px}
   .motor .mi{font-family:'Space Mono';font-size:10px;color:var(--c);letter-spacing:.1em}
   .motor b{font-family:'Sora';font-weight:700;font-size:clamp(12px,2.4vw,15px);color:var(--ink);line-height:1}
@@ -56,7 +56,7 @@
   .m-strat{--c:var(--c-strat)}.m-marka{--c:var(--c-marka)}.m-talep{--c:var(--c-talep)}
   .m-satis{--c:var(--c-satis)}.m-deneyim{--c:var(--c-deneyim)}.m-sadakat{--c:var(--c-sadakat)}
 
-  .panel{background:#fff;border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:0 18px 50px rgba(30,58,107,.1);transition:opacity .3s}
+  .panel{background:#fff;border:1px solid var(--line);border-radius:22px;padding:28px;box-shadow:0 18px 50px rgba(142,123,232,.1);transition:opacity .3s}
   .panel .pe{display:flex;align-items:center;gap:10px;font-family:'Space Mono';font-size:11px;letter-spacing:.16em;color:var(--pc);text-transform:uppercase}
   .panel .pe i{width:10px;height:10px;border-radius:3px;background:var(--pc);display:inline-block}
   .panel h2{font-size:clamp(21px,3vw,28px);font-weight:800;margin:12px 0 6px}
@@ -64,22 +64,15 @@
   .ol{font-family:'Space Mono';font-size:11px;letter-spacing:.14em;color:var(--soft);text-transform:uppercase;margin-bottom:11px}
   .outs{display:flex;flex-wrap:wrap;gap:9px}
   .outs span{font-size:13.5px;font-weight:500;color:var(--deep);background:var(--navy-soft);border:1px solid var(--line);padding:8px 13px;border-radius:9px}
-  .aliblock{margin-top:22px;background:linear-gradient(160deg,#FBF4F6,#F6EEF1);border:1px solid var(--line);border-left:3px solid var(--bordo);border-radius:14px;padding:18px}
-  .aliblock .ah{display:flex;align-items:center;gap:9px;margin-bottom:12px}
-  .aliblock .ah svg{width:22px;height:22px}
-  .aliblock .ah b{font-family:'Sora';font-weight:700;font-size:13.5px;color:var(--bordo-deep)}
-  .aliblock ul{list-style:none;display:flex;flex-direction:column;gap:9px}
-  .aliblock li{display:flex;gap:10px;font-size:13.5px;color:var(--ink);align-items:flex-start}
-  .aliblock li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--bordo);margin-top:7px;flex:none}
 
-  .block{margin-top:34px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:30px;box-shadow:0 12px 40px rgba(30,58,107,.07)}
+  .block{margin-top:34px;background:#fff;border:1px solid var(--line);border-radius:22px;padding:30px;box-shadow:0 12px 40px rgba(142,123,232,.07)}
   .block > h2{font-size:clamp(20px,2.8vw,28px);font-weight:800;margin:8px 0 4px}
   .block > .bsub{color:var(--soft);font-size:14.5px;margin-bottom:24px}
 
   /* hedef matematiği */
   .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
   @media(max-width:780px){.stats{grid-template-columns:repeat(2,1fr)}}
-  .stat{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(30,58,107,.07)}
+  .stat{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:18px 18px 16px;position:relative;overflow:hidden;box-shadow:0 8px 24px rgba(142,123,232,.07)}
   .stat::before{content:"";position:absolute;top:0;left:0;width:100%;height:3px;background:var(--bordo2)}
   .stat .sl{font-family:'Space Mono';font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);margin-bottom:8px}
   .stat .sv{font-family:'Sora';font-size:30px;font-weight:800;line-height:1;color:var(--aksiyon)}
@@ -88,7 +81,7 @@
   .statsnote b{color:var(--deep);font-weight:600}
 
   .chips{display:flex;flex-wrap:wrap;gap:10px;justify-content:center}
-  .chip{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;background:linear-gradient(160deg,#fff,#F2F5FB);border:1px solid var(--line);padding:10px 16px;border-radius:30px;box-shadow:0 3px 10px rgba(30,58,107,.06)}
+  .chip{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;background:linear-gradient(160deg,#fff,#F2F5FB);border:1px solid var(--line);padding:10px 16px;border-radius:30px;box-shadow:0 3px 10px rgba(142,123,232,.06)}
   .chip svg{width:17px;height:17px;color:var(--aksiyon)}
   .arrowdown{display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--soft);font-size:12.5px;margin:18px 0}
   .arrowdown svg{color:var(--bordo)}
@@ -149,13 +142,92 @@
 
   .foot{margin-top:26px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;color:var(--soft);font-size:12px;font-family:'Space Mono'}
   .foot b{color:var(--ink)}
+.grid{display:grid;gap:14px}
+  .g6{grid-template-columns:repeat(3,1fr)}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .g2{grid-template-columns:1fr 1fr}
+  @media(max-width:840px){.g6,.g3,.g2{grid-template-columns:1fr}}
+
+  .comp{border:1px solid var(--line);border-radius:14px;padding:16px 17px;background:linear-gradient(165deg,#fff,#F6F8FC);position:relative}
+  .comp::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:3px;border-radius:3px;background:var(--navy)}
+  .comp.b::before{background:var(--bordo)}
+  .comp h3{font-size:14.5px;font-weight:700;color:var(--ink);padding-left:11px;margin-bottom:5px}
+  .comp h3 .tg{font-family:'Space Mono';font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--bordo);font-weight:400;margin-left:7px}
+  .comp p{font-size:12.5px;color:var(--soft);padding-left:11px;line-height:1.42}
+
+  .motnote{margin-top:16px;background:linear-gradient(155deg,var(--navy),var(--deep));color:#fff;border-radius:14px;padding:16px 20px;font-size:13.5px;line-height:1.5}
+  .motnote b{color:#fff}
+  .tl{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .tl span{font-family:'Space Mono';font-size:11px;color:var(--navy);background:var(--navy-soft);border:1px solid var(--line);padding:7px 12px;border-radius:20px}
+  .tl span.go{color:#fff;background:var(--bordo);border-color:transparent}
+
+  .qcard{border:1px solid var(--line);border-radius:16px;padding:22px;background:#fff}
+  .qcard .qn{font-family:'Space Mono';font-size:11px;letter-spacing:.12em;color:var(--bordo);text-transform:uppercase;margin-bottom:6px}
+  .qcard h3{font-size:16.5px;font-weight:700;margin-bottom:10px}
+  .qcard p{font-size:13.5px;color:var(--ink);line-height:1.5}
+  .qcard p b{color:var(--navy)}
+
+  .track{border:1px solid var(--line);border-radius:16px;padding:22px;background:linear-gradient(165deg,#fff,#F7F8FC)}
+  .track.inv{border-top:4px solid var(--navy)}
+  .track.res{border-top:4px solid var(--bordo)}
+  .track h3{font-size:17px;font-weight:800;margin-bottom:4px}
+  .track .tq{font-size:12.5px;color:var(--soft);font-style:italic;margin-bottom:14px}
+  .track ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+  .track li{display:flex;gap:9px;font-size:13.5px;color:var(--ink);line-height:1.4;align-items:flex-start}
+  .track li::before{content:"";width:6px;height:6px;border-radius:50%;margin-top:7px;flex:none}
+  .track.inv li::before{background:var(--navy)}.track.res li::before{background:var(--bordo)}
+  .repnote{background:var(--bordo-soft);border:1px solid var(--line);border-left:3px solid var(--bordo);border-radius:12px;padding:15px 18px;font-size:13px;line-height:1.5;color:var(--ink);margin-bottom:20px}
+  .repnote b{color:var(--bordo-deep)}
+
+  /* MATRİS */
+  .mxwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+  .matrix{display:grid;grid-template-columns:124px repeat(4,minmax(146px,1fr));gap:8px;min-width:720px}
+  .mx-corner{font-family:'Space Mono';font-size:9.5px;color:var(--soft);display:flex;align-items:flex-end;padding:4px 6px;line-height:1.3}
+  .mx-col{background:var(--deep);color:#fff;border-radius:10px;padding:11px 8px;text-align:center;font-family:'Sora';font-weight:700;font-size:12.5px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+  .mx-col .ar{font-size:14px;color:#F1B8C6;font-weight:700}
+  .mx-row{background:var(--navy-soft);color:var(--navy);border-radius:10px;padding:10px 12px;font-family:'Sora';font-weight:700;font-size:12.5px;display:flex;flex-direction:column;justify-content:center}
+  .mx-row small{font-family:'Inter';font-weight:500;font-size:10px;color:var(--soft);margin-top:2px}
+  .mx-cell{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:11.8px;color:var(--ink);line-height:1.32;cursor:pointer;text-align:left;transition:transform .16s,box-shadow .16s,background .16s,border-color .16s;display:flex;align-items:center;min-height:60px;font-family:'Inter'}
+  .mx-cell:hover{border-color:var(--navy);transform:translateY(-2px);box-shadow:0 8px 20px rgba(142,123,232,.14)}
+  .mx-cell.active{background:linear-gradient(155deg,var(--bordo),var(--bordo-deep));color:#fff;border-color:transparent;box-shadow:0 10px 26px rgba(240,132,86,.3)}
+  .mx-cell:focus-visible{outline:2px solid var(--navy);outline-offset:2px}
+  .mx-hint{font-family:'Space Mono';font-size:10.5px;color:var(--soft);margin:12px 0 0;text-align:center;letter-spacing:.04em}
+
+  .mx-detail{margin-top:16px;border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 12px 34px rgba(142,123,232,.1);transition:opacity .25s}
+  .mx-detail .dh{display:flex;align-items:center;gap:11px;background:linear-gradient(155deg,var(--navy),var(--deep));color:#fff;padding:14px 22px;flex-wrap:wrap}
+  .dh .dp{font-family:'Sora';font-weight:700;font-size:14.5px}
+  .dh .dx{color:#9DB3C6;font-size:13px}
+  .dh .ds{background:var(--bordo);color:#fff;padding:4px 11px;border-radius:20px;font-family:'Space Mono';font-size:10.5px;letter-spacing:.08em}
+  .mx-detail .dbody{padding:20px 22px}
+  .dbody .dt{font-size:18px;font-weight:800;color:var(--ink);margin-bottom:9px}
+  .dbody .dn{font-size:13.5px;color:var(--ink);line-height:1.55;margin-bottom:13px}
+  .dbody .dk{font-size:12.5px;color:var(--soft);margin-bottom:14px}
+  .dbody .dk b{color:var(--navy)}
+  .dbody .do{background:var(--bordo-soft);border-left:3px solid var(--bordo);border-radius:10px;padding:12px 16px;font-size:14.5px;font-style:italic;color:var(--bordo-deep);font-weight:500}
+  .dbody .do span{display:block;font-family:'Space Mono';font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);font-style:normal;font-weight:400;margin-bottom:6px}
+
+  .mxnote{margin-top:16px;font-size:12.5px;color:var(--soft);line-height:1.5}
+  .mxnote b{color:var(--navy)}
+
+  .tpgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media(max-width:840px){.tpgrid{grid-template-columns:1fr}}
+  .tpcol{border:1px solid var(--line);border-radius:16px;padding:20px;background:linear-gradient(165deg,#fff,#F7F8FC);border-top:4px solid var(--c-strat)}
+  .tpcol:nth-child(2){border-top-color:var(--c-talep)}.tpcol:nth-child(3){border-top-color:var(--bordo)}
+  .tpcol h3{font-size:15px;font-weight:800;margin-bottom:3px}
+  .tpcol .tph{font-family:'Space Mono';font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin-bottom:12px}
+  .tpcol ul{list-style:none;display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+  .tpcol li{display:flex;gap:9px;font-size:13.5px;color:var(--ink);align-items:flex-start}
+  .tpcol li::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--soft);margin-top:7px;flex:none}
+  .tpfill{border-top:1px dashed var(--line);padding-top:11px;font-size:12.5px;display:flex;justify-content:space-between;align-items:baseline}
+  .tpfill b{font-family:'Space Mono';font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--bordo)}
+  .tpfill span{color:#C7C5D2;font-style:italic}
 </style>
 </head>
 <body>
 <div class="page">
 
   <div class="top">
-    <span class="badge"><img src="https://babacangyo.com/wp-content/uploads/2026/03/GYO-white-logo-150x67.png" alt="" style="background:#16233D;padding:2px 4px">Revenue OS · Babacan GYO × Ali</span>
+    <span class="badge"><img src="https://babacangyo.com/wp-content/uploads/2026/03/GYO-white-logo-150x67.png" alt="" style="background:#1B2030;padding:2px 4px">Revenue OS · Babacan GYO</span>
     <h1>Gelir Yaratan <em>Organizasyon Modeli</em></h1>
     <p class="slogan">Doğru alıcıyı bul. Güven kur. Talep yarat. Satışı kapat. Teslim sonrası deneyimi yönet. Sadakat ve tavsiye üret. <b>Hepsini veri ve yapay zekâ ile çalıştır — stoğu ucuzlatmadan nakde çevir.</b></p>
   </div>
@@ -191,10 +263,22 @@
     <div class="stats">
       <div class="stat"><div class="sl">Satılabilir stok</div><div class="sv">129M$</div><div class="sn">507 daire · Central · Lagoon · Port Royal · Vista</div></div>
       <div class="stat"><div class="sl">6 ay hedefi</div><div class="sv">%30</div><div class="sn">~39M$ nakit · stoğu ucuzlatmadan</div></div>
-      <div class="stat"><div class="sl">Tek sistem</div><div class="sv">25</div><div class="sn">satışçı · tek CRM · emlak.alisales.ai</div></div>
+      <div class="stat"><div class="sl">Satış sistemi</div><div class="sv">Tek</div><div class="sn">tüm ekip · tek veri kaynağı</div></div>
       <div class="stat"><div class="sl">Pazarlama-satış maliyeti</div><div class="sv">~½</div><div class="sn">ajans + kalabalık ekip yerine yalın yapı (hedef)</div></div>
     </div>
     <p class="statsnote"><b>%30 / 6 ay</b>, 90 gün baz (%25) ile 12 ay baz (%60) eğrisinin altında — savunulabilir. Maliyet tarafı 6. ay çıkış hızı olarak hedeflenir; ajans ve legacy sistem harcaması yerini yalın ekip + AI alır.</p>
+  </div>
+
+  <!-- GÖRÜNMEYEN KATMAN -->
+  <div class="block found">
+    <div class="fh"><b>Revenue OS — görünmeyen katman</b><span>6 motoru çalıştıran altyapı. Eskiden ayrı bölümler; 2026'da tek işletim sistemi.</span></div>
+    <div class="layers">
+      <div class="layer"><div class="li"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="#fff" stroke-width="1.6"/><path d="M3.5 15c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div><b>İnsan</b><small>ekip & roller</small></div>
+      <div class="layer"><div class="li"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 5h12M3 9h12M3 13h8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div><b>Süreç</b><small>iş akışları</small></div>
+      <div class="layer"><div class="li"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><ellipse cx="9" cy="5" rx="5" ry="2.2" stroke="#fff" stroke-width="1.6"/><path d="M4 5v8c0 1.2 2.2 2.2 5 2.2s5-1 5-2.2V5" stroke="#fff" stroke-width="1.6"/></svg></div><b>Veri</b><small>tek kaynak</small></div>
+      <div class="layer"><div class="li"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="5" y="5" width="8" height="8" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M9 2v3M9 13v3M2 9h3M13 9h3" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div><b>Yapay Zekâ</b><small>sinir sistemi</small></div>
+      <div class="layer"><div class="li"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3v6l4 2" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="9" cy="9" r="6" stroke="#fff" stroke-width="1.6"/></svg></div><b>Otomasyon</b><small>7/24 çalışır</small></div>
+    </div>
   </div>
 
   <!-- VERİ AKIŞI -->
@@ -241,7 +325,7 @@
   <div class="block">
     <span class="sec-eye">Verimlilik</span>
     <h2>Otomasyon devralır, satışçı satışa döner.</h2>
-    <p class="bsub">Elle yapılan işler sistemin sırtına biner; 25 satışçı zamanını insanla geçirir.</p>
+    <p class="bsub">Elle yapılan işler sistemin sırtına biner; satış ekibi zamanını insanla geçirir.</p>
     <div class="eff">
       <div class="c1">
         <h3>Otomasyon devralır</h3>
@@ -265,114 +349,168 @@
     </div>
   </div>
 
-  <!-- GÖRÜNMEYEN KATMAN -->
-  <div class="block found">
-    <div class="fh"><b>Revenue OS — görünmeyen katman</b><span>6 motoru çalıştıran altyapı. Eskiden ayrı bölümler; 2026'da tek işletim sistemi.</span></div>
-    <div class="layers">
-      <div class="layer"><div class="li"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="#fff" stroke-width="1.6"/><path d="M3.5 15c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div><b>İnsan</b><small>ekip & roller</small></div>
-      <div class="layer"><div class="li"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 5h12M3 9h12M3 13h8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div><b>Süreç</b><small>iş akışları</small></div>
-      <div class="layer"><div class="li"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><ellipse cx="9" cy="5" rx="5" ry="2.2" stroke="#fff" stroke-width="1.6"/><path d="M4 5v8c0 1.2 2.2 2.2 5 2.2s5-1 5-2.2V5" stroke="#fff" stroke-width="1.6"/></svg></div><b>Veri</b><small>tek kaynak</small></div>
-      <div class="layer"><div class="li"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="5" y="5" width="8" height="8" rx="2" stroke="#fff" stroke-width="1.6"/><path d="M9 2v3M9 13v3M2 9h3M13 9h3" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg></div><b>Yapay Zekâ</b><small>sinir sistemi</small></div>
-      <div class="layer"><div class="li"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 3v6l4 2" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><circle cx="9" cy="9" r="6" stroke="#fff" stroke-width="1.6"/></svg></div><b>Otomasyon</b><small>7/24 çalışır</small></div>
+  <!-- 03 -->
+  <div class="block">
+    <span class="sec-eye">Kime, Nasıl Satıyoruz</span>
+    <h2>İki hat, aynı stok, iki gerçek anlatı.</h2>
+    <div class="repnote"><b>Dürüst tespit:</b> yoğun yabancı satış sonrası eldeki stokta Türk oturumcu nezdinde bir algı oluştu. Çözüm tek kanala kaçmak değil; yatırımcı ve Türk oturumcu hatlarını <b>aynı anda, farklı anlatılarla</b> yürütmek — veri ve AI ile, aynı anda.</div>
+    <div class="grid g2">
+      <div class="track inv"><h3>Yatırımcı hattı</h3><p class="tq">Türk yatırımcı · yabancı · gurbetçi</p><ul>
+        <li><b>Getiri anlatısı:</b> mevcut kiracı tabanı = garantili kira + döviz getiri. Zayıflığı güce çevir.</li>
+        <li>Yabancıyı Körfez'den çeşitlendir (Orta Asya, BDT, Avrupalı Türkler).</li>
+        <li>Vatandaşlık kanalı + çok dilli AI.</li>
+        <li>Algıdan çok ROI'ye bakan segment — en hızlı dönüşen hat.</li></ul></div>
+      <div class="track res"><h3>Türk oturumcu hattı</h3><p class="tq">Reputasyonu yeniden çerçevele — algıyla inatlaşma</p><ul>
+        <li><b>Kozmopolit-premium topluluk</b> konumlaması; çeşitliliği prestij ve güvenliğe çevir.</li>
+        <li>Üründen başla: lokasyon, okul, güvenlik, değer, <b>hazır teslim</b>.</li>
+        <li>Mutlu Türk sakinlerden <b>sosyal kanıt</b>; taze Türkçe dijital cephe.</li>
+        <li>Doğru projeyi doğru aileye eşleştir; itirazı proaktif ve dürüst karşıla.</li></ul></div>
     </div>
   </div>
 
-  <!-- TAKVİM -->
+  <!-- 04 MATRİS -->
   <div class="block">
-    <span class="sec-eye">90 Günlük Takvim · 14 Haz → 1 Eyl</span>
-    <h2>Kurulumdan canlıya, üç ayda.</h2>
-    <p class="bsub">Modeli sahaya indiren yol haritası. Her ay sonunda elinizde çalışan bir parça olur; 1 Eylül'de tam canlı.</p>
-    <div class="cal">
-      <div class="month m1">
-        <div class="dot"></div>
-        <div class="mtag">Ay 1 · Haziran–Temmuz</div>
-        <h3>Temel</h3>
-        <p class="mph">Strateji + Sistem</p>
-        <ul>
-          <li>Durum & rakip incelemesi, hedef matematiği</li>
-          <li>Hedef alıcı & persona, konumlandırma</li>
-          <li>emlak.alisales.ai uyarlama · 2 → 25 koltuk</li>
-          <li>Tüm kanalların CRM'e bağlanması</li>
-          <li>Pazarlama–satış aynı masada</li>
-        </ul>
-        <div class="mout"><b>Ay sonu çıktısı</b>Net hedef, çalışan altyapı.</div>
-      </div>
-      <div class="month m2">
-        <div class="dot"></div>
-        <div class="mtag">Ay 2 · Temmuz–Ağustos</div>
-        <h3>Motor</h3>
-        <p class="mph">Talep + Satış canlı</p>
-        <ul>
-          <li>Aday üretimi & yapay zekâ puanlama</li>
-          <li>Sabah Ajandası + Akşam Brifingi</li>
-          <li>Takip akışları otomatikleşir</li>
-          <li>Uyuyan kayda dönüş · yabancı yatırımcı kanalı</li>
-          <li>Satış eğitimi & el kitabı</li>
-        </ul>
-        <div class="mout"><b>Ay sonu çıktısı</b>Kendi kendine dönen günlük operasyon.</div>
-      </div>
-      <div class="month m3">
-        <div class="dot"></div>
-        <div class="mtag">Ay 3 · Ağustos → 1 Eylül</div>
-        <h3>Büyüme</h3>
-        <p class="mph">Deneyim + Sadakat + Ölçek</p>
-        <ul>
-          <li>Karşılama, SSH & topluluk akışları</li>
-          <li>Sadakat, referans, tekrar yatırım</li>
-          <li>Satışçı / yönetici / patron panoları</li>
-          <li>GYO/yatırımcı & sürdürülebilirlik anlatısı</li>
-          <li>Sürekli iyileştirme döngüsü → canlı</li>
-        </ul>
-        <div class="mout"><b>Ay sonu çıktısı</b>Ölçeklenen, kendini büyüten sistem.</div>
+    <span class="sec-eye">Senaryo × Persona Matrisi</span>
+    <h2>Doğru personaya, doğru senaryoda, doğru mesaj.</h2>
+    <p class="bsub">Her persona her senaryoda farklı şey duyar. Aynı stok — dört persona, dört senaryo, on altı ayrı anlatı. Bir hücreye tıkla; arkasındaki içgörüyü, kanalı ve örnek mesajı gör.</p>
+    <div class="mxwrap">
+      <div class="matrix" id="matrix">
+        <div class="mx-corner">Persona ↓ / Senaryo →</div>
+        <div class="mx-col">Faiz <span class="ar">↓</span></div>
+        <div class="mx-col">Altın <span class="ar">↑</span></div>
+        <div class="mx-col">Savaş / Kriz</div>
+        <div class="mx-col">Piyasa <span class="ar">↗</span></div>
+
+        <div class="mx-row">Türk yatırımcı<small>getiri / değer</small></div>
+        <button class="mx-cell" data-k="ty-f">Düşük faizle kaldıraç + kira</button>
+        <button class="mx-cell" data-k="ty-a">Altından gayrimenkule geç</button>
+        <button class="mx-cell" data-k="ty-s">Döviz kira, sabit varlık</button>
+        <button class="mx-cell" data-k="ty-p">Değer artışı — erken gir</button>
+
+        <div class="mx-row">Yabancı yatırımcı<small>döviz / vatandaşlık</small></div>
+        <button class="mx-cell" data-k="yy-f">TL ucuz — döviz fırsatı</button>
+        <button class="mx-cell" data-k="yy-a">Hard-currency değer saklama</button>
+        <button class="mx-cell" data-k="yy-s">Güvenli liman + vatandaşlık</button>
+        <button class="mx-cell" data-k="yy-p">Premium İstanbul + getiri</button>
+
+        <div class="mx-row">Gurbetçi<small>Avrupalı Türk</small></div>
+        <button class="mx-cell" data-k="g-f">Memlekette fırsat + döviz</button>
+        <button class="mx-cell" data-k="g-a">Birikimi gayrimenkule çevir</button>
+        <button class="mx-cell" data-k="g-s">Döviz varlık, aileye yuva</button>
+        <button class="mx-cell" data-k="g-p">Değerlenen yatırım</button>
+
+        <div class="mx-row">Türk oturumcu<small>aile / yaşam</small></div>
+        <button class="mx-cell" data-k="to-f">Uygun kredi + hazır yuva</button>
+        <button class="mx-cell" data-k="to-a">Birikimi yaşanacak eve</button>
+        <button class="mx-cell" data-k="to-s">Güvenli, yönetimli yuva</button>
+        <button class="mx-cell" data-k="to-p">Kozmopolit-premium, sınırlı daire</button>
       </div>
     </div>
+    <p class="mx-hint">↑ bir hücreye tıkla — içgörü, kanal ve örnek mesaj açılır</p>
+    <div class="mx-detail" id="mxdetail"></div>
+  </div>
+
+  <!-- TEMAS NOKTALARI -->
+  <div class="block">
+    <span class="sec-eye">Temas Noktaları</span>
+    <h2>Tüm satış-pazarlama temas noktaları — en son önceliklendirilir.</h2>
+    <p class="bsub">Strateji, persona ve senaryo netleşmeden kanal seçilmez. Tüm temas noktaları burada gruplanır; ekip önceliği en son, birlikte koyar.</p>
+    <div class="tpgrid">
+      <div class="tpcol"><h3>Pazarlama temas noktaları</h3><div class="tph">talep yaratan</div>
+        <ul><li>Marka websitesi (çok dilli · ayrı yatırımcı/yabancı cephe)</li><li>Online broşür &amp; proje tanıtımları</li><li>Sosyal medya &amp; reklam</li><li>Emlak portalları · broker ağı</li><li>PR &amp; görünürlük</li></ul>
+        <div class="tpfill"><b>Öncelik</b><span>ekip · en son</span></div></div>
+      <div class="tpcol"><h3>Satış temas noktaları</h3><div class="tph">talebi kapatan</div>
+        <ul><li>AI agent satış ekibi (7/24 ilk yanıt, tüm kanallar)</li><li>Satış ofisi &amp; bot</li><li>Inbound akış (nitele → yönlendir → randevu)</li><li>Outbound akış (hedef liste → sekans → devir)</li><li>Çağrı merkezi · WhatsApp / DM</li></ul>
+        <div class="tpfill"><b>Öncelik</b><span>ekip · en son</span></div></div>
+      <div class="tpcol"><h3>Veri &amp; sistem</h3><div class="tph">hepsini bağlayan</div>
+        <ul><li>CRM — tek veri kaynağı</li><li>AI lead skorlama &amp; yönlendirme</li><li>Sabah Ajandası + Akşam Brifingi</li><li>Günlük ajanda &amp; raporlar</li></ul>
+        <div class="tpfill"><b>Öncelik</b><span>ekip · en son</span></div></div>
+    </div>
+    <p class="statsnote" style="margin-top:18px"><b>Kural:</b> önce strateji ve persona; temas noktası önceliği en son, ekip birlikte koyar.</p>
   </div>
 
   <div class="foot">
-    <span>Revenue OS · Babacan GYO'ya özel</span>
-    <span><b>Ali motoru</b> ile çalışır · Gizli</span>
+    <span>Gelir & Satış Motoru · Babacan GYO'ya özel</span>
+    <span><b>Sistem altyapısı</b> · Gizli</span>
   </div>
 
 </div>
 
 <script>
-  const aliMark='<svg viewBox="0 0 40 40" fill="none"><rect width="40" height="40" rx="11" fill="#8A2A43"/><path d="M12 28L19 12h2.5L28.5 28h-3.4l-1.5-3.7h-6.2L14.4 28H12zm5.6-6.2h4.8L20 15.9l-2.4 5.9z" fill="#fff"/></svg>';
-  const data={
-    strateji:{e:"01 · STRATEJİ",t:"Strateji",q:"Ne satıyoruz? Kime? Neden Babacan?",c:"var(--c-strat)",
-      out:["Hedef alıcı profili","Konumlandırma (GYO)","Fiyat & ödeme planı","Stok segmentasyonu"],
-      ali:["İdeal alıcı profili: yatırımcı / oturumcu / yabancı / kurumsal","Stok→nakit hedef matematiği (129M$, %30/6 ay)","Konumlandırma: inşaatçıdan güvenilir GYO'ya","Proje bazlı fiyat & kampanya stratejisi"]},
-    marka:{e:"06 · MARKA",t:"Marka & Güven",q:"Neden Babacan'a güvensinler?",c:"var(--c-marka)",
-      out:["Güven","GYO hikayesi","Sürdürülebilirlik","Yatırımcı anlatısı","Sosyal kanıt"],
-      ali:["Marka sesi: 'Güvenilir Yatırımlar, Güçlü Gelecek'","Zamanında teslim = güven kanıtı içeriği","Sürdürülebilirlik = değer (prim, ucuz sermaye)","GYO/BIST yatırımcı hikayesi & sosyal kanıt"]},
-    talep:{e:"02 · TALEP",t:"Talep",q:"Bizi nasıl bulacaklar?",c:"var(--c-talep)",
-      out:["Arama & emlak portalları","Yapay zekâ görünürlüğü","Reklam","Sosyal medya","Yabancı yatırımcı kanalı","Broker ağı","Referans","Yeniden pazarlama"],
-      ali:["Çok kanallı aday üretimi (portal, sosyal, reklam, broker)","Sinyal Motoru: AI ile kademeli aday puanlama","Yabancı yatırımcı için çok dilli kanal","Uyuyan/ulaşılamayan kayda sistematik yeniden temas"]},
-    satis:{e:"03 · SATIŞ",t:"Satış",q:"Nasıl satın alacaklar?",c:"var(--c-satis)",
-      out:["Aday yönetimi","CRM (25 satışçı)","Satış ofisi randevusu","Teklif & ödeme planı","Kapanış & tapu"],
-      ali:["CRM: 25 koltuk, tek satış hattı","Sabah Ajandası + Akşam Brifingi (günlük kota)","Sıcak alıcıyı doğru satışçıya yönlendirme","Otomatik takip + teklif/ödeme planı üretimi"]},
-    deneyim:{e:"04 · DENEYİM",t:"Deneyim",q:"Satın aldıktan sonra ne yaşayacak?",c:"var(--c-deneyim)",
-      out:["Teslim öncesi süreç","İlk 90 gün","Satış sonrası hizmet","Yaşam deneyimi"],
-      ali:["WhatsApp / sohbet botu + devir bildirimleri","İlk 90 gün karşılama akışı","SSH / talep triyajı (SLA ile)","Yaşam deneyimi & topluluk akışları"]},
-    sadakat:{e:"05 · SADAKAT",t:"Sadakat",q:"Nasıl geri dönecek / tavsiye edecek?",c:"var(--c-sadakat)",
-      out:["Referans","Tekrar yatırım","Portföy büyütme","Tavsiye"],
-      ali:["Referans otomasyonu — en ucuz talep","Yatırımcı tekrar-alım tetikleyicileri","Memnun sakin → tavsiye akışı"]}
+const data={
+ strateji:{e:"01 · STRATEJİ",t:"Strateji",q:"Ne satıyoruz? Kime? Neden Babacan?",c:"var(--c-strat)",
+   out:["Hedef alıcı profili (yatırımcı · oturumcu · yabancı · kurumsal)","Konumlandırma: güvenilir GYO","Stok→nakit hedef matematiği","Proje bazlı fiyat & ödeme planı","Stok segmentasyonu"]},
+ marka:{e:"06 · MARKA",t:"Marka & Güven",q:"Neden Babacan'a güvensinler?",c:"var(--c-marka)",
+   out:["Tek cümlelik marka vaadi","Zamanında teslim = güven kanıtı","GYO & yatırımcı anlatısı","Sürdürülebilirlik = değer (prim, ucuz sermaye)","Sosyal kanıt & referans"]},
+ talep:{e:"02 · TALEP",t:"Talep",q:"Bizi nasıl bulacaklar?",c:"var(--c-talep)",
+   out:["Çok kanallı aday üretimi (portal · sosyal · reklam · broker)","AI ile kademeli aday puanlama","Yabancı için çok dilli kanal","Uyuyan kayda sistematik yeniden temas","Referans & yeniden pazarlama"]},
+ satis:{e:"03 · SATIŞ",t:"Satış",q:"Nasıl satın alacaklar?",c:"var(--c-satis)",
+   out:["Aday yönetimi & önceliklendirme","CRM — tek satış hattı","Sabah Ajandası + Akşam Brifingi","Sıcak alıcıyı doğru satışçıya yönlendirme","Teklif & ödeme planı · kapanış & tapu"]},
+ deneyim:{e:"04 · DENEYİM",t:"Deneyim",q:"Satın aldıktan sonra ne yaşayacak?",c:"var(--c-deneyim)",
+   out:["Teslim öncesi süreç akışı","İlk 90 gün karşılama","SSH / talep triyajı (SLA)","Yaşam deneyimi & topluluk"]},
+ sadakat:{e:"05 · SADAKAT",t:"Sadakat",q:"Nasıl geri dönecek / tavsiye edecek?",c:"var(--c-sadakat)",
+   out:["Referans otomasyonu — en ucuz talep","Tekrar yatırım & portföy büyütme","Memnun sakin → tavsiye akışı"]}
+};
+const panel=document.getElementById('panel');
+function render(k){
+  const d=data[k];
+  panel.style.setProperty('--pc',d.c);
+  panel.innerHTML=`<div class="pe"><i></i>${d.e}</div><h2>${d.t}</h2><p class="q">"${d.q}"</p>`
+    +`<div class="ol">İdeal çıktı</div><div class="outs">${d.out.map(o=>`<span>${o}</span>`).join('')}</div>`;
+}
+render('strateji');
+document.querySelectorAll('.motor').forEach(m=>{
+  m.addEventListener('click',()=>{
+    document.querySelectorAll('.motor').forEach(x=>x.classList.remove('active'));
+    m.classList.add('active');panel.style.opacity=0;
+    setTimeout(()=>{render(m.dataset.k);panel.style.opacity=1;},160);
+  });
+});
+
+  const M={
+    "ty-f":{p:"Türk yatırımcı",s:"Faiz düşerse",baslik:"Ucuz krediyle kaldıraçlı getiri",neden:"Faiz düşünce kredili alım kârlı hale gelir; yatırımcı düşük peşinatla girer, kira geliri ve değer artışıyla kazanır.",kanal:"Broker · yatırımcı içeriği · e-posta",ornek:"Faiz düştü: peşinatın aynı, getirin katlanıyor."},
+    "ty-a":{p:"Türk yatırımcı",s:"Altın fırlarsa",baslik:"Altından gayrimenkule rotasyon",neden:"Altın zirvedeyken yatırımcı kârını realize edip kira getiren sabit bir varlığa geçmek ister; gayrimenkul bu rotasyonun doğal adresidir.",kanal:"Yatırımcı içerik · e-posta · broker",ornek:"Altın zirvede — kâr realize et, kira getiren m²'ye geç."},
+    "ty-s":{p:"Türk yatırımcı",s:"Savaş / kriz",baslik:"Belirsizlikte sabit varlık + döviz kira",neden:"Kur ve piyasa oynaklığında gayrimenkul + döviz kira, enflasyon ve kur riskine karşı koruma sağlar.",kanal:"Yatırımcı içerik · e-posta",ornek:"Kur oynarken değerini koru, döviz kira kazan."},
+    "ty-p":{p:"Türk yatırımcı",s:"Piyasa iyiyse",baslik:"Yükselen piyasada erken pozisyon",neden:"Piyasa iyiyken momentum vardır; erken giren değer artışını yakalar. Aciliyet ve kıtlık mesajı işler.",kanal:"Marka · sosyal · broker",ornek:"Fiyatlar dönmeden — son yatırımlık daireler."},
+
+    "yy-f":{p:"Yabancı yatırımcı",s:"Faiz düşerse",baslik:"Döviz alıcı için kur avantajı penceresi",neden:"TL zayıfken döviz sahibi yabancı için giriş ucuzdur; faiz ortamı yerel talebi de canlandırır, çıkışı kolaylaştırır.",kanal:"Çok dilli · vatandaşlık kanalı",ornek:"Your currency buys more in Istanbul — right now."},
+    "yy-a":{p:"Yabancı yatırımcı",s:"Altın fırlarsa",baslik:"Döviz bazlı değer saklama aracı",neden:"Güvenli liman arayan yabancı için altına alternatif: döviz kira getiren, elle tutulur bir varlık.",kanal:"Çok dilli · yatırımcı içerik",ornek:"A hard asset that pays rent in hard currency."},
+    "yy-s":{p:"Yabancı yatırımcı",s:"Savaş / kriz",baslik:"Güvenli liman + Türk vatandaşlığı",neden:"Jeopolitik krizde yabancı hem güvenli varlık hem ikinci pasaport/oturum arar; ikisini tek pakette sunarız.",kanal:"Çok dilli · vatandaşlık danışmanı",ornek:"Safe asset today, a second passport tomorrow."},
+    "yy-p":{p:"Yabancı yatırımcı",s:"Piyasa iyiyse",baslik:"Premium İstanbul + getiri + vatandaşlık",neden:"Piyasa iyiyken premium lokasyon, lifestyle ve vatandaşlık paketi en güçlü konumlamadır.",kanal:"Çok dilli · lifestyle içerik",ornek:"Own a piece of Istanbul's skyline."},
+
+    "g-f":{p:"Gurbetçi",s:"Faiz düşerse",baslik:"Döviz avantajıyla memlekette fırsat",neden:"Avrupalı Türk döviz kazanır; faiz düşünce ve kur avantajıyla memlekette alım çok cazip hale gelir.",kanal:"Avrupa kanalları · WhatsApp · fuar",ornek:"Euro'nla memlekette daire — bu yaz tam zamanı."},
+    "g-a":{p:"Gurbetçi",s:"Altın fırlarsa",baslik:"Birikimini hem yatırıma hem memlekete bağla",neden:"Gurbetçi için gayrimenkul sadece yatırım değil, memlekete duygusal ve ailevi bir bağdır.",kanal:"Avrupa kanalları · sosyal",ornek:"Birikimin memlekette değerlensin, kökün burada kalsın."},
+    "g-s":{p:"Gurbetçi",s:"Savaş / kriz",baslik:"Güvenli döviz varlık + ailene yuva",neden:"Krizde güvenlik arayışı + memlekette aile için bir yuva ihtiyacı birleşir.",kanal:"Avrupa kanalları · WhatsApp",ornek:"Aileni güvenceye al, memlekette yuvan hazır olsun."},
+    "g-p":{p:"Gurbetçi",s:"Piyasa iyiyse",baslik:"Yükselen piyasada döviz avantajlı yatırım",neden:"Piyasa iyiyken gurbetçi, döviz avantajıyla değer artışını ekstra kârla yakalar.",kanal:"Avrupa kanalları · sosyal",ornek:"Euro avantajınla değerlenen İstanbul'a ortak ol."},
+
+    "to-f":{p:"Türk oturumcu",s:"Faiz düşerse",baslik:"Uygun krediyle hazır, premium yuva",neden:"Faiz düşünce Türk aile kredili alıma yönelir; hazır teslim ve net taksit güven verir, kararı hızlandırır.",kanal:"Arama · sosyal · portal · satış ofisi",ornek:"Düşük taksitle, hayalindeki eve hemen taşın."},
+    "to-a":{p:"Türk oturumcu",s:"Altın fırlarsa",baslik:"Birikimini değer kaybetmeyen bir yuvaya",neden:"Altın/birikim oynaklığında aile, hem oturacağı hem değerini koruyacağı bir eve yönelebilir.",kanal:"Arama · sosyal · portal",ornek:"Paran erimesin — yaşayacağın bir değere dönüşsün."},
+    "to-s":{p:"Türk oturumcu",s:"Savaş / kriz",baslik:"Güvenli, profesyonel yönetimli topluluk",neden:"Belirsizlikte aile güvenlik, yönetim kalitesi ve istikrar arar. Reputasyon reframe'i tam burada devreye girer: kozmopolit ama güvenli, yönetimli yaşam.",kanal:"Arama · satış ofisi · sosyal kanıt",ornek:"Güvenli, yönetimli, kozmopolit bir yaşam alanı."},
+    "to-p":{p:"Türk oturumcu",s:"Piyasa iyiyse",baslik:"Kozmopolit-premium yaşam, sınırlı fırsat",neden:"Piyasa iyiyken premium lifestyle + kıtlık mesajı işler; algıyı 'Arap sitesi'nden 'uluslararası prestij'e çeviririz.",kanal:"Marka · sosyal · satış ofisi",ornek:"Uluslararası bir yaşam — geriye sınırlı sayıda daire."}
   };
-  const panel=document.getElementById('panel');
-  function render(k){
-    const d=data[k];
-    panel.style.setProperty('--pc',d.c);
-    panel.innerHTML=`<div class="pe"><i></i>${d.e}</div><h2>${d.t}</h2><p class="q">"${d.q}"</p>`
-      +`<div class="ol">İdeal çıktı</div><div class="outs">${d.out.map(o=>`<span>${o}</span>`).join('')}</div>`
-      +`<div class="aliblock"><div class="ah">${aliMark}<b>Ali altyapısında ne yapıyorum</b></div><ul>${d.ali.map(a=>`<li>${a}</li>`).join('')}</ul></div>`;
+  const det=document.getElementById('mxdetail');
+  function show(k){
+    const d=M[k];
+    det.style.opacity=0;
+    setTimeout(()=>{
+      det.innerHTML=`<div class="dh"><span class="dp">${d.p}</span><span class="dx">×</span><span class="ds">${d.s}</span></div>`
+        +`<div class="dbody"><div class="dt">${d.baslik}</div><div class="dn">${d.neden}</div>`
+        +`<div class="dk"><b>Kanal:</b> ${d.kanal}</div>`
+        +`<div class="do"><span>Örnek mesaj</span>${d.ornek}</div></div>`;
+      det.style.opacity=1;
+    },140);
   }
-  render('strateji');
-  document.querySelectorAll('.motor').forEach(m=>{
-    m.addEventListener('click',()=>{
-      document.querySelectorAll('.motor').forEach(x=>x.classList.remove('active'));
-      m.classList.add('active');panel.style.opacity=0;
-      setTimeout(()=>{render(m.dataset.k);panel.style.opacity=1;},160);
+  document.querySelectorAll('.mx-cell').forEach(c=>{
+    c.addEventListener('click',()=>{
+      document.querySelectorAll('.mx-cell').forEach(x=>x.classList.remove('active'));
+      c.classList.add('active');
+      show(c.dataset.k);
     });
   });
+  // varsayılan: ilk hücre
+  const first=document.querySelector('.mx-cell[data-k="to-s"]');
+  first.classList.add('active');show('to-s');
+
 </script>
 </body>
 </html>
