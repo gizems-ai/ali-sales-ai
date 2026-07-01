@@ -14,6 +14,7 @@ import {
 } from 'lucide-react'
 import { SegmentSwitch } from './segment-switch'
 import { SECTION_NAME, SECTION_SLUG } from '@/lib/ali-zeka'
+import { SECTION_NAME as KAMPANYA_NAME, SECTION_SLUG as KAMPANYA_SLUG } from '@/lib/kampanya'
 import { SECTION_SLUG as GELISIM_SLUG, GROUP_NAME as GELISIM_GROUP } from '@/lib/gelisim'
 
 // ── Sigortan colours ──────────────────────────────────────────────
@@ -181,6 +182,7 @@ const EMLAK_NAV: EmlakNavLink[] = [
   { href: '/satis-sureci', label: 'Satış Süreci',       iconId: 'columns' },
   { href: '/stok',         label: 'Stok / Envanter',    iconId: 'building' },
   { href: SECTION_SLUG,    label: SECTION_NAME,         iconId: 'sparkle', lavender: true },
+  { href: KAMPANYA_SLUG,   label: KAMPANYA_NAME,        iconId: 'target',  lavender: true },
   { href: '/temsilciler',  label: 'Temsilciler',         iconId: 'badge' },
   { label: 'Operasyon Merkezi', iconId: 'sliders', muted: true },
 ]
