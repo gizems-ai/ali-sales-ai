@@ -1,11 +1,17 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, ChevronDown, Sparkles, Radio, Tag as TagIcon, MessageCircle, ShieldCheck, X } from 'lucide-react'
+import { Check, ChevronDown, Sparkles, Radio, Tag as TagIcon, MessageCircle, ShieldCheck, X, Building2, UserCheck } from 'lucide-react'
 import {
   Z, LEVER_ETIKET, marjRenk, onaylaVeUret, ASSET_ETIKET, GUVEN_GOSTERIM,
   type CampaignRec,
 } from '@/lib/kampanya'
+
+function fmtTL(n: number): string {
+  if (n >= 1_000_000_000) return `${(n / 1_000_000_000).toLocaleString('tr-TR', { maximumFractionDigits: 1 })}Mr ₺`
+  if (n >= 1_000_000) return `${(n / 1_000_000).toLocaleString('tr-TR', { maximumFractionDigits: 1 })}M ₺`
+  return `${Math.round(n).toLocaleString('tr-TR')} ₺`
+}
 
 function LeverChip({ label, birincil }: { label: string; birincil: boolean }) {
   return (
@@ -52,6 +58,12 @@ export function KampanyaKarti({ card, onApprove }: { card: CampaignRec; onApprov
                 {card.grup} grubu
               </span>
             </div>
+            {/* Hakan referans sinyali — motorun segmenti ile yan yana (§7) */}
+            {card.hakan && (
+              <div className="mt-[5px] inline-flex items-center gap-[5px] rounded-full px-[8px] py-[2px] text-[10px] font-bold" style={{ background: '#FFF7ED', color: '#9a3412' }}>
+                <UserCheck size={10} /> Hakan: {card.hakan.segment}
+              </div>
+            )}
           </div>
           <span className="grid place-items-center rounded-[11px] text-white shrink-0" style={{ width: 34, height: 34, background: approved ? Z.grad : Z.lavGrad }}>
             {approved ? <Check size={17} /> : <Sparkles size={16} />}
@@ -63,11 +75,24 @@ export function KampanyaKarti({ card, onApprove }: { card: CampaignRec; onApprov
           {card.levers.map((l, i) => <LeverChip key={l} label={LEVER_ETIKET[l]} birincil={i === 0} />)}
         </div>
 
+        {/* Hedeflenen daire alt-kümesi özeti (§5) */}
+        {card.stokOzeti && (
+          <div className="rounded-[12px] px-[11px] py-[9px] flex items-center gap-[8px]" style={{ background: Z.surface }}>
+            <Building2 size={14} className="shrink-0" style={{ color: Z.green1 }} />
+            <p className="text-[11.5px] leading-[16px]" style={{ color: '#33433a' }}>
+              <b>{card.stokOzeti.daireSayisi} daire</b> · Blok {card.stokOzeti.bloklar.join('/')} · {card.stokOzeti.toplamM2.toLocaleString('tr-TR')} m² · {fmtTL(card.stokOzeti.toplamDegerTL)}
+            </p>
+          </div>
+        )}
+
         {/* Kanal + teklif */}
         <div className="space-y-[7px]">
           <div className="flex items-start gap-[7px] text-[12px] leading-[17px]" style={{ color: '#33433a' }}>
             <Radio size={13} className="mt-[2px] shrink-0" style={{ color: Z.lavanta }} />
-            <span><b>Kanal:</b> {card.kanal}</span>
+            <span>
+              <b>Kanal:</b> {card.kanal}
+              {card.hakan && <span className="block text-[11px] mt-[2px]" style={{ color: '#9a3412' }}>Hakan önerisi: {card.hakan.kanal}</span>}
+            </span>
           </div>
           <div className="flex items-start gap-[7px] text-[12px] leading-[17px]" style={{ color: '#33433a' }}>
             <TagIcon size={13} className="mt-[2px] shrink-0" style={{ color: Z.lavanta }} />
