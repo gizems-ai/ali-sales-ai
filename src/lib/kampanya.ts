@@ -73,6 +73,7 @@ export interface CampaignRec {
   marjLabel: MarjLabel
   guven: Guven
   neden: string[]                      // 3 madde — yeşil-tik listesi
+  nedenAnlati: string                  // §2b — 1–2 cümle akan muhakeme (yalnız sahip olunan sinyaller)
   status: 'suggested' | 'approved'
   assets?: { type: 'landing' | 'whatsapp' | 'instagram' | 'email'; status: 'uretiliyor' | 'qa_bekliyor' }[]
   // Faz 1.5 — gerçek stok alt-kümesi özeti + Hakan referans sinyali (§5, §7)
@@ -350,6 +351,22 @@ function nedenListesi(segment: Segment, signal: Signal, marj: MarjLabel, floor: 
   ]
 }
 
+// §2b — Gerekçeyi anlatıya çevir. YALNIZ sahip olduğumuz sinyaller: grup · emsal ·
+// piyasa sinyali · segment · kaldıraç. Uydurma sayı/tarih/yüzde/stok yaşı YOK.
+const EMSAL_ANLATI: Record<StockInput['emsalKonumu'], string> = {
+  altinda: 'emsalin altında', emsalde: 'emsal seviyesinde', ustunde: 'emsalin üstünde',
+}
+function nedenAnlatiKur(
+  grup: StockGroup, emsal: StockInput['emsalKonumu'], signal: Signal, segment: Segment, birincil: Lever,
+): string {
+  const sinyalCumle = signal !== 'none'
+    ? `${SIGNAL_ETIKET[signal]} sinyali ${SEGMENT_ETIKET[segment]} talebini öne çıkarıyor`
+    : `${SEGMENT_ETIKET[segment]} bu grup için doğru alıcı`
+  const lever = LEVER_ETIKET[birincil].toLocaleLowerCase('tr-TR')
+  return `Bu stok ${grup} grubunda ve ${EMSAL_ANLATI[emsal]}; ${sinyalCumle}. `
+    + `Bu nedenle fiyat indirimi yerine ${lever} kaldıracı öneriyorum — marj tabanı korunur.`
+}
+
 // Tek segment için kampanya kartı üretir.
 function kartOlustur(input: EngineInput, segment: Segment): CampaignRec {
   const { stock, signal, marjTabani } = input
@@ -378,6 +395,7 @@ function kartOlustur(input: EngineInput, segment: Segment): CampaignRec {
     marjLabel,
     guven: guvenHesapla(stock, segment, levers, signal),
     neden: nedenListesi(segment, signal, marjLabel, marjTabani),
+    nedenAnlati: nedenAnlatiKur(stock.grup, stock.emsalKonumu, signal, segment, levers[0]),
     status: 'suggested',
   }
 }

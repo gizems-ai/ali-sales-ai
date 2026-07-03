@@ -100,6 +100,23 @@ export function KampanyaKarti({ card, onApprove }: { card: CampaignRec; onApprov
           </div>
         </div>
 
+        {/* Broker Programı — yalnız B2B broker segmentleri (broker = kanal değil ekosistem, §2c) */}
+        {(card.segment === 'yurtdisi_broker' || card.segment === 'yerli_acente') && (
+          <div className="rounded-[12px] px-[12px] py-[10px]" style={{ background: Z.surface, border: `1px solid ${Z.line}` }}>
+            <div className="flex items-center gap-[6px] mb-[6px]">
+              <UserCheck size={12} style={{ color: Z.green1 }} />
+              <span className="text-[10px] font-black uppercase tracking-wide" style={{ color: Z.green1 }}>Broker Programı</span>
+            </div>
+            <ul className="grid grid-cols-1 gap-[4px]">
+              {['Exclusive inventory', '48 saatte komisyon', 'VIP lansman', 'Broker portalı', 'WhatsApp hattı'].map(x => (
+                <li key={x} className="flex items-center gap-[6px] text-[11.5px]" style={{ color: '#33433a' }}>
+                  <Check size={12} className="shrink-0" style={{ color: Z.green2 }} /> {x}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
         {/* Mesaj */}
         <div className="rounded-[12px] px-[12px] py-[10px]" style={{ background: Z.lavSoft }}>
           <div className="flex items-center gap-[6px] mb-[4px]">
@@ -109,9 +126,12 @@ export function KampanyaKarti({ card, onApprove }: { card: CampaignRec; onApprov
           <p className="text-[12.5px] leading-[18px]" style={{ color: '#48417e' }}>{card.mesaj}</p>
         </div>
 
-        {/* NEDEN — 3 madde, yeşil tik */}
+        {/* NEDEN — akan muhakeme (§2b) + 3 madde, yeşil tik */}
         <div>
           <p className="text-[10px] font-black uppercase tracking-wide mb-[6px]" style={{ color: Z.green1 }}>Neden bu öneri?</p>
+          {card.nedenAnlati && (
+            <p className="text-[12.5px] leading-[18px] mb-[9px]" style={{ color: '#33433a' }}>{card.nedenAnlati}</p>
+          )}
           <ul className="space-y-[5px]">
             {card.neden.map((n, i) => (
               <li key={i} className="flex items-start gap-[7px] text-[12px] leading-[17px]" style={{ color: '#33433a' }}>

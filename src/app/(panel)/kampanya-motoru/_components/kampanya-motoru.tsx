@@ -77,11 +77,11 @@ export function KampanyaMotoru() {
       <div className="mt-[16px] rounded-[22px] p-[18px] overflow-hidden relative"
         style={{ background: 'linear-gradient(120deg, rgba(237,233,254,.9), rgba(196,232,238,.5))', border: '1px solid rgba(255,255,255,.72)' }}>
         <p className="text-[15px] sm:text-[16px] font-black leading-snug" style={{ color: '#3a3475' }}>
-          &ldquo;Ali indirim önermez. Ali, her daireyi doğru alıcı segmentiyle buluşturur.&rdquo;
+          &ldquo;Ali indirim önermez. Her stok için marjı koruyan büyüme kampanyaları üretir.&rdquo;
         </p>
         <p className="mt-[6px] text-[12.5px] leading-[18px]" style={{ color: '#5b51a8' }}>
-          Grup/defect/emsal ham stoktan <b>şeffaf kuralla</b> türetilir; her grup için kampanya önerilir. Fiyat kaldıracı
-          asla otomatik seçilmez. Hakan&apos;ın segment/kanal etiketi referans sinyal olarak yan yana gösterilir.
+          Stok, marj tabanı, segment, kanal ve piyasa sinyalini birlikte okur; fiyatı değil, stoğu eritme yolunu
+          optimize eder. <b>Ali önerir — sen onaylarsın.</b>
         </p>
       </div>
 
