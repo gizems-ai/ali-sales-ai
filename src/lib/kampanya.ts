@@ -9,6 +9,7 @@
 
 import { Z } from './ali-zeka'
 import type { AdaptedUnit } from './stok-adapter'
+import { tureSinyal } from './stok-sinyal'   // erime hizası: Envanter ile AYNI tahminiSatisHafta tabanı
 export { Z }   // tema token'ları tek kaynaktan (Ali Satış Zekâsı ile aynı)
 
 // Bölüm adı/slug tek sabitte — sidebar + sayfa buradan okur.
@@ -273,19 +274,38 @@ function marjEtiketi(levers: Lever[], grup: StockGroup): MarjLabel {
   return 'Korunur'
 }
 
-// Adım 5 — Erime tahmini (heuristik, "tahmini" etiketiyle gösterilir).
+// Adım 5 — Erime tahmini (gün). TEK KAYNAK: Envanter'in tahminiSatisHafta'sı (stok-sinyal.ts)
+// ile AYNI tabandan türer → iki ekran çelişmez. "tahmini" etiketiyle, aralık olarak gösterilir.
+
+// Kaldıraç ayarı: güçlü kaldıraç (komisyon/finansman) erimeyi biraz hızlandırır (×0.9);
+// diğerleri nötr. fiyat zaten önerilmez. Aralık için min ~1 hafta bant korunur.
+function erimeKaldiracAyari(loG: number, hiG: number, levers: Lever[]): [number, number] {
+  const guclu = levers[0] === 'komisyon' || levers[0] === 'finansman'
+  let lo = guclu ? loG * 0.9 : loG
+  let hi = guclu ? hiG * 0.9 : hiG
+  lo = Math.round(lo); hi = Math.round(hi)
+  if (hi - lo < 7) hi = lo + 7
+  return [Math.max(7, lo), Math.max(lo + 7, hi)]
+}
+
+// Grup bazlı (gerçek daire alt-kümesi YOKSA): stok-sinyal SINYAL_TABAN.satisHafta × 7.
+// Taban HAFTA aralıkları birebir stok-sinyal ile aynı; emsal üstü +1h (sinyaldeki +1 ile eş).
 function erimeTahmini(stock: StockInput, levers: Lever[]): [number, number] {
-  const taban: Record<StockGroup, [number, number]> = {
-    A: [35, 55], B: [45, 70], C: [45, 75], D: [65, 95],
+  const tabanHafta: Record<StockGroup, [number, number]> = {
+    A: [3, 5], B: [4, 7], C: [5, 8], D: [8, 13],
   }
-  let [lo, hi] = taban[stock.grup]
-  let d = 0
-  if (stock.emsalKonumu === 'ustunde') d += 10
-  if (stock.kanalDoygun) d += 10
-  if (levers[0] === 'komisyon' || levers[0] === 'finansman') d -= 5
-  lo = Math.max(10, lo + d)
-  hi = Math.max(lo + 5, hi + d)
-  return [lo, hi]
+  let [loH, hiH] = tabanHafta[stock.grup]
+  if (stock.emsalKonumu === 'ustunde') { loH += 1; hiH += 1 }
+  return erimeKaldiracAyari(loH * 7, hiH * 7, levers)
+}
+
+// Gerçek daire alt-kümesinden (Faz 1.5 varsayılan): tahminiSatisHafta'nın çeyreklikleri × 7.
+// Medyanı bracketleyen q25–q75 aralığı → Envanter'de o dairelerin gösterdiği hafta ile örtüşür.
+function erimeGercek(haftalar: number[], levers: Lever[]): [number, number] {
+  if (haftalar.length === 0) return erimeKaldiracAyari(0, 0, levers)
+  const s = [...haftalar].sort((a, b) => a - b)
+  const q = (p: number) => s[Math.min(s.length - 1, Math.round(p * (s.length - 1)))]
+  return erimeKaldiracAyari(q(0.25) * 7, q(0.75) * 7, levers)
 }
 
 // §6/§8 — Güven skoru: deterministik bileşenler (her biri 0/1), yüzdeye normalize.
@@ -564,10 +584,13 @@ export function projeKampanyalari(
     }
     const stokOzeti = { daireSayisi: gu.length, bloklar, toplamM2, toplamDegerTL }
 
+    // Bu grubun gerçek dairelerinin tahminiSatisHafta'sı — erime Envanter ile aynı kaynaktan gelsin.
+    const haftalar = gu.map(u => tureSinyal({ id: u.id, grup: u.grup, emsal: u.emsal, durum: u.durum }).tahminiSatisHafta)
+
     const segments = uygunSegmentler(stock)
     const cards = segments.map(s => {
       const c = kartOlustur({ stock, marjTabani, hedefDaire: gu.length, hedefGun, signal }, s)
-      return { ...c, stokOzeti, hakan }
+      return { ...c, erimeTahminiGun: erimeGercek(haftalar, c.levers), stokOzeti, hakan }
     })
 
     gruplar.push({
