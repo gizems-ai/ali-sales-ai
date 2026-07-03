@@ -12,6 +12,7 @@ const EDITILEBILIR = new Set([
   'Ürün', 'Öncelik', 'Bugün Aranacak', '2026 Arandı mı', '2026 Ulaşıldı mı',
   'Sonra Ara Tarihi', 'Son Durum 2026', 'Kaybedilme Nedeni', 'Ali Özeti',
   'Branş Onaylandı', 'Cross-Sell İmkânı', 'Global Anlaşma', 'Pipeline Aşaması',
+  'Son Mail Tarihi',
 ])
 
 const PIPELINE_ASAMALARI = new Set([
@@ -21,6 +22,7 @@ const PIPELINE_ASAMALARI = new Set([
 
 const DATE_ALANLARI = [
   'Son İletişim Tarihi', 'Sağlık Vade Tarihi', 'Elementer Vade', 'Sonra Ara Tarihi',
+  'Son Mail Tarihi',
 ]
 
 export async function PATCH(req: NextRequest) {
@@ -68,6 +70,7 @@ export async function PATCH(req: NextRequest) {
     'Sonra Ara Tarihi':      checkRec.fields?.['Sonra Ara Tarihi']      ?? null,
     'Pipeline Aşaması':      checkRec.fields?.['Pipeline Aşaması']      ?? null,
     'Bugün Aranacak':        checkRec.fields?.['Bugün Aranacak']        ?? false,
+    'Son Mail Tarihi':       checkRec.fields?.['Son Mail Tarihi']       ?? null,
   }
 
   if (atanan === cfg.airtable.sistemAdi) return Response.json({ error: 'Yetkisiz' }, { status: 403 })

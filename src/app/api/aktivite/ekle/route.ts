@@ -16,7 +16,10 @@ export async function POST(req: NextRequest) {
 
   let body: {
     firmaId?: string
-    aramaSonucu?: string
+    aramaSonucu?: string      // eski "Arama Sonucu" (rapor sürekliliği; yalnız geçerli eski opsiyon gönderilmeli)
+    aksiyonTipi?: string      // yeni "Aksiyon Tipi": 'Arama' | 'Mail'
+    sonuc?: string            // yeni "Sonuç": Ulaşıldı | Cevap Yok | Sonra Ara | Yanıt Bekleniyor
+    brans?: string            // yeni "Branş" (firma branşı denormalize)
     not?: string
     randevuAlindi?: boolean
     temsilci?: string
@@ -28,7 +31,7 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: 'Geçersiz istek' }, { status: 400 })
   }
 
-  const { firmaId, aramaSonucu, not: notMetni, randevuAlindi, temsilci: bodyTemsilci, tarih: bodyTarih } = body
+  const { firmaId, aramaSonucu, aksiyonTipi, sonuc, brans, not: notMetni, randevuAlindi, temsilci: bodyTemsilci, tarih: bodyTarih } = body
 
   if (!firmaId || !/^rec[A-Za-z0-9]+$/.test(firmaId)) {
     return Response.json({ error: 'Geçersiz Firma ID' }, { status: 400 })
@@ -36,7 +39,7 @@ export async function POST(req: NextRequest) {
 
   const temsilci = izin.tip === 'temsilci' ? izin.temsilci : (bodyTemsilci ?? undefined)
   const tarih = bodyTarih ?? new Date().toISOString().slice(0, 10)
-  const baslik = [aramaSonucu ?? 'Not', tarih].join(' — ')
+  const baslik = [sonuc ?? aramaSonucu ?? 'Not', tarih].join(' — ')
 
   const fields: Record<string, unknown> = {
     'Başlık': baslik,
@@ -44,7 +47,10 @@ export async function POST(req: NextRequest) {
     'Firma ID': firmaId,
     'Tarih': tarih,
   }
-  if (aramaSonucu) fields['Arama Sonucu'] = aramaSonucu
+  if (aramaSonucu) fields['Arama Sonucu'] = aramaSonucu   // eski alan (dokunulmadı; yalnız gönderildiğinde yazılır)
+  if (aksiyonTipi) fields['Aksiyon Tipi'] = aksiyonTipi   // yeni
+  if (sonuc) fields['Sonuç'] = sonuc                       // yeni
+  if (brans?.trim()) fields['Branş'] = brans.trim()        // yeni (denormalize)
   if (notMetni?.trim()) fields['Not'] = notMetni.trim()
   if (randevuAlindi) fields['Randevu Alındı'] = true
   if (temsilci) fields['Temsilci'] = temsilci
