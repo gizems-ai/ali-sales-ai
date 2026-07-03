@@ -23,19 +23,35 @@ interface AktiviteLog {
     'Temsilci'?: string
     'Tarih'?: string
     'Arama Sonucu'?: string
+    // v2 aktivite şeması (additive; eski kayıtlarda boş olabilir → null-safe)
+    'Aksiyon Tipi'?: string
+    'Sonuç'?: string
+    'Branş'?: string
     'Randevu Alındı'?: boolean
     'Not'?: string
   }
 }
 
+// Modal hızlı-aksiyon → aktivite loguna yazılacak bilgi
+type AktiviteBilgi = {
+  aksiyonTipi: 'Arama' | 'Mail'
+  sonuc: string                 // yeni "Sonuç" alanı
+  aramaSonucuLegacy?: string    // eski "Arama Sonucu" alanı (rapor sürekliliği için — yalnız geçerli eski opsiyon)
+  randevuAlindi?: boolean
+}
+
 const ARAMA_SONUCU_SECENEKLERI = ['Ulaşıldı', 'Cevap Yok', 'Meşgul', 'Randevu Alındı', 'Geri Aranacak']
 const ARAMA_SONUCU_RENK: Record<string, string> = {
-  'Ulaşıldı':       'bg-green-50 text-green-700 border-green-100',
-  'Cevap Yok':      'bg-gray-100 text-gray-500 border-gray-200',
-  'Meşgul':         'bg-red-50 text-red-500 border-red-100',
-  'Randevu Alındı': 'bg-violet-50 text-violet-600 border-violet-100',
-  'Geri Aranacak':  'bg-blue-50 text-blue-600 border-blue-100',
+  'Ulaşıldı':          'bg-green-50 text-green-700 border-green-100',
+  'Cevap Yok':         'bg-gray-100 text-gray-500 border-gray-200',
+  'Meşgul':            'bg-red-50 text-red-500 border-red-100',
+  'Randevu Alındı':    'bg-violet-50 text-violet-600 border-violet-100',
+  'Geri Aranacak':     'bg-blue-50 text-blue-600 border-blue-100',
+  // v2 Sonuç opsiyonları
+  'Sonra Ara':         'bg-amber-50 text-amber-600 border-amber-100',
+  'Yanıt Bekleniyor':  'bg-sky-50 text-sky-600 border-sky-100',
 }
+const AKSIYON_TIPI_ICON: Record<string, string> = { 'Arama': '📞', 'Mail': '✉️' }
 
 interface Props {
   recordId: string | null
@@ -262,7 +278,7 @@ function EF({ label, fk, type = 'text', opts, em, rec, pend, onCh, err }: EFProp
 interface HizliAksizonProps {
   record: AirtableRecord<FirmaDetay>
   izin: Exclude<MusterilerIzin, { tip: 'yok' }>
-  onAirtableUpdate: (fields: Record<string, unknown>, sonuc?: string) => Promise<void>
+  onAirtableUpdate: (fields: Record<string, unknown>, aktivite?: AktiviteBilgi) => Promise<void>
   onPipelineChange: (asama: string) => Promise<void>
   disabled?: boolean
 }
@@ -271,6 +287,7 @@ function HizliAksiyon({ record, izin, onAirtableUpdate, onPipelineChange, disabl
   const f = record.fields
   const [loading, setLoading] = useState<string | null>(null)
   const [pipelineAcik, setPipelineAcik] = useState(false)
+  const [aramaAcik, setAramaAcik] = useState(false)
   const [sonraAraAcik, setSonraAraAcik] = useState(false)
   const [sonraAraTarih, setSonraAraTarih] = useState('')
   const dateRef = useRef<HTMLInputElement>(null)
@@ -281,11 +298,11 @@ function HizliAksiyon({ record, izin, onAirtableUpdate, onPipelineChange, disabl
 
   const today = new Date().toLocaleDateString('sv-SE')
 
-  async function doAksiyon(key: string, fields: Record<string, unknown>, sonuc?: string) {
+  async function doAksiyon(key: string, fields: Record<string, unknown>, aktivite?: AktiviteBilgi) {
     if (disabled || loading) return
     setLoading(key)
     try {
-      await onAirtableUpdate(fields, sonuc)
+      await onAirtableUpdate(fields, aktivite)
     } finally {
       setLoading(null)
     }
@@ -295,7 +312,12 @@ function HizliAksiyon({ record, izin, onAirtableUpdate, onPipelineChange, disabl
     if (!sonraAraTarih) return
     setLoading('sonra')
     try {
-      await onAirtableUpdate({ 'Sonra Ara Tarihi': sonraAraTarih })
+      // Sonra Ara: yalnız "Sonra Ara Tarihi" yazılır (Son İletişim Tarihi'ne DOKUNULMAZ),
+      // ama aktivite loguna Arama/Sonra Ara olarak düşer.
+      await onAirtableUpdate(
+        { 'Sonra Ara Tarihi': sonraAraTarih },
+        { aksiyonTipi: 'Arama', sonuc: 'Sonra Ara' },
+      )
       setSonraAraAcik(false)
       setSonraAraTarih('')
     } finally {
@@ -318,66 +340,87 @@ function HizliAksiyon({ record, izin, onAirtableUpdate, onPipelineChange, disabl
     'Teklif': '🟣', 'Müzakere': '🟠', 'Kazanıldı': '✅', 'Kaybedildi': '⚫',
   }
 
-  const buttons = [
-    {
-      key: 'arandi',
-      label: 'Arandı',
-      emoji: '📞',
-      color: '#3B82F6',
-      fields: { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, 'Bugün Aranacak': false },
-      sonuc: 'Geri Aranacak',
-    },
+  // Aksiyon = "ne yaptın": Aradım (alt katman: Ulaşıldı/Ulaşılamadı/Sonra Ara) · Mail attım
+  const araSubButtons = [
     {
       key: 'ulasildi',
       label: 'Ulaşıldı',
       emoji: '✓',
       color: '#10B981',
-      fields: { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, '2026 Ulaşıldı mı': true, 'Bugün Aranacak': false },
-      sonuc: 'Ulaşıldı',
+      fields: { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, '2026 Ulaşıldı mı': true, 'Bugün Aranacak': false } as Record<string, unknown>,
+      aktivite: { aksiyonTipi: 'Arama', sonuc: 'Ulaşıldı', aramaSonucuLegacy: 'Ulaşıldı' } as AktiviteBilgi,
     },
     {
       key: 'ulasilamadi',
       label: 'Ulaşılamadı',
       emoji: '✗',
       color: '#DC2626',
-      fields: { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, 'Pipeline Aşaması': 'Ulaşılamadı', 'Bugün Aranacak': false },
-      sonuc: 'Cevap Yok',
-    },
-    {
-      key: 'sonra',
-      label: 'Sonra Ara',
-      emoji: '📅',
-      color: '#8B5CF6',
-      fields: {},
-      sonuc: undefined,
+      fields: { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, 'Pipeline Aşaması': 'Ulaşılamadı', 'Bugün Aranacak': false } as Record<string, unknown>,
+      aktivite: { aksiyonTipi: 'Arama', sonuc: 'Cevap Yok', aramaSonucuLegacy: 'Cevap Yok' } as AktiviteBilgi,
     },
   ]
 
   return (
     <div className="rounded-2xl p-4 shadow-sm" style={{ background: 'linear-gradient(135deg, #7C2D2D 0%, #991B1B 100%)' }}>
-      {/* 4 buton */}
-      <div className="grid grid-cols-4 gap-2 mb-3">
-        {buttons.map(b => (
+      {/* Aksiyon barı: Aradım · Mail attım */}
+      <div className="grid grid-cols-2 gap-2 mb-3">
+        <button
+          disabled={!!loading || disabled}
+          onClick={() => { setSonraAraAcik(false); setAramaAcik(v => !v) }}
+          className={`flex flex-col items-center justify-center gap-1 h-[64px] rounded-xl transition-all duration-150 shadow-md hover:shadow-lg
+            disabled:opacity-50 disabled:cursor-not-allowed ${aramaAcik ? 'bg-white ring-2 ring-blue-300' : 'bg-white/90 hover:bg-white'}`}
+        >
+          <span className="text-[22px] leading-none">📞</span>
+          <span className="text-[11px] font-semibold text-gray-700">Aradım</span>
+        </button>
+        <button
+          disabled={!!loading || disabled}
+          onClick={() => doAksiyon('mail', { 'Son Mail Tarihi': today, 'Bugün Aranacak': false }, { aksiyonTipi: 'Mail', sonuc: 'Yanıt Bekleniyor' })}
+          className="flex flex-col items-center justify-center gap-1 h-[64px] rounded-xl bg-white/90 hover:bg-white
+            transition-all duration-150 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm
+            disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {loading === 'mail' ? (
+            <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: '#0EA5E9', borderTopColor: 'transparent' }} />
+          ) : (
+            <span className="text-[22px] leading-none">✉️</span>
+          )}
+          <span className="text-[11px] font-semibold text-gray-700">Mail attım</span>
+        </button>
+      </div>
+
+      {/* Aradım → alt katman: Ulaşıldı · Ulaşılamadı · Sonra Ara */}
+      {aramaAcik && (
+        <div className="grid grid-cols-3 gap-2 mb-3">
+          {araSubButtons.map(b => (
+            <button
+              key={b.key}
+              disabled={!!loading || disabled}
+              onClick={() => doAksiyon(b.key, b.fields, b.aktivite)}
+              className="flex flex-col items-center justify-center gap-1 h-[56px] rounded-xl bg-white/90 hover:bg-white
+                transition-all duration-150 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm
+                disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading === b.key ? (
+                <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: b.color, borderTopColor: 'transparent' }} />
+              ) : (
+                <span className="text-[18px] leading-none">{b.emoji}</span>
+              )}
+              <span className="text-[10px] font-semibold text-gray-700">{b.label}</span>
+            </button>
+          ))}
           <button
-            key={b.key}
             disabled={!!loading || disabled}
-            onClick={() => {
-              if (b.key === 'sonra') { setSonraAraAcik(v => !v); return }
-              doAksiyon(b.key, b.fields, b.sonuc)
-            }}
-            className="flex flex-col items-center justify-center gap-1 h-[64px] rounded-xl bg-white/90 hover:bg-white
+            onClick={() => setSonraAraAcik(v => !v)}
+            className="flex flex-col items-center justify-center gap-1 h-[56px] rounded-xl bg-white/90 hover:bg-white
               transition-all duration-150 shadow-md hover:shadow-lg hover:-translate-y-0.5 active:translate-y-0 active:shadow-sm
               disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading === b.key ? (
-              <div className="w-4 h-4 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: b.color, borderTopColor: 'transparent' }} />
-            ) : (
-              <span className="text-[22px] leading-none">{b.emoji}</span>
-            )}
-            <span className="text-[11px] font-semibold text-gray-700">{b.label}</span>
+            <span className="text-[18px] leading-none">📅</span>
+            <span className="text-[10px] font-semibold text-gray-700">Sonra Ara</span>
           </button>
-        ))}
-      </div>
+        </div>
+      )}
 
       {/* Sonra Ara date picker */}
       {sonraAraAcik && (
@@ -594,7 +637,8 @@ export function AktiviteSection({ firmaId, izin, em, isAdmin, externalLogs, onNe
         <div className="space-y-2">
           {loglar.map(log => {
             const lf = log.fields
-            const sonuc = lf['Arama Sonucu']
+            const sonuc = lf['Sonuç'] ?? lf['Arama Sonucu']
+            const kanalIcon = lf['Aksiyon Tipi'] ? (AKSIYON_TIPI_ICON[lf['Aksiyon Tipi']] ?? '') : ''
             const renkClass = sonuc ? (ARAMA_SONUCU_RENK[sonuc] ?? 'bg-gray-100 text-gray-500 border-gray-200') : ''
             return (
               <div key={log.id} className="flex gap-3 p-3 rounded-xl border border-gray-100 bg-white hover:border-[#EDE9FE] transition-colors group">
@@ -608,6 +652,7 @@ export function AktiviteSection({ firmaId, izin, em, isAdmin, externalLogs, onNe
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
+                    {kanalIcon && <span className="text-[13px] leading-none" title={lf['Aksiyon Tipi']}>{kanalIcon}</span>}
                     {sonuc && <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium border ${renkClass}`}>{sonuc}</span>}
                     {lf['Randevu Alındı'] && <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-green-50 text-green-700 border border-green-100">Randevu</span>}
                   </div>
@@ -650,12 +695,14 @@ function SonGorusmeler({ firmaId, isAdmin }: { firmaId: string; isAdmin: boolean
       {!yukleniyor && loglar.length === 0 && <p className="text-xs text-gray-400 text-center py-2">Henüz görüşme kaydı yok</p>}
       {gosterilen.map(log => {
         const lf = log.fields
-        const sonuc = lf['Arama Sonucu']
+        const sonuc = lf['Sonuç'] ?? lf['Arama Sonucu']
+        const kanalIcon = lf['Aksiyon Tipi'] ? (AKSIYON_TIPI_ICON[lf['Aksiyon Tipi']] ?? '') : ''
         const renkClass = sonuc ? (ARAMA_SONUCU_RENK[sonuc] ?? 'bg-gray-100 text-gray-500 border-gray-200') : ''
         return (
           <div key={log.id} className="mb-2 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors">
             <div className="flex items-center gap-2 mb-1">
               {lf['Tarih'] && <span className="text-[11px] text-gray-400">{formatTarihKisa(lf['Tarih'])}</span>}
+              {kanalIcon && <span className="text-[13px] leading-none" title={lf['Aksiyon Tipi']}>{kanalIcon}</span>}
               {sonuc && <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium border ${renkClass}`}>{sonuc}</span>}
               {lf['Randevu Alındı'] && <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-green-50 text-green-700 border border-green-100">Randevu</span>}
               {lf['Temsilci'] && (
@@ -773,11 +820,13 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
   // Hızlı aksiyon: Airtable update + aktivite log
   async function handleHizliAksiyon(
     fields: Record<string, unknown>,
-    aramaSonucu?: string,
-    opts?: { randevuAlindi?: boolean; toastMesaj?: string },
+    aktivite?: AktiviteBilgi,
+    opts?: { toastMesaj?: string },
   ) {
     if (!record) return
     const firmaAdi = record.fields['Firma Adı'] ?? 'Firma'
+    const bransArr = (record.fields['Branş'] as string[] | undefined) ?? []
+    const brans = bransArr.join(', ')
     const prevFields: Partial<FirmaDetay> = {}
     for (const k of Object.keys(fields)) prevFields[k as keyof FirmaDetay] = record.fields[k as keyof FirmaDetay] as never
 
@@ -789,12 +838,15 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
         method: 'PATCH', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ recordId: record.id, fields }),
       }),
-      aramaSonucu ? fetch('/api/aktivite/ekle', {
+      aktivite ? fetch('/api/aktivite/ekle', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           firmaId: record.id,
-          aramaSonucu,
-          ...(opts?.randevuAlindi ? { randevuAlindi: true } : {}),
+          aksiyonTipi: aktivite.aksiyonTipi,
+          sonuc: aktivite.sonuc,
+          ...(brans ? { brans } : {}),
+          ...(aktivite.aramaSonucuLegacy ? { aramaSonucu: aktivite.aramaSonucuLegacy } : {}),
+          ...(aktivite.randevuAlindi ? { randevuAlindi: true } : {}),
         }),
       }) : Promise.resolve(null),
     ])
@@ -808,9 +860,10 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
     const prevData = updateRes.status === 'fulfilled' ? await updateRes.value.json().catch(() => ({})) : {}
     let mesaj = `${firmaAdi} · güncellendi`
     if (opts?.toastMesaj) mesaj = `${firmaAdi} · ${opts.toastMesaj}`
-    else if (aramaSonucu === 'Ulaşıldı') mesaj = `${firmaAdi} · Ulaşıldı ✓`
-    else if (aramaSonucu === 'Cevap Yok') mesaj = `${firmaAdi} · Ulaşılamadı`
-    else if (aramaSonucu === 'Geri Aranacak') mesaj = `${firmaAdi} · Arandı kaydedildi`
+    else if (aktivite?.aksiyonTipi === 'Mail') mesaj = `${firmaAdi} · Mail kaydedildi ✉️`
+    else if (aktivite?.sonuc === 'Ulaşıldı') mesaj = `${firmaAdi} · Ulaşıldı ✓`
+    else if (aktivite?.sonuc === 'Cevap Yok') mesaj = `${firmaAdi} · Ulaşılamadı`
+    else if (aktivite?.sonuc === 'Sonra Ara') mesaj = `${firmaAdi} · Sonra ara olarak işaretlendi`
     else if ('Sonra Ara Tarihi' in fields) mesaj = `${firmaAdi} · Sonra ara tarihi ayarlandı`
     else if ('Pipeline Aşaması' in fields) mesaj = `${firmaAdi} · Pipeline: ${fields['Pipeline Aşaması']}`
 
@@ -829,17 +882,17 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
 
   async function handlePipelineChange(asama: string) {
     const today = new Date().toLocaleDateString('sv-SE')
-    // Pipeline → Arama Sonucu eşlemesi (eşleşmeyen aşamalarda aktivite logu açılmaz)
-    let aramaSonucu: string | undefined
-    let randevuAlindi = false
-    if (asama === 'Randevu') { aramaSonucu = 'Randevu Alındı'; randevuAlindi = true }
-    else if (asama === 'Teklif' || asama === 'Kazanıldı' || asama === 'Yanıt Alındı') aramaSonucu = 'Ulaşıldı'
-    else if (asama === 'Ulaşılamadı' || asama === 'Kaybedildi') aramaSonucu = 'Cevap Yok'
+    // Pipeline → aktivite eşlemesi (eşleşmeyen aşamalarda aktivite logu açılmaz).
+    // Pipeline değişimi bir arama teması sayılır (Aksiyon Tipi='Arama').
+    let aktivite: AktiviteBilgi | undefined
+    if (asama === 'Randevu') aktivite = { aksiyonTipi: 'Arama', sonuc: 'Ulaşıldı', aramaSonucuLegacy: 'Randevu Alındı', randevuAlindi: true }
+    else if (asama === 'Teklif' || asama === 'Kazanıldı' || asama === 'Yanıt Alındı') aktivite = { aksiyonTipi: 'Arama', sonuc: 'Ulaşıldı', aramaSonucuLegacy: 'Ulaşıldı' }
+    else if (asama === 'Ulaşılamadı' || asama === 'Kaybedildi') aktivite = { aksiyonTipi: 'Arama', sonuc: 'Cevap Yok', aramaSonucuLegacy: 'Cevap Yok' }
 
     await handleHizliAksiyon(
       { 'Pipeline Aşaması': asama, 'Son İletişim Tarihi': today, 'Bugün Aranacak': false },
-      aramaSonucu,
-      { randevuAlindi, toastMesaj: `Pipeline: ${asama}` },
+      aktivite,
+      { toastMesaj: `Pipeline: ${asama}` },
     )
   }
 
