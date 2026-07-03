@@ -1,4 +1,6 @@
 import { type AirtableRecord, type FirmaListeItem, type FirmaKart } from './airtable'
+import { adaptStok, KUR } from './stok-adapter'
+import { BABACAN_STOK } from '../data/babacan-stok'
 
 // ── Bugünün Hamleleri ─────────────────────────────────────────────────────────
 
@@ -94,19 +96,9 @@ export const LEAD_YASLANMA = [
   { etiket: '90+ gün',  renk: '#94A3B8', sayi: 1 },
 ]
 
-// ── Stok ısı haritası ek veriler ──────────────────────────────────────────────
-
-export interface StokDetay {
-  id: string
-  goruntulenmePerhafta: number
-  aktifTalep: number
-  tahminiSatisSuresi: string  // örn. '~3 hafta'
-  sonGosteriminGunu: number   // gün önce
-  riskli: boolean
-  aliOneri?: string
-}
-
-// ── Bireysel müşteri fixture (Airtable'a gitmez) ──────────────────────────
+// ── Stok (StokItem) — Raporlar panosu bu şekli okur; STOK_LISTESI adapter'dan türer ──
+// Isı sinyalleri (görüntülenme/talep/…) artık burada DEĞİL → src/lib/stok-sinyal.ts.
+// Envanter sayfası da bu tek kaynağı (BABACAN_STOK + adapter) kullanır.
 
 export interface StokItem {
   id: string
@@ -120,48 +112,29 @@ export interface StokItem {
   il: string
 }
 
-// Kaynak: Babacan_Stok_Analizi_TEMIZ_50TL.xlsx · "Önceliklendirme" sayfası (satılabilir stok)
-export const STOK_DETAY: Record<string, StokDetay> = {
-  'A-93': { id: 'A-93', goruntulenmePerhafta: 25, aktifTalep: 2, tahminiSatisSuresi: '~5 hafta', sonGosteriminGunu: 18, riskli: false },
-  'C-209': { id: 'C-209', goruntulenmePerhafta: 18, aktifTalep: 2, tahminiSatisSuresi: '~5 hafta', sonGosteriminGunu: 27, riskli: false },
-  'B-77': { id: 'B-77', goruntulenmePerhafta: 28, aktifTalep: 4, tahminiSatisSuresi: '~2 hafta', sonGosteriminGunu: 21, riskli: false },
-  'B-151': { id: 'B-151', goruntulenmePerhafta: 13, aktifTalep: 5, tahminiSatisSuresi: '~2 hafta', sonGosteriminGunu: 22, riskli: false },
-  'B-79': { id: 'B-79', goruntulenmePerhafta: 30, aktifTalep: 5, tahminiSatisSuresi: '~2 hafta', sonGosteriminGunu: 23, riskli: false },
-  'A-119': { id: 'A-119', goruntulenmePerhafta: 16, aktifTalep: 1, tahminiSatisSuresi: '~10 hafta', sonGosteriminGunu: 25, riskli: true, aliOneri: 'Segment: Yatırımcı paketi / yüksek sepet. Kanal: Yatırımcı portföyü + yabancı ağ + paket satış.' },
-  'B-86': { id: 'B-86', goruntulenmePerhafta: 28, aktifTalep: 4, tahminiSatisSuresi: '~2 hafta', sonGosteriminGunu: 21, riskli: false },
-  'B-112': { id: 'B-112', goruntulenmePerhafta: 10, aktifTalep: 5, tahminiSatisSuresi: '~2 hafta', sonGosteriminGunu: 19, riskli: false },
-  'A-37': { id: 'A-37', goruntulenmePerhafta: 23, aktifTalep: 4, tahminiSatisSuresi: '~2 hafta', sonGosteriminGunu: 16, riskli: false },
-  'B-32': { id: 'B-32', goruntulenmePerhafta: 19, aktifTalep: 6, tahminiSatisSuresi: '~2 hafta', sonGosteriminGunu: 12, riskli: false },
-  'A2-206': { id: 'A2-206', goruntulenmePerhafta: 7, aktifTalep: 2, tahminiSatisSuresi: '~5 hafta', sonGosteriminGunu: 32, riskli: false },
-  'D-85': { id: 'D-85', goruntulenmePerhafta: 29, aktifTalep: 2, tahminiSatisSuresi: '~5 hafta', sonGosteriminGunu: 22, riskli: false },
-  'B-41': { id: 'B-41', goruntulenmePerhafta: 19, aktifTalep: 6, tahminiSatisSuresi: '~2 hafta', sonGosteriminGunu: 12, riskli: false },
-  'A2-3': { id: 'A2-3', goruntulenmePerhafta: 18, aktifTalep: 5, tahminiSatisSuresi: '~2 hafta', sonGosteriminGunu: 11, riskli: false },
-  'B2-452-453': { id: 'B2-452-453', goruntulenmePerhafta: 16, aktifTalep: 0, tahminiSatisSuresi: '~10 hafta', sonGosteriminGunu: 37, riskli: true, aliOneri: 'Segment: 3.5+1 büyük daire, talep dar. Kanal: yatırımcı ağı + paket satış; erken alım primi vurgula.' },
-  'A4-73': { id: 'A4-73', goruntulenmePerhafta: 19, aktifTalep: 3, tahminiSatisSuresi: '~5 hafta', sonGosteriminGunu: 28, riskli: false },
-  'B2-200': { id: 'B2-200', goruntulenmePerhafta: 30, aktifTalep: 3, tahminiSatisSuresi: '~5 hafta', sonGosteriminGunu: 27, riskli: false },
-  'B2-47': { id: 'B2-47', goruntulenmePerhafta: 19, aktifTalep: 3, tahminiSatisSuresi: '~5 hafta', sonGosteriminGunu: 28, riskli: false },
+// Proje → il/ilçe (BABACAN_STOK'ta konum kolonu yok — projeye sabitlenir).
+const PROJE_IL: Record<string, string> = {
+  Central: 'İstanbul / Beylikdüzü',
+  Lagoon: 'İstanbul / 5. Levent',
+  'Port Royal': 'İstanbul / Sefaköy',
+  Premium: 'İstanbul / Esenyurt',
 }
 
-export const STOK_LISTESI: StokItem[] = [
-  { id: 'A-93', proje: 'Central', blok: 'A', kat: 14, daire: 'A-93', metrekare: 193, fiyat: 23_550_000, durum: 'Müsait', il: 'İstanbul / Beylikdüzü' },
-  { id: 'C-209', proje: 'Central', blok: 'C', kat: 15, daire: 'C-209', metrekare: 128, fiyat: 20_100_000, durum: 'Müsait', il: 'İstanbul / Beylikdüzü' },
-  { id: 'B-77', proje: 'Central', blok: 'B', kat: 8, daire: 'B-77', metrekare: 134, fiyat: 15_500_000, durum: 'Müsait', il: 'İstanbul / Beylikdüzü' },
-  { id: 'B-151', proje: 'Central', blok: 'B', kat: 14, daire: 'B-151', metrekare: 79, fiyat: 11_400_000, durum: 'Müsait', il: 'İstanbul / Beylikdüzü' },
-  { id: 'B-79', proje: 'Central', blok: 'B', kat: 8, daire: 'B-79', metrekare: 78, fiyat: 9_550_000, durum: 'Müsait', il: 'İstanbul / Beylikdüzü' },
-  { id: 'A-119', proje: 'Lagoon', blok: 'A', kat: 9, daire: 'A-119', metrekare: 326, fiyat: 31_200_000, durum: 'Müsait', il: 'İstanbul / 5. Levent' },
-  { id: 'B-86', proje: 'Lagoon', blok: 'B', kat: 5, daire: 'B-86', metrekare: 143, fiyat: 15_100_000, durum: 'Müsait', il: 'İstanbul / 5. Levent' },
-  { id: 'B-112', proje: 'Lagoon', blok: 'B', kat: 7, daire: 'B-112', metrekare: 75, fiyat: 10_263_158, durum: 'Müsait', il: 'İstanbul / 5. Levent' },
-  { id: 'A-37', proje: 'Lagoon', blok: 'A', kat: 1, daire: 'A-37', metrekare: 73, fiyat: 9_368_421, durum: 'Müsait', il: 'İstanbul / 5. Levent' },
-  { id: 'B-32', proje: 'Lagoon', blok: 'B', kat: 0, daire: 'B-32', metrekare: 73, fiyat: 8_526_316, durum: 'Müsait', il: 'İstanbul / 5. Levent' },
-  { id: 'A2-206', proje: 'Port Royal', blok: 'A2', kat: 12, daire: 'A2-206', metrekare: 480, fiyat: 30_150_000, durum: 'Müsait', il: 'İstanbul / Sefaköy' },
-  { id: 'D-85', proje: 'Port Royal', blok: 'D', kat: 9, daire: 'D-85', metrekare: 115, fiyat: 15_329_520, durum: 'Müsait', il: 'İstanbul / Sefaköy' },
-  { id: 'B-41', proje: 'Port Royal', blok: 'B', kat: 4, daire: 'B-41', metrekare: 38, fiyat: 8_500_000, durum: 'Müsait', il: 'İstanbul / Sefaköy' },
-  { id: 'A2-3', proje: 'Port Royal', blok: 'A2', kat: 0, daire: 'A2-3', metrekare: 38, fiyat: 6_050_000, durum: 'Müsait', il: 'İstanbul / Sefaköy' },
-  { id: 'B2-452-453', proje: 'Premium', blok: 'B2', kat: 33, daire: 'B2-452-453', metrekare: 219, fiyat: 17_979_928, durum: 'Müsait', il: 'İstanbul / Esenyurt' },
-  { id: 'A4-73', proje: 'Premium', blok: 'A4', kat: 14, daire: 'A4-73', metrekare: 133, fiyat: 10_914_294, durum: 'Müsait', il: 'İstanbul / Esenyurt' },
-  { id: 'B2-200', proje: 'Premium', blok: 'B2', kat: 15, daire: 'B2-200', metrekare: 118, fiyat: 9_686_529, durum: 'Müsait', il: 'İstanbul / Esenyurt' },
-  { id: 'B2-47', proje: 'Premium', blok: 'B2', kat: 4, daire: 'B2-47', metrekare: 101, fiyat: 8_293_464, durum: 'Müsait', il: 'İstanbul / Esenyurt' },
-]
+// STOK_LISTESI — TEK KAYNAK: gerçek 507 daire (BABACAN_STOK) → adapter → StokItem.
+// Eski elle-yazılmış ~18 daire fixture'ı KALDIRILDI; Envanter sayfası ve Raporlar
+// panosu artık aynı gerçekten okur. Fiyat: TL = fiyatUSD × KUR (§7 tek sabit).
+// Durum: bu veride hepsi satılabilir → 'Müsait' (Opsiyonlu/Satıldı = 0).
+export const STOK_LISTESI: StokItem[] = adaptStok(BABACAN_STOK).map(u => ({
+  id: u.id,
+  proje: u.proje,
+  blok: u.blok,
+  kat: u.katInt ?? 0,
+  daire: u.id,
+  metrekare: Math.round(u.brutM2),
+  fiyat: Math.round(u.fiyatUSD * KUR),
+  durum: 'Müsait',
+  il: PROJE_IL[u.proje] ?? u.proje,
+}))
 
 // ── Bireysel müşteri fixture (FirmaListeItem şeklinde) ───────────────────
 

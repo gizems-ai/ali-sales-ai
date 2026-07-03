@@ -50,6 +50,12 @@ export const ESIK = {
 // Satılabilir durumlar (§4). Motor yalnız bunları önerir.
 export const SATILABILIR_DURUMLAR = new Set(['BOŞ', 'SATIŞA AÇIK', 'FİYAT LİSTESİ / STOK'])
 
+// ── Kur (§7) — TL = USD × KUR. Fiyat gösteriminin TEK kaynağı. USD otorite ─────
+// (Hakan USD ile çalışır). Repo Excel'i TEMIZ_50TL → 50. İki Excel'in TL farkı
+// (Satis_Modeli ~47,3) bu sabitle çözülür; net kur belli olunca tek satır güncellenir.
+// TODO(Gizem): Satis_Modeli otorite ise KUR = 47.3 yap. Bloklamıyor (Faz 2 §10).
+export const KUR = 50
+
 // A / B grubu tip kümeleri
 const A_TIPLER = new Set(['1+0', '1+1'])
 const B_TIPLER = new Set(['2+1', '3+1', '3.5+1'])

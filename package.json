@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:adapter": "npx -y tsx src/lib/stok-adapter.test.ts"
+    "test:adapter": "npx -y tsx src/lib/stok-adapter.test.ts",
+    "test:sinyal": "npx -y tsx src/lib/stok-sinyal.test.ts"
   },
   "dependencies": {
     "@clerk/localizations": "^4.7.1",
