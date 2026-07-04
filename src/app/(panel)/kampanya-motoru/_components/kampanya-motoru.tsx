@@ -8,6 +8,8 @@ import {
 } from '@/lib/kampanya'
 import { adaptStok, PROJELER, type Proje, type StockGroup } from '@/lib/stok-adapter'
 import { BABACAN_STOK } from '@/data/babacan-stok'
+import { ilceFor, engineCardId } from '@/lib/kampanya-store'
+import { yayinlaKampanyaAction, kaldirKampanyaAction } from '@/lib/kampanya-actions'
 import { KampanyaKarti } from './kampanya-karti'
 
 const SIGNALS: Signal[] = ['none', 'faiz_dusus', 'altin_yukselis', 'savas_kriz', 'piyasa_yukselis']
@@ -36,6 +38,8 @@ export function KampanyaMotoru() {
   const [hedefGun, setHedefGun] = useState(90)
   const [onerildi, setOnerildi] = useState(false)
   const [approved, setApproved] = useState<Record<string, CampaignRec>>({})
+  const [yayinda, setYayinda] = useState<Record<string, boolean>>({})       // engineCardId → Broker OS'ta yayında mı
+  const [yayinPending, setYayinPending] = useState<Record<string, boolean>>({})
 
   const autoMarj = useMemo(() => projeMarjTabani(adapted.filter(u => u.proje === proje)), [adapted, proje])
   const marjTabani = marjEdit ?? autoMarj
@@ -49,6 +53,26 @@ export function KampanyaMotoru() {
     setProje(p)
     setMarjEdit(null)      // yeni projenin otomatik marjını göster
     setApproved({})        // segmentler değişir — onayları sıfırla
+    setYayinda({})
+    setYayinPending({})
+  }
+
+  // Broker OS'a yayınla / kaldır (§6) — server action store'u mutasyonlar, Broker OS görür.
+  async function yayinToggle(card: CampaignRec, grup: StockGroup) {
+    const id = engineCardId(proje, grup, card.segment)
+    setYayinPending(p => ({ ...p, [id]: true }))
+    try {
+      const r = yayinda[id]
+        ? await kaldirKampanyaAction(id)
+        : await yayinlaKampanyaAction({
+            proje, grup, segment: card.segment,
+            baslik: `${card.segmentEtiket} · ${proje} ${grup}`,
+            kaldirac: card.levers, teklifOzeti: card.teklif, mesaj: card.mesaj,
+          })
+      setYayinda(y => ({ ...y, [id]: r.brokerYayin }))
+    } finally {
+      setYayinPending(p => ({ ...p, [id]: false }))
+    }
   }
 
   const toplamKart = sonuc.gruplar.reduce((s, g) => s + g.cards.length, 0)
@@ -97,7 +121,7 @@ export function KampanyaMotoru() {
               </select>
               <ChevronDown size={14} className="absolute right-0 top-[3px] pointer-events-none" style={{ color: '#8b988f' }} />
             </div>
-            <p className="text-[10.5px] text-slate-400 mt-[1px]">{sonuc.toplamSatilabilir} satılabilir daire</p>
+            <p className="text-[10.5px] text-slate-400 mt-[1px]">{ilceFor(proje)} · {sonuc.toplamSatilabilir} satılabilir daire</p>
           </KurulumAlani>
 
           {/* Marj tabanı (proje medyanından ön-dolu, elle düzenlenebilir) */}
@@ -190,7 +214,13 @@ export function KampanyaMotoru() {
                   {g.cards.map(card => {
                     const k = `${proje}:${g.grup}:${card.segment}`
                     const shown = approved[k] ?? card
-                    return <KampanyaKarti key={k} card={shown} onApprove={a => setApproved(prev => ({ ...prev, [k]: a }))} />
+                    const id = engineCardId(proje, g.grup, card.segment)
+                    return <KampanyaKarti key={k} card={shown}
+                      onApprove={a => setApproved(prev => ({ ...prev, [k]: a }))}
+                      brokerHedefli={card.audience === 'B2B'}
+                      yayinda={!!yayinda[id]}
+                      pending={!!yayinPending[id]}
+                      onYayinToggle={() => yayinToggle(shown, g.grup)} />
                   })}
                 </div>
               ) : (

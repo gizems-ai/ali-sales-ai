@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, ChevronDown, Sparkles, Radio, Tag as TagIcon, MessageCircle, ShieldCheck, X, Building2, UserCheck } from 'lucide-react'
+import { Check, ChevronDown, Sparkles, Radio, Tag as TagIcon, MessageCircle, ShieldCheck, X, Building2, UserCheck, Store, Loader2 } from 'lucide-react'
 import {
   Z, LEVER_ETIKET, marjRenk, onaylaVeUret, ASSET_ETIKET, GUVEN_GOSTERIM,
   type CampaignRec,
@@ -33,7 +33,14 @@ function Metrik({ etiket, deger, renk }: { etiket: string; deger: React.ReactNod
   )
 }
 
-export function KampanyaKarti({ card, onApprove }: { card: CampaignRec; onApprove: (approved: CampaignRec) => void }) {
+export function KampanyaKarti({ card, onApprove, brokerHedefli, yayinda, pending, onYayinToggle }: {
+  card: CampaignRec
+  onApprove: (approved: CampaignRec) => void
+  brokerHedefli?: boolean        // B2B broker segmenti mi (§6 — yayın butonu yalnız bunlarda)
+  yayinda?: boolean
+  pending?: boolean
+  onYayinToggle?: () => void
+}) {
   const [acikGuven, setAcikGuven] = useState(false)
   const approved = card.status === 'approved'
   const marj = marjRenk(card.marjLabel)
@@ -193,6 +200,26 @@ export function KampanyaKarti({ card, onApprove }: { card: CampaignRec; onApprov
               <p className="mt-[9px] text-[11px] leading-[16px]" style={{ color: '#5a4a44' }}>
                 <b>Üretim tamam · Marka QA&apos;ine düştü</b> — yayına insan onayıyla çıkar.
               </p>
+
+              {/* Broker OS yayın aksiyonu — yalnız B2B broker kampanyalarında (§6) */}
+              {brokerHedefli && onYayinToggle && (
+                <div className="mt-[10px] pt-[10px]" style={{ borderTop: `1px solid ${Z.line}` }}>
+                  <div className="flex items-center gap-[6px] mb-[7px]">
+                    <Store size={13} style={{ color: yayinda ? Z.green2 : '#8b988f' }} />
+                    <span className="text-[11px] font-bold" style={{ color: yayinda ? Z.green1 : '#8b988f' }}>
+                      {yayinda ? 'Broker OS’ta yayında' : 'Broker OS’ta yayında değil'}
+                    </span>
+                  </div>
+                  <button onClick={onYayinToggle} disabled={pending}
+                    className="w-full h-[36px] rounded-[12px] text-[12.5px] font-black flex items-center justify-center gap-[6px] transition-shadow disabled:opacity-60"
+                    style={yayinda
+                      ? { background: '#fff', color: '#9a3b2a', border: `1px solid ${Z.coral}55` }
+                      : { background: Z.grad, color: '#fff', boxShadow: '0 8px 16px -10px rgba(40,120,70,.6)' }}>
+                    {pending ? <Loader2 size={14} className="animate-spin" /> : <Store size={14} />}
+                    {yayinda ? 'Broker OS’tan kaldır' : 'Broker OS’a yayınla'}
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
