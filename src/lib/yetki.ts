@@ -129,6 +129,11 @@ export async function getKullanicıProfili(): Promise<KullanicıProfili | null> 
 
   const meta = user.publicMetadata as Record<string, unknown>
 
+  // Broker (Broker OS) kurumsal bir profil DEĞİLDİR. emlak_demo fallback'inin
+  // broker'ı yanlışlıkla kurumsal admin yapmasını engellemek için burada eler.
+  // Broker erişimi ayrıca yönetilir → getBrokerRol / brokerErisimVar.
+  if (meta.rol === 'broker') return null
+
   if (meta.rol === 'admin') return { userId: user.id, rol: 'admin' }
   if (meta.rol === 'yönetici') return { userId: user.id, rol: 'yönetici' }
   if (meta.rol === 'satış_temsilcisi' && typeof meta.temsilci === 'string' && meta.temsilci) {
@@ -147,4 +152,29 @@ export async function getKullanicıProfili(): Promise<KullanicıProfili | null> 
   const tenantId = PROD_HOST_MAP[host] ?? hdrs.get('x-tenant-id') ?? ''
   if (tenantId === 'emlak_demo') return { userId: user.id, rol: 'admin' }
   return null
+}
+
+// ─── Broker OS rolü (kurumsal Rol'den ayrı) ──────────────────────────────────
+// Broker OS, kurumsal panelden izole yeni bir persona. Clerk publicMetadata.rol
+// === 'broker' ile işaretlenir. Kurumsal YETKI_MATRISI'ne DAHİL DEĞİLDİR.
+
+/** Aktif Clerk kullanıcısı broker mı? Değilse null. */
+export async function getBrokerRol(): Promise<'broker' | null> {
+  const user = await currentUser()
+  if (!user) return null
+  const meta = user.publicMetadata as Record<string, unknown>
+  return meta.rol === 'broker' ? 'broker' : null
+}
+
+/**
+ * /broker/* erişim izni. İki grup girebilir:
+ *  1) broker rolü (kendi platformu)
+ *  2) emlak_demo kurumsal admin/yönetici (Broker Yönetimi sekmesinden önizleme)
+ * Diğer herkes → false (layout redirect eder). Broker'ın kurumsala girmesi
+ * ayrıca middleware'de (proxy.ts) engellenir.
+ */
+export async function brokerErisimVar(): Promise<boolean> {
+  if ((await getBrokerRol()) === 'broker') return true
+  const profil = await getKullanicıProfili()
+  return profil?.rol === 'admin' || profil?.rol === 'yönetici'
 }

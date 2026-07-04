@@ -5,15 +5,34 @@ const isPublic = createRouteMatcher([
   '/login(.*)',
   '/register(.*)',
   '/api/(.*)',
+  '/broker/kayit(.*)', // QR onboarding — giriş yapmamış yeni broker erişir
 ])
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
   if (isPublic(req)) return
 
-  const { userId } = await auth()
+  const { userId, sessionClaims } = await auth()
   if (!userId) {
     const loginUrl = new URL('/login', req.url)
     return NextResponse.redirect(loginUrl)
+  }
+
+  // ── Broker OS izolasyonu ────────────────────────────────────────────────────
+  // Broker (publicMetadata.rol === 'broker') SADECE /broker/* görür; kurumsal
+  // panelin hiçbir route'una giremez. Ters yön (/broker erişimi) (broker)/layout
+  // içinde sunucu tarafında yönetilir — emlak_demo admin'i metadata'sız olduğu
+  // için burada rol'e göre gate edilemez.
+  //
+  // NOT: sessionClaims.metadata'nın dolması için Clerk Dashboard → Sessions →
+  // "Customize session token" içine  { "metadata": "{{user.public_metadata}}" }
+  // eklenmelidir. Bu adım yapılmadan bu blok pasif kalır; /broker tarafı yine de
+  // layout guard ile korunur. (Kurumsal kullanıcılar rol!=='broker' olduğu için
+  // bu bloktan hiç etkilenmez → regresyon yok.)
+  const rol = (sessionClaims?.metadata as { rol?: string } | undefined)?.rol
+  const path = req.nextUrl.pathname
+  const brokerAlani = path === '/broker' || path.startsWith('/broker/')
+  if (rol === 'broker' && !brokerAlani) {
+    return NextResponse.redirect(new URL('/broker', req.url))
   }
 
   // Preview / dev: ?tenant= query param'ı x-tenant-id header'ına ve cookie'ye ilet.
