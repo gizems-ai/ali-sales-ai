@@ -132,6 +132,7 @@ const EMLAK_NAV_PATHS: Record<string, string> = {
   play:     '<path d="M8 5.2v13.6a.6.6 0 0 0 .9.52l10.5-6.8a.6.6 0 0 0 0-1.04L8.9 4.68A.6.6 0 0 0 8 5.2z"/>',
   chat:     '<path d="M5 5h14a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-4 4V6a1 1 0 0 1 1-1z"/>',
   cap:      '<path d="M3 9l9-4 9 4-9 4-9-4z"/><path d="M7 11.4V16c0 1.1 2.2 2 5 2s5-.9 5-2v-4.6"/>',
+  broker:   '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5.5A2 2 0 0 1 10 3.5h4a2 2 0 0 1 2 2V7"/><path d="M3 12h18"/>',
 }
 
 function EmlakIcon({ id }: { id: string }) {
@@ -184,6 +185,7 @@ const EMLAK_NAV: EmlakNavLink[] = [
   { href: SECTION_SLUG,    label: SECTION_NAME,         iconId: 'sparkle', lavender: true },
   { href: KAMPANYA_SLUG,   label: KAMPANYA_NAME,        iconId: 'target',  lavender: true },
   { href: '/temsilciler',  label: 'Temsilciler',         iconId: 'badge' },
+  { href: '/broker-yonetimi', label: 'Broker Yönetimi',  iconId: 'broker' },
   { label: 'Operasyon Merkezi', iconId: 'sliders', muted: true },
 ]
 
