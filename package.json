@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:guard": "npx -y tsx src/lib/tenant-guard.test.ts"
   },
   "dependencies": {
     "@clerk/localizations": "^4.7.1",
