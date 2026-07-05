@@ -36,13 +36,20 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
   }
 
   // Preview / dev: ?tenant= query param'ı x-tenant-id header'ına ve cookie'ye ilet.
-  // Üretim domainlerinde (sigorta.*, crm.*) bu header layout tarafından yoksayılır.
+  // GÜVENLİK: Bu override YALNIZCA production-DIŞI deployment'ta geçerli. Prod
+  // deployment'ında (VERCEL_ENV==='production' — sigorta.alisales.ai VE onun ham
+  // *.vercel.app URL'i dahil) client'ın gönderdiği x-tenant-id sökülür ve ?tenant/cookie
+  // yoksayılır. Asıl chokepoint yetki.ts (getTenantConfigFromRequest); bu, sayfa
+  // istekleri için ek savunmadır (/api/* zaten isPublic → middleware'i baypas eder).
   const requestHeaders = new Headers(req.headers)
-  const tenantQP     = req.nextUrl.searchParams.get('tenant')
-  const cookieTenant = req.cookies.get('preview-tenant')?.value
+  requestHeaders.delete('x-tenant-id')  // client-forge edilmiş header'ı her authed istekte sök
+
+  const previewDeploy = process.env.VERCEL_ENV !== 'production'
+  const tenantQP     = previewDeploy ? req.nextUrl.searchParams.get('tenant') : null
+  const cookieTenant = previewDeploy ? req.cookies.get('preview-tenant')?.value : null
   const effective    = tenantQP ?? cookieTenant ?? null
 
-  if (!effective) return
+  if (!effective) return NextResponse.next({ request: { headers: requestHeaders } })
 
   requestHeaders.set('x-tenant-id', effective)
   const res = NextResponse.next({ request: { headers: requestHeaders } })
