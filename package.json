@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test:adapter": "npx -y tsx src/lib/stok-adapter.test.ts",
-    "test:sinyal": "npx -y tsx src/lib/stok-sinyal.test.ts"
+    "test:sinyal": "npx -y tsx src/lib/stok-sinyal.test.ts",
+    "test:guard": "npx -y tsx src/lib/tenant-guard.test.ts"
   },
   "dependencies": {
     "@clerk/localizations": "^4.7.1",

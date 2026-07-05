@@ -1,15 +1,10 @@
 import { currentUser } from '@clerk/nextjs/server'
 import { headers } from 'next/headers'
 import { tenantFromHost, TENANTS, type TenantConfig } from './tenants'
+import { tenantIdForRequest } from './tenant-guard'
 
-// Exact prod hostname → tenant ID. Substring match kullanma: tenant bleed riski.
-// Yeni tenant eklenince buraya + tenants.ts TENANTS'a ekle.
-const PROD_HOST_MAP: Record<string, string> = {
-  'sigorta.alisales.ai': 'sigortan_biz',
-  'crm.alisales.ai':     'ali_genel',
-  'panel.alisales.ai':   'sigortan_biz',  // legacy alias — gerekli değilse decommission et
-  'emlak.alisales.ai':   'emlak_demo',    // preview only, production alias yok
-}
+// PROD_HOST_MAP + tenant çözümleme güvenlik kuralı tenant-guard.ts'e taşındı
+// (saf, birim-test edilebilir). Buradaki her iki fonksiyon da tenantIdForRequest kullanır.
 
 // ─── Tipler ──────────────────────────────────────────────────────────────────
 
@@ -112,13 +107,18 @@ export function izolasyonBelirle(profil: KullanicıProfili): IzolasyonSiniri {
 export async function getTenantConfigFromRequest(): Promise<TenantConfig | null> {
   const hdrs = await headers()
   const host = hdrs.get('host') ?? ''
-
-  const prodTenantId = PROD_HOST_MAP[host]
-  if (prodTenantId) return TENANTS[prodTenantId] ?? null
-
-  // Preview / localhost
+  const isProd = process.env.VERCEL_ENV === 'production'
   const xTenantId = hdrs.get('x-tenant-id')
-  return tenantFromHost(host, xTenantId)
+
+  // Güvenlik chokepoint'i. Host PROD_HOST_MAP dışıysa VE prod deployment'ındaysak
+  // (ham *.vercel.app dahil) → null. KRİTİK: middleware /api/* için erken return
+  // ettiğinden, forge edilmiş x-tenant-id header'ını API route'larında YALNIZ burası reddeder.
+  const tenantId = tenantIdForRequest(host, xTenantId, isProd)
+  if (tenantId) return TENANTS[tenantId] ?? null
+
+  // Prod-dışı localhost preview'i DEFAULT tenant'a düşür (mevcut davranış korunur).
+  if (!isProd) return tenantFromHost(host, xTenantId)
+  return null
 }
 
 // ─── Clerk'ten profil ─────────────────────────────────────────────────────────
@@ -142,9 +142,12 @@ export async function getKullanicıProfili(): Promise<KullanicıProfili | null> 
     return { userId: user.id, rol: 'satış_temsilcisi', temsilciAdi: meta.temsilci }
   }
   // emlak_demo: metadata olmayan authenticated user → admin (demo tenant, tüm data fixture)
+  // DEFENSE-IN-DEPTH: tenant sinyali aynı güvenlik kuralından geçer — prod deployment'ta
+  // host PROD_HOST_MAP dışıysa (ham *.vercel.app) x-tenant-id ile emlak_demo seçilemez,
+  // dolayısıyla bu admin fallback ham-URL üzerinden tetiklenemez.
   const hdrs = await headers()
   const host = hdrs.get('host') ?? ''
-  const tenantId = PROD_HOST_MAP[host] ?? hdrs.get('x-tenant-id') ?? ''
+  const tenantId = tenantIdForRequest(host, hdrs.get('x-tenant-id'), process.env.VERCEL_ENV === 'production') ?? ''
   if (tenantId === 'emlak_demo') return { userId: user.id, rol: 'admin' }
   return null
 }
