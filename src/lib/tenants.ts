@@ -250,9 +250,10 @@ export const TENANTS: Record<string, TenantConfig> = {
     name: 'Emlak Demo',
     readOnly: true,
     airtable: {
-      // AYRI base (appC55NvDvQ51f0ww "RealEstateTR") — SENTETİK emlak verisi, sıfır gerçek PII.
-      // Artık sigortan_biz'in canlı base'ini (appjULACncjRV48pf) OKUMAZ. Kendi benzersiz tablo ID'leri.
-      baseId: 'appC55NvDvQ51f0ww',
+      // Babacan GYO — Production Tenant base (gerçek 507 envanter + 5-katman yapı).
+      // Sigortan'ın canlı base'inden (appjULACncjRV48pf) TAM ayrık. Müşteri/fırsat
+      // tabloları KVKK gereği boş; müşteri ekranları kod fixture'ından beslenir.
+      baseId: 'appGYQQR2f6wqW0lV',
       tables: {
         firmalar:      'tbljuodDnLJ73CqTQ',
         opportunities: 'tblBSMULvR1t2Jjkq',
