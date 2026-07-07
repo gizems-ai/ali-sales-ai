@@ -4,7 +4,7 @@ import { getMusterilerIzni } from '@/lib/musteriler-izin'
 import { redirect } from 'next/navigation'
 import { KanbanBoard } from './_components/kanban-board'
 import { getSegment } from '@/lib/emlak-segment'
-import { BIREYSEL_KANBAN } from '@/lib/emlak-fixtures'
+import { BIREYSEL_KANBAN, KURUMSAL_KANBAN } from '@/lib/emlak-fixtures'
 
 export const revalidate = 60
 
@@ -38,7 +38,7 @@ export default async function SatisSureciPage({
   if (isEmlak) {
     initialColumns = PIPELINE_ASAMALARI.map(col => ({
       ...col,
-      records: BIREYSEL_KANBAN.filter(r => r.fields['Atanan Temsilci'] !== undefined).filter((_, i) =>
+      records: (isBireysel ? BIREYSEL_KANBAN : KURUMSAL_KANBAN).filter(r => r.fields['Atanan Temsilci'] !== undefined).filter((_, i) =>
         i % PIPELINE_ASAMALARI.length === PIPELINE_ASAMALARI.findIndex(a => a.value === col.value)
       ),
       offset: undefined,

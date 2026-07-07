@@ -5,7 +5,7 @@ import { getKullanicıProfili, getTenantConfigFromRequest } from '@/lib/yetki'
 import { type TenantConfig } from '@/lib/tenants'
 import { MusterilerClient } from './_components/musteriler-client'
 import { getSegment } from '@/lib/emlak-segment'
-import { BIREYSEL_MUSTERILER } from '@/lib/emlak-fixtures'
+import { BIREYSEL_MUSTERILER, KURUMSAL_MUSTERILER } from '@/lib/emlak-fixtures'
 
 
 export const dynamic = 'force-dynamic'
@@ -67,7 +67,7 @@ export default async function MusterilerPage({
 
   let records, offset: string | undefined, brifingData, counts
   if (isEmlak) {
-    records = BIREYSEL_MUSTERILER
+    records = isBireysel ? BIREYSEL_MUSTERILER : KURUMSAL_MUSTERILER
     offset = undefined
     brifingData = null
     counts = {

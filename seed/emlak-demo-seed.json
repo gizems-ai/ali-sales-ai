@@ -1,0 +1,2197 @@
+{
+ "projeler": [
+  {
+   "key": "P1",
+   "Ad": "Marina Vista Residences",
+   "Şehir": "İstanbul",
+   "İlçe": "Kartal",
+   "Segment": "Premium",
+   "Teslim Tarihi": "2026-12-31",
+   "Durum": "İnşaat"
+  },
+  {
+   "key": "P2",
+   "Ad": "Ege Panorama Evleri",
+   "Şehir": "İzmir",
+   "İlçe": "Çeşme",
+   "Segment": "Karma",
+   "Teslim Tarihi": "2027-06-30",
+   "Durum": "Planlama"
+  },
+  {
+   "key": "P3",
+   "Ad": "Başkent Yaşam Kule",
+   "Şehir": "Ankara",
+   "İlçe": "Çankaya",
+   "Segment": "Volume",
+   "Teslim Tarihi": "2026-09-30",
+   "Durum": "Teslime Yakın"
+  },
+  {
+   "key": "P4",
+   "Ad": "Antalya Sahil Konakları",
+   "Şehir": "Antalya",
+   "İlçe": "Konyaaltı",
+   "Segment": "Premium",
+   "Teslim Tarihi": "2027-03-31",
+   "Durum": "İnşaat"
+  }
+ ],
+ "uniteler": [
+  {
+   "key": "P1U1",
+   "Ünite Kodu": "MV-1-0101",
+   "Proje": "P1",
+   "Tip": "1+1",
+   "Kat": 1,
+   "Brüt m²": 58,
+   "USD/m²": 3259,
+   "Liste Fiyat USD": 189022,
+   "Durum": "Satıldı",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 6.8,
+   "Grup": "D"
+  },
+  {
+   "key": "P1U2",
+   "Ünite Kodu": "MV-2-0202",
+   "Proje": "P1",
+   "Tip": "2+1",
+   "Kat": 2,
+   "Brüt m²": 95,
+   "USD/m²": 3363,
+   "Liste Fiyat USD": 319485,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.9,
+   "Grup": "C"
+  },
+  {
+   "key": "P1U3",
+   "Ünite Kodu": "MV-3-0303",
+   "Proje": "P1",
+   "Tip": "3+1",
+   "Kat": 3,
+   "Brüt m²": 141,
+   "USD/m²": 3469,
+   "Liste Fiyat USD": 489129,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 5.2,
+   "Grup": "C"
+  },
+  {
+   "key": "P1U4",
+   "Ünite Kodu": "MV-4-0404",
+   "Proje": "P1",
+   "Tip": "4+1",
+   "Kat": 4,
+   "Brüt m²": 185,
+   "USD/m²": 3375,
+   "Liste Fiyat USD": 624375,
+   "Durum": "Kapora",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 4.6,
+   "Grup": "C"
+  },
+  {
+   "key": "P1U5",
+   "Ünite Kodu": "MV-1-0501",
+   "Proje": "P1",
+   "Tip": "1+1",
+   "Kat": 5,
+   "Brüt m²": 61,
+   "USD/m²": 3481,
+   "Liste Fiyat USD": 212341,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 6.8,
+   "Grup": "B"
+  },
+  {
+   "key": "P1U6",
+   "Ünite Kodu": "MV-2-0602",
+   "Proje": "P1",
+   "Tip": "2+1",
+   "Kat": 6,
+   "Brüt m²": 98,
+   "USD/m²": 3590,
+   "Liste Fiyat USD": 351820,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.9,
+   "Grup": "B"
+  },
+  {
+   "key": "P1U7",
+   "Ünite Kodu": "MV-3-0703",
+   "Proje": "P1",
+   "Tip": "3+1",
+   "Kat": 7,
+   "Brüt m²": 135,
+   "USD/m²": 3490,
+   "Liste Fiyat USD": 471150,
+   "Durum": "Opsiyon",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 5.2,
+   "Grup": "B"
+  },
+  {
+   "key": "P1U8",
+   "Ünite Kodu": "MV-4-0804",
+   "Proje": "P1",
+   "Tip": "4+1",
+   "Kat": 8,
+   "Brüt m²": 188,
+   "USD/m²": 3600,
+   "Liste Fiyat USD": 676800,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 4.6,
+   "Grup": "B"
+  },
+  {
+   "key": "P1U9",
+   "Ünite Kodu": "MV-1-0901",
+   "Proje": "P1",
+   "Tip": "1+1",
+   "Kat": 9,
+   "Brüt m²": 64,
+   "USD/m²": 3710,
+   "Liste Fiyat USD": 237440,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 6.8,
+   "Grup": "A"
+  },
+  {
+   "key": "P1U10",
+   "Ünite Kodu": "MV-2-1002",
+   "Proje": "P1",
+   "Tip": "2+1",
+   "Kat": 10,
+   "Brüt m²": 92,
+   "USD/m²": 3606,
+   "Liste Fiyat USD": 331752,
+   "Durum": "Satıldı",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.9,
+   "Grup": "A"
+  },
+  {
+   "key": "P1U11",
+   "Ünite Kodu": "MV-3-1103",
+   "Proje": "P1",
+   "Tip": "3+1",
+   "Kat": 11,
+   "Brüt m²": 138,
+   "USD/m²": 3718,
+   "Liste Fiyat USD": 513084,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 5.2,
+   "Grup": "A"
+  },
+  {
+   "key": "P1U12",
+   "Ünite Kodu": "MV-4-1204",
+   "Proje": "P1",
+   "Tip": "4+1",
+   "Kat": 12,
+   "Brüt m²": 191,
+   "USD/m²": 3831,
+   "Liste Fiyat USD": 731721,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 4.6,
+   "Grup": "A"
+  },
+  {
+   "key": "P1U13",
+   "Ünite Kodu": "MV-1-0101",
+   "Proje": "P1",
+   "Tip": "1+1",
+   "Kat": 1,
+   "Brüt m²": 58,
+   "USD/m²": 3259,
+   "Liste Fiyat USD": 189022,
+   "Durum": "Kapora",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 6.8,
+   "Grup": "D"
+  },
+  {
+   "key": "P1U14",
+   "Ünite Kodu": "MV-2-0202",
+   "Proje": "P1",
+   "Tip": "2+1",
+   "Kat": 2,
+   "Brüt m²": 95,
+   "USD/m²": 3363,
+   "Liste Fiyat USD": 319485,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.9,
+   "Grup": "C"
+  },
+  {
+   "key": "P1U15",
+   "Ünite Kodu": "MV-3-0303",
+   "Proje": "P1",
+   "Tip": "3+1",
+   "Kat": 3,
+   "Brüt m²": 141,
+   "USD/m²": 3469,
+   "Liste Fiyat USD": 489129,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 5.2,
+   "Grup": "C"
+  },
+  {
+   "key": "P2U1",
+   "Ünite Kodu": "EP-1-0101",
+   "Proje": "P2",
+   "Tip": "1+1",
+   "Kat": 1,
+   "Brüt m²": 58,
+   "USD/m²": 2125,
+   "Liste Fiyat USD": 123250,
+   "Durum": "Satıldı",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 6.6,
+   "Grup": "D"
+  },
+  {
+   "key": "P2U2",
+   "Ünite Kodu": "EP-2-0202",
+   "Proje": "P2",
+   "Tip": "2+1",
+   "Kat": 2,
+   "Brüt m²": 95,
+   "USD/m²": 2193,
+   "Liste Fiyat USD": 208335,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.7,
+   "Grup": "C"
+  },
+  {
+   "key": "P2U3",
+   "Ünite Kodu": "EP-3-0303",
+   "Proje": "P2",
+   "Tip": "3+1",
+   "Kat": 3,
+   "Brüt m²": 141,
+   "USD/m²": 2263,
+   "Liste Fiyat USD": 319083,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.0,
+   "Grup": "C"
+  },
+  {
+   "key": "P2U4",
+   "Ünite Kodu": "EP-4-0404",
+   "Proje": "P2",
+   "Tip": "4+1",
+   "Kat": 4,
+   "Brüt m²": 185,
+   "USD/m²": 2201,
+   "Liste Fiyat USD": 407185,
+   "Durum": "Kapora",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 4.4,
+   "Grup": "C"
+  },
+  {
+   "key": "P2U5",
+   "Ünite Kodu": "EP-1-0501",
+   "Proje": "P2",
+   "Tip": "1+1",
+   "Kat": 5,
+   "Brüt m²": 61,
+   "USD/m²": 2271,
+   "Liste Fiyat USD": 138531,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 6.6,
+   "Grup": "B"
+  },
+  {
+   "key": "P2U6",
+   "Ünite Kodu": "EP-2-0602",
+   "Proje": "P2",
+   "Tip": "2+1",
+   "Kat": 6,
+   "Brüt m²": 98,
+   "USD/m²": 2341,
+   "Liste Fiyat USD": 229418,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.7,
+   "Grup": "B"
+  },
+  {
+   "key": "P2U7",
+   "Ünite Kodu": "EP-3-0703",
+   "Proje": "P2",
+   "Tip": "3+1",
+   "Kat": 7,
+   "Brüt m²": 135,
+   "USD/m²": 2276,
+   "Liste Fiyat USD": 307260,
+   "Durum": "Opsiyon",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.0,
+   "Grup": "B"
+  },
+  {
+   "key": "P2U8",
+   "Ünite Kodu": "EP-4-0804",
+   "Proje": "P2",
+   "Tip": "4+1",
+   "Kat": 8,
+   "Brüt m²": 188,
+   "USD/m²": 2348,
+   "Liste Fiyat USD": 441424,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 4.4,
+   "Grup": "B"
+  },
+  {
+   "key": "P2U9",
+   "Ünite Kodu": "EP-1-0901",
+   "Proje": "P2",
+   "Tip": "1+1",
+   "Kat": 9,
+   "Brüt m²": 64,
+   "USD/m²": 2420,
+   "Liste Fiyat USD": 154880,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 6.6,
+   "Grup": "A"
+  },
+  {
+   "key": "P2U10",
+   "Ünite Kodu": "EP-2-1002",
+   "Proje": "P2",
+   "Tip": "2+1",
+   "Kat": 10,
+   "Brüt m²": 92,
+   "USD/m²": 2352,
+   "Liste Fiyat USD": 216384,
+   "Durum": "Satıldı",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.7,
+   "Grup": "A"
+  },
+  {
+   "key": "P2U11",
+   "Ünite Kodu": "EP-3-1103",
+   "Proje": "P2",
+   "Tip": "3+1",
+   "Kat": 11,
+   "Brüt m²": 138,
+   "USD/m²": 2425,
+   "Liste Fiyat USD": 334650,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.0,
+   "Grup": "A"
+  },
+  {
+   "key": "P2U12",
+   "Ünite Kodu": "EP-4-1204",
+   "Proje": "P2",
+   "Tip": "4+1",
+   "Kat": 12,
+   "Brüt m²": 191,
+   "USD/m²": 2498,
+   "Liste Fiyat USD": 477118,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 4.4,
+   "Grup": "A"
+  },
+  {
+   "key": "P2U13",
+   "Ünite Kodu": "EP-1-0101",
+   "Proje": "P2",
+   "Tip": "1+1",
+   "Kat": 1,
+   "Brüt m²": 58,
+   "USD/m²": 2125,
+   "Liste Fiyat USD": 123250,
+   "Durum": "Kapora",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 6.6,
+   "Grup": "D"
+  },
+  {
+   "key": "P2U14",
+   "Ünite Kodu": "EP-2-0202",
+   "Proje": "P2",
+   "Tip": "2+1",
+   "Kat": 2,
+   "Brüt m²": 95,
+   "USD/m²": 2193,
+   "Liste Fiyat USD": 208335,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.7,
+   "Grup": "C"
+  },
+  {
+   "key": "P2U15",
+   "Ünite Kodu": "EP-3-0303",
+   "Proje": "P2",
+   "Tip": "3+1",
+   "Kat": 3,
+   "Brüt m²": 141,
+   "USD/m²": 2263,
+   "Liste Fiyat USD": 319083,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.0,
+   "Grup": "C"
+  },
+  {
+   "key": "P3U1",
+   "Ünite Kodu": "BK-1-0101",
+   "Proje": "P3",
+   "Tip": "1+1",
+   "Kat": 1,
+   "Brüt m²": 58,
+   "USD/m²": 1394,
+   "Liste Fiyat USD": 80852,
+   "Durum": "Satıldı",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 6.4,
+   "Grup": "D"
+  },
+  {
+   "key": "P3U2",
+   "Ünite Kodu": "BK-2-0202",
+   "Proje": "P3",
+   "Tip": "2+1",
+   "Kat": 2,
+   "Brüt m²": 95,
+   "USD/m²": 1439,
+   "Liste Fiyat USD": 136705,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.5,
+   "Grup": "C"
+  },
+  {
+   "key": "P3U3",
+   "Ünite Kodu": "BK-3-0303",
+   "Proje": "P3",
+   "Tip": "3+1",
+   "Kat": 3,
+   "Brüt m²": 141,
+   "USD/m²": 1484,
+   "Liste Fiyat USD": 209244,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 4.8,
+   "Grup": "C"
+  },
+  {
+   "key": "P3U4",
+   "Ünite Kodu": "BK-4-0404",
+   "Proje": "P3",
+   "Tip": "4+1",
+   "Kat": 4,
+   "Brüt m²": 185,
+   "USD/m²": 1444,
+   "Liste Fiyat USD": 267140,
+   "Durum": "Kapora",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 4.2,
+   "Grup": "C"
+  },
+  {
+   "key": "P3U5",
+   "Ünite Kodu": "BK-1-0501",
+   "Proje": "P3",
+   "Tip": "1+1",
+   "Kat": 5,
+   "Brüt m²": 61,
+   "USD/m²": 1489,
+   "Liste Fiyat USD": 90829,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 6.4,
+   "Grup": "B"
+  },
+  {
+   "key": "P3U6",
+   "Ünite Kodu": "BK-2-0602",
+   "Proje": "P3",
+   "Tip": "2+1",
+   "Kat": 6,
+   "Brüt m²": 98,
+   "USD/m²": 1536,
+   "Liste Fiyat USD": 150528,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.5,
+   "Grup": "B"
+  },
+  {
+   "key": "P3U7",
+   "Ünite Kodu": "BK-3-0703",
+   "Proje": "P3",
+   "Tip": "3+1",
+   "Kat": 7,
+   "Brüt m²": 135,
+   "USD/m²": 1493,
+   "Liste Fiyat USD": 201555,
+   "Durum": "Opsiyon",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 4.8,
+   "Grup": "B"
+  },
+  {
+   "key": "P3U8",
+   "Ünite Kodu": "BK-4-0804",
+   "Proje": "P3",
+   "Tip": "4+1",
+   "Kat": 8,
+   "Brüt m²": 188,
+   "USD/m²": 1540,
+   "Liste Fiyat USD": 289520,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 4.2,
+   "Grup": "B"
+  },
+  {
+   "key": "P3U9",
+   "Ünite Kodu": "BK-1-0901",
+   "Proje": "P3",
+   "Tip": "1+1",
+   "Kat": 9,
+   "Brüt m²": 64,
+   "USD/m²": 1587,
+   "Liste Fiyat USD": 101568,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 6.4,
+   "Grup": "A"
+  },
+  {
+   "key": "P3U10",
+   "Ünite Kodu": "BK-2-1002",
+   "Proje": "P3",
+   "Tip": "2+1",
+   "Kat": 10,
+   "Brüt m²": 92,
+   "USD/m²": 1543,
+   "Liste Fiyat USD": 141956,
+   "Durum": "Satıldı",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.5,
+   "Grup": "A"
+  },
+  {
+   "key": "P3U11",
+   "Ünite Kodu": "BK-3-1103",
+   "Proje": "P3",
+   "Tip": "3+1",
+   "Kat": 11,
+   "Brüt m²": 138,
+   "USD/m²": 1591,
+   "Liste Fiyat USD": 219558,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 4.8,
+   "Grup": "A"
+  },
+  {
+   "key": "P3U12",
+   "Ünite Kodu": "BK-4-1204",
+   "Proje": "P3",
+   "Tip": "4+1",
+   "Kat": 12,
+   "Brüt m²": 191,
+   "USD/m²": 1639,
+   "Liste Fiyat USD": 313049,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 4.2,
+   "Grup": "A"
+  },
+  {
+   "key": "P3U13",
+   "Ünite Kodu": "BK-1-0101",
+   "Proje": "P3",
+   "Tip": "1+1",
+   "Kat": 1,
+   "Brüt m²": 58,
+   "USD/m²": 1394,
+   "Liste Fiyat USD": 80852,
+   "Durum": "Kapora",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 6.4,
+   "Grup": "D"
+  },
+  {
+   "key": "P3U14",
+   "Ünite Kodu": "BK-2-0202",
+   "Proje": "P3",
+   "Tip": "2+1",
+   "Kat": 2,
+   "Brüt m²": 95,
+   "USD/m²": 1439,
+   "Liste Fiyat USD": 136705,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.5,
+   "Grup": "C"
+  },
+  {
+   "key": "P3U15",
+   "Ünite Kodu": "BK-3-0303",
+   "Proje": "P3",
+   "Tip": "3+1",
+   "Kat": 3,
+   "Brüt m²": 141,
+   "USD/m²": 1484,
+   "Liste Fiyat USD": 209244,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 4.8,
+   "Grup": "C"
+  },
+  {
+   "key": "P4U1",
+   "Ünite Kodu": "AS-1-0101",
+   "Proje": "P4",
+   "Tip": "1+1",
+   "Kat": 1,
+   "Brüt m²": 58,
+   "USD/m²": 3060,
+   "Liste Fiyat USD": 177480,
+   "Durum": "Satıldı",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 6.7,
+   "Grup": "D"
+  },
+  {
+   "key": "P4U2",
+   "Ünite Kodu": "AS-2-0202",
+   "Proje": "P4",
+   "Tip": "2+1",
+   "Kat": 2,
+   "Brüt m²": 95,
+   "USD/m²": 3159,
+   "Liste Fiyat USD": 300105,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.8,
+   "Grup": "C"
+  },
+  {
+   "key": "P4U3",
+   "Ünite Kodu": "AS-3-0303",
+   "Proje": "P4",
+   "Tip": "3+1",
+   "Kat": 3,
+   "Brüt m²": 141,
+   "USD/m²": 3258,
+   "Liste Fiyat USD": 459378,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 5.1,
+   "Grup": "C"
+  },
+  {
+   "key": "P4U4",
+   "Ünite Kodu": "AS-4-0404",
+   "Proje": "P4",
+   "Tip": "4+1",
+   "Kat": 4,
+   "Brüt m²": 185,
+   "USD/m²": 3169,
+   "Liste Fiyat USD": 586265,
+   "Durum": "Kapora",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 4.5,
+   "Grup": "C"
+  },
+  {
+   "key": "P4U5",
+   "Ünite Kodu": "AS-1-0501",
+   "Proje": "P4",
+   "Tip": "1+1",
+   "Kat": 5,
+   "Brüt m²": 61,
+   "USD/m²": 3270,
+   "Liste Fiyat USD": 199470,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 6.7,
+   "Grup": "B"
+  },
+  {
+   "key": "P4U6",
+   "Ünite Kodu": "AS-2-0602",
+   "Proje": "P4",
+   "Tip": "2+1",
+   "Kat": 6,
+   "Brüt m²": 98,
+   "USD/m²": 3371,
+   "Liste Fiyat USD": 330358,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.8,
+   "Grup": "B"
+  },
+  {
+   "key": "P4U7",
+   "Ünite Kodu": "AS-3-0703",
+   "Proje": "P4",
+   "Tip": "3+1",
+   "Kat": 7,
+   "Brüt m²": 135,
+   "USD/m²": 3278,
+   "Liste Fiyat USD": 442530,
+   "Durum": "Opsiyon",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 5.1,
+   "Grup": "B"
+  },
+  {
+   "key": "P4U8",
+   "Ünite Kodu": "AS-4-0804",
+   "Proje": "P4",
+   "Tip": "4+1",
+   "Kat": 8,
+   "Brüt m²": 188,
+   "USD/m²": 3381,
+   "Liste Fiyat USD": 635628,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 4.5,
+   "Grup": "B"
+  },
+  {
+   "key": "P4U9",
+   "Ünite Kodu": "AS-1-0901",
+   "Proje": "P4",
+   "Tip": "1+1",
+   "Kat": 9,
+   "Brüt m²": 64,
+   "USD/m²": 3485,
+   "Liste Fiyat USD": 223040,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 6.7,
+   "Grup": "A"
+  },
+  {
+   "key": "P4U10",
+   "Ünite Kodu": "AS-2-1002",
+   "Proje": "P4",
+   "Tip": "2+1",
+   "Kat": 10,
+   "Brüt m²": 92,
+   "USD/m²": 3387,
+   "Liste Fiyat USD": 311604,
+   "Durum": "Satıldı",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.8,
+   "Grup": "A"
+  },
+  {
+   "key": "P4U11",
+   "Ünite Kodu": "AS-3-1103",
+   "Proje": "P4",
+   "Tip": "3+1",
+   "Kat": 11,
+   "Brüt m²": 138,
+   "USD/m²": 3492,
+   "Liste Fiyat USD": 481896,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 5.1,
+   "Grup": "A"
+  },
+  {
+   "key": "P4U12",
+   "Ünite Kodu": "AS-4-1204",
+   "Proje": "P4",
+   "Tip": "4+1",
+   "Kat": 12,
+   "Brüt m²": 191,
+   "USD/m²": 3598,
+   "Liste Fiyat USD": 687218,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 4.5,
+   "Grup": "A"
+  },
+  {
+   "key": "P4U13",
+   "Ünite Kodu": "AS-1-0101",
+   "Proje": "P4",
+   "Tip": "1+1",
+   "Kat": 1,
+   "Brüt m²": 58,
+   "USD/m²": 3060,
+   "Liste Fiyat USD": 177480,
+   "Durum": "Kapora",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 6.7,
+   "Grup": "D"
+  },
+  {
+   "key": "P4U14",
+   "Ünite Kodu": "AS-2-0202",
+   "Proje": "P4",
+   "Tip": "2+1",
+   "Kat": 2,
+   "Brüt m²": 95,
+   "USD/m²": 3159,
+   "Liste Fiyat USD": 300105,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": false,
+   "Tahmini Kira Getirisi %": 5.8,
+   "Grup": "C"
+  },
+  {
+   "key": "P4U15",
+   "Ünite Kodu": "AS-3-0303",
+   "Proje": "P4",
+   "Tip": "3+1",
+   "Kat": 3,
+   "Brüt m²": 141,
+   "USD/m²": 3258,
+   "Liste Fiyat USD": 459378,
+   "Durum": "Müsait",
+   "Vatandaşlık Uygun": true,
+   "Tahmini Kira Getirisi %": 5.1,
+   "Grup": "C"
+  }
+ ],
+ "kisiler": [
+  {
+   "key": "K1",
+   "Ad": "Ahmet Yıldız",
+   "Dil": "Türkçe",
+   "Ülke": "Türkiye",
+   "Persona": "Yatırımcı",
+   "Bütçe Aralığı": "350-500K USD",
+   "Kaynak Kanal": "Dijital",
+   "Telefon": "+9053001110000",
+   "Email": "ahmetyildiz@example.com"
+  },
+  {
+   "key": "K2",
+   "Ad": "Elif Demir",
+   "Dil": "Türkçe",
+   "Ülke": "Türkiye",
+   "Persona": "Oturumcu",
+   "Bütçe Aralığı": "200-350K USD",
+   "Kaynak Kanal": "Referans",
+   "Telefon": "+9053011110001",
+   "Email": "elifdemir@example.com"
+  },
+  {
+   "key": "K3",
+   "Ad": "Mohammed Al-Rashid",
+   "Dil": "Arapça",
+   "Ülke": "Katar",
+   "Persona": "Vatandaşlık",
+   "Bütçe Aralığı": "500K+ USD",
+   "Kaynak Kanal": "Broker",
+   "Telefon": "+9053021110002",
+   "Email": "mohammedal-ras@example.com"
+  },
+  {
+   "key": "K4",
+   "Ad": "Selin Arslan",
+   "Dil": "Türkçe",
+   "Ülke": "Türkiye",
+   "Persona": "Oturumcu",
+   "Bütçe Aralığı": "200-350K USD",
+   "Kaynak Kanal": "Dijital",
+   "Telefon": "+9053031110003",
+   "Email": "selinarslan@example.com"
+  },
+  {
+   "key": "K5",
+   "Ad": "Hans Müller",
+   "Dil": "Almanca",
+   "Ülke": "Almanya",
+   "Persona": "Gurbetçi",
+   "Bütçe Aralığı": "350-500K USD",
+   "Kaynak Kanal": "Referans",
+   "Telefon": "+9053041110004",
+   "Email": "hansmuller@example.com"
+  },
+  {
+   "key": "K6",
+   "Ad": "Cem Öztürk",
+   "Dil": "Türkçe",
+   "Ülke": "Türkiye",
+   "Persona": "Yatırımcı",
+   "Bütçe Aralığı": "200-350K USD",
+   "Kaynak Kanal": "Tele-SDR",
+   "Telefon": "+9053051110005",
+   "Email": "cemozturk@example.com"
+  },
+  {
+   "key": "K7",
+   "Ad": "Olga Ivanova",
+   "Dil": "Rusça",
+   "Ülke": "Rusya",
+   "Persona": "Vatandaşlık",
+   "Bütçe Aralığı": "500K+ USD",
+   "Kaynak Kanal": "Broker",
+   "Telefon": "+9053061110006",
+   "Email": "olgaivanova@example.com"
+  },
+  {
+   "key": "K8",
+   "Ad": "Burak Aydın",
+   "Dil": "Türkçe",
+   "Ülke": "Türkiye",
+   "Persona": "Yatırımcı",
+   "Bütçe Aralığı": "100-200K USD",
+   "Kaynak Kanal": "Dijital",
+   "Telefon": "+9053071110007",
+   "Email": "burakaydin@example.com"
+  },
+  {
+   "key": "K9",
+   "Ad": "Fatima Al-Sayed",
+   "Dil": "Arapça",
+   "Ülke": "BAE",
+   "Persona": "Vatandaşlık",
+   "Bütçe Aralığı": "500K+ USD",
+   "Kaynak Kanal": "Broker",
+   "Telefon": "+9053081110008",
+   "Email": "fatimaal-sayed@example.com"
+  },
+  {
+   "key": "K10",
+   "Ad": "Zeynep Şahin",
+   "Dil": "Türkçe",
+   "Ülke": "Türkiye",
+   "Persona": "Oturumcu",
+   "Bütçe Aralığı": "200-350K USD",
+   "Kaynak Kanal": "Dijital",
+   "Telefon": "+9053091110009",
+   "Email": "zeynepsahin@example.com"
+  },
+  {
+   "key": "K11",
+   "Ad": "Mehmet Kaya",
+   "Dil": "Türkçe",
+   "Ülke": "Almanya",
+   "Persona": "Gurbetçi",
+   "Bütçe Aralığı": "350-500K USD",
+   "Kaynak Kanal": "Referans",
+   "Telefon": "+9053101110010",
+   "Email": "mehmetkaya@example.com"
+  },
+  {
+   "key": "K12",
+   "Ad": "Ayşe Çelik",
+   "Dil": "Türkçe",
+   "Ülke": "Türkiye",
+   "Persona": "Oturumcu",
+   "Bütçe Aralığı": "100-200K USD",
+   "Kaynak Kanal": "Tele-SDR",
+   "Telefon": "+9053111110011",
+   "Email": "aysecelik@example.com"
+  },
+  {
+   "key": "K13",
+   "Ad": "Viktor Petrov",
+   "Dil": "Rusça",
+   "Ülke": "Rusya",
+   "Persona": "Yatırımcı",
+   "Bütçe Aralığı": "350-500K USD",
+   "Kaynak Kanal": "Broker",
+   "Telefon": "+9053121110012",
+   "Email": "viktorpetrov@example.com"
+  },
+  {
+   "key": "K14",
+   "Ad": "Deniz Aksoy",
+   "Dil": "Türkçe",
+   "Ülke": "Türkiye",
+   "Persona": "Yatırımcı",
+   "Bütçe Aralığı": "200-350K USD",
+   "Kaynak Kanal": "Dijital",
+   "Telefon": "+9053131110013",
+   "Email": "denizaksoy@example.com"
+  },
+  {
+   "key": "K15",
+   "Ad": "Khalid Nasser",
+   "Dil": "Arapça",
+   "Ülke": "Suudi Arabistan",
+   "Persona": "Vatandaşlık",
+   "Bütçe Aralığı": "500K+ USD",
+   "Kaynak Kanal": "Broker",
+   "Telefon": "+9053141110014",
+   "Email": "khalidnasser@example.com"
+  },
+  {
+   "key": "K16",
+   "Ad": "Emre Doğan",
+   "Dil": "Türkçe",
+   "Ülke": "Hollanda",
+   "Persona": "Gurbetçi",
+   "Bütçe Aralığı": "200-350K USD",
+   "Kaynak Kanal": "Referans",
+   "Telefon": "+9053151110015",
+   "Email": "emredogan@example.com"
+  },
+  {
+   "key": "K17",
+   "Ad": "Sofia Rossi",
+   "Dil": "İngilizce",
+   "Ülke": "İtalya",
+   "Persona": "Yatırımcı",
+   "Bütçe Aralığı": "350-500K USD",
+   "Kaynak Kanal": "Dijital",
+   "Telefon": "+9053161110016",
+   "Email": "sofiarossi@example.com"
+  },
+  {
+   "key": "K18",
+   "Ad": "Merve Kılıç",
+   "Dil": "Türkçe",
+   "Ülke": "Türkiye",
+   "Persona": "Oturumcu",
+   "Bütçe Aralığı": "100-200K USD",
+   "Kaynak Kanal": "Tele-SDR",
+   "Telefon": "+9053171110017",
+   "Email": "mervekilic@example.com"
+  },
+  {
+   "key": "K19",
+   "Ad": "Ali Rıza Tekin",
+   "Dil": "Türkçe",
+   "Ülke": "Türkiye",
+   "Persona": "Yatırımcı",
+   "Bütçe Aralığı": "350-500K USD",
+   "Kaynak Kanal": "Referans",
+   "Telefon": "+9053181110018",
+   "Email": "alirizatekin@example.com"
+  },
+  {
+   "key": "K20",
+   "Ad": "Yusuf Şen",
+   "Dil": "Türkçe",
+   "Ülke": "Belçika",
+   "Persona": "Gurbetçi",
+   "Bütçe Aralığı": "200-350K USD",
+   "Kaynak Kanal": "Dijital",
+   "Telefon": "+9053191110019",
+   "Email": "yusufsen@example.com"
+  }
+ ],
+ "firmalar": [
+  {
+   "key": "F1",
+   "Firma Adı": "Deniz Yatırım Holding A.Ş.",
+   "Firma Tipi": "Kurumsal Yatırımcı",
+   "Ülke": "Türkiye",
+   "İlgi Segmenti": "Premium",
+   "Atanan Temsilci": "Rüya",
+   "Pipeline Aşaması": "Yanıt Alındı"
+  },
+  {
+   "key": "F2",
+   "Firma Adı": "Aksoy Gayrimenkul",
+   "Firma Tipi": "Aile Ofisi",
+   "Ülke": "Türkiye",
+   "İlgi Segmenti": "Volume",
+   "Atanan Temsilci": "Sude",
+   "Pipeline Aşaması": "Randevu"
+  },
+  {
+   "key": "F3",
+   "Firma Adı": "Batı Anadolu İnşaat",
+   "Firma Tipi": "Kurumsal Yatırımcı",
+   "Ülke": "Türkiye",
+   "İlgi Segmenti": "Karma",
+   "Atanan Temsilci": "Rüya",
+   "Pipeline Aşaması": "Teklif"
+  },
+  {
+   "key": "F4",
+   "Firma Adı": "Karadeniz Turizm Yatırım",
+   "Firma Tipi": "Fon",
+   "Ülke": "Türkiye",
+   "İlgi Segmenti": "Premium",
+   "Atanan Temsilci": "Sude",
+   "Pipeline Aşaması": "Müzakere"
+  },
+  {
+   "key": "F5",
+   "Firma Adı": "Nur Perakende A.Ş.",
+   "Firma Tipi": "Kurumsal Yatırımcı",
+   "Ülke": "Türkiye",
+   "İlgi Segmenti": "Volume",
+   "Atanan Temsilci": "Rüya",
+   "Pipeline Aşaması": "Kazanıldı"
+  },
+  {
+   "key": "F6",
+   "Firma Adı": "Ege Emlak Danışmanlık",
+   "Firma Tipi": "Aile Ofisi",
+   "Ülke": "Türkiye",
+   "İlgi Segmenti": "Karma",
+   "Atanan Temsilci": "Sude",
+   "Pipeline Aşaması": "Yanıt Alındı"
+  },
+  {
+   "key": "F7",
+   "Firma Adı": "Marmara Lojistik",
+   "Firma Tipi": "Kurumsal Yatırımcı",
+   "Ülke": "Türkiye",
+   "İlgi Segmenti": "Volume",
+   "Atanan Temsilci": "Rüya",
+   "Pipeline Aşaması": "Randevu"
+  },
+  {
+   "key": "F8",
+   "Firma Adı": "Anadolu Sigorta Emeklilik",
+   "Firma Tipi": "Fon",
+   "Ülke": "Türkiye",
+   "İlgi Segmenti": "Premium",
+   "Atanan Temsilci": "Sude",
+   "Pipeline Aşaması": "Teklif"
+  },
+  {
+   "key": "F9",
+   "Firma Adı": "Toros Grup İnşaat",
+   "Firma Tipi": "Kurumsal Yatırımcı",
+   "Ülke": "Türkiye",
+   "İlgi Segmenti": "Karma",
+   "Atanan Temsilci": "Rüya",
+   "Pipeline Aşaması": "Müzakere"
+  },
+  {
+   "key": "F10",
+   "Firma Adı": "Gulf Invest Partners",
+   "Firma Tipi": "Fon",
+   "Ülke": "BAE",
+   "İlgi Segmenti": "Premium",
+   "Atanan Temsilci": "Sude",
+   "Pipeline Aşaması": "Kazanıldı"
+  },
+  {
+   "key": "F11",
+   "Firma Adı": "Boğaziçi Aile Ofisi",
+   "Firma Tipi": "Aile Ofisi",
+   "Ülke": "Türkiye",
+   "İlgi Segmenti": "Premium",
+   "Atanan Temsilci": "Rüya",
+   "Pipeline Aşaması": "Yanıt Alındı"
+  },
+  {
+   "key": "F12",
+   "Firma Adı": "Levent Capital",
+   "Firma Tipi": "Fon",
+   "Ülke": "Türkiye",
+   "İlgi Segmenti": "Premium",
+   "Atanan Temsilci": "Sude",
+   "Pipeline Aşaması": "Randevu"
+  },
+  {
+   "key": "F13",
+   "Firma Adı": "Anka Emlak Portföy",
+   "Firma Tipi": "Kurumsal Yatırımcı",
+   "Ülke": "Türkiye",
+   "İlgi Segmenti": "Volume",
+   "Atanan Temsilci": "Rüya",
+   "Pipeline Aşaması": "Teklif"
+  },
+  {
+   "key": "F14",
+   "Firma Adı": "Mavi Deniz GYO",
+   "Firma Tipi": "Kurumsal Yatırımcı",
+   "Ülke": "Türkiye",
+   "İlgi Segmenti": "Karma",
+   "Atanan Temsilci": "Sude",
+   "Pipeline Aşaması": "Müzakere"
+  },
+  {
+   "key": "F15",
+   "Firma Adı": "Star Real Estate Fund",
+   "Firma Tipi": "Fon",
+   "Ülke": "Katar",
+   "İlgi Segmenti": "Premium",
+   "Atanan Temsilci": "Rüya",
+   "Pipeline Aşaması": "Kazanıldı"
+  },
+  {
+   "key": "F16",
+   "Firma Adı": "Efe Holding",
+   "Firma Tipi": "Aile Ofisi",
+   "Ülke": "Türkiye",
+   "İlgi Segmenti": "Karma",
+   "Atanan Temsilci": "Sude",
+   "Pipeline Aşaması": "Yanıt Alındı"
+  }
+ ],
+ "brokerFirmalari": [
+  {
+   "key": "BF1",
+   "Ad": "Prime Estate Brokers",
+   "Kademe": "Platin",
+   "Komisyon %": 4.0,
+   "Şehir": "İstanbul"
+  },
+  {
+   "key": "BF2",
+   "Ad": "Ege Broker Partners",
+   "Kademe": "Altın",
+   "Komisyon %": 3.0,
+   "Şehir": "İzmir"
+  },
+  {
+   "key": "BF3",
+   "Ad": "Başkent Realty",
+   "Kademe": "Gümüş",
+   "Komisyon %": 2.0,
+   "Şehir": "Ankara"
+  },
+  {
+   "key": "BF4",
+   "Ad": "Riviera Homes",
+   "Kademe": "Altın",
+   "Komisyon %": 3.0,
+   "Şehir": "Antalya"
+  },
+  {
+   "key": "BF5",
+   "Ad": "Global Property Network",
+   "Kademe": "Platin",
+   "Komisyon %": 4.0,
+   "Şehir": "İstanbul"
+  },
+  {
+   "key": "BF6",
+   "Ad": "Anadolu Broker Grubu",
+   "Kademe": "Gümüş",
+   "Komisyon %": 2.0,
+   "Şehir": "Bursa"
+  },
+  {
+   "key": "BF7",
+   "Ad": "Bosphorus Luxury Realty",
+   "Kademe": "Platin",
+   "Komisyon %": 4.0,
+   "Şehir": "İstanbul"
+  },
+  {
+   "key": "BF8",
+   "Ad": "Sahil Emlak Ağı",
+   "Kademe": "Gümüş",
+   "Komisyon %": 2.0,
+   "Şehir": "Antalya"
+  }
+ ],
+ "brokerKullanicilari": [
+  {
+   "key": "BU1",
+   "Ad": "Broker A Yılmaz",
+   "Firma": "BF1",
+   "Email": "broker1@prime.com",
+   "Clerk ID": ""
+  },
+  {
+   "key": "BU2",
+   "Ad": "Broker B Yılmaz",
+   "Firma": "BF2",
+   "Email": "broker2@ege.com",
+   "Clerk ID": ""
+  },
+  {
+   "key": "BU3",
+   "Ad": "Broker C Yılmaz",
+   "Firma": "BF3",
+   "Email": "broker3@başkent.com",
+   "Clerk ID": ""
+  },
+  {
+   "key": "BU4",
+   "Ad": "Broker D Yılmaz",
+   "Firma": "BF4",
+   "Email": "broker4@riviera.com",
+   "Clerk ID": ""
+  },
+  {
+   "key": "BU5",
+   "Ad": "Broker E Yılmaz",
+   "Firma": "BF5",
+   "Email": "broker5@global.com",
+   "Clerk ID": ""
+  },
+  {
+   "key": "BU6",
+   "Ad": "Broker F Yılmaz",
+   "Firma": "BF6",
+   "Email": "broker6@anadolu.com",
+   "Clerk ID": ""
+  },
+  {
+   "key": "BU7",
+   "Ad": "Broker G Yılmaz",
+   "Firma": "BF7",
+   "Email": "broker7@bosphorus.com",
+   "Clerk ID": ""
+  },
+  {
+   "key": "BU8",
+   "Ad": "Broker H Yılmaz",
+   "Firma": "BF8",
+   "Email": "broker8@sahil.com",
+   "Clerk ID": ""
+  },
+  {
+   "key": "BU9",
+   "Ad": "Broker I Yılmaz",
+   "Firma": "BF1",
+   "Email": "broker9@prime.com",
+   "Clerk ID": ""
+  },
+  {
+   "key": "BU10",
+   "Ad": "Broker J Yılmaz",
+   "Firma": "BF2",
+   "Email": "broker10@ege.com",
+   "Clerk ID": ""
+  },
+  {
+   "key": "BU11",
+   "Ad": "Broker K Yılmaz",
+   "Firma": "BF3",
+   "Email": "broker11@başkent.com",
+   "Clerk ID": ""
+  },
+  {
+   "key": "BU12",
+   "Ad": "Broker L Yılmaz",
+   "Firma": "BF4",
+   "Email": "broker12@riviera.com",
+   "Clerk ID": ""
+  }
+ ],
+ "kampanyalar": [
+  {
+   "key": "C1",
+   "Ad": "Sıfır Faiz 24 Ay",
+   "Kaldıraç Tipi": "Finansman",
+   "Hedef Grup": [
+    "A",
+    "B"
+   ],
+   "Başlangıç": "2026-06-01",
+   "Bitiş": "2026-09-30",
+   "Durum": "Aktif"
+  },
+  {
+   "key": "C2",
+   "Ad": "Broker Süper Komisyon",
+   "Kaldıraç Tipi": "Komisyon",
+   "Hedef Grup": [
+    "B",
+    "C"
+   ],
+   "Başlangıç": "2026-07-01",
+   "Bitiş": "2026-08-31",
+   "Durum": "Aktif"
+  },
+  {
+   "key": "C3",
+   "Ad": "Erken Alım Prestij Paketi",
+   "Kaldıraç Tipi": "Prestij",
+   "Hedef Grup": [
+    "A"
+   ],
+   "Başlangıç": "2026-08-01",
+   "Bitiş": "2026-10-31",
+   "Durum": "Taslak"
+  },
+  {
+   "key": "C4",
+   "Ad": "Son 10 Daire Fırsatı",
+   "Kaldıraç Tipi": "Kıtlık",
+   "Hedef Grup": [
+    "C",
+    "D"
+   ],
+   "Başlangıç": "2026-07-01",
+   "Bitiş": "2026-07-31",
+   "Durum": "Aktif"
+  }
+ ],
+ "kampanyaStokBaglari": [
+  {
+   "Etiket": "Sıfır Faiz 24 Ay × MV-1-0501",
+   "Kampanya": "C1",
+   "Ünite": "P1U5"
+  },
+  {
+   "Etiket": "Sıfır Faiz 24 Ay × MV-2-0602",
+   "Kampanya": "C1",
+   "Ünite": "P1U6"
+  },
+  {
+   "Etiket": "Sıfır Faiz 24 Ay × MV-4-0804",
+   "Kampanya": "C1",
+   "Ünite": "P1U8"
+  },
+  {
+   "Etiket": "Sıfır Faiz 24 Ay × MV-1-0901",
+   "Kampanya": "C1",
+   "Ünite": "P1U9"
+  },
+  {
+   "Etiket": "Broker Süper Komisyon × MV-2-0202",
+   "Kampanya": "C2",
+   "Ünite": "P1U2"
+  },
+  {
+   "Etiket": "Broker Süper Komisyon × MV-3-0303",
+   "Kampanya": "C2",
+   "Ünite": "P1U3"
+  },
+  {
+   "Etiket": "Broker Süper Komisyon × MV-1-0501",
+   "Kampanya": "C2",
+   "Ünite": "P1U5"
+  },
+  {
+   "Etiket": "Broker Süper Komisyon × MV-2-0602",
+   "Kampanya": "C2",
+   "Ünite": "P1U6"
+  },
+  {
+   "Etiket": "Erken Alım Prestij Paketi × MV-1-0901",
+   "Kampanya": "C3",
+   "Ünite": "P1U9"
+  },
+  {
+   "Etiket": "Erken Alım Prestij Paketi × MV-3-1103",
+   "Kampanya": "C3",
+   "Ünite": "P1U11"
+  },
+  {
+   "Etiket": "Erken Alım Prestij Paketi × MV-4-1204",
+   "Kampanya": "C3",
+   "Ünite": "P1U12"
+  },
+  {
+   "Etiket": "Erken Alım Prestij Paketi × EP-1-0901",
+   "Kampanya": "C3",
+   "Ünite": "P2U9"
+  },
+  {
+   "Etiket": "Son 10 Daire Fırsatı × MV-2-0202",
+   "Kampanya": "C4",
+   "Ünite": "P1U2"
+  },
+  {
+   "Etiket": "Son 10 Daire Fırsatı × MV-3-0303",
+   "Kampanya": "C4",
+   "Ünite": "P1U3"
+  },
+  {
+   "Etiket": "Son 10 Daire Fırsatı × MV-2-0202",
+   "Kampanya": "C4",
+   "Ünite": "P1U14"
+  },
+  {
+   "Etiket": "Son 10 Daire Fırsatı × MV-3-0303",
+   "Kampanya": "C4",
+   "Ünite": "P1U15"
+  }
+ ],
+ "firsatlar": [
+  {
+   "key": "O1",
+   "Başlık": "Ahmet Yıldız · MV-1-0101",
+   "Kişi": "K1",
+   "Firma": null,
+   "Ünite": "P1U1",
+   "Aşama": "Yeni",
+   "Kaynak": "Broker",
+   "Kampanya": "C1"
+  },
+  {
+   "key": "O2",
+   "Başlık": "Elif Demir · MV-2-0202",
+   "Kişi": "K2",
+   "Firma": null,
+   "Ünite": "P1U2",
+   "Aşama": "Randevu",
+   "Kaynak": "Dijital",
+   "Kampanya": null
+  },
+  {
+   "key": "O3",
+   "Başlık": "Mohammed Al-Rashid · MV-3-0303",
+   "Kişi": "K3",
+   "Firma": null,
+   "Ünite": "P1U3",
+   "Aşama": "Sunum",
+   "Kaynak": "Referans",
+   "Kampanya": null
+  },
+  {
+   "key": "O4",
+   "Başlık": "Selin Arslan · MV-4-0404",
+   "Kişi": "K4",
+   "Firma": null,
+   "Ünite": "P1U4",
+   "Aşama": "Opsiyon",
+   "Kaynak": "Tele-SDR",
+   "Kampanya": "C4"
+  },
+  {
+   "key": "O5",
+   "Başlık": "Hans Müller · MV-1-0501",
+   "Kişi": "K5",
+   "Firma": null,
+   "Ünite": "P1U5",
+   "Aşama": "Kapora",
+   "Kaynak": "Broker",
+   "Kampanya": null
+  },
+  {
+   "key": "O6",
+   "Başlık": "Cem Öztürk · MV-2-0602",
+   "Kişi": "K6",
+   "Firma": null,
+   "Ünite": "P1U6",
+   "Aşama": "Satış",
+   "Kaynak": "Dijital",
+   "Kampanya": null
+  },
+  {
+   "key": "O7",
+   "Başlık": "Olga Ivanova · MV-3-0703",
+   "Kişi": "K7",
+   "Firma": null,
+   "Ünite": "P1U7",
+   "Aşama": "Kayıp",
+   "Kaynak": "Referans",
+   "Kampanya": "C3"
+  },
+  {
+   "key": "O8",
+   "Başlık": "Burak Aydın · MV-4-0804",
+   "Kişi": "K8",
+   "Firma": null,
+   "Ünite": "P1U8",
+   "Aşama": "Yeni",
+   "Kaynak": "Tele-SDR",
+   "Kampanya": null
+  },
+  {
+   "key": "O9",
+   "Başlık": "Fatima Al-Sayed · MV-1-0901",
+   "Kişi": "K9",
+   "Firma": null,
+   "Ünite": "P1U9",
+   "Aşama": "Randevu",
+   "Kaynak": "Broker",
+   "Kampanya": null
+  },
+  {
+   "key": "O10",
+   "Başlık": "Zeynep Şahin · MV-2-1002",
+   "Kişi": "K10",
+   "Firma": null,
+   "Ünite": "P1U10",
+   "Aşama": "Sunum",
+   "Kaynak": "Dijital",
+   "Kampanya": "C2"
+  },
+  {
+   "key": "O11",
+   "Başlık": "Mehmet Kaya · MV-3-1103",
+   "Kişi": "K11",
+   "Firma": null,
+   "Ünite": "P1U11",
+   "Aşama": "Opsiyon",
+   "Kaynak": "Referans",
+   "Kampanya": null
+  },
+  {
+   "key": "O12",
+   "Başlık": "Ayşe Çelik · MV-4-1204",
+   "Kişi": "K12",
+   "Firma": null,
+   "Ünite": "P1U12",
+   "Aşama": "Kapora",
+   "Kaynak": "Tele-SDR",
+   "Kampanya": null
+  },
+  {
+   "key": "O13",
+   "Başlık": "Viktor Petrov · MV-1-0101",
+   "Kişi": "K13",
+   "Firma": null,
+   "Ünite": "P1U13",
+   "Aşama": "Satış",
+   "Kaynak": "Broker",
+   "Kampanya": "C1"
+  },
+  {
+   "key": "O14",
+   "Başlık": "Deniz Aksoy · MV-2-0202",
+   "Kişi": "K14",
+   "Firma": null,
+   "Ünite": "P1U14",
+   "Aşama": "Kayıp",
+   "Kaynak": "Dijital",
+   "Kampanya": null
+  },
+  {
+   "key": "O15",
+   "Başlık": "Khalid Nasser · MV-3-0303",
+   "Kişi": "K15",
+   "Firma": null,
+   "Ünite": "P1U15",
+   "Aşama": "Yeni",
+   "Kaynak": "Referans",
+   "Kampanya": null
+  },
+  {
+   "key": "O16",
+   "Başlık": "Emre Doğan · EP-1-0101",
+   "Kişi": "K16",
+   "Firma": null,
+   "Ünite": "P2U1",
+   "Aşama": "Randevu",
+   "Kaynak": "Tele-SDR",
+   "Kampanya": "C4"
+  },
+  {
+   "key": "O17",
+   "Başlık": "Sofia Rossi · EP-2-0202",
+   "Kişi": "K17",
+   "Firma": null,
+   "Ünite": "P2U2",
+   "Aşama": "Sunum",
+   "Kaynak": "Broker",
+   "Kampanya": null
+  },
+  {
+   "key": "O18",
+   "Başlık": "Merve Kılıç · EP-3-0303",
+   "Kişi": "K18",
+   "Firma": null,
+   "Ünite": "P2U3",
+   "Aşama": "Opsiyon",
+   "Kaynak": "Dijital",
+   "Kampanya": null
+  },
+  {
+   "key": "O19",
+   "Başlık": "Deniz Yatırım Holding A.Ş. · MV-2-0602",
+   "Kişi": null,
+   "Firma": "F1",
+   "Ünite": "P1U6",
+   "Aşama": "Sunum",
+   "Kaynak": "Dijital",
+   "Kampanya": "C1"
+  },
+  {
+   "key": "O20",
+   "Başlık": "Aksoy Gayrimenkul · MV-3-0703",
+   "Kişi": null,
+   "Firma": "F2",
+   "Ünite": "P1U7",
+   "Aşama": "Opsiyon",
+   "Kaynak": "Referans",
+   "Kampanya": null
+  },
+  {
+   "key": "O21",
+   "Başlık": "Batı Anadolu İnşaat · MV-4-0804",
+   "Kişi": null,
+   "Firma": "F3",
+   "Ünite": "P1U8",
+   "Aşama": "Kapora",
+   "Kaynak": "Tele-SDR",
+   "Kampanya": null
+  },
+  {
+   "key": "O22",
+   "Başlık": "Karadeniz Turizm Yatırım · MV-1-0901",
+   "Kişi": null,
+   "Firma": "F4",
+   "Ünite": "P1U9",
+   "Aşama": "Satış",
+   "Kaynak": "Broker",
+   "Kampanya": null
+  },
+  {
+   "key": "O23",
+   "Başlık": "Nur Perakende A.Ş. · MV-2-1002",
+   "Kişi": null,
+   "Firma": "F5",
+   "Ünite": "P1U10",
+   "Aşama": "Kayıp",
+   "Kaynak": "Dijital",
+   "Kampanya": "C1"
+  },
+  {
+   "key": "O24",
+   "Başlık": "Ege Emlak Danışmanlık · MV-3-1103",
+   "Kişi": null,
+   "Firma": "F6",
+   "Ünite": "P1U11",
+   "Aşama": "Yeni",
+   "Kaynak": "Referans",
+   "Kampanya": null
+  },
+  {
+   "key": "O25",
+   "Başlık": "Marmara Lojistik · MV-4-1204",
+   "Kişi": null,
+   "Firma": "F7",
+   "Ünite": "P1U12",
+   "Aşama": "Randevu",
+   "Kaynak": "Tele-SDR",
+   "Kampanya": null
+  },
+  {
+   "key": "O26",
+   "Başlık": "Anadolu Sigorta Emeklilik · MV-1-0101",
+   "Kişi": null,
+   "Firma": "F8",
+   "Ünite": "P1U13",
+   "Aşama": "Sunum",
+   "Kaynak": "Broker",
+   "Kampanya": null
+  },
+  {
+   "key": "O27",
+   "Başlık": "Toros Grup İnşaat · MV-2-0202",
+   "Kişi": null,
+   "Firma": "F9",
+   "Ünite": "P1U14",
+   "Aşama": "Opsiyon",
+   "Kaynak": "Dijital",
+   "Kampanya": "C1"
+  },
+  {
+   "key": "O28",
+   "Başlık": "Gulf Invest Partners · MV-3-0303",
+   "Kişi": null,
+   "Firma": "F10",
+   "Ünite": "P1U15",
+   "Aşama": "Kapora",
+   "Kaynak": "Referans",
+   "Kampanya": null
+  },
+  {
+   "key": "O29",
+   "Başlık": "Boğaziçi Aile Ofisi · EP-1-0101",
+   "Kişi": null,
+   "Firma": "F11",
+   "Ünite": "P2U1",
+   "Aşama": "Satış",
+   "Kaynak": "Tele-SDR",
+   "Kampanya": null
+  },
+  {
+   "key": "O30",
+   "Başlık": "Levent Capital · EP-2-0202",
+   "Kişi": null,
+   "Firma": "F12",
+   "Ünite": "P2U2",
+   "Aşama": "Kayıp",
+   "Kaynak": "Broker",
+   "Kampanya": null
+  },
+  {
+   "key": "O31",
+   "Başlık": "Emre Doğan · MV-1-0101 (rakip talep)",
+   "Kişi": "K16",
+   "Firma": null,
+   "Ünite": "P1U1",
+   "Aşama": "Sunum",
+   "Kaynak": "Dijital",
+   "Kampanya": null
+  },
+  {
+   "key": "O32",
+   "Başlık": "Sofia Rossi · MV-2-0202 (rakip talep)",
+   "Kişi": "K17",
+   "Firma": null,
+   "Ünite": "P1U2",
+   "Aşama": "Sunum",
+   "Kaynak": "Dijital",
+   "Kampanya": null
+  },
+  {
+   "key": "O33",
+   "Başlık": "Merve Kılıç · MV-3-0303 (rakip talep)",
+   "Kişi": "K18",
+   "Firma": null,
+   "Ünite": "P1U3",
+   "Aşama": "Sunum",
+   "Kaynak": "Dijital",
+   "Kampanya": null
+  }
+ ],
+ "aktiviteler": [
+  {
+   "Başlık": "Ahmet Yıldız · MV-1-0101 — temas",
+   "Fırsat": "O1",
+   "Kişi": "K1",
+   "Firma": null,
+   "Aksiyon Tipi": "Arama",
+   "Sonuç": "Ulaşıldı",
+   "Tip": "Görüşme",
+   "Tarih": "2026-07-01",
+   "Temsilci": "Rüya"
+  },
+  {
+   "Başlık": "Elif Demir · MV-2-0202 — temas",
+   "Fırsat": "O2",
+   "Kişi": "K2",
+   "Firma": null,
+   "Aksiyon Tipi": "Mail",
+   "Sonuç": "Cevap Yok",
+   "Tip": "Randevu",
+   "Tarih": "2026-07-02",
+   "Temsilci": "Sude"
+  },
+  {
+   "Başlık": "Mohammed Al-Rashid · MV-3-0303 — temas",
+   "Fırsat": "O3",
+   "Kişi": "K3",
+   "Firma": null,
+   "Aksiyon Tipi": "Arama",
+   "Sonuç": "Sonra Ara",
+   "Tip": "Sunum",
+   "Tarih": "2026-07-03",
+   "Temsilci": "Rüya"
+  },
+  {
+   "Başlık": "Selin Arslan · MV-4-0404 — temas",
+   "Fırsat": "O4",
+   "Kişi": "K4",
+   "Firma": null,
+   "Aksiyon Tipi": "Mail",
+   "Sonuç": "Yanıt Bekleniyor",
+   "Tip": "Takip",
+   "Tarih": "2026-07-04",
+   "Temsilci": "Sude"
+  },
+  {
+   "Başlık": "Hans Müller · MV-1-0501 — temas",
+   "Fırsat": "O5",
+   "Kişi": "K5",
+   "Firma": null,
+   "Aksiyon Tipi": "Arama",
+   "Sonuç": "Ulaşıldı",
+   "Tip": "Görüşme",
+   "Tarih": "2026-07-05",
+   "Temsilci": "Rüya"
+  },
+  {
+   "Başlık": "Cem Öztürk · MV-2-0602 — temas",
+   "Fırsat": "O6",
+   "Kişi": "K6",
+   "Firma": null,
+   "Aksiyon Tipi": "Mail",
+   "Sonuç": "Cevap Yok",
+   "Tip": "Randevu",
+   "Tarih": "2026-07-06",
+   "Temsilci": "Sude"
+  },
+  {
+   "Başlık": "Olga Ivanova · MV-3-0703 — temas",
+   "Fırsat": "O7",
+   "Kişi": "K7",
+   "Firma": null,
+   "Aksiyon Tipi": "Arama",
+   "Sonuç": "Sonra Ara",
+   "Tip": "Sunum",
+   "Tarih": "2026-07-07",
+   "Temsilci": "Rüya"
+  },
+  {
+   "Başlık": "Burak Aydın · MV-4-0804 — temas",
+   "Fırsat": "O8",
+   "Kişi": "K8",
+   "Firma": null,
+   "Aksiyon Tipi": "Mail",
+   "Sonuç": "Yanıt Bekleniyor",
+   "Tip": "Takip",
+   "Tarih": "2026-07-08",
+   "Temsilci": "Sude"
+  },
+  {
+   "Başlık": "Fatima Al-Sayed · MV-1-0901 — temas",
+   "Fırsat": "O9",
+   "Kişi": "K9",
+   "Firma": null,
+   "Aksiyon Tipi": "Arama",
+   "Sonuç": "Ulaşıldı",
+   "Tip": "Görüşme",
+   "Tarih": "2026-07-09",
+   "Temsilci": "Rüya"
+  },
+  {
+   "Başlık": "Zeynep Şahin · MV-2-1002 — temas",
+   "Fırsat": "O10",
+   "Kişi": "K10",
+   "Firma": null,
+   "Aksiyon Tipi": "Mail",
+   "Sonuç": "Cevap Yok",
+   "Tip": "Randevu",
+   "Tarih": "2026-07-10",
+   "Temsilci": "Sude"
+  },
+  {
+   "Başlık": "Mehmet Kaya · MV-3-1103 — temas",
+   "Fırsat": "O11",
+   "Kişi": "K11",
+   "Firma": null,
+   "Aksiyon Tipi": "Arama",
+   "Sonuç": "Sonra Ara",
+   "Tip": "Sunum",
+   "Tarih": "2026-07-11",
+   "Temsilci": "Rüya"
+  },
+  {
+   "Başlık": "Ayşe Çelik · MV-4-1204 — temas",
+   "Fırsat": "O12",
+   "Kişi": "K12",
+   "Firma": null,
+   "Aksiyon Tipi": "Mail",
+   "Sonuç": "Yanıt Bekleniyor",
+   "Tip": "Takip",
+   "Tarih": "2026-07-12",
+   "Temsilci": "Sude"
+  },
+  {
+   "Başlık": "Viktor Petrov · MV-1-0101 — temas",
+   "Fırsat": "O13",
+   "Kişi": "K13",
+   "Firma": null,
+   "Aksiyon Tipi": "Arama",
+   "Sonuç": "Ulaşıldı",
+   "Tip": "Görüşme",
+   "Tarih": "2026-07-13",
+   "Temsilci": "Rüya"
+  },
+  {
+   "Başlık": "Deniz Aksoy · MV-2-0202 — temas",
+   "Fırsat": "O14",
+   "Kişi": "K14",
+   "Firma": null,
+   "Aksiyon Tipi": "Mail",
+   "Sonuç": "Cevap Yok",
+   "Tip": "Randevu",
+   "Tarih": "2026-07-14",
+   "Temsilci": "Sude"
+  },
+  {
+   "Başlık": "Khalid Nasser · MV-3-0303 — temas",
+   "Fırsat": "O15",
+   "Kişi": "K15",
+   "Firma": null,
+   "Aksiyon Tipi": "Arama",
+   "Sonuç": "Sonra Ara",
+   "Tip": "Sunum",
+   "Tarih": "2026-07-15",
+   "Temsilci": "Rüya"
+  },
+  {
+   "Başlık": "Emre Doğan · EP-1-0101 — temas",
+   "Fırsat": "O16",
+   "Kişi": "K16",
+   "Firma": null,
+   "Aksiyon Tipi": "Mail",
+   "Sonuç": "Yanıt Bekleniyor",
+   "Tip": "Takip",
+   "Tarih": "2026-07-16",
+   "Temsilci": "Sude"
+  },
+  {
+   "Başlık": "Sofia Rossi · EP-2-0202 — temas",
+   "Fırsat": "O17",
+   "Kişi": "K17",
+   "Firma": null,
+   "Aksiyon Tipi": "Arama",
+   "Sonuç": "Ulaşıldı",
+   "Tip": "Görüşme",
+   "Tarih": "2026-07-17",
+   "Temsilci": "Rüya"
+  },
+  {
+   "Başlık": "Merve Kılıç · EP-3-0303 — temas",
+   "Fırsat": "O18",
+   "Kişi": "K18",
+   "Firma": null,
+   "Aksiyon Tipi": "Mail",
+   "Sonuç": "Cevap Yok",
+   "Tip": "Randevu",
+   "Tarih": "2026-07-18",
+   "Temsilci": "Sude"
+  },
+  {
+   "Başlık": "Deniz Yatırım Holding A.Ş. · MV-2-0602 — temas",
+   "Fırsat": "O19",
+   "Kişi": null,
+   "Firma": "F1",
+   "Aksiyon Tipi": "Arama",
+   "Sonuç": "Sonra Ara",
+   "Tip": "Sunum",
+   "Tarih": "2026-07-19",
+   "Temsilci": "Rüya"
+  },
+  {
+   "Başlık": "Aksoy Gayrimenkul · MV-3-0703 — temas",
+   "Fırsat": "O20",
+   "Kişi": null,
+   "Firma": "F2",
+   "Aksiyon Tipi": "Mail",
+   "Sonuç": "Yanıt Bekleniyor",
+   "Tip": "Takip",
+   "Tarih": "2026-07-20",
+   "Temsilci": "Sude"
+  },
+  {
+   "Başlık": "Batı Anadolu İnşaat · MV-4-0804 — temas",
+   "Fırsat": "O21",
+   "Kişi": null,
+   "Firma": "F3",
+   "Aksiyon Tipi": "Arama",
+   "Sonuç": "Ulaşıldı",
+   "Tip": "Görüşme",
+   "Tarih": "2026-07-21",
+   "Temsilci": "Rüya"
+  },
+  {
+   "Başlık": "Karadeniz Turizm Yatırım · MV-1-0901 — temas",
+   "Fırsat": "O22",
+   "Kişi": null,
+   "Firma": "F4",
+   "Aksiyon Tipi": "Mail",
+   "Sonuç": "Cevap Yok",
+   "Tip": "Randevu",
+   "Tarih": "2026-07-22",
+   "Temsilci": "Sude"
+  },
+  {
+   "Başlık": "Nur Perakende A.Ş. · MV-2-1002 — temas",
+   "Fırsat": "O23",
+   "Kişi": null,
+   "Firma": "F5",
+   "Aksiyon Tipi": "Arama",
+   "Sonuç": "Sonra Ara",
+   "Tip": "Sunum",
+   "Tarih": "2026-07-23",
+   "Temsilci": "Rüya"
+  },
+  {
+   "Başlık": "Ege Emlak Danışmanlık · MV-3-1103 — temas",
+   "Fırsat": "O24",
+   "Kişi": null,
+   "Firma": "F6",
+   "Aksiyon Tipi": "Mail",
+   "Sonuç": "Yanıt Bekleniyor",
+   "Tip": "Takip",
+   "Tarih": "2026-07-24",
+   "Temsilci": "Sude"
+  }
+ ],
+ "satislar": [
+  {
+   "Satış Kodu": "S-2026-001",
+   "Fırsat": "O6",
+   "Kapanış Tarihi": "2026-07-02",
+   "Satış Fiyatı USD": 351820,
+   "Komisyon %": 3.0
+  },
+  {
+   "Satış Kodu": "S-2026-002",
+   "Fırsat": "O13",
+   "Kapanış Tarihi": "2026-07-03",
+   "Satış Fiyatı USD": 189022,
+   "Komisyon %": 3.0
+  },
+  {
+   "Satış Kodu": "S-2026-003",
+   "Fırsat": "O22",
+   "Kapanış Tarihi": "2026-07-04",
+   "Satış Fiyatı USD": 237440,
+   "Komisyon %": 3.0
+  },
+  {
+   "Satış Kodu": "S-2026-004",
+   "Fırsat": "O29",
+   "Kapanış Tarihi": "2026-07-05",
+   "Satış Fiyatı USD": 123250,
+   "Komisyon %": 3.0
+  }
+ ],
+ "icerik": [
+  {
+   "Başlık": "Marina Vista Tanıtım Broşürü",
+   "Tip": "Broşür",
+   "Dil": "Türkçe",
+   "Persona": "Yatırımcı",
+   "Proje": "P1"
+  },
+  {
+   "Başlık": "Citizenship by Investment Guide",
+   "Tip": "Broşür",
+   "Dil": "İngilizce",
+   "Persona": "Vatandaşlık",
+   "Proje": "P4"
+  },
+  {
+   "Başlık": "Ege Panorama Drone Video",
+   "Tip": "Video",
+   "Dil": "Türkçe",
+   "Persona": "Oturumcu",
+   "Proje": "P2"
+  },
+  {
+   "Başlık": "Yatırım Getiri Sunumu",
+   "Tip": "Sunum",
+   "Dil": "İngilizce",
+   "Persona": "Yatırımcı",
+   "Proje": "P1"
+  },
+  {
+   "Başlık": "Gurbetçi Alım Rehberi",
+   "Tip": "Blog",
+   "Dil": "Almanca",
+   "Persona": "Gurbetçi",
+   "Proje": "P3"
+  },
+  {
+   "Başlık": "Sık Sorulan Sorular",
+   "Tip": "SSS",
+   "Dil": "Türkçe",
+   "Persona": "Oturumcu",
+   "Proje": null
+  }
+ ]
+}
