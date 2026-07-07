@@ -250,15 +250,16 @@ export const TENANTS: Record<string, TenantConfig> = {
     name: 'Emlak Demo',
     readOnly: true,
     airtable: {
-      // SB_* tabloları — sadece okuma (readOnly:true sayesinde yazma API'leri bloklanır)
-      baseId: 'appjULACncjRV48pf',
+      // AYRI base (appC55NvDvQ51f0ww "RealEstateTR") — SENTETİK emlak verisi, sıfır gerçek PII.
+      // Artık sigortan_biz'in canlı base'ini (appjULACncjRV48pf) OKUMAZ. Kendi benzersiz tablo ID'leri.
+      baseId: 'appC55NvDvQ51f0ww',
       tables: {
-        firmalar:      'tblHy9njVwfkmNSMP',
-        opportunities: 'tblBdnZ4dDUGroLpC',
-        aktiviteler:   'tbl0ISTyEy8nvZBbn',
-        raporlar:      'tblXFizKL2iTqY6Fr',
+        firmalar:      'tbljuodDnLJ73CqTQ',
+        opportunities: 'tblBSMULvR1t2Jjkq',
+        aktiviteler:   'tblP6b1AudCcv8L41',
+        raporlar:      'tbl5wC8sBTAPBgAd9',
       },
-      sistemAdi: 'SIGORTAN BIZ',
+      sistemAdi: '',  // yeni base'de sistem-kayıt filtresi yok
     },
     n8nBaseUrl: 'https://n8n.alisales.ai/webhook',
     n8nSlug: 'emlak_demo',
