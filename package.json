@@ -10,7 +10,8 @@
     "test:adapter": "npx -y tsx src/lib/stok-adapter.test.ts",
     "test:sinyal": "npx -y tsx src/lib/stok-sinyal.test.ts",
     "test:store": "npx -y tsx src/lib/kampanya-store.test.ts",
-    "test:guard": "npx -y tsx src/lib/tenant-guard.test.ts"
+    "test:guard": "npx -y tsx src/lib/tenant-guard.test.ts",
+    "test:ali-chat": "npx -y tsx src/lib/ali-chat/retrieval.test.ts"
   },
   "dependencies": {
     "@clerk/localizations": "^4.7.1",
