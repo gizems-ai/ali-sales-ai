@@ -18,6 +18,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { MoveCard } from '@/components/emlak/move-card'
 import { StatTile } from '@/components/emlak/stat-tile'
+import { AliChatLauncher } from '@/components/ali-chat/ali-chat-launcher'
 
 export const revalidate = 300
 
@@ -753,21 +754,8 @@ async function EmlakDashboard({ sicakKpi, yanitBekleyen, portfoyToplam }: {
             <div style={{ fontSize: 13.5, fontWeight: 600, color: ET.body, lineHeight: 1.5, marginTop: 16 }}>
               Portföy analizi hazır. Sıcak lead&apos;lerin teklif aşamasında — önce onlara odaklanmanı öneriyorum.
             </div>
-            {/* CTA */}
-            <button style={{
-              display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-              width: '100%', marginTop: 16,
-              background: EMLAK_GRAD, color: '#fff', border: 0,
-              fontFamily: 'inherit', fontSize: 14, fontWeight: 700,
-              padding: 14, borderRadius: 14, cursor: 'pointer',
-              boxShadow: '0 12px 24px -12px rgba(40,120,70,.6)',
-            }}>
-              Ali ile sohbet et
-              <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                style={{ width: 16, height: 16, stroke: '#fff' }}>
-                <path d="M5 12h14M13 6l6 6-6 6"/>
-              </svg>
-            </button>
+            {/* CTA — Ali Sohbet drawer'ını açar */}
+            <AliChatLauncher />
           </EmlakGlass>
 
           {/* Quick filters card */}
