@@ -7,6 +7,27 @@ Panel tarafı hazır: `POST /api/ali-chat` soruyu alır, **deterministik retriev
 çalıştırır, aşağıdaki payload'ı `N8N_ALI_WEBHOOK_URL`'e gönderir ve dönen editöryel
 metni UI'a verir. LLM **yalnız cümle kurar** — rakamlar `veriPaketi`'nden gelir.
 
+## Kurulum (hızlı — elle node dizme yok)
+
+Aşağıdaki 4 adım workflow'u sıfırdan kurar. Node yapısını elle dizmen gerekmez —
+`docs/ali-chat-workflow.json` import edilebilir formatta hazır (3 node bağlı).
+
+1. **Import from File** → `docs/ali-chat-workflow.json` (n8n: sağ üst ⋯ → *Import from File*).
+   Webhook → OpenAI → Respond to Webhook zinciri bağlı gelir; webhook path `ali-chat`,
+   respond modu "Using Respond to Webhook node" ayarlı. Prompt ve model map'li, hardcode yok.
+2. **OpenAI node'una credential bağla** — node'u aç, *Credential to connect with* alanında
+   OpenAI API anahtarını seç/oluştur. (Anahtar JSON'da YOK; bilerek boş bırakıldı.)
+   Not: Model dropdown'da `gpt-4o-mini` seçili görünmezse listeden tekrar seç.
+3. **Workflow'u aktive et** (sağ üst *Active* toggle) → Webhook node'undaki **Production URL**'i
+   kopyala (biçim: `https://<n8n-host>/webhook/ali-chat`).
+4. **Vercel'de env tanımla** — proje **emlak-crm** (`prj_bAk6U3nzchTXuD9JEjd8EZu0d0Vg`),
+   Settings → Environment Variables:
+   `N8N_ALI_WEBHOOK_URL = <kopyalanan Production URL>` → **Production + Preview** işaretle → kaydet → redeploy.
+
+Doğrulama: panelde "Ali ile sohbet et" → bir demo sorusu sor (ör. *"Şu an yayında olan
+kampanyalar hangileri?"*). Cevap gelirse zincir çalışıyor. Boş/fallback gelirse: OpenAI
+credential'ını ve Respond node'unun `cevap` alanını kontrol et.
+
 ## 0. Vercel env
 
 ```
