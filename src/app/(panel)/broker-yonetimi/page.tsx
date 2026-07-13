@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation'
-import { getKullanicıProfili } from '@/lib/yetki'
+import { getKullanicıProfili, getTenantConfigFromRequest } from '@/lib/yetki'
 import {
   listHighlights,
   listBrokers,
@@ -51,6 +51,8 @@ export default async function BrokerYonetimi({
   searchParams: Promise<{ edit?: string; editCampaign?: string }>
 }) {
   const profil = await getKullanicıProfili()
+  const cfg = await getTenantConfigFromRequest()
+  if (!cfg || cfg.id !== 'emlak_demo') redirect('/')  // emlak-only bölüm — diğer tenant'larda URL ile de erişilemez
   if (!profil || (profil.rol !== 'admin' && profil.rol !== 'yönetici')) {
     redirect('/')
   }

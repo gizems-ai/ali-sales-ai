@@ -24,6 +24,7 @@ export default async function TemsilcilerPage() {
   ])
   if (!profil) redirect('/login')
   if (!cfg) redirect('/login')
+  if (cfg.id !== 'emlak_demo') redirect('/')  // emlak-only bölüm — diğer tenant'larda URL ile de erişilemez
 
   const komisyonOrani = 0.025  // %2.5 varsayılan komisyon
 

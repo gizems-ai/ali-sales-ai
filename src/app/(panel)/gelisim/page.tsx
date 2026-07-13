@@ -15,6 +15,7 @@ export default async function GelisimPage() {
   ])
   if (!profil) redirect('/login')
   if (!cfg) redirect('/login')
+  if (cfg.id !== 'emlak_demo') redirect('/')  // emlak-only bölüm — diğer tenant'larda URL ile de erişilemez
 
   // Liderlik tablosu yalnızca Kurumsal modda (skor aynası her zaman görünür)
   const isKurumsal = segment === 'kurumsal'

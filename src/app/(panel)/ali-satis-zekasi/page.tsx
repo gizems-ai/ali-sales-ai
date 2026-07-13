@@ -13,6 +13,7 @@ export default async function AliSatisZekasiPage() {
   ])
   if (!profil) redirect('/login')
   if (!cfg) redirect('/login')
+  if (cfg.id !== 'emlak_demo') redirect('/')  // emlak-only bölüm — diğer tenant'larda URL ile de erişilemez
 
   // Yönetici görünümü yalnızca Kurumsal modda
   const isKurumsal = segment === 'kurumsal'

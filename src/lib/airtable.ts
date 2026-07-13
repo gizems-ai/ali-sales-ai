@@ -218,6 +218,7 @@ export interface FirmaListeItem {
   'Son İletişim Tarihi'?: string; 'Ali Özeti'?: string; 'Branş'?: string[]
   'Sağlık Vade Tarihi'?: string; 'Sağlık Poliçe Türü'?: string
   'Elementer Ürün'?: string; 'Elementer Vade'?: string; 'Sonra Ara Tarihi'?: string
+  'Ajanda Slotu'?: string
 }
 
 export interface FirmalarSayfasi {
@@ -231,7 +232,10 @@ export async function getFirmalarSayfasi(
   revalidate = 60,
   cfg = resolveTenant(),
 ): Promise<FirmalarSayfasi> {
-  const actualFields = translateFieldList(cfg, 'firmalar', FIRMA_LISTE_FIELDS)
+  // 'Ajanda Slotu' yalnızca ajanda modülü açık tenant'ta istenir (yalnız sigortan_biz base'inde bu alan var;
+  // ali_genel farklı base olduğundan istenirse Airtable 422 UNKNOWN_FIELD_NAME döner).
+  const panelFields = cfg.modules?.ajanda ? [...FIRMA_LISTE_FIELDS, 'Ajanda Slotu'] : FIRMA_LISTE_FIELDS
+  const actualFields = translateFieldList(cfg, 'firmalar', panelFields)
   const params: Record<string, string | string[]> = {
     filterByFormula,
     'sort[0][field]': fieldActual(cfg, 'firmalar', 'Sıcaklık Skoru'),

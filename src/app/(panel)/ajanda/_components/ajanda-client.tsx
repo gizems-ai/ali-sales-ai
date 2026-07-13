@@ -27,7 +27,16 @@ const _normTR = (s: string) => s.toLowerCase()
   .replace(/ğ/g,'g').replace(/ü/g,'u').replace(/ş/g,'s')
   .replace(/ı/g,'i').replace(/ö/g,'o').replace(/ç/g,'c')
 
+// n8n 'Ajanda Slotu' değerini panel kategorisine eşler (Airtable singleSelect → Kategori)
+const SLOT_KATEGORI: Record<string, Kategori> = {
+  'Takip': 'takip', 'Sağlık': 'saglik', 'Elementer': 'elementer', 'Acıbadem': 'acibadem',
+}
+
 function getKategori(f: FirmaListeItem): Kategori {
+  // Önce n8n'in yazdığı gerçek slot; yoksa (eski kayıt / slot boş) Branş-bazlı fallback
+  const slot = f['Ajanda Slotu']
+  if (slot && SLOT_KATEGORI[slot]) return SLOT_KATEGORI[slot]
+
   const sonraAra = f['Sonra Ara Tarihi']
   if (sonraAra) {
     const today = new Date().toLocaleDateString('sv-SE')

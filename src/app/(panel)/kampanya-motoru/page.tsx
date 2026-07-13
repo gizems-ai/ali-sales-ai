@@ -14,6 +14,7 @@ export default async function KampanyaMotoruPage() {
   ])
   if (!profil) redirect('/login')
   if (!cfg) redirect('/login')
+  if (cfg.id !== 'emlak_demo') redirect('/')  // emlak-only bölüm — diğer tenant'larda URL ile de erişilemez
 
   // Kampanya Motoru yalnızca Kurumsal modda açılır (Ali Satış Zekâsı gibi).
   if (segment !== 'kurumsal') return <KurumsalGate />
