@@ -6,6 +6,7 @@ import { type TenantConfig } from '@/lib/tenants'
 import { MusterilerClient } from './_components/musteriler-client'
 import { getSegment } from '@/lib/emlak-segment'
 import { BIREYSEL_MUSTERILER } from '@/lib/emlak-fixtures'
+import { getServerT } from '@/lib/i18n/server'
 
 
 export const dynamic = 'force-dynamic'
@@ -49,12 +50,13 @@ export default async function MusterilerPage({
   if (!cfg) return null
 
   if (izin.tip === 'yok') {
+    const { t } = await getServerT()
     return (
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-lg font-semibold text-gray-900 mb-4">Müşteriler</h1>
+        <h1 className="text-lg font-semibold text-gray-900 mb-4">{t('cust.title')}</h1>
         <div className="rounded-xl border border-dashed border-red-200 bg-red-50 p-12 flex flex-col items-center justify-center text-center">
-          <p className="text-sm font-medium text-red-600">Yetkiniz tanımlı değil</p>
-          <p className="text-xs text-red-400 mt-1">Bu sayfayı görüntülemek için yöneticinizle iletişime geçin.</p>
+          <p className="text-sm font-medium text-red-600">{t('cust.noPermission')}</p>
+          <p className="text-xs text-red-400 mt-1">{t('cust.noPermissionHint')}</p>
         </div>
       </div>
     )

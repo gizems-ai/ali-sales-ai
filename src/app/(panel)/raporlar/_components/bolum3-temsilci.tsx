@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import { type TemsilciAktivite } from '@/app/api/raporlar/bugun-aktivite/route'
+import { useT } from '@/lib/i18n/context'
+
+const AY_FULL_KEYS = [
+  'rep.monFull0','rep.monFull1','rep.monFull2','rep.monFull3','rep.monFull4','rep.monFull5',
+  'rep.monFull6','rep.monFull7','rep.monFull8','rep.monFull9','rep.monFull10','rep.monFull11',
+] as const
 
 // ── Rate eşiği ────────────────────────────────────────────────────────────────
 function rateBadgeStyle(pct: number): { bg: string; color: string } {
@@ -43,6 +49,7 @@ function TemsilciKart({
   tarih: string
   displayAd: string
 }) {
+  const tr = useT()
   const HEDEF = 250
   const bos = t.toplam === 0
   const hedefPct = Math.min((t.toplam / HEDEF) * 100, 100)
@@ -55,7 +62,7 @@ function TemsilciKart({
 
   const renk = bos ? '#D1D5DB' : t.renk
 
-  const TR_AY = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık']
+  const TR_AY = AY_FULL_KEYS.map(k => tr(k))
   const s = new Date(weekStart + 'T00:00:00')
   const e = new Date(tarih     + 'T00:00:00')
   const hafta =
@@ -76,7 +83,7 @@ function TemsilciKart({
           </span>
           <div>
             <p className="text-[16px] font-bold text-gray-900 leading-none">{displayAd}</p>
-            <p className="text-[12px] text-gray-400 mt-0.5">Satış temsilcisi · {hafta}</p>
+            <p className="text-[12px] text-gray-400 mt-0.5">{tr('rep.satisTemsilcisi')} · {hafta}</p>
           </div>
         </div>
         <TrendBadge now={t.toplam} prev={aktiviteGecen} />
@@ -85,21 +92,21 @@ function TemsilciKart({
       {/* ── Ana metrikler: Randevu + Satış ── */}
       <div className="grid grid-cols-2 gap-3">
         <div className="rounded-xl p-4 flex flex-col gap-1 min-h-[96px]" style={{ backgroundColor: '#F5E8EA' }}>
-          <span className="text-[10px] font-bold uppercase tracking-wide" style={{ color: '#8e2433' }}>Randevu</span>
+          <span className="text-[10px] font-bold uppercase tracking-wide" style={{ color: '#8e2433' }}>{tr('rep.randevu')}</span>
           <span className="text-[48px] font-black leading-none" style={{ color: bos ? '#D1D5DB' : '#8e2433' }}>
             {t.randevu}
           </span>
           <span className="text-[11px] font-semibold h-4" style={{ color: '#8e2433' }}>
-            {randevuRate > 0 ? `%${randevuRate} dönüşüm` : ''}
+            {randevuRate > 0 ? tr('rep.donusumPct').replace('{n}', String(randevuRate)) : ''}
           </span>
         </div>
         <div className="rounded-xl p-4 flex flex-col gap-1 min-h-[96px]" style={{ backgroundColor: '#DCFCE7' }}>
-          <span className="text-[10px] font-bold uppercase tracking-wide text-[#15803D]">Satış</span>
+          <span className="text-[10px] font-bold uppercase tracking-wide text-[#15803D]">{tr('rep.satis')}</span>
           <span className="text-[48px] font-black leading-none" style={{ color: bos ? '#D1D5DB' : '#15803D' }}>
             {t.kazanim ?? 0}
           </span>
           <span className="text-[11px] font-semibold h-4 text-[#15803D]">
-            {(t.kazanim ?? 0) > 0 ? 'kazanım' : ''}
+            {(t.kazanim ?? 0) > 0 ? tr('rep.kazanimLower') : ''}
           </span>
         </div>
       </div>
@@ -110,19 +117,19 @@ function TemsilciKart({
           <span className="text-[44px] font-black leading-none" style={{ color: bos ? '#D1D5DB' : renk }}>
             {t.toplam}
           </span>
-          <span className="text-[12px] text-gray-500">aktivite</span>
+          <span className="text-[12px] text-gray-500">{tr('rep.aktivite')}</span>
           {ulasmaRate > 0 && (
             <span
               className="ml-2 text-[11px] font-semibold px-2 py-0.5 rounded-full"
               style={ulasmaStyle}
             >
-              %{ulasmaRate} ulaşma
+              {tr('rep.ulasmaPct').replace('{n}', String(ulasmaRate))}
             </span>
           )}
         </div>
         <div className="flex flex-col items-end gap-1">
           <div className="flex items-center justify-between text-[10px] text-gray-400 w-28">
-            <span>Hedef {HEDEF}</span>
+            <span>{tr('rep.hedef')} {HEDEF}</span>
             <span>{Math.min(t.toplam, HEDEF)}/{HEDEF}</span>
           </div>
           <div className="h-1.5 w-28 rounded-full overflow-hidden" style={{ backgroundColor: bos ? '#F3F4F6' : `${renk}25` }}>
@@ -138,15 +145,15 @@ function TemsilciKart({
       <div className="grid grid-cols-3 gap-2">
         <div className="rounded-lg px-2 py-2.5 text-center bg-[#D1FAE5]">
           <p className="text-[18px] font-black text-[#059669]">{t.kirilim['Ulaşıldı'] ?? 0}</p>
-          <p className="text-[10px] text-[#059669] mt-0.5">Ulaşıldı</p>
+          <p className="text-[10px] text-[#059669] mt-0.5">{tr('rep.ulasildi')}</p>
         </div>
         <div className="rounded-lg px-2 py-2.5 text-center bg-[#FEF3C7]">
           <p className="text-[18px] font-black text-[#D97706]">{t.kirilim['Cevap Yok'] ?? 0}</p>
-          <p className="text-[10px] text-[#D97706] mt-0.5">Cevap Yok</p>
+          <p className="text-[10px] text-[#D97706] mt-0.5">{tr('rep.cevapYok')}</p>
         </div>
         <div className="rounded-lg px-2 py-2.5 text-center bg-[#DBEAFE]">
           <p className="text-[18px] font-black text-[#2563EB]">{t.kirilim['Geri Aranacak'] ?? 0}</p>
-          <p className="text-[10px] text-[#2563EB] mt-0.5">Geri Ara</p>
+          <p className="text-[10px] text-[#2563EB] mt-0.5">{tr('rep.geriAra')}</p>
         </div>
       </div>
     </div>
@@ -166,6 +173,7 @@ export function Bolum3Temsilci({
   displayAdMap?: Record<string, string>
   weekOffset?: number
 }) {
+  const tr = useT()
   const [bugunData, setBugunData] = useState<{
     tarih: string; weekStart: string; temsilciler: TemsilciAktivite[]
   } | null>(null)
@@ -201,9 +209,9 @@ export function Bolum3Temsilci({
     <section className="space-y-4">
       <div>
         <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-          Bölüm 3 — Temsilci Performansı
+          {tr('rep.bolum3')}
         </h2>
-        <p className="text-[11px] text-gray-400 mt-0.5">Bireysel kırılım</p>
+        <p className="text-[11px] text-gray-400 mt-0.5">{tr('rep.bireyselKirilim')}</p>
       </div>
 
       {loading ? (

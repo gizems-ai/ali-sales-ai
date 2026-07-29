@@ -4,6 +4,7 @@ import { TEMSILCI_SKORU, LEAD_YASLANMA, BUGUNUN_HAMLELERI, STOK_LISTESI } from '
 import { TrendingUp, Home, Users, Phone, BarChart3, FileText, ChevronRight } from 'lucide-react'
 import Image from 'next/image'
 import { useState } from 'react'
+import { useT } from '@/lib/i18n/context'
 import { ContentViewer } from '@/app/(panel)/gelisim/_components/content-viewer'
 
 const E = {
@@ -25,6 +26,7 @@ const KAYNAK_DATA = [
 ]
 
 export function EmlakRapor() {
+  const tr = useT()
   const [viewer, setViewer] = useState<{ src: string; baslik: string } | null>(null)
   const toplamCiro   = TEMSILCI_SKORU.reduce((s, t) => s + t.ciro, 0)
   const toplamSatis  = TEMSILCI_SKORU.reduce((s, t) => s + t.satisAdedi, 0)
@@ -59,21 +61,21 @@ export function EmlakRapor() {
           </div>
         </div>
         <div>
-          <p style={{ fontSize: 12, fontWeight: 800, color: E.green2, marginBottom: 5 }}>Ali — Dönemsel Rapor</p>
+          <p style={{ fontSize: 12, fontWeight: 800, color: E.green2, marginBottom: 5 }}>{tr('rep.aliDonemsel')}</p>
           <p style={{ fontSize: 13, fontWeight: 500, color: '#57655b', lineHeight: 1.6 }}>
-            Bu ay referans kanalı en yüksek dönüşüm oranını (%67) gösterdi — mevcut müşterilerden aktif referans talep etmeye odaklanın. Instagram leadi artıyor ama dönüşüm düşük; takip sürecini hızlandırmanızı öneririm.
+            {tr('rep.aliInsight')}
           </p>
         </div>
       </div>
 
       {/* Örnek veri banner */}
       <div className="flex items-center gap-[10px] rounded-[14px] border border-amber-200 bg-amber-50 px-[16px] py-[10px]">
-        <span className="text-[12px] font-bold text-amber-700">Emlak Demo — Örnek veri</span>
-        <span className="text-[12px] text-amber-600 flex-1">Gerçek veriler Airtable entegrasyonu sonrası aktif olacak.</span>
+        <span className="text-[12px] font-bold text-amber-700">{tr('rep.emlakDemoOrnek')}</span>
+        <span className="text-[12px] text-amber-600 flex-1">{tr('rep.airtableNotice')}</span>
       </div>
 
       {/* Stok Durumu Analizi — gömülü canlı pano */}
-      <button onClick={() => setViewer({ src: '/decks/Babacan_Portfoy_Durum_Panosu.html', baslik: 'Portföy Durum Panosu' })}
+      <button onClick={() => setViewer({ src: '/decks/Babacan_Portfoy_Durum_Panosu.html', baslik: tr('rep.portfoyDurumPanosu') })}
         className="w-full text-left rounded-[22px] border bg-white p-[16px] shadow-sm flex items-center gap-[14px] transition-shadow hover:shadow-md"
         style={{ borderColor: E.line }}>
         <span className="grid place-items-center rounded-[13px] text-white shrink-0" style={{ width: 44, height: 44, background: 'linear-gradient(135deg,#6D5BE0,#8c97d8)' }}>
@@ -81,12 +83,12 @@ export function EmlakRapor() {
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-[8px] flex-wrap">
-            <p className="text-[15px] font-black" style={{ color: E.text }}>Stok Durumu Analizi</p>
+            <p className="text-[15px] font-black" style={{ color: E.text }}>{tr('rep.stokDurumuAnalizi')}</p>
             <span className="inline-flex items-center gap-[5px] rounded-full px-[8px] py-[2px] text-[10px] font-bold" style={{ background: '#D1FAE5', color: '#065F46' }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />Canlı içerik
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />{tr('rep.canliIcerik')}
             </span>
           </div>
-          <p className="text-[12px] text-slate-400 mt-[2px] truncate">Portföy Durum Panosu · risk-fırsat matrisi · Esenyurt · 507 daire / $129,3M</p>
+          <p className="text-[12px] text-slate-400 mt-[2px] truncate">{tr('rep.stokDurumuSub')}</p>
         </div>
         <ChevronRight size={18} className="text-slate-300 shrink-0" />
       </button>
@@ -94,12 +96,12 @@ export function EmlakRapor() {
       {/* Tahmini Ciro / Komisyon / Döngü KPI'ları */}
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-[12px]">
         {[
-          { icon: TrendingUp, label: 'Tahmini Ciro',       value: fmtPara(toplamCiro + 4_500_000 * 0.3 * 5), sub: 'Pipeline dahil tahmin' },
-          { icon: Home,       label: 'Gerçekleşen Ciro',   value: fmtPara(toplamCiro),                        sub: `${toplamSatis} satış kapandı` },
-          { icon: BarChart3,  label: 'Tahmini Komisyon',   value: fmtPara(toplamKomisyon),                    sub: `%${(komisyonOrani * 100).toFixed(1)} oran` },
-          { icon: Users,      label: 'Pipeline Lead',      value: BUGUNUN_HAMLELERI.length.toString(),        sub: 'Aktif müşteri' },
-          { icon: Phone,      label: 'Ortalama Döngü',     value: `${ortalamaDonum} hafta`,                   sub: 'İlk temas → teklif' },
-          { icon: Home,       label: 'Stok Devri',         value: `${STOK_LISTESI.filter(s => s.durum === 'Müsait').length} müsait`, sub: 'Aktif portföy' },
+          { icon: TrendingUp, label: tr('rep.tahminiCiro'),       value: fmtPara(toplamCiro + 4_500_000 * 0.3 * 5), sub: tr('rep.pipelineDahilTahmin') },
+          { icon: Home,       label: tr('rep.gerceklesenCiro'),   value: fmtPara(toplamCiro),                        sub: tr('rep.satisKapandi').replace('{n}', String(toplamSatis)) },
+          { icon: BarChart3,  label: tr('rep.tahminiKomisyon'),   value: fmtPara(toplamKomisyon),                    sub: tr('rep.oranPct').replace('{n}', (komisyonOrani * 100).toFixed(1)) },
+          { icon: Users,      label: tr('rep.pipelineLead'),      value: BUGUNUN_HAMLELERI.length.toString(),        sub: tr('rep.aktifMusteri') },
+          { icon: Phone,      label: tr('rep.ortalamaDongu'),     value: tr('rep.haftaUnit').replace('{n}', String(ortalamaDonum)),                   sub: tr('rep.ilkTemasTeklif') },
+          { icon: Home,       label: tr('rep.stokDevri'),         value: tr('rep.musaitCount').replace('{n}', String(STOK_LISTESI.filter(s => s.durum === 'Müsait').length)), sub: tr('rep.aktifPortfoy') },
         ].map(({ icon: Icon, label, value, sub }) => (
           <div key={label} className="rounded-[22px] border bg-white p-[16px] shadow-sm" style={{ borderColor: E.line }}>
             <div className="flex items-start justify-between">
@@ -117,16 +119,16 @@ export function EmlakRapor() {
 
       {/* Lead Kaynak Performansı */}
       <div className="rounded-[22px] border bg-white p-[20px] shadow-sm" style={{ borderColor: E.line }}>
-        <h3 className="text-[16px] font-black mb-[16px]" style={{ color: E.text }}>Lead Kaynak Performansı</h3>
+        <h3 className="text-[16px] font-black mb-[16px]" style={{ color: E.text }}>{tr('rep.leadKaynakPerformansi')}</h3>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
               <tr className="text-left text-[11px] font-bold text-slate-400 uppercase tracking-wide"
                 style={{ borderBottom: `1px solid ${E.line}`, background: E.surface }}>
-                <th className="px-[16px] py-[8px]">Kaynak</th>
-                <th className="px-[12px] py-[8px] text-right">Lead</th>
-                <th className="px-[12px] py-[8px]">Dönüşüm %</th>
-                <th className="px-[16px] py-[8px]">Performans</th>
+                <th className="px-[16px] py-[8px]">{tr('rep.kaynak')}</th>
+                <th className="px-[12px] py-[8px] text-right">{tr('rep.lead')}</th>
+                <th className="px-[12px] py-[8px]">{tr('rep.donusumPctHeader')}</th>
+                <th className="px-[16px] py-[8px]">{tr('rep.performans')}</th>
               </tr>
             </thead>
             <tbody>
@@ -161,7 +163,7 @@ export function EmlakRapor() {
                         color:      donusum >= 50 ? '#065F46' : donusum >= 25 ? '#92400E' : '#991B1B',
                       }}
                     >
-                      {donusum >= 50 ? 'İyi' : donusum >= 25 ? 'Orta' : donusum === 0 ? 'Pasif' : 'Düşük'}
+                      {donusum >= 50 ? tr('rep.iyi') : donusum >= 25 ? tr('rep.orta') : donusum === 0 ? tr('rep.pasif') : tr('rep.dusuk')}
                     </span>
                   </td>
                 </tr>
@@ -173,17 +175,17 @@ export function EmlakRapor() {
 
       {/* Komisyon Paylaşımı */}
       <div className="rounded-[22px] border bg-white p-[20px] shadow-sm" style={{ borderColor: E.line }}>
-        <h3 className="text-[16px] font-black mb-[16px]" style={{ color: E.text }}>Komisyon Paylaşımı</h3>
+        <h3 className="text-[16px] font-black mb-[16px]" style={{ color: E.text }}>{tr('rep.komisyonPaylasimi')}</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-[14px]">
           <div>
-            <p className="text-[12px] text-slate-400 mb-[10px]">Dağılım Özeti</p>
+            <p className="text-[12px] text-slate-400 mb-[10px]">{tr('rep.dagilimOzeti')}</p>
             <div className="space-y-[10px]">
               <div className="flex items-center justify-between py-[8px] border-b" style={{ borderColor: E.line }}>
-                <span className="text-[13px] font-bold" style={{ color: E.text }}>Toplam Komisyon</span>
+                <span className="text-[13px] font-bold" style={{ color: E.text }}>{tr('rep.toplamKomisyon')}</span>
                 <span className="text-[15px] font-black" style={{ color: E.green2 }}>{fmtPara(toplamKomisyon)}</span>
               </div>
               <div className="flex items-center justify-between py-[8px] border-b" style={{ borderColor: E.line }}>
-                <span className="text-[13px] text-slate-500">Ofis Payı (%50)</span>
+                <span className="text-[13px] text-slate-500">{tr('rep.ofisPayi')}</span>
                 <span className="text-[14px] font-black" style={{ color: E.text }}>{fmtPara(toplamKomisyon * 0.5)}</span>
               </div>
               {TEMSILCI_SKORU.map(t => (
@@ -203,7 +205,7 @@ export function EmlakRapor() {
           </div>
 
           <div>
-            <p className="text-[12px] text-slate-400 mb-[10px]">Lead Yaşlanma (Genel)</p>
+            <p className="text-[12px] text-slate-400 mb-[10px]">{tr('rep.leadYaslanma')}</p>
             <div className="space-y-[8px]">
               {LEAD_YASLANMA.map(({ etiket, renk, sayi }) => (
                 <div key={etiket} className="flex items-center gap-[10px]">
@@ -224,7 +226,7 @@ export function EmlakRapor() {
       </div>
 
       {/* Sistem deck'leri — Raporlar sonu */}
-      <button onClick={() => setViewer({ src: '/decks/Babacan_Revenue_OS.html', baslik: 'Revenue OS — Gelir & Satış Motoru' })}
+      <button onClick={() => setViewer({ src: '/decks/Babacan_Revenue_OS.html', baslik: tr('rep.revenueOsTitle') })}
         className="w-full text-left rounded-[22px] border bg-white p-[16px] shadow-sm flex items-center gap-[14px] transition-shadow hover:shadow-md"
         style={{ borderColor: E.line }}>
         <span className="grid place-items-center rounded-[13px] text-white shrink-0" style={{ width: 44, height: 44, background: 'linear-gradient(135deg,#6D5BE0,#8c97d8)' }}>
@@ -232,17 +234,17 @@ export function EmlakRapor() {
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-[8px] flex-wrap">
-            <p className="text-[15px] font-black" style={{ color: E.text }}>Revenue OS — Gelir &amp; Satış Motoru</p>
+            <p className="text-[15px] font-black" style={{ color: E.text }}>{tr('rep.revenueOsTitle')}</p>
             <span className="inline-flex items-center gap-[5px] rounded-full px-[8px] py-[2px] text-[10px] font-bold" style={{ background: '#D1FAE5', color: '#065F46' }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />Canlı içerik
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />{tr('rep.canliIcerik')}
             </span>
           </div>
-          <p className="text-[12px] text-slate-400 mt-[2px] truncate">Sistem · 6 motorlu gelir çarkı · CRM · temas noktaları matrisi</p>
+          <p className="text-[12px] text-slate-400 mt-[2px] truncate">{tr('rep.revenueOsSub')}</p>
         </div>
         <ChevronRight size={18} className="text-slate-300 shrink-0" />
       </button>
 
-      <button onClick={() => setViewer({ src: '/decks/Babacan_Stok_Zekasi.html', baslik: 'Stok Dönüşüm Merkezi' })}
+      <button onClick={() => setViewer({ src: '/decks/Babacan_Stok_Zekasi.html', baslik: tr('rep.stokDonusumMerkezi') })}
         className="w-full text-left rounded-[22px] border bg-white p-[16px] shadow-sm flex items-center gap-[14px] transition-shadow hover:shadow-md"
         style={{ borderColor: E.line }}>
         <span className="grid place-items-center rounded-[13px] text-white shrink-0" style={{ width: 44, height: 44, background: 'linear-gradient(135deg,#2c8a52,#4f9f6c)' }}>
@@ -250,12 +252,12 @@ export function EmlakRapor() {
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-[8px] flex-wrap">
-            <p className="text-[15px] font-black" style={{ color: E.text }}>Stok Dönüşüm Merkezi</p>
+            <p className="text-[15px] font-black" style={{ color: E.text }}>{tr('rep.stokDonusumMerkezi')}</p>
             <span className="inline-flex items-center gap-[5px] rounded-full px-[8px] py-[2px] text-[10px] font-bold" style={{ background: '#D1FAE5', color: '#065F46' }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />Canlı içerik
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10B981', display: 'inline-block' }} />{tr('rep.canliIcerik')}
             </span>
           </div>
-          <p className="text-[12px] text-slate-400 mt-[2px] truncate">Sistem · neden satılmadı → nasıl satılır · alıcı-daire eşleştirme</p>
+          <p className="text-[12px] text-slate-400 mt-[2px] truncate">{tr('rep.stokDonusumSub')}</p>
         </div>
         <ChevronRight size={18} className="text-slate-300 shrink-0" />
       </button>

@@ -1,6 +1,7 @@
 import { Flame } from 'lucide-react'
 import { type AirtableRecord, type FirmaKart } from '@/lib/airtable'
 import { TEMSILCI_RENK, TEMSILCI_RENK_FALLBACK } from '@/lib/temsilciler'
+import { useT } from '@/lib/i18n/context'
 
 function temsilciRenk(ad: string) {
   return TEMSILCI_RENK[ad] ?? TEMSILCI_RENK_FALLBACK
@@ -21,6 +22,7 @@ function SicaklikBadge({ skor }: { skor: number }) {
 }
 
 export function KanbanCard({ record }: { record: AirtableRecord<FirmaKart> }) {
+  const t = useT()
   const f = record.fields
   const isYuksek = f['Öncelik'] === 'Yüksek'
   const temsilci = f['Atanan Temsilci']
@@ -38,7 +40,7 @@ export function KanbanCard({ record }: { record: AirtableRecord<FirmaKart> }) {
           className="text-[13px] font-semibold text-gray-900 leading-snug line-clamp-2 min-w-0"
           style={{ overflowWrap: 'break-word', wordBreak: 'normal' }}
         >
-          {f['Firma Adı'] ?? 'İsimsiz'}
+          {f['Firma Adı'] ?? t('pipe.unnamed')}
         </p>
         <div className="flex items-center gap-1 shrink-0">
           {f['Sıcaklık Skoru'] != null && (

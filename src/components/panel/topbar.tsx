@@ -2,10 +2,12 @@ import { currentUser } from '@clerk/nextjs/server'
 import { UserButtonClient } from './user-button-client'
 import { Bell } from 'lucide-react'
 import { SearchBar } from './search-bar'
+import { LanguageToggle } from './language-toggle'
 import { getTenantConfigFromRequest } from '@/lib/yetki'
+import { getServerT } from '@/lib/i18n/server'
 
-function getTurkishDate() {
-  return new Date().toLocaleDateString('tr-TR', {
+function getLocalizedDate(locale: string) {
+  return new Date().toLocaleDateString(locale, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -13,17 +15,23 @@ function getTurkishDate() {
   })
 }
 
-function getGreeting() {
+function getGreetingKey() {
   const h = new Date().getHours()
-  if (h < 12) return { text: 'Günaydın', emoji: '🌞' }
-  if (h < 18) return { text: 'İyi günler', emoji: '☀️' }
-  return { text: 'İyi akşamlar', emoji: '🌙' }
+  if (h < 12) return { key: 'topbar.greeting.morning', emoji: '🌞' }
+  if (h < 18) return { key: 'topbar.greeting.afternoon', emoji: '☀️' }
+  return { key: 'topbar.greeting.evening', emoji: '🌙' }
 }
 
 export async function Topbar() {
-  const [user, cfg] = await Promise.all([currentUser(), getTenantConfigFromRequest()])
-  const firstName = user?.firstName ?? 'hoş geldin'
-  const { text, emoji } = getGreeting()
+  const [user, cfg, { t, locale }] = await Promise.all([
+    currentUser(),
+    getTenantConfigFromRequest(),
+    getServerT(),
+  ])
+  const firstName = user?.firstName ?? t('topbar.welcome')
+  const greeting = getGreetingKey()
+  const text = t(greeting.key)
+  const emoji = greeting.emoji
   const isEmlak = cfg?.id === 'emlak_demo'
 
   if (isEmlak) {
@@ -54,7 +62,7 @@ export async function Topbar() {
             {text}, {firstName} {emoji}
           </h1>
           <p style={{ fontSize: 11, fontWeight: 600, color: '#57655b', margin: '1px 0 0' }}>
-            {getTurkishDate()}
+            {getLocalizedDate(locale)}
           </p>
         </div>
 
@@ -81,7 +89,7 @@ export async function Topbar() {
           </svg>
           <input
             type="text"
-            placeholder="Müşteri, portföy veya fırsat ara…"
+            placeholder={t('topbar.searchPlaceholder')}
             style={{
               width: '100%',
               border: '1px solid rgba(255,255,255,.72)',
@@ -99,9 +107,12 @@ export async function Topbar() {
           />
         </div>
 
+        {/* Dil değiştirici */}
+        <LanguageToggle variant="glass" />
+
         {/* Bell button */}
         <button
-          aria-label="Bildirimler"
+          aria-label={t('topbar.notifications')}
           style={{
             width: 44,
             height: 44,
@@ -137,7 +148,7 @@ export async function Topbar() {
 
         {/* Avatar button */}
         <button
-          aria-label="Profil"
+          aria-label={t('topbar.profile')}
           style={{
             width: 44,
             height: 44,
@@ -168,7 +179,7 @@ export async function Topbar() {
         <p className="text-sm font-semibold text-gray-900">
           {text}, {firstName}. <span>{emoji}</span>
         </p>
-        <p className="text-xs text-gray-400 mt-0.5">{getTurkishDate()}</p>
+        <p className="text-xs text-gray-400 mt-0.5">{getLocalizedDate(locale)}</p>
       </div>
 
       {/* Orta: arama */}
@@ -176,6 +187,8 @@ export async function Topbar() {
 
       {/* Sağ: eylemler */}
       <div className="flex items-center gap-2">
+        <LanguageToggle />
+
         <button className="relative p-2 rounded-xl text-gray-400 hover:bg-gray-50 hover:text-gray-700 transition-colors">
           <Bell size={17} />
         </button>

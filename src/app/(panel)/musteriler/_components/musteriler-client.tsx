@@ -16,6 +16,7 @@ import {
 import { type MusterilerIzin } from '@/lib/musteriler-izin'
 import { TEMSILCILER } from '@/lib/temsilciler'
 import { type BrifingData } from '@/lib/brifing'
+import { useT } from '@/lib/i18n/context'
 import { FirmaSatir, GRID } from './firma-satir'
 import { FirmaModal } from './firma-modal'
 import { EmlakMusteriModal } from './emlak-musteri-modal'
@@ -47,10 +48,10 @@ function getKategori(f: FirmaListeItem): Kategori {
 const KATEGORI_SIRA: Record<Kategori, number> = { takip: 0, saglik: 1, elementer: 2, acibadem: 3, diger: 4 }
 
 const GRUP_CFG: Partial<Record<Kategori, { emoji: string; label: string; color: string }>> = {
-  takip:     { emoji: '📞', label: 'TAKİP',     color: '#2980b9' },
-  saglik:    { emoji: '🏥', label: 'SAĞLIK',    color: '#27ae60' },
-  elementer: { emoji: '🔧', label: 'ELEMENTER', color: '#e67e22' },
-  acibadem:  { emoji: '💎', label: 'ACİBADEM',  color: '#8e44ad' },
+  takip:     { emoji: '📞', label: 'cust.groupTakip',     color: '#2980b9' },
+  saglik:    { emoji: '🏥', label: 'cust.groupSaglik',    color: '#27ae60' },
+  elementer: { emoji: '🔧', label: 'cust.groupElementer', color: '#e67e22' },
+  acibadem:  { emoji: '💎', label: 'cust.groupAcibadem',  color: '#8e44ad' },
 }
 
 // ──────────────────────────────────────────────────────────────────────────
@@ -131,11 +132,11 @@ const BOSLUK: Filtreler = {
 }
 
 const BRANS_CHIPS: { key: BransChip; label: string }[] = [
-  { key: '',          label: 'Hepsi' },
-  { key: 'saglik',    label: 'Sağlık' },
-  { key: 'elementer', label: 'Elementer' },
-  { key: 'acibadem',  label: 'Acıbadem' },
-  { key: 'crosssell', label: 'Cross-sell' },
+  { key: '',          label: 'cust.all' },
+  { key: 'saglik',    label: 'cust.branchSaglik' },
+  { key: 'elementer', label: 'cust.branchElementer' },
+  { key: 'acibadem',  label: 'cust.branchAcibadem' },
+  { key: 'crosssell', label: 'cust.crossSellChip' },
 ]
 
 function useDebounce<T>(value: T, ms: number): T {
@@ -156,6 +157,7 @@ export function MusterilerClient({
   izin, initialRecords, initialOffset, brifingData, counts, sicakKpi, initialModalId, initialFilters, isAdmin,
   isEmlak = false, isBireysel = false, displayAdMap = {},
 }: Props) {
+  const t = useT()
   const [filtreler, setFiltreler] = useState<Filtreler>({
     ...BOSLUK,
     ...(initialFilters?.oncelik ? { oncelik: initialFilters.oncelik } : {}),
@@ -236,7 +238,7 @@ export function MusterilerClient({
         setRecords(data.records ?? [])
         setOffset(data.offset)
       } catch {
-        setError('Veriler yüklenemedi')
+        setError(t('cust.loadFailed'))
       } finally {
         setLoading(false)
       }
@@ -274,7 +276,7 @@ export function MusterilerClient({
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ recordId: undoRecordId, fields: undoFields }),
     })
-    if (!res.ok) showToast({ mesaj: 'Geri alınamadı', hataMi: true }, 4000)
+    if (!res.ok) showToast({ mesaj: t('cust.undoFailed'), hataMi: true }, 4000)
   }
 
   async function handleAksiyon(recordId: string, fields: Record<string, unknown>, firmaAdi: string) {
@@ -285,14 +287,14 @@ export function MusterilerClient({
     })
     const data = await res.json()
     if (!res.ok) {
-      showToast({ mesaj: `${firmaAdi}: ${data.error ?? 'Kaydedilemedi'}`, hataMi: true }, 5000)
+      showToast({ mesaj: `${firmaAdi}: ${data.error ?? t('cust.saveFailed')}`, hataMi: true }, 5000)
       return
     }
-    let mesaj = `${firmaAdi} · güncellendi`
-    if ('Pipeline Aşaması' in fields) mesaj = `${firmaAdi} · ${fields['Pipeline Aşaması']} işaretlendi`
-    else if ('2026 Ulaşıldı mı' in fields) mesaj = `${firmaAdi} · Ulaşıldı işaretlendi`
-    else if ('Sonra Ara Tarihi' in fields) mesaj = `${firmaAdi} · Sonra ara tarihi ayarlandı`
-    else if ('2026 Arandı mı' in fields) mesaj = `${firmaAdi} · Arandı işaretlendi`
+    let mesaj = `${firmaAdi} · ${t('cust.updated')}`
+    if ('Pipeline Aşaması' in fields) mesaj = `${firmaAdi} · ${t('cust.stageMarked').replace('{stage}', String(fields['Pipeline Aşaması']))}`
+    else if ('2026 Ulaşıldı mı' in fields) mesaj = `${firmaAdi} · ${t('cust.reachedMarked')}`
+    else if ('Sonra Ara Tarihi' in fields) mesaj = `${firmaAdi} · ${t('cust.callLaterSet')}`
+    else if ('2026 Arandı mı' in fields) mesaj = `${firmaAdi} · ${t('cust.calledMarked')}`
     showToast({ mesaj, undoRecordId: recordId, undoFields: data.prev })
   }
 
@@ -303,10 +305,10 @@ export function MusterilerClient({
       body: JSON.stringify({ recordId, fields: {}, notEkle: not }),
     })
     if (!res.ok) {
-      showToast({ mesaj: `${firmaAdi}: Not eklenemedi`, hataMi: true }, 5000)
+      showToast({ mesaj: `${firmaAdi}: ${t('cust.noteAddFailed')}`, hataMi: true }, 5000)
       return
     }
-    showToast({ mesaj: `${firmaAdi} · Not eklendi` }, 4000)
+    showToast({ mesaj: `${firmaAdi} · ${t('cust.noteAdded')}` }, 4000)
   }
 
   async function handleAjandayaEkle(recordId: string, firmaAdi: string) {
@@ -316,13 +318,13 @@ export function MusterilerClient({
       body: JSON.stringify({ recordId, fields: { 'Bugün Aranacak': true } }),
     })
     if (!res.ok) {
-      showToast({ mesaj: `${firmaAdi}: Eklenemedi`, hataMi: true }, 4000)
+      showToast({ mesaj: `${firmaAdi}: ${t('cust.addFailed')}`, hataMi: true }, 4000)
       return
     }
     setRecords(prev => prev.map(r =>
       r.id === recordId ? { ...r, fields: { ...r.fields, 'Bugün Aranacak': true } } : r
     ))
-    showToast({ mesaj: `${firmaAdi} · Ajandaya eklendi` }, 4000)
+    showToast({ mesaj: `${firmaAdi} · ${t('cust.addedToAgenda')}` }, 4000)
   }
 
   async function loadMore() {
@@ -335,7 +337,7 @@ export function MusterilerClient({
       setRecords(prev => [...prev, ...(data.records ?? [])])
       setOffset(data.offset)
     } catch {
-      setError('Daha fazla yüklenemedi')
+      setError(t('cust.loadMoreFailed'))
     } finally {
       setLoadingMore(false)
     }
@@ -383,16 +385,16 @@ export function MusterilerClient({
               </div>
             </div>
             <div>
-              <div className="text-[11px] text-white/70 font-semibold">Portföy Özeti</div>
+              <div className="text-[11px] text-white/70 font-semibold">{t('cust.portfolioSummary')}</div>
               <h2 className="mt-[4px] text-[20px] font-black tracking-[-.02em]">
                 {firmaToplam
-                  ? `${firmaToplam.toLocaleString('tr-TR')} firma portföyünde`
-                  : 'Müşteri portföyünde'}
+                  ? t('cust.companiesInPortfolio').replace('{n}', firmaToplam.toLocaleString('tr-TR'))
+                  : t('cust.customerPortfolio')}
               </h2>
               <p className="mt-[6px] text-[13px] text-white/80">
                 {counts.bugunAranacak > 0
-                  ? `Bugün ${counts.bugunAranacak} müşteri aramanızı bekliyor.`
-                  : 'Portföyünüzü yönetin.'}
+                  ? t('cust.customersWaitingToday').replace('{n}', String(counts.bugunAranacak))
+                  : t('cust.managePortfolio')}
               </p>
             </div>
           </div>
@@ -410,13 +412,13 @@ export function MusterilerClient({
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-[10px]">
               <h1 className="text-[23px] font-black tracking-[-.02em]" style={{ color: C.text }}>
-                Müşteriler
+                {t('cust.title')}
               </h1>
               {!isEmlak && statsLoading ? (
                 <span className="rounded-full bg-violet-50 px-[10px] py-[4px] text-[11px] font-bold text-violet-400">…</span>
               ) : !isEmlak && stats ? (
                 <span className="rounded-full bg-violet-50 px-[10px] py-[4px] text-[11px] font-bold text-violet-700">
-                  {stats.total.toLocaleString('tr-TR')} firma
+                  {stats.total.toLocaleString('tr-TR')} {t('cust.companyUnit')}
                 </span>
               ) : null}
             </div>
@@ -431,17 +433,17 @@ export function MusterilerClient({
                 className="h-[36px] rounded-[10px] border bg-white px-[13px] text-[12px] font-bold flex items-center gap-[6px]"
                 style={{ borderColor: C.line, color: C.text }}
               >
-                <Download size={14} />Dışa Aktar
+                <Download size={14} />{t('cust.export')}
               </button>
               <button
                 className="h-[36px] rounded-[10px] px-[16px] text-[12px] font-black text-white shadow-sm"
                 style={{ background: isEmlak ? '#1B7A47' : C.bordo }}
               >
-                + Yeni Müşteri
+                {t('cust.newCustomer')}
               </button>
               <button
                 onClick={() => setRailAcik(v => !v)}
-                title={railAcik ? 'Paneli kapat' : 'Paneli aç'}
+                title={railAcik ? t('cust.panelClose') : t('cust.panelOpen')}
                 className="h-[36px] w-[36px] rounded-[10px] border bg-white grid place-items-center transition-colors hover:bg-slate-50"
                 style={{ borderColor: C.line, color: railAcik ? (isEmlak ? '#1B7A47' : C.violet) : '#94A3B8' }}
               >
@@ -453,31 +455,31 @@ export function MusterilerClient({
           {/* Örnek veri badge (emlak demo) */}
           {isEmlak && (
             <div className="flex items-center gap-[8px] rounded-[10px] border border-amber-200 bg-amber-50 px-[14px] py-[8px]">
-              <span className="text-[12px] font-bold text-amber-700">Örnek veri</span>
-              <span className="text-[12px] text-amber-600">Emlak demo — yerel fixture, Airtable bağlantısı yok.</span>
+              <span className="text-[12px] font-bold text-amber-700">{t('cust.sampleData')}</span>
+              <span className="text-[12px] text-amber-600">{t('cust.emlakDemoNote')}</span>
             </div>
           )}
 
           {/* KPI 3-grid */}
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-[12px]">
             <KpiCard
-              title={isEmlak ? 'Aktif Müşteri' : 'Toplam Portföy'}
+              title={isEmlak ? t('cust.kpiActiveCustomer') : t('cust.kpiTotalPortfolio')}
               value={isBireysel ? String(initialRecords.length) : (firmaToplam?.toLocaleString('tr-TR') ?? stats?.total?.toLocaleString('tr-TR') ?? '—')}
-              sub={isEmlak ? 'Kayıtlı müşteri' : 'Aktif firma'}
+              sub={isEmlak ? t('cust.kpiRegisteredCustomer') : t('cust.kpiActiveCompany')}
               Icon={TrendingUp}
               tone="chart"
             />
             <KpiCard
-              title={isEmlak ? 'İlgi Puanı Yüksek' : 'Sıcak Fırsatlar'}
+              title={isEmlak ? t('cust.kpiHighInterest') : t('cust.kpiHotOpportunities')}
               value={String(sicakKpi)}
-              sub={isEmlak ? 'Skor ≥ 7 müşteri' : 'Skor ≥ 7 firma'}
+              sub={isEmlak ? t('cust.kpiScoreCustomer') : t('cust.kpiScoreCompany')}
               Icon={Flame}
               tone="red"
             />
             <KpiCard
-              title="Yanıt Bekleyen"
+              title={t('cust.kpiAwaitingResponse')}
               value={String(counts.yanitBekleyen)}
-              sub={isEmlak ? 'Randevu bekleniyor' : 'Pipeline\'da'}
+              sub={isEmlak ? t('cust.kpiAwaitingAppointment') : t('cust.kpiInPipeline')}
               Icon={MessageSquare}
               tone="violet"
             />
@@ -498,7 +500,7 @@ export function MusterilerClient({
                       : { background: '#F2EEFF', color: '#5B47E0' }
                     }
                   >
-                    {label}
+                    {t(label)}
                   </button>
                 )
               })}
@@ -513,36 +515,36 @@ export function MusterilerClient({
                 type="text"
                 value={filtreler.q}
                 onChange={e => setFiltreler(p => ({ ...p, q: e.target.value }))}
-                placeholder="Firma adı veya sektör ara..."
+                placeholder={t('cust.searchPlaceholder')}
                 className="h-[35px] w-[220px] rounded-[11px] border bg-white pl-[34px] pr-3 text-[12px] focus:outline-none focus:ring-2 focus:ring-violet-300/30"
                 style={{ borderColor: C.line }}
               />
             </div>
             <FilterPill
-              label="Sektör" value={filtreler.sektor}
+              label={t('cust.sector')} value={filtreler.sektor}
               onChange={v => setFiltreler(p => ({ ...p, sektor: v }))}
               options={SEKTORLER}
             />
             <FilterPill
-              label="Aşama" value={filtreler.asama}
+              label={t('cust.stage')} value={filtreler.asama}
               onChange={v => setFiltreler(p => ({ ...p, asama: v }))}
               options={PIPELINE_ASAMALARI.map(a => a.value)}
             />
             {showTemsilci && (
               <FilterPill
-                label={isEmlak ? 'Danışman' : 'Temsilci'} value={filtreler.temsilci}
+                label={isEmlak ? t('cust.advisor') : t('cust.rep')} value={filtreler.temsilci}
                 onChange={v => setFiltreler(p => ({ ...p, temsilci: v }))}
                 options={[...TEMSILCILER]}
                 optionLabels={displayAdMap}
               />
             )}
             <FilterPill
-              label="Öncelik" value={filtreler.oncelik}
+              label={t('cust.priority')} value={filtreler.oncelik}
               onChange={v => setFiltreler(p => ({ ...p, oncelik: v }))}
               options={['Yüksek', 'Normal', 'Düşük']}
             />
             <FilterPill
-              label="Vade" value={filtreler.vade}
+              label={t('cust.due')} value={filtreler.vade}
               onChange={v => setFiltreler(p => ({ ...p, vade: v }))}
               options={VADELER}
             />
@@ -554,7 +556,7 @@ export function MusterilerClient({
                 : { borderColor: C.line, background: 'white', color: '#334155' }
               }
             >
-              Bugün Aranacak
+              {t('cust.callToday')}
             </button>
             {aktifFiltreSayisi > 0 && (
               <button
@@ -562,7 +564,7 @@ export function MusterilerClient({
                 className="h-[35px] inline-flex items-center gap-1.5 rounded-[11px] border border-dashed px-[12px] text-[12px] text-slate-400 hover:text-slate-600 transition-colors"
                 style={{ borderColor: C.line }}
               >
-                <X size={11} />Temizle
+                <X size={11} />{t('cust.clear')}
               </button>
             )}
           </div>
@@ -578,14 +580,14 @@ export function MusterilerClient({
                   style={{ borderColor: C.line }}
                 >
                   <div><input type="checkbox" className="h-4 w-4 rounded border-slate-300" /></div>
-                  <div>Firma / İletişim</div>
-                  <div>Sektör</div>
-                  <div>Aşama</div>
-                  <div>Öncelik</div>
-                  <div>Son Etkileşim</div>
-                  <div>Temsilci</div>
-                  <div>Ali Skoru</div>
-                  <div>Aksiyon</div>
+                  <div>{t('cust.colCompanyContact')}</div>
+                  <div>{t('cust.sector')}</div>
+                  <div>{t('cust.stage')}</div>
+                  <div>{t('cust.priority')}</div>
+                  <div>{t('cust.colLastInteraction')}</div>
+                  <div>{t('cust.rep')}</div>
+                  <div>{t('cust.colAliScore')}</div>
+                  <div>{t('cust.colAction')}</div>
                 </div>
 
                 {/* Rows */}
@@ -600,18 +602,18 @@ export function MusterilerClient({
                   <div className="py-16 text-center">
                     {aktifFiltreSayisi > 0 ? (
                       <>
-                        <p className="text-sm text-gray-400">Bu kriterde firma bulunamadı</p>
+                        <p className="text-sm text-gray-400">{t('cust.emptyNoMatch')}</p>
                         <button onClick={temizle} className="mt-2 text-xs hover:underline" style={{ color: C.violet }}>
-                          Filtreleri temizle
+                          {t('cust.clearFilters')}
                         </button>
                       </>
                     ) : izin.tip === 'temsilci' ? (
                       <>
-                        <p className="text-sm font-semibold text-slate-500">Henüz size atanmış firma yok</p>
-                        <p className="mt-1 text-xs text-slate-400">Portföy ataması için yöneticinizle iletişime geçin.</p>
+                        <p className="text-sm font-semibold text-slate-500">{t('cust.emptyNoneAssigned')}</p>
+                        <p className="mt-1 text-xs text-slate-400">{t('cust.emptyNoneAssignedHint')}</p>
                       </>
                     ) : (
-                      <p className="text-sm text-gray-400">Portföyde henüz firma yok</p>
+                      <p className="text-sm text-gray-400">{t('cust.emptyNoCompanies')}</p>
                     )}
                   </div>
                 ) : (
@@ -642,7 +644,7 @@ export function MusterilerClient({
                           >
                             <span className="text-[10px] font-black uppercase tracking-[.15em]"
                               style={{ color: GRUP_CFG[kat]!.color }}>
-                              {GRUP_CFG[kat]!.emoji} {GRUP_CFG[kat]!.label}
+                              {GRUP_CFG[kat]!.emoji} {t(GRUP_CFG[kat]!.label)}
                             </span>
                             <span className="text-[10px] text-slate-400 font-bold">{items.length}</span>
                           </div>
@@ -673,7 +675,7 @@ export function MusterilerClient({
             >
               <div className="text-slate-500">
                 {statsLoading ? '…' : stats ? (
-                  <><span className="font-semibold">{stats.total.toLocaleString('tr-TR')}</span> firma</>
+                  <><span className="font-semibold">{stats.total.toLocaleString('tr-TR')}</span> {t('cust.companyUnit')}</>
                 ) : null}
               </div>
               {offset && (
@@ -683,7 +685,7 @@ export function MusterilerClient({
                   className="h-[31px] rounded-[8px] border px-[14px] text-[12px] font-semibold hover:bg-slate-50 transition-colors disabled:opacity-50"
                   style={{ borderColor: C.line }}
                 >
-                  {loadingMore ? 'Yükleniyor…' : 'Daha fazla →'}
+                  {loadingMore ? t('cust.loading') : t('cust.loadMore')}
                 </button>
               )}
             </div>
@@ -698,13 +700,13 @@ export function MusterilerClient({
           <section className="rounded-[18px] border bg-white p-[18px] shadow-sm" style={{ borderColor: C.line }}>
             <div className="flex items-center justify-between">
               <div className="text-[11px] tracking-[.17em] font-black" style={{ color: isEmlak ? '#1B7A47' : C.bordo }}>
-                ALİ ASİSTANIN
+                {t('cust.aliAssistant')}
               </div>
               <button
                 onClick={() => setRailAcik(false)}
                 className="h-[26px] w-[26px] rounded-[8px] border grid place-items-center text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors"
                 style={{ borderColor: C.line }}
-                title="Paneli kapat"
+                title={t('cust.panelClose')}
               >
                 <X size={12} />
               </button>
@@ -727,28 +729,28 @@ export function MusterilerClient({
             </div>
             <div className="mt-[18px] inline-flex items-center gap-[8px] rounded-full px-[12px] py-[6px] text-[13px] font-bold text-white"
               style={{ background: C.navy }}>
-              <span className="h-[8px] w-[8px] rounded-full bg-emerald-400" />Çevrimiçi
+              <span className="h-[8px] w-[8px] rounded-full bg-emerald-400" />{t('cust.online')}
             </div>
             <p className="mt-[14px] text-[13px] leading-[22px] text-slate-600">
-              Portföyünle ilgili önerilerim ve uyarılarım yanında.
+              {t('cust.aliRailBlurb')}
             </p>
             <button
               className="mt-[16px] h-[42px] w-full rounded-[12px] text-[13px] font-black text-white shadow-sm"
               style={{ background: isEmlak ? '#1B7A47' : C.bordo }}
             >
-              Ali ile sohbet et →
+              {t('cust.chatWithAli')}
             </button>
           </section>
 
           {/* Hızlı Filtreler */}
           <section className="rounded-[18px] border bg-white p-[18px] shadow-sm" style={{ borderColor: C.line }}>
-            <h3 className="font-black text-[14px]" style={{ color: C.text }}>Hızlı Filtreler</h3>
+            <h3 className="font-black text-[14px]" style={{ color: C.text }}>{t('cust.quickFilters')}</h3>
             <div className="mt-[14px] grid grid-cols-2 gap-[10px]">
               {([
-                { Icon: Flame,         n: sicakKpi,             label: 'Sıcak',           color: isEmlak ? '#1B7A47' : C.bordo,  onClick: () => setFiltreler(f => ({ ...f, oncelik: 'Yüksek' })) },
-                { Icon: Clock3,        n: counts.bugunAranacak, label: 'Bugün aranacak',  color: isEmlak ? '#2c8a52' : C.violet, onClick: () => setFiltreler(f => ({ ...f, bugun: true })) },
-                { Icon: CalendarDays,  n: vade30 ?? '—',        label: 'Vadesi yaklaşan', color: isEmlak ? '#2c8a52' : C.violet, yakinda: true as const },
-                { Icon: AlertTriangle, n: counts.yenilemeriski, label: 'Riskli',          color: C.red,                          yakinda: true as const },
+                { Icon: Flame,         n: sicakKpi,             label: t('cust.quickHot'),           color: isEmlak ? '#1B7A47' : C.bordo,  onClick: () => setFiltreler(f => ({ ...f, oncelik: 'Yüksek' })) },
+                { Icon: Clock3,        n: counts.bugunAranacak, label: t('cust.quickCallToday'),  color: isEmlak ? '#2c8a52' : C.violet, onClick: () => setFiltreler(f => ({ ...f, bugun: true })) },
+                { Icon: CalendarDays,  n: vade30 ?? '—',        label: t('cust.quickDueSoon'), color: isEmlak ? '#2c8a52' : C.violet, yakinda: true as const },
+                { Icon: AlertTriangle, n: counts.yenilemeriski, label: t('cust.quickRisky'),          color: C.red,                          yakinda: true as const },
               ]).map(({ Icon, n, label, color, ...rest }) => {
                 const yakinda = 'yakinda' in rest && rest.yakinda
                 const onClick  = 'onClick'  in rest ? rest.onClick as () => void : undefined
@@ -761,7 +763,7 @@ export function MusterilerClient({
                   >
                     {yakinda && (
                       <span className="absolute top-[6px] right-[7px] rounded-full bg-slate-100 px-[6px] py-[1px] text-[8px] font-bold text-slate-400">
-                        Yakında
+                        {t('cust.comingSoon')}
                       </span>
                     )}
                     <div className="flex items-center gap-[8px]">
@@ -777,7 +779,7 @@ export function MusterilerClient({
 
           {/* Branş Dağılımı (sigortan only) */}
           {!isEmlak && <section className="rounded-[18px] border bg-white p-[18px] shadow-sm" style={{ borderColor: C.line }}>
-            <h3 className="font-black text-[14px]" style={{ color: C.text }}>Branş Dağılımı</h3>
+            <h3 className="font-black text-[14px]" style={{ color: C.text }}>{t('cust.branchDistribution')}</h3>
             {branchSum > 0 ? (
               <div className="mt-[15px] flex items-center gap-[15px]">
                 <div
@@ -789,15 +791,15 @@ export function MusterilerClient({
                   <div className="absolute inset-[20px] rounded-full bg-white grid place-items-center text-center">
                     <div>
                       <div className="text-[15px] font-black leading-none">{branchSum}</div>
-                      <div className="text-[9px] text-slate-500 mt-0.5">Toplam</div>
+                      <div className="text-[9px] text-slate-500 mt-0.5">{t('cust.total')}</div>
                     </div>
                   </div>
                 </div>
                 <div className="flex-1 space-y-[9px] text-[11px]">
                   {[
-                    { label: 'Sağlık',    pct: saglikPct, color: C.bordo   },
-                    { label: 'Elementer', pct: elemPct,   color: C.violet  },
-                    { label: 'Acıbadem', pct: acibadPct, color: '#B36BE3' },
+                    { label: t('cust.branchSaglik'),    pct: saglikPct, color: C.bordo   },
+                    { label: t('cust.branchElementer'), pct: elemPct,   color: C.violet  },
+                    { label: t('cust.branchAcibadem'), pct: acibadPct, color: '#B36BE3' },
                   ].map(({ label, pct, color }) => (
                     <div key={label} className="flex items-center gap-[6px]">
                       <span className="h-[8px] w-[8px] rounded-full shrink-0" style={{ background: color }} />
@@ -809,7 +811,7 @@ export function MusterilerClient({
               </div>
             ) : (
               <div className="mt-4 py-6 text-center">
-                <p className="text-xs text-slate-400">Veri yükleniyor…</p>
+                <p className="text-xs text-slate-400">{t('cust.dataLoading')}</p>
               </div>
             )}
           </section>}
@@ -823,7 +825,7 @@ export function MusterilerClient({
             <div className="absolute right-[-64px] bottom-[-76px] h-[210px] w-[210px] rounded-full border border-white/20 pointer-events-none" />
             <div className="text-[22px] font-black">alisales.ai</div>
             <p className="mt-[24px] text-[14px] leading-[22px] text-white/85">
-              Bağımsız sigortacılığın yeni nesli.
+              {t('cust.brandTagline')}
             </p>
           </section>
           )}
@@ -852,7 +854,7 @@ export function MusterilerClient({
               onClick={handleUndo}
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-xs font-medium transition-colors shrink-0"
             >
-              <Undo2 size={11} />Geri al
+              <Undo2 size={11} />{t('cust.undo')}
             </button>
           )}
           <button

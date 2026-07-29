@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useTenant } from '@/lib/tenant-context'
+import { useT } from '@/lib/i18n/context'
 import type { AirtableRecord, FirmaListeItem } from '@/lib/airtable'
 
 interface Hit {
@@ -15,6 +16,7 @@ interface Hit {
 export function SearchBar() {
   const { airtable: { sistemAdi } } = useTenant()
   const router = useRouter()
+  const t = useT()
   const [q, setQ] = useState('')
   const [hits, setHits] = useState<Hit[]>([])
   const [open, setOpen] = useState(false)
@@ -86,7 +88,7 @@ export function SearchBar() {
             if (e.key === 'Escape') { setOpen(false); setQ('') }
             if (e.key === 'Enter' && hits.length === 1) go(hits[0].id)
           }}
-          placeholder="müşteri ara..."
+          placeholder={t('search.placeholder')}
           className="flex-1 min-w-0 bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none"
         />
       </div>
@@ -94,7 +96,7 @@ export function SearchBar() {
       {open && (
         <div className="absolute top-full left-0 right-0 mt-1.5 bg-white rounded-xl border border-gray-100 shadow-lg overflow-hidden z-50">
           {hits.length === 0 ? (
-            <p className="text-xs text-gray-400 px-3 py-3 text-center">Sonuç bulunamadı</p>
+            <p className="text-xs text-gray-400 px-3 py-3 text-center">{t('search.noResults')}</p>
           ) : (
             hits.map(h => (
               <button
@@ -112,7 +114,7 @@ export function SearchBar() {
                   className="text-[10px] font-bold px-1.5 py-0.5 rounded-md shrink-0"
                   style={{ background: '#F2EEFF', color: '#5B38E8' }}
                 >
-                  Müşteri
+                  {t('search.customerBadge')}
                 </span>
               </button>
             ))

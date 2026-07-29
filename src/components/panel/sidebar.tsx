@@ -13,18 +13,19 @@ import {
   Building2,
 } from 'lucide-react'
 import { SegmentSwitch } from './segment-switch'
-import { SECTION_NAME, SECTION_SLUG } from '@/lib/ali-zeka'
-import { SECTION_NAME as KAMPANYA_NAME, SECTION_SLUG as KAMPANYA_SLUG } from '@/lib/kampanya'
-import { SECTION_SLUG as GELISIM_SLUG, GROUP_NAME as GELISIM_GROUP } from '@/lib/gelisim'
+import { useT } from '@/lib/i18n/context'
+import { SECTION_SLUG } from '@/lib/ali-zeka'
+import { SECTION_SLUG as KAMPANYA_SLUG } from '@/lib/kampanya'
+import { SECTION_SLUG as GELISIM_SLUG } from '@/lib/gelisim'
 
 // ── Sigortan colours ──────────────────────────────────────────────
 const C = {
   violet: '#5B38E8', bordo: '#982A49', pink: '#D978B6', line: '#E7EAF2', navy: '#061f3d',
 }
 
-const ROL_ETIKETI: Record<string, string> = {
-  admin: 'Admin', yönetici: 'Yönetici',
-  satış_temsilcisi: 'Satış Temsilcisi', operasyon_temsilcisi: 'Operasyon Tem.',
+const ROL_ETIKETI_KEY: Record<string, string> = {
+  admin: 'role.admin', yönetici: 'role.yonetici',
+  satış_temsilcisi: 'role.satisTemsilcisi', operasyon_temsilcisi: 'role.operasyonTemsilcisi',
 }
 
 const activeItemStyle = {
@@ -32,37 +33,37 @@ const activeItemStyle = {
   boxShadow: '0 12px 26px rgba(91,56,232,.22)',
 }
 
-interface NavItem { href: string; label: string; icon: React.ElementType; moduleKey?: string }
-interface StubItem { label: string; icon: React.ElementType; moduleKey?: string }
+interface NavItem { href: string; labelKey: string; icon: React.ElementType; moduleKey?: string }
+interface StubItem { labelKey: string; icon: React.ElementType; moduleKey?: string }
 
 const mainNav: NavItem[] = [
-  { href: '/',             label: 'Ana Akış',         icon: LayoutDashboard, moduleKey: 'dashboard' },
-  { href: '/ajanda',       label: 'Ajanda',           icon: Calendar,        moduleKey: 'ajanda' },
-  { href: '/firsatlar',    label: 'Satış Fırsatları', icon: Flame,           moduleKey: 'firsatlar' },
-  { href: '/musteriler',   label: 'Müşteriler',       icon: Users,           moduleKey: 'musteriler' },
-  { href: '/satis-sureci', label: 'Satış Süreci',     icon: KanbanSquare,    moduleKey: 'satis_sureci' },
-  { href: '/stok',         label: 'Stok / Envanter',  icon: Building2,       moduleKey: 'stok' },
-  { href: '/temsilciler',  label: 'Temsilciler',       icon: UserCheck,       moduleKey: 'stok' },
+  { href: '/',             labelKey: 'nav.dashboard',   icon: LayoutDashboard, moduleKey: 'dashboard' },
+  { href: '/ajanda',       labelKey: 'nav.ajanda',      icon: Calendar,        moduleKey: 'ajanda' },
+  { href: '/firsatlar',    labelKey: 'nav.firsatlar',   icon: Flame,           moduleKey: 'firsatlar' },
+  { href: '/musteriler',   labelKey: 'nav.musteriler',  icon: Users,           moduleKey: 'musteriler' },
+  { href: '/satis-sureci', labelKey: 'nav.satisSureci', icon: KanbanSquare,    moduleKey: 'satis_sureci' },
+  { href: '/stok',         labelKey: 'nav.stok',        icon: Building2,       moduleKey: 'stok' },
+  { href: '/temsilciler',  labelKey: 'nav.temsilciler', icon: UserCheck,       moduleKey: 'stok' },
 ]
 
 const stubNav: StubItem[] = [
-  { label: 'Yenilemeler',       icon: RefreshCw,  moduleKey: 'yenilemeler' },
-  { label: 'Portföy',           icon: Briefcase,  moduleKey: 'portfoy' },
-  { label: 'Komisyon',          icon: Wallet,     moduleKey: 'komisyonlar' },
-  { label: 'Operasyon Merkezi', icon: Settings2 },
+  { labelKey: 'nav.yenilemeler',      icon: RefreshCw,  moduleKey: 'yenilemeler' },
+  { labelKey: 'nav.portfoy',          icon: Briefcase,  moduleKey: 'portfoy' },
+  { labelKey: 'nav.komisyon',         icon: Wallet,     moduleKey: 'komisyonlar' },
+  { labelKey: 'nav.operasyonMerkezi', icon: Settings2 },
 ]
 
 const raporNav: NavItem[] = [
-  { href: '/raporlar', label: 'Raporlar', icon: BarChart3, moduleKey: 'raporlar' },
+  { href: '/raporlar', labelKey: 'nav.raporlar', icon: BarChart3, moduleKey: 'raporlar' },
 ]
 
 const aliNav: NavItem[] = [
-  { href: '/ali-onerileri', label: 'Ali Önerileri', icon: Lightbulb, moduleKey: 'ali_asistan' },
-  { href: '/ali-uyarilar',  label: 'Ali Uyarıları',  icon: Bell,      moduleKey: 'ali_asistan' },
+  { href: '/ali-onerileri', labelKey: 'nav.aliOnerileri',  icon: Lightbulb, moduleKey: 'ali_asistan' },
+  { href: '/ali-uyarilar',  labelKey: 'nav.aliUyarilari',  icon: Bell,      moduleKey: 'ali_asistan' },
 ]
 
 const aliStubNav: StubItem[] = [
-  { label: 'Ali ile Sohbet', icon: MessageSquare, moduleKey: 'ali_asistan' },
+  { labelKey: 'nav.aliSohbet', icon: MessageSquare, moduleKey: 'ali_asistan' },
 ]
 
 // ── Emlak segment switch (glass style) ────────────────────────────
@@ -70,6 +71,7 @@ function EmlakSegmentSwitch() {
   const [segment, setSegment] = useState<'kurumsal' | 'bireysel'>('kurumsal')
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+  const t = useT()
 
   useEffect(() => {
     const match = document.cookie.match(/(?:^|;\s*)emlak_segment=([^;]*)/)
@@ -108,7 +110,7 @@ function EmlakSegmentSwitch() {
               : { background: 'transparent', color: '#57655b' }),
           }}
         >
-          {s === 'kurumsal' ? 'Kurumsal' : 'Bireysel'}
+          {s === 'kurumsal' ? t('segment.kurumsal') : t('segment.bireysel')}
         </button>
       ))}
     </div>
@@ -152,7 +154,7 @@ function EmlakIcon({ id }: { id: string }) {
 // ── Emlak Sidebar ─────────────────────────────────────────────────
 interface EmlakNavLink {
   href?: string
-  label: string
+  labelKey: string
   iconId: string
   active?: boolean
   muted?: boolean
@@ -163,38 +165,38 @@ interface EmlakNavLink {
 // GELİŞİM grubu — Satış Kütüphanesi açılış; çoğu öğe stub (yakında).
 // Not: Ali Satış Zekâsı ayrı bir ANA bölümdür (EMLAK_NAV) — buraya derin link konmaz (çift kapı olmasın).
 const EMLAK_GELISIM_NAV: EmlakNavLink[] = [
-  { href: GELISIM_SLUG, label: 'Satış Kütüphanesi', iconId: 'star', lavender: true, star: true },
-  { label: 'AI Koçum',                 iconId: 'sparkle',  muted: true },
-  { label: 'Günlük Challenge',         iconId: 'target',   muted: true },
-  { label: 'Rol Yap (AI Simülasyon)',  iconId: 'play',     muted: true },
-  { label: 'Oyun Kitabı',              iconId: 'book',     muted: true },
-  { label: 'Hikâye Kütüphanesi',       iconId: 'book',     muted: true },
-  { label: 'Persona Kütüphanesi',      iconId: 'badge',    muted: true },
-  { label: 'Proje Akademisi',          iconId: 'cap',      muted: true },
-  { label: 'İtiraz Merkezi',           iconId: 'chat',     muted: true },
-  { label: 'WhatsApp Kütüphanesi',     iconId: 'chat',     muted: true },
-  { href: '/raporlar', label: 'Raporlar', iconId: 'chart' },
+  { href: GELISIM_SLUG, labelKey: 'nav.satisKutuphanesi', iconId: 'star', lavender: true, star: true },
+  { labelKey: 'nav.aiKocum',              iconId: 'sparkle',  muted: true },
+  { labelKey: 'nav.gunlukChallenge',      iconId: 'target',   muted: true },
+  { labelKey: 'nav.rolYap',               iconId: 'play',     muted: true },
+  { labelKey: 'nav.oyunKitabi',           iconId: 'book',     muted: true },
+  { labelKey: 'nav.hikayeKutuphanesi',    iconId: 'book',     muted: true },
+  { labelKey: 'nav.personaKutuphanesi',   iconId: 'badge',    muted: true },
+  { labelKey: 'nav.projeAkademisi',       iconId: 'cap',      muted: true },
+  { labelKey: 'nav.itirazMerkezi',        iconId: 'chat',     muted: true },
+  { labelKey: 'nav.whatsappKutuphanesi',  iconId: 'chat',     muted: true },
+  { href: '/raporlar', labelKey: 'nav.raporlar', iconId: 'chart' },
 ]
 
 const EMLAK_NAV: EmlakNavLink[] = [
-  { href: '/',             label: 'Ana Akış',           iconId: 'grid' },
-  { href: '/firsatlar',    label: 'Satış Fırsatları',   iconId: 'flame' },
-  { href: '/musteriler',   label: 'Müşteriler',          iconId: 'users' },
-  { href: '/satis-sureci', label: 'Satış Süreci',       iconId: 'columns' },
-  { href: '/stok',         label: 'Stok / Envanter',    iconId: 'building' },
-  { href: SECTION_SLUG,    label: SECTION_NAME,         iconId: 'sparkle', lavender: true },
-  { href: KAMPANYA_SLUG,   label: KAMPANYA_NAME,        iconId: 'target',  lavender: true },
-  { href: '/temsilciler',  label: 'Temsilciler',         iconId: 'badge' },
-  { href: '/broker-yonetimi', label: 'Broker Yönetimi',  iconId: 'broker' },
-  { label: 'Operasyon Merkezi', iconId: 'sliders', muted: true },
+  { href: '/',             labelKey: 'nav.dashboard',      iconId: 'grid' },
+  { href: '/firsatlar',    labelKey: 'nav.firsatlar',      iconId: 'flame' },
+  { href: '/musteriler',   labelKey: 'nav.musteriler',     iconId: 'users' },
+  { href: '/satis-sureci', labelKey: 'nav.satisSureci',    iconId: 'columns' },
+  { href: '/stok',         labelKey: 'nav.stok',           iconId: 'building' },
+  { href: SECTION_SLUG,    labelKey: 'nav.aliSatisZekasi', iconId: 'sparkle', lavender: true },
+  { href: KAMPANYA_SLUG,   labelKey: 'nav.kampanyaMotoru', iconId: 'target',  lavender: true },
+  { href: '/temsilciler',  labelKey: 'nav.temsilciler',    iconId: 'badge' },
+  { href: '/broker-yonetimi', labelKey: 'nav.brokerYonetimi', iconId: 'broker' },
+  { labelKey: 'nav.operasyonMerkezi', iconId: 'sliders', muted: true },
 ]
 
 // Ali bölümü için lavanta gradyanı (yeşil GRAD'in lavanta ikizi)
 const LAV_GRAD = 'linear-gradient(135deg,#6D5BE0,#8c97d8)'
 
 const EMLAK_RAPOR_NAV: EmlakNavLink[] = [
-  { label: 'Eğitim & İpuçları', iconId: 'book', muted: true },
-  { href: '/raporlar', label: 'Raporlar', iconId: 'chart' },
+  { labelKey: 'nav.egitimIpuclari', iconId: 'book', muted: true },
+  { href: '/raporlar', labelKey: 'nav.raporlar', iconId: 'chart' },
 ]
 
 const GRAD = 'linear-gradient(135deg,#2c8a52,#4f9f6c 44%,#8c97d8)'
@@ -206,6 +208,7 @@ function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
   initials: string
   rolEtiketi: string
 }) {
+  const t = useT()
   const isActive = (href?: string) => {
     if (!href) return false
     return href === '/' ? pathname === '/' : pathname.startsWith(href)
@@ -237,7 +240,7 @@ function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
           <span style={{ color: '#8c97d8', fontSize: 12, marginLeft: 3, alignSelf: 'flex-start', lineHeight: 1 }}>✦</span>
         </div>
         <div style={{ fontSize: 11, fontWeight: 600, color: '#8b988f', letterSpacing: '0.02em' }}>
-          Satış Zekâsı Paneli
+          {t('sidebar.salesIntelPanel')}
         </div>
       </div>
 
@@ -256,7 +259,7 @@ function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
             const idleColor = item.lavender ? '#6D5BE0' : '#57655b'
             return (
               <Link
-                key={item.label}
+                key={item.labelKey}
                 href={item.href}
                 style={{
                   display: 'flex',
@@ -280,14 +283,14 @@ function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
                 }}
               >
                 <EmlakIcon id={item.iconId} />
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             )
           }
 
           return (
             <div
-              key={item.label}
+              key={item.labelKey}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -301,7 +304,7 @@ function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
               }}
             >
               <EmlakIcon id={item.iconId} />
-              {item.label}
+              {t(item.labelKey)}
             </div>
           )
         })}
@@ -318,7 +321,7 @@ function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
         padding: '0 12px',
         margin: '22px 0 8px',
       }}>
-        {GELISIM_GROUP}
+        {t('group.gelisim')}
       </div>
 
       {/* GELİŞİM nav */}
@@ -330,7 +333,7 @@ function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
           if (item.href && !item.muted) {
             return (
               <Link
-                key={item.label}
+                key={item.labelKey}
                 href={item.href}
                 style={{
                   display: 'flex',
@@ -354,7 +357,7 @@ function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
                 }}
               >
                 <EmlakIcon id={item.iconId} />
-                <span style={{ flex: 1 }}>{item.label}</span>
+                <span style={{ flex: 1 }}>{t(item.labelKey)}</span>
                 {item.star && <span aria-hidden style={{ fontSize: 12 }}>⭐</span>}
               </Link>
             )
@@ -362,7 +365,7 @@ function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
 
           return (
             <div
-              key={item.label}
+              key={item.labelKey}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -376,7 +379,7 @@ function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
               }}
             >
               <EmlakIcon id={item.iconId} />
-              {item.label}
+              {t(item.labelKey)}
             </div>
           )
         })}
@@ -392,7 +395,7 @@ function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
         padding: '0 12px',
         margin: '22px 0 8px',
       }}>
-        Eğitim &amp; Topluluk
+        {t('group.eduCommunity')}
       </div>
 
       {/* Rapor nav */}
@@ -402,7 +405,7 @@ function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
           if (item.href && !item.muted) {
             return (
               <Link
-                key={item.label}
+                key={item.labelKey}
                 href={item.href}
                 style={{
                   display: 'flex',
@@ -422,13 +425,13 @@ function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
                 }}
               >
                 <EmlakIcon id={item.iconId} />
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             )
           }
           return (
             <div
-              key={item.label}
+              key={item.labelKey}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -442,7 +445,7 @@ function EmlakSidebar({ pathname, displayName, initials, rolEtiketi }: {
               }}
             >
               <EmlakIcon id={item.iconId} />
-              {item.label}
+              {t(item.labelKey)}
             </div>
           )
         })}
@@ -501,6 +504,7 @@ export function Sidebar() {
   const pathname = usePathname()
   const { user } = useUser()
   const cfg = useTenant()
+  const t = useT()
   const mods = cfg.modules as unknown as Record<string, boolean>
 
   const isActive = (href: string) => href === '/' ? pathname === '/' : pathname.startsWith(href)
@@ -509,8 +513,8 @@ export function Sidebar() {
   const meta = (user?.publicMetadata ?? {}) as Record<string, unknown>
   const rolKey = typeof meta.rol === 'string' ? meta.rol
     : typeof meta.temsilci === 'string' ? 'satış_temsilcisi' : ''
-  const rolEtiketi = ROL_ETIKETI[rolKey] ?? 'Kullanıcı'
-  const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Kullanıcı'
+  const rolEtiketi = t(ROL_ETIKETI_KEY[rolKey] ?? 'common.user')
+  const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || t('common.user')
   const initials = ((user?.firstName?.[0] ?? '') + (user?.lastName?.[0] ?? '')).toUpperCase() || '?'
 
   const isEmlak = cfg.id === 'emlak_demo'
@@ -573,23 +577,23 @@ export function Sidebar() {
 
         {/* Ana nav */}
         <div className="space-y-[7px]">
-          {mainNav.filter(n => moduleOn(n.moduleKey)).map(({ href, label, icon: Icon }) => {
+          {mainNav.filter(n => moduleOn(n.moduleKey)).map(({ href, labelKey, icon: Icon }) => {
             const active = isActive(href)
             return (
               <Link key={href} href={href}
                 className={`h-[44px] flex items-center gap-[13px] rounded-[12px] px-[14px] text-[15px] font-semibold transition-colors ${active ? 'text-white' : 'text-slate-600 hover:bg-gray-50'}`}
                 style={active ? activeItemStyle : {}}>
                 <Icon size={18} strokeWidth={2.05} />
-                <span className="flex-1">{label}</span>
+                <span className="flex-1">{t(labelKey)}</span>
               </Link>
             )
           })}
 
-          {stubNav.filter(n => moduleOn(n.moduleKey)).map(({ label, icon: Icon }) => (
-            <div key={label}
+          {stubNav.filter(n => moduleOn(n.moduleKey)).map(({ labelKey, icon: Icon }) => (
+            <div key={labelKey}
               className="h-[44px] flex items-center gap-[13px] rounded-[12px] px-[14px] text-[15px] font-semibold text-slate-400 cursor-default">
               <Icon size={18} strokeWidth={2.05} />
-              <span className="flex-1">{label}</span>
+              <span className="flex-1">{t(labelKey)}</span>
             </div>
           ))}
         </div>
@@ -598,14 +602,14 @@ export function Sidebar() {
           <>
             <div className="my-[16px] h-px" style={{ backgroundColor: C.line }} />
             <div className="space-y-[7px]">
-              {raporNav.filter(n => moduleOn(n.moduleKey)).map(({ href, label, icon: Icon }) => {
+              {raporNav.filter(n => moduleOn(n.moduleKey)).map(({ href, labelKey, icon: Icon }) => {
                 const active = isActive(href)
                 return (
                   <Link key={href} href={href}
                     className={`h-[44px] flex items-center gap-[13px] rounded-[12px] px-[14px] text-[15px] font-semibold transition-colors ${active ? 'text-white' : 'text-slate-600 hover:bg-gray-50'}`}
                     style={active ? activeItemStyle : {}}>
                     <Icon size={18} strokeWidth={2.05} />
-                    <span className="flex-1">{label}</span>
+                    <span className="flex-1">{t(labelKey)}</span>
                   </Link>
                 )
               })}
@@ -618,22 +622,22 @@ export function Sidebar() {
             <div className="my-[16px] h-px" style={{ backgroundColor: C.line }} />
             <p className="px-[8px] mb-[10px] text-[11px] font-black tracking-[.24em] text-slate-400">ALİ</p>
             <div className="space-y-[7px]">
-              {aliNav.filter(n => moduleOn(n.moduleKey)).map(({ href, label, icon: Icon }) => {
+              {aliNav.filter(n => moduleOn(n.moduleKey)).map(({ href, labelKey, icon: Icon }) => {
                 const active = isActive(href)
                 return (
                   <Link key={href} href={href}
                     className={`h-[44px] flex items-center gap-[13px] rounded-[12px] px-[14px] text-[15px] font-semibold transition-colors ${active ? 'text-white' : 'text-slate-600 hover:bg-gray-50'}`}
                     style={active ? activeItemStyle : {}}>
                     <Icon size={18} strokeWidth={2.05} />
-                    <span className="flex-1">{label}</span>
+                    <span className="flex-1">{t(labelKey)}</span>
                   </Link>
                 )
               })}
-              {aliStubNav.filter(n => moduleOn(n.moduleKey)).map(({ label, icon: Icon }) => (
-                <div key={label}
+              {aliStubNav.filter(n => moduleOn(n.moduleKey)).map(({ labelKey, icon: Icon }) => (
+                <div key={labelKey}
                   className="h-[44px] flex items-center gap-[13px] rounded-[12px] px-[14px] text-[15px] font-semibold text-slate-400 cursor-default">
                   <Icon size={18} strokeWidth={2.05} />
-                  <span className="flex-1">{label}</span>
+                  <span className="flex-1">{t(labelKey)}</span>
                 </div>
               ))}
             </div>
@@ -641,16 +645,16 @@ export function Sidebar() {
         )}
 
         <div className="my-[16px] h-px" style={{ backgroundColor: C.line }} />
-        <p className="px-[8px] mb-[10px] text-[11px] font-black tracking-[.18em] text-slate-400">EĞİTİM & TOPLULUK</p>
+        <p className="px-[8px] mb-[10px] text-[11px] font-black tracking-[.18em] text-slate-400">{t('group.eduCommunity')}</p>
         <div className="space-y-[7px]">
           {[
-            { label: 'Eğitim & İpuçları', icon: BookOpen },
-            { label: 'Topluluk',          icon: Users2 },
-          ].map(({ label, icon: Icon }) => (
-            <div key={label}
+            { labelKey: 'nav.egitimIpuclari', icon: BookOpen },
+            { labelKey: 'nav.topluluk',       icon: Users2 },
+          ].map(({ labelKey, icon: Icon }) => (
+            <div key={labelKey}
               className="h-[44px] flex items-center gap-[13px] rounded-[12px] px-[14px] text-[15px] font-semibold text-slate-400 cursor-default">
               <Icon size={18} strokeWidth={2.05} />
-              <span className="flex-1">{label}</span>
+              <span className="flex-1">{t(labelKey)}</span>
             </div>
           ))}
         </div>

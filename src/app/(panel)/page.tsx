@@ -19,6 +19,7 @@ import Image from 'next/image'
 import { MoveCard } from '@/components/emlak/move-card'
 import { StatTile } from '@/components/emlak/stat-tile'
 import { AliChatLauncher } from '@/components/ali-chat/ali-chat-launcher'
+import { getServerT } from '@/lib/i18n/server'
 
 export const revalidate = 300
 
@@ -78,17 +79,18 @@ function InsightTile({
   return href ? <Link href={href}>{inner}</Link> : <div>{inner}</div>
 }
 
-function fmt(n: number | undefined) {
-  return n?.toLocaleString('tr-TR') ?? '—'
+function fmt(n: number | undefined, locale = 'tr-TR') {
+  return n?.toLocaleString(locale) ?? '—'
 }
 
 // ── KPI Card ──────────────────────────────────────────────────────
 function KpiCard({
-  icon: Icon, tone, label, value, sub, yakinda = false,
+  icon: Icon, tone, label, value, sub, yakinda = false, t,
 }: {
   icon: React.ElementType
   tone: 'chart' | 'red' | 'violet' | 'bordo'
   label: string; value?: string | number; sub?: string; yakinda?: boolean
+  t: (key: string) => string
 }) {
   const iconBg = tone === 'red' ? '#FFF0F3' : tone === 'bordo' ? '#F8E9EF' : C.lavender
   const iconFg = tone === 'red' ? '#FF445F' : tone === 'bordo' ? C.bordo : C.violet
@@ -118,7 +120,7 @@ function KpiCard({
         <span className="text-[13px] text-slate-500">{!yakinda ? (sub ?? '') : ''}</span>
         {yakinda && (
           <span className="rounded-[7px] bg-gray-100 px-[8px] py-[4px] text-[11px] font-bold text-gray-400">
-            Yakında
+            {t('dash.comingSoon')}
           </span>
         )}
       </div>
@@ -128,10 +130,11 @@ function KpiCard({
 
 // ── Insight / Suggestion Card ────────────────────────────────────
 function InsightCard({
-  icon: Icon, count, label, description, yakinda = false, href, hrefYakinda = false,
+  icon: Icon, count, label, description, yakinda = false, href, hrefYakinda = false, t, locale = 'tr-TR',
 }: {
   icon: React.ElementType; count?: number; label: string; description: string
   yakinda?: boolean; href?: string; hrefYakinda?: boolean
+  t: (key: string) => string; locale?: string
 }) {
   return (
     <div
@@ -148,12 +151,12 @@ function InsightCard({
         <div className="flex items-center gap-2 mt-3">
           <p className="text-[28px] leading-none font-black text-gray-200">—</p>
           <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-[10px] font-medium text-gray-400">
-            Yakında
+            {t('dash.comingSoon')}
           </span>
         </div>
       ) : (
         <p className="mt-3 text-[28px] leading-none font-black" style={{ color: C.text }}>
-          {fmt(count)}
+          {fmt(count, locale)}
         </p>
       )}
       <p className="mt-[9px] text-[13px] leading-[17px] font-black" style={{ color: C.text }}>
@@ -166,16 +169,16 @@ function InsightCard({
           className="mt-3 inline-flex items-center h-[30px] rounded-[8px] border bg-white px-[11px] text-[12px] font-bold self-start"
           style={{ borderColor: C.line, color: C.violet }}
         >
-          Detayları gör →
+          {t('dash.viewDetails')} →
         </Link>
       )}
       {!yakinda && hrefYakinda && (
         <span
-          title="Filtreli görünüm geliyor"
+          title={t('dash.filteredViewComing')}
           className="mt-3 inline-flex items-center h-[30px] rounded-[8px] border bg-white px-[11px] text-[12px] font-bold self-start opacity-40 cursor-not-allowed pointer-events-none"
           style={{ borderColor: C.line, color: '#94A3B8' }}
         >
-          Detayları gör →
+          {t('dash.viewDetails')} →
         </span>
       )}
     </div>
@@ -184,9 +187,10 @@ function InsightCard({
 
 // ── Donut Chart ──────────────────────────────────────────────────
 function DonutChart({
-  saglik, elementer, acibadem, toplam,
+  saglik, elementer, acibadem, toplam, t, locale = 'tr-TR',
 }: {
   saglik: number; elementer: number; acibadem: number; toplam: number
+  t: (key: string) => string; locale?: string
 }) {
   // Yüzdeler branş toplamı üzerinden hesaplanır (firma_toplam değil)
   // böylece acıbadem dilimi gerçek oranını yansıtır
@@ -201,7 +205,7 @@ function DonutChart({
       style={{ borderColor: C.line }}
     >
       <p className="font-black text-[15px] mb-[17px]" style={{ color: C.text }}>
-        Portföy Dağılımı
+        {t('dash.portfolioDistribution')}
       </p>
       <div className="flex items-center gap-[22px] flex-1">
         <div className="relative shrink-0 w-[152px] h-[152px]">
@@ -217,23 +221,23 @@ function DonutChart({
           />
           <div className="absolute inset-[30px] rounded-full bg-white grid place-items-center text-center">
             <div>
-              <div className="text-[22px] font-black" style={{ color: C.text }}>{fmt(toplam)}</div>
-              <div className="text-[13px] leading-tight text-slate-500">Toplam<br />firma</div>
+              <div className="text-[22px] font-black" style={{ color: C.text }}>{fmt(toplam, locale)}</div>
+              <div className="text-[13px] leading-tight text-slate-500">{t('dash.total')}<br />{t('dash.company')}</div>
             </div>
           </div>
         </div>
         <div className="flex-1 space-y-[11px]">
           {[
-            { label: 'Sağlık',    val: saglik,   pct: s, color: C.bordo   },
-            { label: 'Elementer', val: elementer, pct: e, color: C.violet  },
-            { label: 'Acıbadem',  val: acibadem,  pct: a, color: '#C95B92' },
+            { label: t('dash.branchHealth'),   val: saglik,   pct: s, color: C.bordo   },
+            { label: t('dash.branchGeneral'),  val: elementer, pct: e, color: C.violet  },
+            { label: t('dash.branchAcibadem'), val: acibadem,  pct: a, color: '#C95B92' },
           ].map(({ label, val, pct, color }) => (
             <div key={label} className="grid grid-cols-[1fr_58px_42px] items-center text-[13px]">
               <div className="flex items-center gap-[10px]">
                 <span className="h-[9px] w-[9px] rounded-full shrink-0" style={{ background: color }} />
                 <span className="font-semibold text-slate-700">{label}</span>
               </div>
-              <div className="text-right font-black" style={{ color: C.text }}>{fmt(val)}</div>
+              <div className="text-right font-black" style={{ color: C.text }}>{fmt(val, locale)}</div>
               <div className="text-right text-slate-500">%{pct}</div>
             </div>
           ))}
@@ -245,20 +249,21 @@ function DonutChart({
 
 // ── Vade Row ─────────────────────────────────────────────────────
 function VadeRow({
-  label, sayi, hot, temsilciSayilari, showTemsilci,
+  label, sayi, hot, temsilciSayilari, showTemsilci, t, locale = 'tr-TR',
 }: {
   label: string; sayi: number; hot: number
   temsilciSayilari?: { ad: string; sayi: number }[]
   showTemsilci: boolean
+  t: (key: string) => string; locale?: string
 }) {
   return (
     <div className="py-[13px] border-b last:border-0" style={{ borderColor: C.line }}>
       <div className="flex items-center justify-between">
         <span className="text-[13px] text-slate-600">{label}</span>
         <div className="flex items-center gap-[10px]">
-          <b className="text-[13px] font-black" style={{ color: C.text }}>{fmt(sayi)}</b>
+          <b className="text-[13px] font-black" style={{ color: C.text }}>{fmt(sayi, locale)}</b>
           <span className="rounded-full bg-violet-600 px-[10px] py-[4px] text-[11px] font-bold text-white">
-            {hot} sıcak
+            {hot} {t('dash.hot')}
           </span>
         </div>
       </div>
@@ -283,9 +288,9 @@ function vadeSayilari(
 
 // ── Insight Row (uyarı listesi) ───────────────────────────────────
 function InsightRow({
-  icon: Icon, label, count, iconColor,
+  icon: Icon, label, count, iconColor, locale = 'tr-TR',
 }: {
-  icon: React.ElementType; label: string; count: number; iconColor: string
+  icon: React.ElementType; label: string; count: number; iconColor: string; locale?: string
 }) {
   return (
     <div className="flex items-center gap-[13px] py-[13px] border-b last:border-0" style={{ borderColor: C.line }}>
@@ -300,7 +305,7 @@ function InsightRow({
         className="shrink-0 rounded-full px-[10px] py-[4px] text-[11px] font-bold text-white"
         style={{ backgroundColor: iconColor }}
       >
-        {fmt(count)}
+        {fmt(count, locale)}
       </span>
     </div>
   )
@@ -324,10 +329,11 @@ function SicakFirmaRow({ firma, skor, temsilci }: { firma: string; skor: number;
 
 // ── Hızlı Yol Kartı ──────────────────────────────────────────────
 function HizliYolCard({
-  href, icon: Icon, label, count, countColor, yakinda = false, noLink = false,
+  href, icon: Icon, label, count, countColor, yakinda = false, noLink = false, t, locale = 'tr-TR',
 }: {
   href: string; icon: React.ElementType; label: string
   count?: number; countColor?: string; yakinda?: boolean; noLink?: boolean
+  t: (key: string) => string; locale?: string
 }) {
   const isDisabled = yakinda || noLink
   const inner = (
@@ -346,20 +352,20 @@ function HizliYolCard({
         {label}
       </span>
       {yakinda ? (
-        <span className="text-[10px] text-gray-400 bg-gray-100 rounded-full px-2 py-0.5">Yakında</span>
+        <span className="text-[10px] text-gray-400 bg-gray-100 rounded-full px-2 py-0.5">{t('dash.comingSoon')}</span>
       ) : count !== undefined ? (
         <span
           className="text-xs font-bold px-2 py-0.5 rounded-full text-white"
           style={{ backgroundColor: noLink ? '#94A3B8' : (countColor ?? C.violet) }}
         >
-          {fmt(count)}
+          {fmt(count, locale)}
         </span>
       ) : (
         <ArrowRight size={13} className="text-gray-300" />
       )}
     </div>
   )
-  return isDisabled ? <div title={yakinda ? 'Yakında' : 'Filtre desteği geliyor'}>{inner}</div> : <Link href={href}>{inner}</Link>
+  return isDisabled ? <div title={yakinda ? t('dash.comingSoon') : t('dash.filterSupportComing')}>{inner}</div> : <Link href={href}>{inner}</Link>
 }
 
 // ══════════════════════════════════════════════════════════════════
@@ -461,7 +467,7 @@ function BriefCnt({
 }
 
 // Deal card (glass version replaces MoveCard in this layout)
-function EmlakDealCard({ item }: { item: import('@/lib/emlak-fixtures').HamleItem }) {
+function EmlakDealCard({ item, t }: { item: import('@/lib/emlak-fixtures').HamleItem; t: (key: string) => string }) {
   const telHref = `tel:${item.tel}`
   const waHref  = `https://wa.me/90${item.tel.replace(/^0/, '').replace(/\s/g, '')}`
 
@@ -507,7 +513,7 @@ function EmlakDealCard({ item }: { item: import('@/lib/emlak-fixtures').HamleIte
             style={{ width: 15, height: 15, stroke: ET.green }}>
             <path d="M5 4h3l2 5-2 1a11 11 0 0 0 5 5l1-2 5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/>
           </svg>
-          Ara
+          {t('dash.call')}
         </a>
         <a href={waHref} target="_blank" rel="noopener noreferrer" style={{
           display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 13, fontWeight: 700,
@@ -530,7 +536,7 @@ function EmlakDealCard({ item }: { item: import('@/lib/emlak-fixtures').HamleIte
             style={{ width: 15, height: 15, stroke: ET.muted }}>
             <circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>
           </svg>
-          Ertele
+          {t('dash.postpone')}
         </button>
       </div>
     </div>
@@ -579,6 +585,7 @@ async function EmlakDashboard({ sicakKpi, yanitBekleyen, portfoyToplam }: {
   yanitBekleyen: number
   portfoyToplam: number
 }) {
+  const { t } = await getServerT()
   const hamleleri = BUGUNUN_HAMLELERI
   const oneriSayisi = hamleleri.filter(h => h.sicaklik === 'hot').length
   const uyariSayisi = hamleleri.filter(h => h.sicaklik === 'cold').length
@@ -609,11 +616,11 @@ async function EmlakDashboard({ sicakKpi, yanitBekleyen, portfoyToplam }: {
             {/* Text */}
             <div style={{ minWidth: 0 }}>
               <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: '-0.01em', color: ET.ink }}>
-                Ali bugün senin için çalıştı —{' '}
-                <b style={{ color: ET.greenD }}>{hamleleri.length} kritik gelişme</b> var.
+                {t('dash.emlakBriefPrefix')}{' '}
+                <b style={{ color: ET.greenD }}>{t('dash.emlakBriefCritical').replace('{n}', String(hamleleri.length))}</b>{t('dash.emlakBriefSuffix')}
               </div>
               <div style={{ fontSize: 13, fontWeight: 600, color: ET.body, marginTop: 3 }}>
-                Sabah taraması tamamlandı · Portföy ve lead havuzu güncel.
+                {t('dash.morningScanComplete')}
               </div>
             </div>
 
@@ -621,46 +628,46 @@ async function EmlakDashboard({ sicakKpi, yanitBekleyen, portfoyToplam }: {
             <div style={{ marginLeft: 'auto', display: 'flex', gap: 10, flexShrink: 0 }}>
               <BriefCnt variant="sug"
                 icon='<path d="M12 3l1.8 4.7L18.5 9l-4.7 1.8L12 15l-1.8-4.2L5.5 9l4.7-1.3z"/>'
-                n={oneriSayisi} label="Öneri" />
+                n={oneriSayisi} label={t('dash.suggestionLabel')} />
               <BriefCnt variant="warn"
                 icon='<path d="M12 4 3 19h18z"/><path d="M12 10v4M12 17h.01"/>'
-                n={uyariSayisi} label="Uyarı" />
+                n={uyariSayisi} label={t('dash.warningLabel')} />
               <BriefCnt variant="opp"
                 icon='<path d="M4 16l5-5 4 3 6-7"/><path d="M19 7v4h-4"/>'
-                n={sicakKpi} label="Fırsat" />
+                n={sicakKpi} label={t('dash.opportunityLabel')} />
             </div>
           </EmlakGlass>
 
           {/* KPI row */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 16 }}>
             <EKpiCard
-              label="Aktif Portföy"
+              label={t('dash.activePortfolio')}
               num={String(portfoyToplam)}
-              sub="↑ 8 bu hafta eklendi"
+              sub={t('dash.addedThisWeek')}
               iconBg="linear-gradient(135deg,#aef0c2,#86e6a6)"
               iconStroke="#14622f"
               iconPath='<path d="M4 20h16M6 20V7l6-3 6 3v13"/><path d="M10 11h4M10 15h4"/>'
             />
             <EKpiCard
-              label="Sıcak Lead"
+              label={t('dash.hotLead')}
               num={String(sicakKpi)}
-              sub="Skor ≥ 8 müşteri"
+              sub={t('dash.scoreGte8Customers')}
               iconBg="linear-gradient(135deg,#fbcdb9,#f3a98c)"
               iconStroke="#a8421d"
               iconPath='<path d="M12 3c1 3-2 4-2 7a3 3 0 0 0 6 .3c.8 1 1 2 1 3a5 5 0 1 1-10 0c0-4 3-5 5-10.3z"/>'
             />
             <EKpiCard
-              label="Yanıt Bekleyen"
+              label={t('dash.awaitingResponse')}
               num={String(yanitBekleyen)}
-              sub="Randevu / teklif yanıtı"
+              sub={t('dash.apptOfferResponse')}
               iconBg="linear-gradient(135deg,#bccaf2,#92a6e6)"
               iconStroke="#36479a"
               iconPath='<path d="M4 5h16v11H9l-4 3v-3H4z"/><path d="M8 10h8M8 13h5"/>'
             />
             <EKpiCard
-              label="Bu Ay Kazanım"
-              num="4,9M ₺"
-              sub="↑ %12 geçen aya göre"
+              label={t('dash.thisMonthGain')}
+              num={t('dash.thisMonthGainValue')}
+              sub={t('dash.pct12VsLastMonth')}
               iconBg="linear-gradient(135deg,#fbf0a6,#f6e57e)"
               iconStroke="#7c6611"
               iconPath='<rect x="3" y="6" width="18" height="13" rx="2"/><path d="M3 10h18M7 15h4"/>'
@@ -687,10 +694,10 @@ async function EmlakDashboard({ sicakKpi, yanitBekleyen, portfoyToplam }: {
               </span>
               <div>
                 <div style={{ fontSize: 15.5, fontWeight: 800, letterSpacing: '-0.01em', color: ET.ink }}>
-                  Bugünün Hamleleri
+                  {t('dash.todaysMoves')}
                 </div>
                 <div style={{ fontSize: 12, fontWeight: 600, color: ET.muted, marginTop: 1 }}>
-                  Ali&apos;nin önceliklendirdiği aksiyonlar
+                  {t('dash.aliPrioritizedActions')}
                 </div>
               </div>
               <span style={{
@@ -698,13 +705,13 @@ async function EmlakDashboard({ sicakKpi, yanitBekleyen, portfoyToplam }: {
                 background: 'linear-gradient(135deg,#aef0c2,#86e6a6)',
                 padding: '6px 12px', borderRadius: 999,
               }}>
-                {hamleleri.length} hareket
+                {t('dash.movesCount').replace('{n}', String(hamleleri.length))}
               </span>
               <Link href="/satis-sureci" style={{
                 marginLeft: 'auto', fontSize: 13, fontWeight: 700, color: ET.greenD,
                 textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 5,
               }}>
-                Satış süreci
+                {t('dash.salesProcess')}
                 <svg viewBox="0 0 24 24" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                   style={{ width: 15, height: 15, stroke: ET.greenD }}>
                   <path d="M5 12h14M13 6l6 6-6 6"/>
@@ -714,7 +721,7 @@ async function EmlakDashboard({ sicakKpi, yanitBekleyen, portfoyToplam }: {
 
             {/* Deal rows */}
             {hamleleri.map(item => (
-              <EmlakDealCard key={item.id} item={item} />
+              <EmlakDealCard key={item.id} item={item} t={t} />
             ))}
           </EmlakGlass>
 
@@ -726,7 +733,7 @@ async function EmlakDashboard({ sicakKpi, yanitBekleyen, portfoyToplam }: {
           {/* Ali assistant card */}
           <EmlakGlass style={{ padding: '22px 20px', textAlign: 'center' }}>
             <div style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase', color: ET.greenD }}>
-              Ali Asistanın
+              {t('dash.aliYourAssistant')}
             </div>
             <div style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-0.02em', marginTop: 4, lineHeight: 1, color: ET.ink }}>
               Ali
@@ -748,11 +755,11 @@ async function EmlakDashboard({ sicakKpi, yanitBekleyen, portfoyToplam }: {
               padding: '7px 16px', borderRadius: 999,
             }}>
               <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4fdc7a', boxShadow: '0 0 0 3px rgba(79,220,122,.25)', display: 'block' }} />
-              Çevrimiçi
+              {t('dash.online')}
             </div>
             {/* Message */}
             <div style={{ fontSize: 13.5, fontWeight: 600, color: ET.body, lineHeight: 1.5, marginTop: 16 }}>
-              Portföy analizi hazır. Sıcak lead&apos;lerin teklif aşamasında — önce onlara odaklanmanı öneriyorum.
+              {t('dash.aliMessageEmlak')}
             </div>
             {/* CTA — Ali Sohbet drawer'ını açar */}
             <AliChatLauncher />
@@ -762,21 +769,21 @@ async function EmlakDashboard({ sicakKpi, yanitBekleyen, portfoyToplam }: {
           <EmlakGlass style={{ overflow: 'hidden' }}>
             {/* Card header */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 9, padding: '16px 18px 13px' }}>
-              <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: '-0.01em', color: ET.ink }}>Hızlı Filtreler</span>
-              <span style={{ marginLeft: 'auto', fontSize: 11.5, fontWeight: 700, color: ET.muted }}>Lead havuzu</span>
+              <span style={{ fontSize: 14, fontWeight: 800, letterSpacing: '-0.01em', color: ET.ink }}>{t('dash.quickFilters')}</span>
+              <span style={{ marginLeft: 'auto', fontSize: 11.5, fontWeight: 700, color: ET.muted }}>{t('dash.leadPool')}</span>
             </div>
             <EmlakFilter variant="hot"
               iconPath='<path d="M12 3c1 3-2 4-2 7a3 3 0 0 0 6 .3c.8 1 1 2 1 3a5 5 0 1 1-10 0c0-4 3-5 5-10.3z"/>'
-              label="Sıcak Lead'ler" sub="Skor ≥ 8" count={sicakKpi} />
+              label={t('dash.hotLeads')} sub={t('dash.scoreGte8')} count={sicakKpi} />
             <EmlakFilter variant="appt"
               iconPath='<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/>'
-              label="Randevular" sub="Önümüzdeki 7 gün" count={6} />
+              label={t('dash.appointments')} sub={t('dash.next7Days')} count={6} />
             <EmlakFilter variant="wait"
               iconPath='<circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/>'
-              label="Yanıt Bekleyen" sub="Teklif gönderildi" count={yanitBekleyen} />
+              label={t('dash.awaitingResponse')} sub={t('dash.offerSent')} count={yanitBekleyen} />
             <EmlakFilter variant="new"
               iconPath='<path d="M12 5v14M5 12h14"/>'
-              label="Yeni Lead'ler" sub="Son 24 saat" count={11} />
+              label={t('dash.newLeads')} sub={t('dash.last24Hours')} count={11} />
           </EmlakGlass>
 
         </aside>
@@ -796,6 +803,8 @@ export default async function DashboardPage() {
   ])
   if (!profil) redirect('/login')
   if (!cfg) redirect('/login')
+
+  const { t, locale } = await getServerT()
 
   const isEmlak = cfg.id === 'emlak_demo'
   const isBireysel = isEmlak && segment === 'bireysel'
@@ -832,7 +841,7 @@ export default async function DashboardPage() {
   let portfoySub: string | undefined
   if (isBireysel) {
     portfoyToplam = BIREYSEL_MUSTERILER.length
-    portfoySub = 'Örnek müşteri verisi'
+    portfoySub = t('dash.sampleCustomerData')
   } else if (!d) {
     portfoyToplam = 0
   } else if (showTeam) {
@@ -886,17 +895,17 @@ export default async function DashboardPage() {
   const uyariKalemSayisi = isEmlak ? BUGUNUN_HAMLELERI.filter(h => h.sicaklik === 'cold').length : 2
 
   const heroStats: Array<{ n: string; l: string; Icon: React.ElementType }> = [
-    { n: oneriKalemSayisi.toString(), l: 'Öneri',  Icon: MessageCircle },
-    { n: uyariKalemSayisi.toString(), l: 'Uyarı',  Icon: Bell          },
-    { n: fmt(sicakKpi),               l: 'Fırsat', Icon: TrendingUp     },
+    { n: oneriKalemSayisi.toString(), l: t('dash.suggestionLabel'),  Icon: MessageCircle },
+    { n: uyariKalemSayisi.toString(), l: t('dash.warningLabel'),     Icon: Bell          },
+    { n: fmt(sicakKpi, locale),       l: t('dash.opportunityLabel'), Icon: TrendingUp     },
   ]
 
   const kisaYollar: Array<{ Icon: React.ElementType; label: string }> = [
-    { Icon: FileText,      label: 'Yeni Teklif Oluştur'  },
-    { Icon: UserPlus,      label: 'Müşteri Ekle'          },
-    { Icon: Upload,        label: 'Belge Yükle'           },
-    { Icon: Bell,          label: 'Hatırlatma Oluştur'   },
-    { Icon: ClipboardList, label: 'Rapor Oluştur'         },
+    { Icon: FileText,      label: t('dash.createNewOffer')  },
+    { Icon: UserPlus,      label: t('dash.addCustomer')     },
+    { Icon: Upload,        label: t('dash.uploadDocument')  },
+    { Icon: Bell,          label: t('dash.createReminder')  },
+    { Icon: ClipboardList, label: t('dash.createReport')    },
   ]
 
   const heroBg = isEmlak
@@ -933,17 +942,17 @@ export default async function DashboardPage() {
           />
           <div>
             <h2 className="text-[19px] font-black tracking-[-0.01em]">
-              Ali bugün senin için çalıştı.
+              {t('dash.aliWorkedTitle')}
             </h2>
             <p className="mt-[5px] text-[15px] text-white/90">
-              Kaçırmaman gereken{' '}
-              <span className="font-black">{isEmlak ? BUGUNUN_HAMLELERI.length : fmt(sicakKpi)}</span> kritik gelişme var.
+              {t('dash.dontMissPrefix')}{' '}
+              <span className="font-black">{isEmlak ? BUGUNUN_HAMLELERI.length : fmt(sicakKpi, locale)}</span>{t('dash.dontMissSuffix')}
             </p>
             <button
               disabled
               className="mt-[14px] h-[34px] rounded-[10px] border border-white/25 bg-white/5 px-[18px] text-[13px] font-bold cursor-not-allowed"
             >
-              💬 Ali ile sohbet et
+              💬 {t('dash.chatWithAli')}
             </button>
           </div>
         </div>
@@ -968,9 +977,9 @@ export default async function DashboardPage() {
       {/* ── Örnek veri banner (bireysel segment) ──────────── */}
       {isBireysel && (
         <div className="flex items-center gap-[10px] rounded-[12px] border border-amber-200 bg-amber-50 px-[16px] py-[10px]">
-          <span className="text-[13px] font-bold text-amber-700">Örnek veri</span>
+          <span className="text-[13px] font-bold text-amber-700">{t('dash.sampleData')}</span>
           <span className="text-[12px] text-amber-600 flex-1">
-            Bireysel segment — tüm veriler yerel fixture&apos;dan geliyor. Airtable&apos;a bağlanılmıyor.
+            {t('dash.sampleDataDesc')}
           </span>
         </div>
       )}
@@ -983,10 +992,10 @@ export default async function DashboardPage() {
 
           {/* KPI 4'lü Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-[14px]">
-            <KpiCard icon={Building2}     tone="chart"  label={isEmlak ? 'Aktif Müşteri' : 'Toplam Portföy'}   value={fmt(portfoyToplam)} sub={portfoySub} />
-            <KpiCard icon={Flame}         tone="red"    label={isEmlak ? 'İlgi Puanı Yüksek' : 'Sıcak Fırsatlar'} value={fmt(sicakKpi)} sub={isEmlak ? 'Skor ≥ 7 müşteri' : 'Skor ≥ 7 firma'} />
-            <KpiCard icon={MessageCircle} tone="violet" label={isEmlak ? 'Yanıt Bekleyen' : 'Yanıt Bekleyen'}   value={fmt(counts.yanitBekleyen)} sub={isEmlak ? 'Randevu bekleniyor' : 'Pipeline: Yanıt Alındı'} />
-            <KpiCard icon={Wallet}        tone="bordo"  label={isEmlak ? 'Bu Ay Kazanım' : 'Bu Ay Komisyon'}    yakinda />
+            <KpiCard icon={Building2}     tone="chart"  label={isEmlak ? t('dash.activeCustomers') : t('dash.totalPortfolio')}   value={fmt(portfoyToplam, locale)} sub={portfoySub} t={t} />
+            <KpiCard icon={Flame}         tone="red"    label={isEmlak ? t('dash.highInterestScore') : t('dash.hotOpportunities')} value={fmt(sicakKpi, locale)} sub={isEmlak ? t('dash.scoreGte7Customers') : t('dash.scoreGte7Companies')} t={t} />
+            <KpiCard icon={MessageCircle} tone="violet" label={t('dash.awaitingResponse')}   value={fmt(counts.yanitBekleyen, locale)} sub={isEmlak ? t('dash.awaitingAppointment') : t('dash.pipelineResponseReceived')} t={t} />
+            <KpiCard icon={Wallet}        tone="bordo"  label={isEmlak ? t('dash.thisMonthGain') : t('dash.thisMonthCommission')}    yakinda t={t} />
           </div>
 
           {/* ── PANEL: Bugünün Hamleleri (emlak-only) ──────────── */}
@@ -1001,14 +1010,14 @@ export default async function DashboardPage() {
                     <Home size={16} className="text-white" />
                   </div>
                   <div>
-                    <h2 className="text-[17px] font-black" style={{ color: E.text }}>Panel</h2>
-                    <p className="text-[11px] text-slate-400">Bugünün Hamleleri</p>
+                    <h2 className="text-[17px] font-black" style={{ color: E.text }}>{t('dash.panelHeading')}</h2>
+                    <p className="text-[11px] text-slate-400">{t('dash.todaysMoves')}</p>
                   </div>
                   <span
                     className="ml-[6px] rounded-full px-[10px] py-[3px] text-[11px] font-bold"
                     style={{ background: E.surface, color: E.green2 }}
                   >
-                    {BUGUNUN_HAMLELERI.length} hareket
+                    {t('dash.movesCount').replace('{n}', String(BUGUNUN_HAMLELERI.length))}
                   </span>
                 </div>
                 <Link
@@ -1016,7 +1025,7 @@ export default async function DashboardPage() {
                   className="text-[12px] font-bold"
                   style={{ color: E.green2 }}
                 >
-                  Satış süreci →
+                  {t('dash.salesProcess')} →
                 </Link>
               </div>
               <div className="space-y-[10px]">
@@ -1033,28 +1042,28 @@ export default async function DashboardPage() {
               <section className="rounded-[22px] border bg-white p-[18px] shadow-sm" style={{ borderColor: E.line }}>
                 <div className="flex items-center gap-[8px] mb-[14px]">
                   <Lightbulb size={18} style={{ color: E.green2 }} />
-                  <h3 className="text-[16px] font-black" style={{ color: E.text }}>Ali Öneriyor</h3>
+                  <h3 className="text-[16px] font-black" style={{ color: E.text }}>{t('dash.aliSuggests')}</h3>
                   <span className="ml-auto rounded-full px-[10px] py-[3px] text-[11px] font-bold" style={{ background: E.surface, color: E.green2 }}>
-                    {oneriKalemSayisi} öneri
+                    {t('dash.suggestionsCount').replace('{n}', String(oneriKalemSayisi))}
                   </span>
                 </div>
                 <div className="space-y-[8px]">
-                  <InsightTile icon={Home}       label="Stok Güncelleme"       description="2 mülk 30+ gün gösterim almadı"  count={2} href="/stok" />
-                  <InsightTile icon={MapPin}      label="Bölgesel Fırsat"        description="Kadıköy'de talep artışı tespit ettim" count={1} />
-                  <InsightTile icon={TrendingUp}  label="Fiyat Revizyonu Öner"  description="3 mülk piyasanın üzerinde fiyatlanmış" count={3} />
+                  <InsightTile icon={Home}       label={t('dash.stockUpdate')}       description={t('dash.stockUpdateDesc')}  count={2} href="/stok" />
+                  <InsightTile icon={MapPin}      label={t('dash.regionalOpportunity')}        description={t('dash.regionalOpportunityDesc')} count={1} />
+                  <InsightTile icon={TrendingUp}  label={t('dash.priceRevision')}  description={t('dash.priceRevisionDesc')} count={3} />
                 </div>
               </section>
               <section className="rounded-[22px] border bg-white p-[18px] shadow-sm" style={{ borderColor: E.line }}>
                 <div className="flex items-center gap-[8px] mb-[14px]">
                   <AlertTriangle size={18} style={{ color: E.coral }} />
-                  <h3 className="text-[16px] font-black" style={{ color: E.text }}>Ali Uyarılar</h3>
+                  <h3 className="text-[16px] font-black" style={{ color: E.text }}>{t('dash.aliWarnings')}</h3>
                   <span className="ml-auto rounded-full px-[10px] py-[3px] text-[11px] font-bold" style={{ background: '#FFF0EC', color: E.coral }}>
-                    {uyariKalemSayisi} uyarı
+                    {t('dash.warningsCount').replace('{n}', String(uyariKalemSayisi))}
                   </span>
                 </div>
                 <div className="space-y-[8px]">
-                  <InsightTile icon={CalendarClock} label={`${fmt(counts.yanitBekleyen)} müşteri yanıt bekliyor`} description="48+ saattir iletişim yok"  count={counts.yanitBekleyen} />
-                  <InsightTile icon={Users}          label="Soğuk müşteriler"                                      description="7+ gün sessiz, harekete geç" count={uyariKalemSayisi} />
+                  <InsightTile icon={CalendarClock} label={t('dash.customersAwaiting').replace('{n}', fmt(counts.yanitBekleyen, locale))} description={t('dash.customersAwaitingDesc')}  count={counts.yanitBekleyen} />
+                  <InsightTile icon={Users}          label={t('dash.coldCustomers')}                                      description={t('dash.coldCustomersDesc')} count={uyariKalemSayisi} />
                 </div>
               </section>
             </div>
@@ -1066,41 +1075,45 @@ export default async function DashboardPage() {
             <section className="rounded-[15px] border bg-white p-[18px] shadow-sm" style={{ borderColor: C.line }}>
               <div className="mb-[15px] flex items-center gap-[8px]">
                 <Lightbulb size={19} style={{ color: C.violet }} />
-                <h3 className="text-[17px] font-black" style={{ color: C.text }}>Ali Öneriyor</h3>
+                <h3 className="text-[17px] font-black" style={{ color: C.text }}>{t('dash.aliSuggests')}</h3>
                 <span
                   className="ml-[8px] rounded-full px-[11px] py-[4px] text-[11px] font-bold"
                   style={{ background: C.lavender, color: C.violet }}
                 >
-                  {oneriKalemSayisi} yeni öneri
+                  {t('dash.newSuggestionsCount').replace('{n}', String(oneriKalemSayisi))}
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-[13px]">
                 <InsightCard
                   icon={Clock3}
                   count={counts.yenilemeriski}
-                  label="Yenileme Riski"
-                  description="30 gün içinde vadesi dolan, skor < 5"
+                  label={t('dash.renewalRisk')}
+                  description={t('dash.renewalRiskDesc')}
                   hrefYakinda
+                  t={t} locale={locale}
                 />
                 <InsightCard
                   icon={Heart}
                   count={counts.crossSellUygun}
-                  label="Çapraz Satış"
-                  description="Cross-sell fırsatı işaretlenmiş"
+                  label={t('dash.crossSell')}
+                  description={t('dash.crossSellDesc')}
                   hrefYakinda
+                  t={t} locale={locale}
                 />
                 <InsightCard
                   icon={Bell}
                   count={counts.teklifSessiz}
-                  label="Teklif Sessiz"
-                  description="14+ gün iletişim yok, Teklif aşaması"
+                  label={t('dash.offerSilent')}
+                  description={t('dash.offerSilentDesc')}
                   href="/satis-sureci"
+                  t={t} locale={locale}
                 />
                 <InsightCard
                   icon={Gift}
-                  label="Sezonsal Kampanya"
-                  description="Allianz & diğer kampanya önerileri"
+                  label={t('dash.seasonalCampaign')}
+                  description={t('dash.seasonalCampaignDesc')}
                   yakinda
+                  t={t} locale={locale}
                 />
               </div>
             </section>
@@ -1109,26 +1122,28 @@ export default async function DashboardPage() {
               <div className="mb-[15px] flex items-center justify-between">
                 <div className="flex items-center gap-[8px]">
                   <AlertTriangle size={19} className="text-red-500" />
-                  <h3 className="text-[17px] font-black" style={{ color: C.text }}>Ali Uyarılar</h3>
+                  <h3 className="text-[17px] font-black" style={{ color: C.text }}>{t('dash.aliWarnings')}</h3>
                 </div>
                 <span
                   className="rounded-full px-[11px] py-[4px] text-[11px] font-bold"
                   style={{ background: '#FFF0F3', color: '#FF445F' }}
                 >
-                  {uyariKalemSayisi} uyarı
+                  {t('dash.warningsCount').replace('{n}', String(uyariKalemSayisi))}
                 </span>
               </div>
               <InsightRow
                 icon={Users}
-                label={`${fmt(counts.sessizlesenler)} firma 30+ gün sessiz`}
+                label={t('dash.companiesSilent30').replace('{n}', fmt(counts.sessizlesenler, locale))}
                 count={counts.sessizlesenler}
                 iconColor="#FF445F"
+                locale={locale}
               />
               <InsightRow
                 icon={CalendarClock}
-                label={`${fmt(counts.yenilemeriski)} firma yenileme riskinde`}
+                label={t('dash.companiesRenewalRisk').replace('{n}', fmt(counts.yenilemeriski, locale))}
                 count={counts.yenilemeriski}
                 iconColor="#DC2626"
+                locale={locale}
               />
               <div
                 className="flex items-center gap-[13px] py-[13px]"
@@ -1137,9 +1152,9 @@ export default async function DashboardPage() {
                 <div className="h-[42px] w-[42px] rounded-full bg-gray-50 grid place-items-center shrink-0">
                   <ClipboardList size={18} className="text-gray-400" />
                 </div>
-                <p className="flex-1 text-[13px] font-black text-gray-400">Eksik belge takibi</p>
+                <p className="flex-1 text-[13px] font-black text-gray-400">{t('dash.missingDocTracking')}</p>
                 <span className="rounded-full bg-gray-100 px-[10px] py-[4px] text-[11px] font-medium text-gray-400">
-                  Yakında
+                  {t('dash.comingSoon')}
                 </span>
               </div>
             </section>
@@ -1152,20 +1167,21 @@ export default async function DashboardPage() {
               elementer={d?.brans_dagilimi.elementer ?? 0}
               acibadem={d?.brans_dagilimi.acibadem ?? 0}
               toplam={d?.firma_toplam ?? 0}
+              t={t} locale={locale}
             />
             <div className="rounded-[15px] border bg-white p-[18px] shadow-sm" style={{ borderColor: C.line }}>
               <p className="font-black text-[15px] mb-[16px]" style={{ color: C.text }}>
-                Yaklaşan Yenilemeler
+                {t('dash.upcomingRenewals')}
               </p>
               {d ? (
                 <>
-                  <VadeRow label={`Bu ay (${d.vade_takvimi.bu_ay.ay})`} sayi={d.vade_takvimi.bu_ay.sayi} hot={d.vade_takvimi.bu_ay.hot} temsilciSayilari={showTeam ? vadeSayilari(d.vade_takvimi.bu_ay, cfg) : undefined} showTemsilci={showTeam} />
-                  <VadeRow label="30 gün içinde" sayi={d.vade_takvimi.vade_30.sayi} hot={d.vade_takvimi.vade_30.hot} temsilciSayilari={showTeam ? vadeSayilari(d.vade_takvimi.vade_30, cfg) : undefined} showTemsilci={showTeam} />
-                  <VadeRow label="60 gün içinde" sayi={d.vade_takvimi.vade_60.sayi} hot={d.vade_takvimi.vade_60.hot} temsilciSayilari={showTeam ? vadeSayilari(d.vade_takvimi.vade_60, cfg) : undefined} showTemsilci={showTeam} />
-                  <VadeRow label="90 gün içinde" sayi={d.vade_takvimi.vade_90.sayi} hot={d.vade_takvimi.vade_90.hot} temsilciSayilari={showTeam ? vadeSayilari(d.vade_takvimi.vade_90, cfg) : undefined} showTemsilci={showTeam} />
+                  <VadeRow label={`${t('dash.thisMonth')} (${d.vade_takvimi.bu_ay.ay})`} sayi={d.vade_takvimi.bu_ay.sayi} hot={d.vade_takvimi.bu_ay.hot} temsilciSayilari={showTeam ? vadeSayilari(d.vade_takvimi.bu_ay, cfg) : undefined} showTemsilci={showTeam} t={t} locale={locale} />
+                  <VadeRow label={t('dash.within30Days')} sayi={d.vade_takvimi.vade_30.sayi} hot={d.vade_takvimi.vade_30.hot} temsilciSayilari={showTeam ? vadeSayilari(d.vade_takvimi.vade_30, cfg) : undefined} showTemsilci={showTeam} t={t} locale={locale} />
+                  <VadeRow label={t('dash.within60Days')} sayi={d.vade_takvimi.vade_60.sayi} hot={d.vade_takvimi.vade_60.hot} temsilciSayilari={showTeam ? vadeSayilari(d.vade_takvimi.vade_60, cfg) : undefined} showTemsilci={showTeam} t={t} locale={locale} />
+                  <VadeRow label={t('dash.within90Days')} sayi={d.vade_takvimi.vade_90.sayi} hot={d.vade_takvimi.vade_90.hot} temsilciSayilari={showTeam ? vadeSayilari(d.vade_takvimi.vade_90, cfg) : undefined} showTemsilci={showTeam} t={t} locale={locale} />
                 </>
               ) : (
-                <p className="text-[13px] text-gray-400 py-6 text-center">Veri alınamadı</p>
+                <p className="text-[13px] text-gray-400 py-6 text-center">{t('dash.dataUnavailable')}</p>
               )}
             </div>
           </div>}
@@ -1174,9 +1190,9 @@ export default async function DashboardPage() {
           {filtrelenmis.length > 0 && (
             <div className="rounded-[15px] border bg-white p-[18px] shadow-sm" style={{ borderColor: C.line }}>
               <div className="flex items-center justify-between mb-[15px]">
-                <p className="font-black text-[15px]" style={{ color: C.text }}>Sıcak Fırsatlar</p>
+                <p className="font-black text-[15px]" style={{ color: C.text }}>{t('dash.hotOpportunities')}</p>
                 <Link href="/musteriler" className="text-[13px] font-bold" style={{ color: C.bordo }}>
-                  Tümünü gör →
+                  {t('dash.viewAll')} →
                 </Link>
               </div>
               {filtrelenmis.slice(0, 8).map((item, i) => (
@@ -1187,8 +1203,8 @@ export default async function DashboardPage() {
 
           {/* Son Aktiviteler */}
           <div className="rounded-[15px] border bg-white p-[18px] shadow-sm" style={{ borderColor: C.line }}>
-            <p className="font-black text-[15px] mb-[14px]" style={{ color: C.text }}>Son Aktiviteler</p>
-            <p className="text-[13px] text-slate-500 py-4 text-center">Henüz aktivite yok</p>
+            <p className="font-black text-[15px] mb-[14px]" style={{ color: C.text }}>{t('dash.recentActivities')}</p>
+            <p className="text-[13px] text-slate-500 py-4 text-center">{t('dash.noActivityYet')}</p>
           </div>
 
         </div>
@@ -1202,7 +1218,7 @@ export default async function DashboardPage() {
             style={{ borderColor: C.line }}
           >
             <div className="text-[11px] tracking-[.17em] font-black" style={{ color: C.bordo }}>
-              ALİ ASİSTANIN
+              {t('dash.aliYourAssistantCaps')}
             </div>
             <h2 className="mt-[8px] text-[30px] font-black leading-none" style={{ color: C.text }}>Ali</h2>
             <div className="mt-[18px] flex justify-center">
@@ -1229,20 +1245,20 @@ export default async function DashboardPage() {
                 style={{ background: C.navy }}
               >
                 <span className="h-[8px] w-[8px] rounded-full bg-emerald-400" />
-                Çevrimiçi
+                {t('dash.online')}
               </div>
             </div>
             <p className="mt-[16px] text-[14px] leading-[22px] text-slate-600">
               {d
-                ? `${fmt(sicakKpi)} sıcak fırsat ve ${fmt(counts.sessizlesenler)} sessizleşen firma tespit ettim.`
-                : 'Portföy analizi bekleniyor.'}
+                ? t('dash.aliDetected').replace('{hot}', fmt(sicakKpi, locale)).replace('{silent}', fmt(counts.sessizlesenler, locale))
+                : t('dash.portfolioAnalysisPending')}
             </p>
             <button
               disabled
               className="mt-[18px] h-[42px] w-full rounded-[12px] text-[14px] font-black text-white cursor-not-allowed opacity-80"
               style={{ background: C.bordo }}
             >
-              Ali ile sohbet et →
+              {t('dash.chatWithAli')} →
             </button>
           </section>
 
@@ -1251,12 +1267,12 @@ export default async function DashboardPage() {
             className="rounded-[18px] border bg-white p-[18px] shadow-sm"
             style={{ borderColor: C.line }}
           >
-            <p className="font-black text-[15px] mb-[17px]" style={{ color: C.text }}>Hızlı Filtreler</p>
+            <p className="font-black text-[15px] mb-[17px]" style={{ color: C.text }}>{t('dash.quickFilters')}</p>
             <div className="space-y-[10px]">
-              <HizliYolCard href="/musteriler?oncelik=Y%C3%BCksek" icon={Flame}         label="Sıcak Firmalar"  count={sicakKpi}                    countColor="#FF445F" />
-              <HizliYolCard href="/musteriler?bugun=true"          icon={PhoneCall}     label="Bugün Aranacak"  count={counts.bugunAranacak}         countColor={C.violet} />
-              <HizliYolCard href="/musteriler"                     icon={CalendarDays}  label="Vadesi Yaklaşan" count={d?.vade_takvimi.vade_30.sayi} countColor={C.violet} noLink />
-              <HizliYolCard href="/musteriler"                     icon={AlertTriangle} label="Riskli Firmalar" count={counts.yenilemeriski}         countColor="#DC2626"  noLink />
+              <HizliYolCard href="/musteriler?oncelik=Y%C3%BCksek" icon={Flame}         label={t('dash.hotCompanies')}  count={sicakKpi}                    countColor="#FF445F" t={t} locale={locale} />
+              <HizliYolCard href="/musteriler?bugun=true"          icon={PhoneCall}     label={t('dash.toCallToday')}  count={counts.bugunAranacak}         countColor={C.violet} t={t} locale={locale} />
+              <HizliYolCard href="/musteriler"                     icon={CalendarDays}  label={t('dash.dueSoon')} count={d?.vade_takvimi.vade_30.sayi} countColor={C.violet} noLink t={t} locale={locale} />
+              <HizliYolCard href="/musteriler"                     icon={AlertTriangle} label={t('dash.riskyCompanies')} count={counts.yenilemeriski}         countColor="#DC2626"  noLink t={t} locale={locale} />
             </div>
           </section>
 
@@ -1265,7 +1281,7 @@ export default async function DashboardPage() {
             className="rounded-[18px] border bg-white p-[18px] shadow-sm"
             style={{ borderColor: C.line }}
           >
-            <p className="font-black text-[15px] mb-[17px]" style={{ color: C.text }}>Kısa Yollar</p>
+            <p className="font-black text-[15px] mb-[17px]" style={{ color: C.text }}>{t('dash.shortcuts')}</p>
             <div className="space-y-[17px]">
               {kisaYollar.map(({ Icon, label }) => (
                 <div
@@ -1298,7 +1314,7 @@ export default async function DashboardPage() {
                 }}
               />
               <p className="mt-[24px] text-[15px] leading-[22px] text-white/90">
-                Bağımsız sigortacılığın yeni nesli.
+                {t('dash.brandTagline')}
               </p>
             </div>
           </section>

@@ -9,9 +9,19 @@ import {
 import { FileText, ExternalLink, Phone, CalendarCheck } from 'lucide-react'
 import { type MusterilerIzin } from '@/lib/musteriler-izin'
 import { type TemsilciAktivite } from '@/app/api/raporlar/bugun-aktivite/route'
+import { useT } from '@/lib/i18n/context'
 import { RaporModal } from './rapor-modal'
 import { Bolum2Ekip } from './bolum2-ekip'
 import { Bolum3Temsilci } from './bolum3-temsilci'
+
+const AY_FULL_KEYS = [
+  'rep.monFull0','rep.monFull1','rep.monFull2','rep.monFull3','rep.monFull4','rep.monFull5',
+  'rep.monFull6','rep.monFull7','rep.monFull8','rep.monFull9','rep.monFull10','rep.monFull11',
+] as const
+const AY_SHORT_KEYS = [
+  'rep.monShort0','rep.monShort1','rep.monShort2','rep.monShort3','rep.monShort4','rep.monShort5',
+  'rep.monShort6','rep.monShort7','rep.monShort8','rep.monShort9','rep.monShort10','rep.monShort11',
+] as const
 
 // ── Bu Hafta Aktivite — mevcut mor palette korunuyor ─────────────────────────
 const C_PRIMARY = '#5B47E0'
@@ -76,16 +86,12 @@ const PIPELINE_BG: Record<string, string> = {
   'Kaybedildi':   '#FFF1F2',
 }
 const PIPELINE_LABEL: Record<string, string> = {
-  'Kazanıldı': 'Satış / Kazanım',
+  'Kazanıldı': 'rep.satisKazanim',
 }
 
 // ── Türkçe ay ─────────────────────────────────────────────────────────────────
 const TR_AY = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık']
 const TR_GUN = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi']
-const AY_KISA: Record<string, string> = {
-  Ocak:'Oca',Şubat:'Şub',Mart:'Mar',Nisan:'Nis',Mayıs:'May',Haziran:'Haz',
-  Temmuz:'Tem',Ağustos:'Ağu',Eylül:'Eyl',Ekim:'Eki',Kasım:'Kas',Aralık:'Ara',
-}
 const BUGUN_AY_IDX = (new Date()).getMonth()
 
 function isGecmisAy(ay: string): boolean {
@@ -98,16 +104,16 @@ function fmt(n: number): string {
 }
 
 // ── Hafta aralığı başlık ──────────────────────────────────────────────────────
-function getWeekLabel(): string {
+function getWeekLabel(AY: string[]): string {
   const now = new Date()
   const day = now.getDay()
   const diffToMonday = day === 0 ? -6 : 1 - day
   const mon = new Date(now)
   mon.setDate(now.getDate() + diffToMonday)
   if (mon.getMonth() === now.getMonth()) {
-    return `${mon.getDate()}-${now.getDate()} ${TR_AY[now.getMonth()]} ${now.getFullYear()}`
+    return `${mon.getDate()}-${now.getDate()} ${AY[now.getMonth()]} ${now.getFullYear()}`
   }
-  return `${mon.getDate()} ${TR_AY[mon.getMonth()]} – ${now.getDate()} ${TR_AY[now.getMonth()]} ${now.getFullYear()}`
+  return `${mon.getDate()} ${AY[mon.getMonth()]} – ${now.getDate()} ${AY[now.getMonth()]} ${now.getFullYear()}`
 }
 
 // ── Tip tanımları ─────────────────────────────────────────────────────────────
@@ -134,14 +140,14 @@ interface ArsivRecord {
 }
 
 // ── Formatlar ─────────────────────────────────────────────────────────────────
-function formatHafta(weekStart: string, today: string): string {
+function formatHafta(weekStart: string, today: string, AY: string[]): string {
   const s = new Date(weekStart + 'T00:00:00')
   const e = new Date(today   + 'T00:00:00')
-  if (weekStart === today) return `${s.getDate()} ${TR_AY[s.getMonth()]} ${s.getFullYear()}`
+  if (weekStart === today) return `${s.getDate()} ${AY[s.getMonth()]} ${s.getFullYear()}`
   if (s.getMonth() === e.getMonth()) {
-    return `${s.getDate()}-${e.getDate()} ${TR_AY[s.getMonth()]} ${s.getFullYear()}`
+    return `${s.getDate()}-${e.getDate()} ${AY[s.getMonth()]} ${s.getFullYear()}`
   }
-  return `${s.getDate()} ${TR_AY[s.getMonth()]} - ${e.getDate()} ${TR_AY[e.getMonth()]} ${e.getFullYear()}`
+  return `${s.getDate()} ${AY[s.getMonth()]} - ${e.getDate()} ${AY[e.getMonth()]} ${e.getFullYear()}`
 }
 
 function formatTarih(iso: string): string {
@@ -194,7 +200,8 @@ function DonutLegend({ items }: { items: { label: string; sayi: number; renk: st
 
 // ── a) Branş Dağılımı ────────────────────────────────────────────────────────
 function BransDonut({ data, loading }: { data: BransItem[]; loading: boolean }) {
-  if (loading || !data.length) return <Kart title="Branş dağılımı"><Skeleton /></Kart>
+  const tr = useT()
+  if (loading || !data.length) return <Kart title={tr('rep.bransDagilimi')}><Skeleton /></Kart>
   const total = data.reduce((s, d) => s + d.sayi, 0)
   const items = data.map((d, i) => ({
     label: d.ad,
@@ -203,7 +210,7 @@ function BransDonut({ data, loading }: { data: BransItem[]; loading: boolean }) 
     pct: total > 0 ? Math.round(d.sayi / total * 100) : 0,
   }))
   return (
-    <Kart title="Branş dağılımı">
+    <Kart title={tr('rep.bransDagilimi')}>
       <ResponsiveContainer width="100%" height={160}>
         <PieChart>
           <Pie data={data} dataKey="sayi" nameKey="ad" cx="50%" cy="50%" innerRadius={44} outerRadius={72}>
@@ -213,7 +220,7 @@ function BransDonut({ data, loading }: { data: BransItem[]; loading: boolean }) 
           </Pie>
           <Tooltip
             contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #E5E7EB' }}
-            formatter={(v) => [fmt(v as number), 'Firma']}
+            formatter={(v) => [fmt(v as number), tr('rep.firma')]}
           />
         </PieChart>
       </ResponsiveContainer>
@@ -224,7 +231,8 @@ function BransDonut({ data, loading }: { data: BransItem[]; loading: boolean }) 
 
 // ── b) Sektör Dağılımı ───────────────────────────────────────────────────────
 function SektorDonut({ data, loading }: { data?: SektorItem[]; loading: boolean }) {
-  if (loading || !data?.length) return <Kart title="Sektör dağılımı"><Skeleton /></Kart>
+  const tr = useT()
+  if (loading || !data?.length) return <Kart title={tr('rep.sektorDagilimi')}><Skeleton /></Kart>
   const total = data.reduce((s, d) => s + d.sayi, 0)
   const items = data.map((d, i) => ({
     label: d.ad,
@@ -233,7 +241,7 @@ function SektorDonut({ data, loading }: { data?: SektorItem[]; loading: boolean 
     pct: total > 0 ? Math.round(d.sayi / total * 100) : 0,
   }))
   return (
-    <Kart title="Sektör dağılımı">
+    <Kart title={tr('rep.sektorDagilimi')}>
       <ResponsiveContainer width="100%" height={160}>
         <PieChart>
           <Pie data={data} dataKey="sayi" nameKey="ad" cx="50%" cy="50%" innerRadius={44} outerRadius={72}>
@@ -243,7 +251,7 @@ function SektorDonut({ data, loading }: { data?: SektorItem[]; loading: boolean 
           </Pie>
           <Tooltip
             contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #E5E7EB' }}
-            formatter={(v) => [fmt(v as number), 'Firma']}
+            formatter={(v) => [fmt(v as number), tr('rep.firma')]}
           />
         </PieChart>
       </ResponsiveContainer>
@@ -254,16 +262,19 @@ function SektorDonut({ data, loading }: { data?: SektorItem[]; loading: boolean 
 
 // ── c) Vade Takvimi ──────────────────────────────────────────────────────────
 function VadeBar({ data, loading }: { data: VadeItem[]; loading: boolean }) {
+  const tr = useT()
   if (loading || !data.length) {
     return (
-      <Kart title="Vade takvimi" right="Sağlık poliçesi yenileme dönemleri">
+      <Kart title={tr('rep.vadeTakvimi')} right={tr('rep.vadeSubtitle')}>
         <Skeleton />
       </Kart>
     )
   }
+  const AY_KISA: Record<string, string> = {}
+  TR_AY.forEach((m, i) => { AY_KISA[m] = tr(AY_SHORT_KEYS[i]) })
   const mapped = data.map(v => ({ ...v, ay: AY_KISA[v.ay] ?? v.ay, _ay: v.ay }))
   return (
-    <Kart title="Vade takvimi" right="Sağlık poliçesi yenileme dönemleri">
+    <Kart title={tr('rep.vadeTakvimi')} right={tr('rep.vadeSubtitle')}>
       <ResponsiveContainer width="100%" height={170}>
         <BarChart data={mapped} margin={{ top: 18, right: 4, left: 4, bottom: 0 }}>
           <XAxis
@@ -275,7 +286,7 @@ function VadeBar({ data, loading }: { data: VadeItem[]; loading: boolean }) {
           <YAxis hide />
           <Tooltip
             contentStyle={{ fontSize: 12, borderRadius: 8, border: '1px solid #E5E7EB' }}
-            formatter={(v) => [fmt(v as number), 'Firma']}
+            formatter={(v) => [fmt(v as number), tr('rep.firma')]}
             labelFormatter={(_, payload) => payload?.[0]?.payload?._ay ?? ''}
           />
           <Bar dataKey="sayi" radius={[3, 3, 0, 0]}>
@@ -300,9 +311,10 @@ function PipelineRow({
 }: {
   asama: string; sayi: number; pct: number
 }) {
+  const tr = useT()
   const renk = PIPELINE_RENK[asama] ?? '#9CA3AF'
   const bg   = PIPELINE_BG[asama]   ?? '#F3F4F6'
-  const label = PIPELINE_LABEL[asama] ?? asama
+  const label = PIPELINE_LABEL[asama] ? tr(PIPELINE_LABEL[asama]) : asama
   const showPct = pct >= 2
 
   return (
@@ -330,14 +342,15 @@ function PipelineRow({
 }
 
 function PipelineKart({ data, toplam, loading }: { data: PipelineItem[]; toplam?: number; loading: boolean }) {
+  const tr = useT()
   if (loading || !data.length) {
-    return <Kart title="Pipeline aşaması"><Skeleton /></Kart>
+    return <Kart title={tr('rep.pipelineAsamasi')}><Skeleton /></Kart>
   }
   const total = data.reduce((s, d) => s + d.sayi, 0)
   return (
     <Kart
-      title="Pipeline aşaması"
-      right={toplam ? `${fmt(toplam)} aktif firma` : undefined}
+      title={tr('rep.pipelineAsamasi')}
+      right={toplam ? tr('rep.aktifFirma').replace('{n}', fmt(toplam)) : undefined}
     >
       <div className="space-y-0">
         {data.map(({ asama, sayi }) => (
@@ -355,7 +368,8 @@ function PipelineKart({ data, toplam, loading }: { data: PipelineItem[]; toplam?
 
 // ── e) Sıcaklık Skoru ────────────────────────────────────────────────────────
 function SicaklikKart({ data, toplam, loading }: { data?: SicaklikData; toplam?: number; loading: boolean }) {
-  if (loading || !data) return <Kart title="Sıcaklık skoru" subtitle="Portföy dağılımı"><Skeleton h="h-20" /></Kart>
+  const tr = useT()
+  if (loading || !data) return <Kart title={tr('rep.sicaklikSkoru')} subtitle={tr('rep.portfoyDagilimi')}><Skeleton h="h-20" /></Kart>
   const total = toplam ?? (data.hot + data.warm + data.cold)
   const tiers = [
     { key: 'hot',  label: 'HOT',  count: data.hot,  renk: '#8e2433', barBg: '#F5E8EA' },
@@ -363,7 +377,7 @@ function SicaklikKart({ data, toplam, loading }: { data?: SicaklikData; toplam?:
     { key: 'cold', label: 'COLD', count: data.cold, renk: '#5B38E8', barBg: '#F0EEFF' },
   ]
   return (
-    <Kart title="Sıcaklık skoru" subtitle="Portföy dağılımı">
+    <Kart title={tr('rep.sicaklikSkoru')} subtitle={tr('rep.portfoyDagilimi')}>
       <div className="grid grid-cols-3 divide-x divide-gray-100">
         {tiers.map(({ key, label, count, renk, barBg }) => {
           const pct = total > 0 ? Math.round(count / total * 100) : 0
@@ -393,6 +407,7 @@ function SicaklikKart({ data, toplam, loading }: { data?: SicaklikData; toplam?:
 
 // ── Raporlar Hero Banner ──────────────────────────────────────────────────────
 function RaporlarHero({ weekLabel }: { weekLabel: string }) {
+  const tr = useT()
   return (
     <section
       className="relative h-[150px] rounded-[16px] overflow-hidden text-white flex items-center px-[31px] shadow-sm"
@@ -421,13 +436,13 @@ function RaporlarHero({ weekLabel }: { weekLabel: string }) {
         </div>
         <div>
           <div className="text-[11px] text-white/70 font-semibold uppercase tracking-[.12em]">
-            📊 Haftalık Raporlar
+            📊 {tr('rep.haftalikRaporlar')}
           </div>
           <h2 className="mt-[4px] text-[20px] font-black tracking-[-.02em]">
             {weekLabel}
           </h2>
           <p className="mt-[6px] text-[13px] text-white/80">
-            Ekip performansını ve portföy durumunu takip ediyorsunuz.
+            {tr('rep.heroSubtitle')}
           </p>
         </div>
       </div>
@@ -439,6 +454,8 @@ function RaporlarHero({ weekLabel }: { weekLabel: string }) {
 const HEDEF = 50
 
 function BugunAktiviteKart({ t, weekStart, tarih }: { t: TemsilciAktivite; weekStart: string; tarih: string }) {
+  const tr = useT()
+  const AY = AY_FULL_KEYS.map(k => tr(k))
   const bos = t.toplam === 0
   const hedefPct = Math.min(t.toplam / HEDEF * 100, 100)
 
@@ -454,30 +471,30 @@ function BugunAktiviteKart({ t, weekStart, tarih }: { t: TemsilciAktivite; weekS
           </span>
           <span className="text-sm font-semibold text-gray-800">{t.ad}</span>
         </div>
-        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wide">Bu Hafta</span>
+        <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wide">{tr('rep.buHafta')}</span>
       </div>
 
-      <div className="text-[10px] text-gray-400">{formatHafta(weekStart, tarih)}</div>
+      <div className="text-[10px] text-gray-400">{formatHafta(weekStart, tarih, AY)}</div>
 
       <div className="flex items-baseline gap-1">
         <span className="text-[32px] font-black leading-none" style={{ color: bos ? '#D1D5DB' : C_PRIMARY }}>
           {t.toplam}
         </span>
-        <span className="text-xs text-gray-400">aktivite</span>
+        <span className="text-xs text-gray-400">{tr('rep.aktivite')}</span>
       </div>
 
       {bos ? (
-        <p className="text-[11px] text-gray-400 italic">Henüz aktivite kaydı yok</p>
+        <p className="text-[11px] text-gray-400 italic">{tr('rep.henuzAktiviteYok')}</p>
       ) : (
         <>
           <div className="flex items-center gap-2">
             <Phone size={12} className="shrink-0" style={{ color: C_PRIMARY }} />
             <span className="text-[12px] font-bold" style={{ color: C_PRIMARY }}>
-              {t.kirilim['Ulaşıldı'] ?? 0} ulaşıldı
+              {tr('rep.ulasildiCount').replace('{n}', String(t.kirilim['Ulaşıldı'] ?? 0))}
             </span>
             {t.ulasma_yuzde !== null && (
               <span className="ml-auto text-[11px] font-bold" style={{ color: C_PRIMARY }}>
-                %{t.ulasma_yuzde} ulaşma
+                {tr('rep.ulasmaPct').replace('{n}', String(t.ulasma_yuzde))}
               </span>
             )}
           </div>
@@ -485,18 +502,18 @@ function BugunAktiviteKart({ t, weekStart, tarih }: { t: TemsilciAktivite; weekS
           <div className="flex items-center gap-2">
             <CalendarCheck size={12} className="text-[#10B981] shrink-0" />
             <span className="text-[12px] font-bold text-[#10B981]">
-              {t.randevu} randevu
+              {tr('rep.randevuCount').replace('{n}', String(t.randevu))}
             </span>
             {t.donusum_yuzde !== null && (
               <span className="ml-auto text-[11px] font-bold text-[#10B981]">
-                %{t.donusum_yuzde} dönüşüm
+                {tr('rep.donusumPct').replace('{n}', String(t.donusum_yuzde))}
               </span>
             )}
           </div>
 
           <div className="flex flex-col gap-1">
             <div className="flex items-center justify-between text-[10px] text-gray-400">
-              <span>Hedef</span>
+              <span>{tr('rep.hedef')}</span>
               <span>{Math.min(t.toplam, HEDEF)}/{HEDEF}</span>
             </div>
             <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
@@ -509,22 +526,22 @@ function BugunAktiviteKart({ t, weekStart, tarih }: { t: TemsilciAktivite; weekS
               />
             </div>
             {t.toplam >= HEDEF && (
-              <span className="text-[10px] text-[#10B981] font-medium">✓ Hedefe ulaşıldı</span>
+              <span className="text-[10px] text-[#10B981] font-medium">✓ {tr('rep.hedefeUlasildi')}</span>
             )}
           </div>
 
           <div className="grid grid-cols-3 gap-1.5">
             <div className="rounded-lg px-2 py-1.5 text-center bg-[#D1FAE5]">
               <p className="text-[11px] font-bold text-[#10B981]">{t.kirilim['Ulaşıldı'] ?? 0}</p>
-              <p className="text-[9px] text-[#10B981]">Ulaşıldı</p>
+              <p className="text-[9px] text-[#10B981]">{tr('rep.ulasildi')}</p>
             </div>
             <div className="rounded-lg px-2 py-1.5 text-center bg-[#FEF3C7]">
               <p className="text-[11px] font-bold text-[#F59E0B]">{t.kirilim['Cevap Yok'] ?? 0}</p>
-              <p className="text-[9px] text-[#F59E0B]">Cevap Yok</p>
+              <p className="text-[9px] text-[#F59E0B]">{tr('rep.cevapYok')}</p>
             </div>
             <div className="rounded-lg px-2 py-1.5 text-center bg-[#DBEAFE]">
               <p className="text-[11px] font-bold text-[#3B82F6]">{t.kirilim['Geri Aranacak'] ?? 0}</p>
-              <p className="text-[9px] text-[#3B82F6]">Geri Ara</p>
+              <p className="text-[9px] text-[#3B82F6]">{tr('rep.geriAra')}</p>
             </div>
           </div>
         </>
@@ -543,6 +560,7 @@ export function RaporlarClient({
   isBireysel?: boolean
   displayAdMap?: Record<string, string>
 }) {
+  const tr = useT()
   const [grafik, setGrafik] = useState<GrafikData | null>(null)
   const [grafikLoading, setGrafikLoading] = useState(!isBireysel)
   const [grafikError, setGrafikError] = useState<string | null>(null)
@@ -567,7 +585,7 @@ export function RaporlarClient({
     fetch('/api/raporlar/grafik')
       .then(r => r.json())
       .then(d => {
-        if (d.error) { setGrafikError('Grafikler yüklenemedi'); return }
+        if (d.error) { setGrafikError(tr('rep.grafikYuklenemedi')); return }
         const mapped = { ...d }
         if (mapped.temsilci) {
           mapped.temsilci = mapped.temsilci.map((item: TemsilciItem) => ({
@@ -577,7 +595,7 @@ export function RaporlarClient({
         }
         setGrafik(mapped)
       })
-      .catch(() => setGrafikError('Grafikler yüklenemedi'))
+      .catch(() => setGrafikError(tr('rep.grafikYuklenemedi')))
       .finally(() => setGrafikLoading(false))
   }, [isBireysel]) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -603,31 +621,31 @@ export function RaporlarClient({
     fetch('/api/raporlar/arsiv')
       .then(r => r.json())
       .then(d => {
-        if (d.error) { setArsivError('Arşiv yüklenemedi'); return }
+        if (d.error) { setArsivError(tr('rep.arsivYuklenemedi')); return }
         setArsiv(d.records ?? [])
       })
-      .catch(() => setArsivError('Arşiv yüklenemedi'))
+      .catch(() => setArsivError(tr('rep.arsivYuklenemedi')))
       .finally(() => setArsivLoading(false))
   }, [isBireysel]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const weekLabel = mounted ? getWeekLabel() : ''
+  const weekLabel = mounted ? getWeekLabel(AY_FULL_KEYS.map(k => tr(k))) : ''
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
 
       {/* ── Hero Banner (yönetici) / Bireysel başlık ────────────────── */}
       {!isBireysel
-        ? mounted && <RaporlarHero weekLabel={weekLabel || 'Bu Hafta'} />
+        ? mounted && <RaporlarHero weekLabel={weekLabel || tr('rep.buHafta')} />
         : (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h1 className="text-xl font-bold text-gray-900">Raporlar</h1>
+              <h1 className="text-xl font-bold text-gray-900">{tr('rep.title')}</h1>
               <span className="rounded-full border border-amber-200 bg-amber-50 px-[11px] py-[5px] text-[11px] font-bold text-amber-700">
-                Örnek veri
+                {tr('rep.ornekVeri')}
               </span>
             </div>
             <div className="rounded-[12px] border border-amber-200 bg-amber-50 px-[16px] py-[12px] text-[13px] text-amber-700">
-              Bireysel segmentte raporlar örnek verilerle gösterilmektedir.
+              {tr('rep.bireyselNotice')}
             </div>
           </div>
         )
@@ -640,11 +658,11 @@ export function RaporlarClient({
       <section className="space-y-4">
         <div>
           <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-            Bölüm 1 — Genel Dağılımlar
+            {tr('rep.bolum1')}
           </h2>
           <p className="text-[11px] text-gray-400 mt-0.5">
-            Total portföy
-            {grafik?.toplam ? ` · ${fmt(grafik.toplam)} firma` : ''}
+            {tr('rep.totalPortfoy')}
+            {grafik?.toplam ? ` · ${tr('rep.firmaCount').replace('{n}', fmt(grafik.toplam))}` : ''}
           </p>
         </div>
 
@@ -704,7 +722,7 @@ export function RaporlarClient({
       {izin.tip !== 'yönetici' && (
         <section className="space-y-3">
           <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-            Bu Hafta Aktivite
+            {tr('rep.buHaftaAktivite')}
           </h2>
           {bugunLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -725,7 +743,7 @@ export function RaporlarClient({
       {/* ── Rapor Arşivi ─────────────────────────────────────────────── */}
       <section>
         <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-3">
-          Rapor Arşivi
+          {tr('rep.raporArsivi')}
         </h2>
         <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
           {arsivLoading ? (
@@ -736,7 +754,7 @@ export function RaporlarClient({
             <div className="py-12 text-center text-sm text-red-500">{arsivError}</div>
           ) : arsiv.length === 0 ? (
             <div className="py-16 text-center">
-              <p className="text-sm text-gray-400">Henüz rapor yok</p>
+              <p className="text-sm text-gray-400">{tr('rep.henuzRaporYok')}</p>
             </div>
           ) : (
             arsiv.map((r, i) => (

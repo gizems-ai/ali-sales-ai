@@ -2,16 +2,18 @@ import { redirect } from 'next/navigation'
 import { getMusterilerIzni } from '@/lib/musteriler-izin'
 import { getTenantConfigFromRequest } from '@/lib/yetki'
 import { getSegment } from '@/lib/emlak-segment'
+import { getServerT } from '@/lib/i18n/server'
 import { RaporlarClient } from './_components/raporlar-client'
 import { EmlakRapor } from './_components/emlak-rapor'
 
 const E = { green1: '#0E5132', green2: '#1B7A47', text: '#071B3A' }
 
 export default async function RaporlarPage() {
-  const [izin, cfg, segment] = await Promise.all([
+  const [izin, cfg, segment, { t }] = await Promise.all([
     getMusterilerIzni(),
     getTenantConfigFromRequest(),
     getSegment(),
+    getServerT(),
   ])
   if (izin.tip === 'yok') redirect('/sign-in')
 
@@ -30,8 +32,8 @@ export default async function RaporlarPage() {
             <span className="text-[16px]">📊</span>
           </div>
           <div>
-            <h1 className="text-[20px] font-black" style={{ color: E.text }}>Raporlar</h1>
-            <p className="text-[12px] text-slate-400">Emlak · Tahmini ciro · Kaynak performansı · Komisyon</p>
+            <h1 className="text-[20px] font-black" style={{ color: E.text }}>{t('rep.title')}</h1>
+            <p className="text-[12px] text-slate-400">{t('rep.emlakSubtitle')}</p>
           </div>
         </div>
         <EmlakRapor />

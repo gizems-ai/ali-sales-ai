@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { type FirmaListeItem, type AirtableRecord, PIPELINE_ASAMALARI } from '@/lib/airtable'
 import { type MusterilerIzin } from '@/lib/musteriler-izin'
+import { useT } from '@/lib/i18n/context'
 
 interface Props {
   record: AirtableRecord<FirmaListeItem>
@@ -63,15 +64,15 @@ const PIPELINE_COLOR: Record<string, string> = Object.fromEntries(
   PIPELINE_ASAMALARI.map(a => [a.value, a.color])
 )
 
-function formatSonEtkilesim(dateStr?: string): string {
+function formatSonEtkilesim(dateStr: string | undefined, t: (key: string) => string): string {
   if (!dateStr) return '—'
   try {
     const d = new Date(dateStr)
     if (isNaN(d.getTime())) return dateStr
     const diff = Math.floor((Date.now() - d.getTime()) / 86_400_000)
-    if (diff === 0) return 'Bugün'
-    if (diff === 1) return 'Dün'
-    if (diff < 7) return `${diff} gün önce`
+    if (diff === 0) return t('cust.today')
+    if (diff === 1) return t('cust.yesterday')
+    if (diff < 7) return t('cust.daysAgo').replace('{n}', String(diff))
     return d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' })
   } catch {
     return dateStr
@@ -79,9 +80,10 @@ function formatSonEtkilesim(dateStr?: string): string {
 }
 
 function ScoreRing({ score }: { score: number }) {
+  const t = useT()
   const pct = Math.min(100, Math.max(0, score * 10))
   const color = score >= 7 ? C.bordo : score >= 4 ? C.violet : '#94A3B8'
-  const label = score >= 7 ? 'Sıcak' : score >= 4 ? 'Orta' : 'Soğuk'
+  const label = score >= 7 ? t('cust.scoreHot') : score >= 4 ? t('cust.scoreMid') : t('cust.scoreCold')
   return (
     <div className="flex items-center gap-[6px]">
       <div
@@ -146,13 +148,14 @@ const LINK_BTN = 'h-[31px] w-[31px] rounded-[10px] border grid place-items-cente
 const DEAD_BTN = 'h-[31px] w-[31px] rounded-[10px] border grid place-items-center opacity-30 cursor-not-allowed'
 
 function PhoneBtn({ tel }: { tel?: string }) {
+  const t = useT()
   if (!tel) return (
-    <span className={DEAD_BTN} style={{ borderColor: C.line }} title="Telefon yok">
+    <span className={DEAD_BTN} style={{ borderColor: C.line }} title={t('cust.noPhone')}>
       <PhoneCall size={14} className="text-gray-400" />
     </span>
   )
   return (
-    <a href={`tel:${tel}`} title={`Ara: ${tel}`} onClick={e => e.stopPropagation()}
+    <a href={`tel:${tel}`} title={t('cust.callTitle').replace('{tel}', tel)} onClick={e => e.stopPropagation()}
       className={LINK_BTN} style={{ borderColor: C.line }}>
       <PhoneCall size={14} />
     </a>
@@ -160,8 +163,9 @@ function PhoneBtn({ tel }: { tel?: string }) {
 }
 
 function WaBtn({ tel }: { tel?: string }) {
+  const t = useT()
   if (!tel) return (
-    <span className={DEAD_BTN} style={{ borderColor: C.line }} title="Telefon yok">
+    <span className={DEAD_BTN} style={{ borderColor: C.line }} title={t('cust.noPhone')}>
       <MessageSquare size={14} className="text-gray-400" />
     </span>
   )
@@ -183,6 +187,7 @@ export function FirmaSatir({
   record, showTemsilci = true, izin, onClick, onAksiyon, onNotEkle,
   onAjandadanCikar, onAjandayaEkle,
 }: Props) {
+  const t = useT()
   const { airtable: { sistemAdi }, temsilciler } = useTenant()
   const f = record.fields
   const firmaAdi  = f['Firma Adı'] ?? '—'
@@ -195,7 +200,7 @@ export function FirmaSatir({
   const temsilciRaw = f['Atanan Temsilci']
   // displayAd override: emlak demoda Rüya→Hülya, Sude→Ahmet
   const temsilci  = temsilciRaw
-    ? (temsilciler.find(t => t.ad === temsilciRaw)?.displayAd ?? temsilciRaw)
+    ? (temsilciler.find(tm => tm.ad === temsilciRaw)?.displayAd ?? temsilciRaw)
     : undefined
   const oncelik   = f['Öncelik']
   const bugun     = f['Bugün Aranacak']
@@ -283,7 +288,7 @@ export function FirmaSatir({
             </span>
             {bugun && (
               <span className="rounded-full bg-red-50 px-[6px] py-[2px] text-[9px] font-semibold text-red-500 uppercase tracking-wide">
-                Bugün
+                {t('cust.today')}
               </span>
             )}
             {vadeRozet && (
@@ -335,7 +340,7 @@ export function FirmaSatir({
         <div>{oncelik ? <PriorityPill value={oncelik} /> : <span className="text-slate-400">—</span>}</div>
 
         {/* Son Etkileşim */}
-        <div className="text-[12px] font-semibold text-slate-600">{formatSonEtkilesim(sonTarih)}</div>
+        <div className="text-[12px] font-semibold text-slate-600">{formatSonEtkilesim(sonTarih, t)}</div>
 
         {/* Temsilci */}
         <div>
@@ -365,7 +370,7 @@ export function FirmaSatir({
                 <PhoneBtn tel={tel} />
                 <WaBtn tel={tel} />
                 <button
-                  title="Sonra Ara"
+                  title={t('cust.callLater')}
                   onClick={e => { e.stopPropagation(); setSonraAra(v => !v); setNotAcik(false) }}
                   className="h-[31px] w-[31px] rounded-[10px] border grid place-items-center transition-colors text-slate-400 hover:text-violet-600 hover:border-violet-200 hover:bg-violet-50"
                   style={{ borderColor: C.line }}
@@ -373,7 +378,7 @@ export function FirmaSatir({
                   <CalendarClock size={14} />
                 </button>
                 <button
-                  title="Not ekle"
+                  title={t('cust.addNote')}
                   onClick={e => { e.stopPropagation(); setNotAcik(v => !v); setSonraAra(false) }}
                   className="h-[31px] w-[31px] rounded-[10px] border grid place-items-center transition-colors text-slate-400 hover:text-violet-600 hover:border-violet-200 hover:bg-violet-50"
                   style={{ borderColor: C.line }}
@@ -383,7 +388,7 @@ export function FirmaSatir({
 
                 {onAjandayaEkle && !bugun && (
                   <button
-                    title="Ajandaya ekle"
+                    title={t('cust.addToAgenda')}
                     onClick={e => { e.stopPropagation(); onAjandayaEkle(record.id, firmaAdi) }}
                     className="h-[31px] w-[31px] rounded-[10px] border border-emerald-200 grid place-items-center transition-colors bg-emerald-50 text-emerald-600 hover:bg-emerald-100 hover:border-emerald-300"
                   >
@@ -392,7 +397,7 @@ export function FirmaSatir({
                 )}
                 {onAjandadanCikar && bugun && (
                   <button
-                    title="Ajandadan çıkar"
+                    title={t('cust.removeFromAgenda')}
                     onClick={e => { e.stopPropagation(); onAjandadanCikar(record.id, firmaAdi) }}
                     className="h-[31px] w-[31px] rounded-[10px] border border-rose-200 grid place-items-center transition-colors bg-rose-50 text-rose-500 hover:bg-rose-100 hover:border-rose-300"
                   >
@@ -408,16 +413,16 @@ export function FirmaSatir({
                 </button>
                 {mobileMenu && (
                   <div className="flex items-center gap-[5px] mt-1 bg-white border border-gray-200 rounded-xl shadow-lg px-2 py-1.5 absolute right-4 z-10">
-                    <AkBtn icon={Phone}         label="Arandı"      onClick={() => doArandi()} />
-                    <AkBtn icon={PhoneCall}     label="Ulaşıldı"    onClick={() => doUlasildi()} />
-                    <AkBtn icon={PhoneOff}      label="Ulaşılamadı" onClick={() => doUlasilamadi()} danger />
-                    <AkBtn icon={CalendarClock} label="Sonra Ara"   onClick={() => { setSonraAra(true); setMobileMenu(false) }} />
-                    <AkBtn icon={MessageSquare} label="Not"         onClick={() => { setNotAcik(true); setMobileMenu(false) }} />
+                    <AkBtn icon={Phone}         label={t('cust.called')}      onClick={() => doArandi()} />
+                    <AkBtn icon={PhoneCall}     label={t('cust.reached')}    onClick={() => doUlasildi()} />
+                    <AkBtn icon={PhoneOff}      label={t('cust.notReached')} onClick={() => doUlasilamadi()} danger />
+                    <AkBtn icon={CalendarClock} label={t('cust.callLater')}   onClick={() => { setSonraAra(true); setMobileMenu(false) }} />
+                    <AkBtn icon={MessageSquare} label={t('cust.note')}         onClick={() => { setNotAcik(true); setMobileMenu(false) }} />
                     {onAjandayaEkle && !bugun && (
-                      <AkBtn icon={CalendarCheck} label="Ajandaya Ekle" onClick={() => { onAjandayaEkle(record.id, firmaAdi); setMobileMenu(false) }} />
+                      <AkBtn icon={CalendarCheck} label={t('cust.addToAgenda')} onClick={() => { onAjandayaEkle(record.id, firmaAdi); setMobileMenu(false) }} />
                     )}
                     {onAjandadanCikar && bugun && (
-                      <AkBtn icon={CalendarX} label="Ajandadan Çıkar" onClick={() => { onAjandadanCikar(record.id, firmaAdi); setMobileMenu(false) }} danger />
+                      <AkBtn icon={CalendarX} label={t('cust.removeFromAgenda')} onClick={() => { onAjandadanCikar(record.id, firmaAdi); setMobileMenu(false) }} danger />
                     )}
                   </div>
                 )}
@@ -457,7 +462,7 @@ export function FirmaSatir({
             type="text"
             value={notInput}
             onChange={e => setNotInput(e.target.value)}
-            placeholder="Kısa not…"
+            placeholder={t('cust.shortNotePlaceholder')}
             maxLength={500}
             onKeyDown={e => { if (e.key === 'Enter') doNot(); if (e.key === 'Escape') { setNotAcik(false); setNotInput('') } }}
             className="flex-1 text-xs border border-violet-300 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-violet-300/30 text-gray-700 min-w-0 max-w-sm"

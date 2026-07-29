@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from 'react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
+import { useT } from '@/lib/i18n/context'
+
+const AY_FULL_KEYS = [
+  'rep.monFull0','rep.monFull1','rep.monFull2','rep.monFull3','rep.monFull4','rep.monFull5',
+  'rep.monFull6','rep.monFull7','rep.monFull8','rep.monFull9','rep.monFull10','rep.monFull11',
+] as const
 
 // ── Renkler — Sigorta identity: mat bordo, yeşil yok ─────────────────────────
 const BORDO  = '#982A49'
@@ -96,22 +102,23 @@ function Skeleton({ h = 'h-40' }: { h?: string }) {
 }
 
 // ── 1. Dönüşüm Hunisi ────────────────────────────────────────────────────────
-const FUNNEL_ROWS: { key: keyof EkipData['funnel']; label: string; renk: string; bg: string }[] = [
-  { key: 'aktivite',     label: 'Toplam aktivite', renk: BORDO,     bg: '#FFF3F6' },
-  { key: 'ulasildi',    label: 'Ulaşıldı',        renk: BORDO,     bg: '#FFF3F6' },
-  { key: 'yanit_alindi',label: 'Yanıt alındı',    renk: '#5B38E8', bg: '#F0EEFF' },
-  { key: 'randevu',     label: 'Randevu',          renk: '#E62164', bg: '#FFF0F6' },
-  { key: 'teklif',      label: 'Teklif',           renk: '#4B1FB4', bg: '#EEE9FF' },
-  { key: 'kazanim',     label: 'Kazanım',          renk: BORDO,     bg: '#FFF3F6' },
+const FUNNEL_ROWS: { key: keyof EkipData['funnel']; labelKey: string; renk: string; bg: string }[] = [
+  { key: 'aktivite',     labelKey: 'rep.toplamAktivite', renk: BORDO,     bg: '#FFF3F6' },
+  { key: 'ulasildi',    labelKey: 'rep.ulasildi',       renk: BORDO,     bg: '#FFF3F6' },
+  { key: 'yanit_alindi',labelKey: 'rep.yanitAlindi',    renk: '#5B38E8', bg: '#F0EEFF' },
+  { key: 'randevu',     labelKey: 'rep.randevu',         renk: '#E62164', bg: '#FFF0F6' },
+  { key: 'teklif',      labelKey: 'rep.teklif',          renk: '#4B1FB4', bg: '#EEE9FF' },
+  { key: 'kazanim',     labelKey: 'rep.kazanim',         renk: BORDO,     bg: '#FFF3F6' },
 ]
 
 function DonusumHunisi({ funnel }: { funnel: EkipData['funnel'] }) {
+  const tr = useT()
   const max = funnel.aktivite || 1
 
   return (
-    <Kart title="Dönüşüm hunisi" right="Ekip toplamı">
+    <Kart title={tr('rep.donusumHunisi')} right={tr('rep.ekipToplami')}>
       <div className="space-y-2">
-        {FUNNEL_ROWS.map(({ key, label, renk, bg }) => {
+        {FUNNEL_ROWS.map(({ key, labelKey, renk, bg }) => {
           const sayi = funnel[key]
           const barPct = Math.min((sayi / max) * 100, 100)
           const ratePctNum = key === 'aktivite' ? null : pctOf(sayi, funnel.aktivite)
@@ -120,7 +127,7 @@ function DonusumHunisi({ funnel }: { funnel: EkipData['funnel'] }) {
 
           return (
             <div key={key} className="flex items-center gap-3">
-              <div className="w-28 text-[12px] text-gray-600 shrink-0 text-right">{label}</div>
+              <div className="w-28 text-[12px] text-gray-600 shrink-0 text-right">{tr(labelKey)}</div>
               <div
                 className="flex-1 h-7 rounded-sm overflow-hidden"
                 style={{ backgroundColor: bg }}
@@ -183,13 +190,14 @@ function HedefSutun({ label, aktivite, hedef, renk }: {
 }
 
 function HedefTutturma({ temsilciler }: { temsilciler: EkipData['temsilciler'] }) {
+  const tr = useT()
   const ekipAktivite = temsilciler.reduce((s, t) => s + t.aktivite, 0)
 
   return (
-    <Kart title="Hedef tutturma" right="50 arama / gün / kişi">
+    <Kart title={tr('rep.hedefTutturma')} right={tr('rep.hedefTutturmaRight')}>
       <div className="grid grid-cols-3 divide-x divide-gray-100">
         <div className="pr-6">
-          <HedefSutun label="Ekip" aktivite={ekipAktivite} hedef={HEDEF_EKIP} renk={BORDO} />
+          <HedefSutun label={tr('rep.ekip')} aktivite={ekipAktivite} hedef={HEDEF_EKIP} renk={BORDO} />
         </div>
         {temsilciler.map((t, i) => (
           <div key={t.slug} className={i === 0 ? 'px-6' : 'pl-6'}>
@@ -205,6 +213,7 @@ function HedefTutturma({ temsilciler }: { temsilciler: EkipData['temsilciler'] }
 interface DonutItem { ad: string; sayi: number; renk: string }
 
 function MiniDonut({ title, items, toplam }: { title: string; items: DonutItem[]; toplam: number }) {
+  const tr = useT()
   const filtered = items.filter(i => i.sayi > 0)
   if (!filtered.length) {
     return (
@@ -224,7 +233,7 @@ function MiniDonut({ title, items, toplam }: { title: string; items: DonutItem[]
           </Pie>
           <Tooltip
             contentStyle={{ fontSize: 11, borderRadius: 8, border: '1px solid #E5E7EB' }}
-            formatter={(v) => [fmt(v as number), 'Arama']}
+            formatter={(v) => [fmt(v as number), tr('rep.arama')]}
           />
         </PieChart>
       </ResponsiveContainer>
@@ -257,11 +266,12 @@ function buildDonutItems(
 
 // ── Sektör text legend ────────────────────────────────────────────────────────
 function SektorLegend({ items, toplam }: { items: DonutItem[]; toplam: number }) {
+  const tr = useT()
   const filtered = items.filter(i => i.sayi > 0)
   if (!filtered.length) return <p className="text-[11px] text-gray-300 pt-4">—</p>
   return (
     <div>
-      <p className="text-[10px] text-gray-400 mb-3">Sektör</p>
+      <p className="text-[10px] text-gray-400 mb-3">{tr('rep.sektor')}</p>
       <div className="space-y-2">
         {filtered.map(({ ad, sayi, renk }) => (
           <div key={ad} className="flex items-center gap-2">
@@ -279,16 +289,17 @@ function SektorLegend({ items, toplam }: { items: DonutItem[]; toplam: number })
 
 // ── 3. Aramaların Dağılımı ───────────────────────────────────────────────────
 function AramaDagilimi({ data }: { data: DagilimData }) {
+  const tr = useT()
   const temsilciItems = buildDonutItems(data.temsilci.map(t => ({ ...t, renk: t.renk })), {}, [])
   const bransItems    = buildDonutItems(data.brans,  BRANS_COLORS,  BRANS_FALLBACKS)
   const sektorItems   = buildDonutItems(data.sektor, SEKTOR_COLORS, SEKTOR_FALLBACKS)
 
   return (
-    <Kart title="Aramaların dağılımı" right={`${fmt(data.toplam)} arama · bu hafta`}>
+    <Kart title={tr('rep.aramalarinDagilimi')} right={tr('rep.aramaBuHafta').replace('{n}', fmt(data.toplam))}>
       <div className="grid grid-cols-[1fr_1fr_auto] gap-6 divide-x divide-gray-100">
-        <MiniDonut title="Temsilci" items={temsilciItems} toplam={data.toplam} />
+        <MiniDonut title={tr('rep.temsilci')} items={temsilciItems} toplam={data.toplam} />
         <div className="pl-6">
-          <MiniDonut title="Branş" items={bransItems} toplam={data.toplam} />
+          <MiniDonut title={tr('rep.brans')} items={bransItems} toplam={data.toplam} />
         </div>
         <div className="pl-6 min-w-[120px]">
           <SektorLegend items={sektorItems} toplam={data.toplam} />
@@ -300,17 +311,18 @@ function AramaDagilimi({ data }: { data: DagilimData }) {
 
 // ── 4. Randevuların Dağılımı ─────────────────────────────────────────────────
 function RandevuDagilimi({ data }: { data: DagilimData }) {
+  const tr = useT()
   const temsilciItems = buildDonutItems(data.temsilci.map(t => ({ ...t, renk: t.renk })), {}, [])
   const bransItems    = buildDonutItems(data.brans,  BRANS_COLORS,  BRANS_FALLBACKS)
   const sektorItems   = buildDonutItems(data.sektor, SEKTOR_COLORS, SEKTOR_FALLBACKS)
   const safeT = Math.max(data.toplam, 1)
 
   return (
-    <Kart title="Randevuların dağılımı" right={`${fmt(data.toplam)} randevu · bu hafta`}>
+    <Kart title={tr('rep.randevularinDagilimi')} right={tr('rep.randevuBuHafta').replace('{n}', fmt(data.toplam))}>
       <div className="grid grid-cols-[1fr_1fr_auto] gap-6 divide-x divide-gray-100">
-        <MiniDonut title="Temsilci" items={temsilciItems} toplam={safeT} />
+        <MiniDonut title={tr('rep.temsilci')} items={temsilciItems} toplam={safeT} />
         <div className="pl-6">
-          <MiniDonut title="Branş" items={bransItems} toplam={safeT} />
+          <MiniDonut title={tr('rep.brans')} items={bransItems} toplam={safeT} />
         </div>
         <div className="pl-6 min-w-[120px]">
           <SektorLegend items={sektorItems} toplam={safeT} />
@@ -353,31 +365,33 @@ function TrendKarti({ funnel, gecen }: {
   funnel: EkipData['funnel']
   gecen: EkipData['gecen_hafta']
 }) {
+  const tr = useT()
   return (
-    <Kart title="Geçen haftaya göre">
-      <TrendSatir label="Aktivite"  now={funnel.aktivite} prev={gecen.aktivite} />
-      <TrendSatir label="Ulaşıldı"  now={funnel.ulasildi} prev={gecen.ulasildi} />
-      <TrendSatir label="Randevu"   now={funnel.randevu}   prev={gecen.randevu} />
+    <Kart title={tr('rep.gecenHaftayaGore')}>
+      <TrendSatir label={tr('rep.aktiviteLabel')}  now={funnel.aktivite} prev={gecen.aktivite} />
+      <TrendSatir label={tr('rep.ulasildi')}  now={funnel.ulasildi} prev={gecen.ulasildi} />
+      <TrendSatir label={tr('rep.randevu')}   now={funnel.randevu}   prev={gecen.randevu} />
     </Kart>
   )
 }
 
 // ── 5b. Pipeline İlerletme ───────────────────────────────────────────────────
 function PipelineIlerletme({ data }: { data: EkipData['pipeline_ilerletme'] }) {
+  const tr = useT()
   return (
-    <Kart title="Pipeline ilerletme">
+    <Kart title={tr('rep.pipelineIlerletme')}>
       <div className="flex flex-col gap-3">
         <div className="flex items-baseline gap-2">
           <span className="text-[32px] font-black" style={{ color: BORDO }}>
             {data.ileri_tasindi}
           </span>
-          <span className="text-[13px] text-gray-600">firma ileri taşındı</span>
+          <span className="text-[13px] text-gray-600">{tr('rep.firmaIleriTasindi')}</span>
         </div>
         <p className="text-[11px] text-gray-400">
-          Ulaşılamadı → Yanıt / Randevu / Teklif
+          {tr('rep.pipelineIlerletmeDesc')}
         </p>
         <div className="flex items-center justify-between border-t border-gray-100 pt-3">
-          <span className="text-[12px] text-gray-500">Bu hafta yeni randevu</span>
+          <span className="text-[12px] text-gray-500">{tr('rep.buHaftaYeniRandevu')}</span>
           <span className="text-[16px] font-bold" style={{ color: BORDO }}>
             {data.yeni_randevu}
           </span>
@@ -388,15 +402,13 @@ function PipelineIlerletme({ data }: { data: EkipData['pipeline_ilerletme'] }) {
 }
 
 // ── Tarih etiket yardımcısı ───────────────────────────────────────────────────
-const TR_AY = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık']
-
-function haftaLabel(start: string, end: string): string {
+function haftaLabel(start: string, end: string, AY: string[]): string {
   const s = new Date(start + 'T00:00:00')
   const e = new Date(end   + 'T00:00:00')
   if (s.getMonth() === e.getMonth()) {
-    return `${s.getDate()}-${e.getDate()} ${TR_AY[e.getMonth()]}`
+    return `${s.getDate()}-${e.getDate()} ${AY[e.getMonth()]}`
   }
-  return `${s.getDate()} ${TR_AY[s.getMonth()]} – ${e.getDate()} ${TR_AY[e.getMonth()]}`
+  return `${s.getDate()} ${AY[s.getMonth()]} – ${e.getDate()} ${AY[e.getMonth()]}`
 }
 
 // ── Ana bileşen ───────────────────────────────────────────────────────────────
@@ -409,6 +421,7 @@ export function Bolum2Ekip({
   weekOffset: number
   onWeekChange: (offset: number) => void
 }) {
+  const tr = useT()
   const [data, setData] = useState<EkipData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -433,17 +446,18 @@ export function Bolum2Ekip({
         }
         setData(d)
       })
-      .catch(() => setError('Ekip verisi yüklenemedi'))
+      .catch(() => setError(tr('rep.ekipVerisiYuklenemedi')))
       .finally(() => setLoading(false))
   }, [weekOffset]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const haftaBasligi = weekOffset === 0
-    ? 'Bu hafta'
+    ? tr('rep.buHaftaLower')
     : weekOffset === -1
-    ? 'Geçen hafta'
-    : `${Math.abs(weekOffset)} hafta önce`
+    ? tr('rep.gecenHafta')
+    : tr('rep.haftaOnce').replace('{n}', String(Math.abs(weekOffset)))
 
-  const haftaTarih = data?.hafta ? haftaLabel(data.hafta.start, data.hafta.end) : ''
+  const AY = AY_FULL_KEYS.map(k => tr(k))
+  const haftaTarih = data?.hafta ? haftaLabel(data.hafta.start, data.hafta.end, AY) : ''
 
   return (
     <section className="space-y-4">
@@ -451,7 +465,7 @@ export function Bolum2Ekip({
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">
-            Bölüm 2 — Ekip Performansı
+            {tr('rep.bolum2')}
           </h2>
           <p className="text-[11px] text-gray-400 mt-0.5">
             {haftaBasligi}{haftaTarih ? ` · ${haftaTarih}` : ''}
@@ -465,7 +479,7 @@ export function Bolum2Ekip({
             disabled={loading}
             className="flex items-center gap-1 px-3 py-2 text-[12px] font-medium text-gray-600 hover:bg-[#F5E8EA] hover:text-[#8e2433] disabled:opacity-40 transition-colors border-r border-gray-200"
           >
-            ← Önceki
+            ← {tr('rep.onceki')}
           </button>
           <div className="px-4 py-2 text-[12px] font-semibold text-gray-700 min-w-[120px] text-center">
             {loading
@@ -477,7 +491,7 @@ export function Bolum2Ekip({
             disabled={loading || weekOffset >= 0}
             className="flex items-center gap-1 px-3 py-2 text-[12px] font-medium text-gray-600 hover:bg-[#F5E8EA] hover:text-[#8e2433] disabled:opacity-40 disabled:cursor-not-allowed transition-colors border-l border-gray-200"
           >
-            Sonraki →
+            {tr('rep.sonraki')} →
           </button>
         </div>
       </div>

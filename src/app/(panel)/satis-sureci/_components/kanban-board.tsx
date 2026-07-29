@@ -23,6 +23,21 @@ import { TEMSILCI_RENK, TEMSILCI_RENK_FALLBACK } from '@/lib/temsilciler'
 import { FirmaModal } from '../../musteriler/_components/firma-modal'
 import { useRouter } from 'next/navigation'
 import { useTenant } from '@/lib/tenant-context'
+import { useT } from '@/lib/i18n/context'
+
+/* Pipeline aşama value → i18n key slug (value KİLİTLİ; sadece görünen etiket çevrilir) */
+const STAGE_KEY: Record<string, string> = {
+  'Ulaşılamadı':  'ulasilamadi',
+  'Yanıt Alındı': 'yanitAlindi',
+  'Randevu':      'randevu',
+  'Teklif':       'teklif',
+  'Müzakere':     'muzakere',
+  'Kazanıldı':    'kazanildi',
+  'Kaybedildi':   'kaybedildi',
+}
+function stageLabel(t: (key: string) => string, value: string) {
+  return t(`pipe.stage.${STAGE_KEY[value] ?? value}`)
+}
 
 /* ─── Renkler ─────────────────────────────────────────────────────── */
 const C = {
@@ -88,6 +103,7 @@ export interface InitialColumn {
 function CardContent({
   record, asama = '', overlay = false,
 }: { record: AirtableRecord<FirmaKart>; asama?: string; overlay?: boolean }) {
+  const t = useT()
   const { id: tenantId2, airtable: { sistemAdi }, temsilciler } = useTenant()
   const isEmlakCard = tenantId2 === 'emlak_demo'
   const f = record.fields
@@ -119,7 +135,7 @@ function CardContent({
       {/* Başlık */}
       <div className="flex items-start justify-between gap-[8px]">
         <h4 className="text-[11px] leading-[15px] font-black uppercase" style={{ color: C.text }}>
-          {f['Firma Adı'] ?? 'İsimsiz'}
+          {f['Firma Adı'] ?? t('pipe.unnamed')}
         </h4>
         {isKazandi ? (
           <CheckCircle2 size={14} className="text-emerald-500 shrink-0" />
@@ -129,7 +145,7 @@ function CardContent({
           </span>
         ) : isYuksek ? (
           <span className="rounded-[5px] px-[6px] py-[2px] text-[9px] font-black shrink-0"
-            style={{ background: EKC?.lavender ?? C.lavender, color: EKC?.violet ?? C.violet }}>↑ YÜKSEK</span>
+            style={{ background: EKC?.lavender ?? C.lavender, color: EKC?.violet ?? C.violet }}>{t('pipe.highBadge')}</span>
         ) : null}
       </div>
 
@@ -237,6 +253,7 @@ function DroppableColumn({
   onCardClick: (recordId: string) => void
   overrideMeta?: { tint: string; colColor: string; colColor2: string; no: number }
 }) {
+  const t = useT()
   const { isOver, setNodeRef } = useDroppable({ id: asama })
   const meta = overrideMeta ?? (STAGE_META[asama] ?? { tint: '#F5F3FF', colColor: color, colColor2: color, no: 1 })
 
@@ -260,7 +277,7 @@ function DroppableColumn({
         style={{ background: isOver ? (overrideMeta ? 'rgba(220,245,228,.7)' : '#EDE9FE') : meta.tint, minHeight: 0 }}>
         <div className="flex-1 overflow-y-auto space-y-[7px] p-[8px]">
           {colState.records.length === 0 && (
-            <p className="text-[11px] text-slate-400 text-center pt-6">Bu aşamada firma yok</p>
+            <p className="text-[11px] text-slate-400 text-center pt-6">{t('pipe.emptyColumn')}</p>
           )}
           {colState.records.map(r => (
             <DraggableCard key={r.id} record={r} asama={asama} onClick={() => onCardClick(r.id)} />
@@ -269,7 +286,7 @@ function DroppableColumn({
             <button onClick={() => onLoadMore(asama)} disabled={colState.loadingMore}
               className="w-full text-[11px] text-slate-500 hover:text-slate-700 py-2 rounded-[9px] border border-dashed hover:border-slate-300 transition-colors disabled:opacity-50"
               style={{ borderColor: C.line }}>
-              {colState.loadingMore ? 'Yükleniyor…' : 'Daha fazla göster'}
+              {colState.loadingMore ? t('pipe.loading') : t('pipe.loadMore')}
             </button>
           )}
         </div>
@@ -311,6 +328,7 @@ export function KanbanBoard({
   initialModalId?: string
   isAdmin?: boolean
 }) {
+  const t = useT()
   const { id: tenantId, airtable: { sistemAdi }, temsilciler: cfgTemsilciler } = useTenant()
   const isEmlak = tenantId === 'emlak_demo'
   const EK = isEmlak ? {
@@ -496,7 +514,7 @@ export function KanbanBoard({
       revertRecord(record, fromAsama, toAsama)
       adjustCount(toAsama, fromAsama, 1)
       if (undo?.key === key) { clearTimeout(timeoutId); setUndo(null) }
-      setError('Kaydedilemedi, tekrar dene.')
+      setError(t('pipe.errorSave'))
       setTimeout(() => setError(null), 4000)
     }
   }
@@ -516,7 +534,7 @@ export function KanbanBoard({
       })
       if (!res.ok) throw new Error()
     } catch {
-      setError('Geri alma başarısız. Sayfayı yenile.')
+      setError(t('pipe.errorUndo'))
       setTimeout(() => setError(null), 5000)
     }
   }
@@ -525,7 +543,7 @@ export function KanbanBoard({
   const countValues = PIPELINE_ASAMALARI.map(a => counts[a.value] ?? 0)
   const totalCount  = countValues.reduce((s, n) => s + n, 0)
   const donutStages = PIPELINE_ASAMALARI.slice(0, 4).map((a, i) => ({
-    label: a.label,
+    label: stageLabel(t, a.value),
     pct:   totalCount > 0 ? Math.round((countValues[i] / totalCount) * 100) : 0,
     color: (isEmlak ? EMLAK_STAGE_META : STAGE_META)[a.value]?.colColor ?? a.color,
   }))
@@ -538,8 +556,9 @@ export function KanbanBoard({
   if (donutAccum < 100) donutGradParts.push(`#E7EAF2 ${donutAccum}% 100%`)
   const donutGrad = `conic-gradient(${donutGradParts.join(', ')})`
 
-  const undoFirma = undo?.record.fields['Firma Adı'] ?? 'Firma'
-  const undoTo    = PIPELINE_ASAMALARI.find(a => a.value === undo?.toAsama)?.label ?? ''
+  const undoFirma = undo?.record.fields['Firma Adı'] ?? t('pipe.company')
+  const undoToStage = PIPELINE_ASAMALARI.find(a => a.value === undo?.toAsama)?.value
+  const undoTo    = undoToStage ? stageLabel(t, undoToStage) : ''
 
   /* ─── render ──────────────────────────────────────────────────── */
   return (
@@ -558,14 +577,14 @@ export function KanbanBoard({
                 <div>
                   <div className="flex items-center gap-[8px]">
                     <h1 className="text-[22px] font-black tracking-[-.02em]" style={{ color: C.text }}>
-                      Satış Süreci
+                      {t('pipe.title')}
                     </h1>
                     <span className="rounded-full bg-emerald-50 px-[8px] py-[4px] text-[11px] font-bold text-emerald-700">
-                      ● Canlı
+                      {t('pipe.liveBadge')}
                     </span>
                   </div>
                   <p className="mt-[4px] text-[12px] font-medium text-slate-400">
-                    Pipeline · Kartları sürükleyerek aşamalar arasında taşıyabilirsiniz
+                    {t('pipe.subtitle')}
                   </p>
                 </div>
                 <div className="flex items-center gap-[8px]">
@@ -584,7 +603,7 @@ export function KanbanBoard({
                       style={{ borderColor: filterAcik ? (EK?.violet ?? C.violet) : C.line, color: filterAcik ? (EK?.violet ?? C.violet) : C.text }}
                     >
                       <Filter size={13} />
-                      Filtrele
+                      {t('pipe.filter')}
                       {aktifFilterSayisi > 0 && (
                         <span className="ml-0.5 h-[16px] min-w-[16px] rounded-full text-[9px] font-black text-white grid place-items-center px-1"
                           style={{ background: EK?.violet ?? C.violet }}>
@@ -600,12 +619,12 @@ export function KanbanBoard({
                         {/* Temsilci */}
                         {temsilcilerRaw.length > 0 && (
                           <div>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-[7px]">Temsilci</p>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-[7px]">{t('pipe.representative')}</p>
                             <div className="space-y-[4px]">
                               {['', ...temsilcilerRaw].map(tAd => {
                                 const tDisplay = tAd
                                   ? (cfgTemsilciler.find(x => x.ad === tAd)?.displayAd ?? tAd)
-                                  : 'Tümü'
+                                  : t('pipe.all')
                                 return (
                                   <button key={tAd || '__tumu'} onClick={() => setKFilter(f => ({ ...f, temsilci: tAd }))}
                                     className="w-full text-left text-[12px] px-[9px] py-[5px] rounded-[8px] font-medium transition-colors"
@@ -623,9 +642,9 @@ export function KanbanBoard({
 
                         {/* Sıcaklık */}
                         <div>
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-[7px]">Sıcaklık</p>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-[7px]">{t('pipe.temperature')}</p>
                           <div className="space-y-[4px]">
-                            {[['', 'Tümü'], ['sicak', '🔥 Sıcak (skor ≥ 7)'], ['soguk', '❄️ Soğuk (skor < 4)']].map(([v, l]) => (
+                            {[['', t('pipe.all')], ['sicak', t('pipe.hot')], ['soguk', t('pipe.cold')]].map(([v, l]) => (
                               <button key={v || '__tumu'} onClick={() => setKFilter(f => ({ ...f, sicaklik: v }))}
                                 className="w-full text-left text-[12px] px-[9px] py-[5px] rounded-[8px] font-medium transition-colors"
                                 style={{
@@ -640,7 +659,7 @@ export function KanbanBoard({
 
                         {/* Branş */}
                         <div>
-                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-[7px]">Branş</p>
+                          <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-[7px]">{t('pipe.branch')}</p>
                           <div className="space-y-[4px]">
                             {['', ...BRANSLAR].map(b => (
                               <button key={b || '__tumu'} onClick={() => setKFilter(f => ({ ...f, brans: b }))}
@@ -649,7 +668,7 @@ export function KanbanBoard({
                                   background: kFilter.brans === b ? (EK?.lavender ?? C.lavender) : 'transparent',
                                   color:      kFilter.brans === b ? (EK?.violet ?? C.violet) : '#475569',
                                 }}>
-                                {b || 'Tümü'}
+                                {b || t('pipe.all')}
                               </button>
                             ))}
                           </div>
@@ -660,7 +679,7 @@ export function KanbanBoard({
                           <button onClick={() => { setKFilter({ temsilci: '', sicaklik: '', brans: '' }); setFilterAcik(false) }}
                             className="w-full text-[11px] font-bold text-slate-400 hover:text-red-500 pt-[6px] border-t transition-colors"
                             style={{ borderColor: C.line }}>
-                            Filtreleri temizle
+                            {t('pipe.clearFilters')}
                           </button>
                         )}
                       </div>
@@ -668,11 +687,11 @@ export function KanbanBoard({
                   </div>
                   <button className="h-[36px] rounded-[10px] px-[16px] text-[12px] font-black text-white shadow-sm"
                     style={{ background: EK?.bordo ?? C.bordo }}>
-                    + Yeni Fırsat
+                    {t('pipe.newOpportunity')}
                   </button>
                   <button
                     onClick={() => setRailAcik(v => !v)}
-                    title={railAcik ? 'Paneli kapat' : 'Paneli aç'}
+                    title={railAcik ? t('pipe.closePanel') : t('pipe.openPanel')}
                     className="h-[36px] w-[36px] rounded-[10px] border bg-white grid place-items-center transition-colors hover:bg-slate-50"
                     style={{ borderColor: C.line, color: railAcik ? (EK?.violet ?? C.violet) : '#94A3B8' }}
                   >
@@ -689,7 +708,7 @@ export function KanbanBoard({
                     <StageSummary
                       key={col.value}
                       asama={col.value}
-                      label={col.label}
+                      label={stageLabel(t, col.value)}
                       color={meta.colColor}
                       count={counts[col.value]}
                       no={meta.no}
@@ -708,7 +727,7 @@ export function KanbanBoard({
                   <DroppableColumn
                     key={col.value}
                     asama={col.value}
-                    label={col.label}
+                    label={stageLabel(t, col.value)}
                     color={col.color}
                     overrideMeta={isEmlak ? EMLAK_STAGE_META[col.value] : undefined}
                     muted={col.muted}
@@ -733,7 +752,7 @@ export function KanbanBoard({
                   <section className="rounded-[16px] border bg-white p-[16px] shadow-sm" style={{ borderColor: C.line }}>
                     <div className="flex items-center justify-between">
                       <div className="text-[10px] tracking-[.17em] font-black" style={{ color: EK?.bordo ?? C.bordo }}>
-                        ALİ ASİSTAN
+                        {t('pipe.aliAssistant')}
                       </div>
                       <button onClick={() => setRailAcik(false)}
                         className="h-[24px] w-[24px] rounded-[7px] border grid place-items-center text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors"
@@ -757,11 +776,11 @@ export function KanbanBoard({
                       </div>
                       <div>
                         <div className="text-[12px] font-black leading-[17px]" style={{ color: C.text }}>
-                          Pipeline'ınızda<br />aktif takip var.
+                          {t('pipe.aliTrackLine1')}<br />{t('pipe.aliTrackLine2')}
                         </div>
                         <button className="mt-[10px] h-[32px] rounded-[9px] px-[13px] text-[11px] font-black text-white"
                           style={{ background: EK?.bordo ?? C.bordo }}>
-                          Önerileri gör →
+                          {t('pipe.seeSuggestions')}
                         </button>
                       </div>
                     </div>
@@ -770,7 +789,7 @@ export function KanbanBoard({
                   {/* Performans */}
                   <section className="rounded-[16px] border bg-white p-[16px] shadow-sm" style={{ borderColor: C.line }}>
                     <div className="flex items-center justify-between mb-[12px]">
-                      <h3 className="font-black text-[13px]" style={{ color: C.text }}>Pipeline Dağılımı</h3>
+                      <h3 className="font-black text-[13px]" style={{ color: C.text }}>{t('pipe.pipelineDistribution')}</h3>
                     </div>
                     <div className="flex items-center gap-[14px]">
                       <div className="relative h-[90px] w-[90px] rounded-full shrink-0"
@@ -778,7 +797,7 @@ export function KanbanBoard({
                         <div className="absolute inset-[18px] rounded-full bg-white grid place-items-center text-center">
                           <div>
                             <div className="text-[14px] font-black leading-none">{totalCount || '—'}</div>
-                            <div className="text-[8px] text-slate-400 mt-0.5">Toplam</div>
+                            <div className="text-[8px] text-slate-400 mt-0.5">{t('pipe.total')}</div>
                           </div>
                         </div>
                       </div>
@@ -787,7 +806,7 @@ export function KanbanBoard({
                           <div key={s.label} className="flex items-center gap-[5px]">
                             <span className="h-[7px] w-[7px] rounded-full shrink-0" style={{ background: s.color }} />
                             <span className="flex-1 text-slate-500 truncate">{s.label}</span>
-                            <b className="tabular-nums">%{s.pct}</b>
+                            <b className="tabular-nums">{t('pipe.percent').replace('{n}', String(s.pct))}</b>
                           </div>
                         ))}
                       </div>
@@ -798,17 +817,17 @@ export function KanbanBoard({
                   <section className="rounded-[16px] border bg-white p-[16px] shadow-sm" style={{ borderColor: C.line }}>
                     <div className="flex items-center gap-[6px] mb-[12px]">
                       <Sparkles size={13} style={{ color: EK?.violet ?? C.violet }} />
-                      <h3 className="font-black text-[13px]" style={{ color: C.text }}>Akıllı Öneriler</h3>
+                      <h3 className="font-black text-[13px]" style={{ color: C.text }}>{t('pipe.smartSuggestions')}</h3>
                       <span className="rounded-full bg-violet-50 px-[7px] py-[2px] text-[9px] font-bold text-violet-700 ml-auto">
-                        Yakında
+                        {t('pipe.soon')}
                       </span>
                     </div>
                     <div className="space-y-[8px]">
                       {[
-                        { Icon: Flame,          title: 'Yüksek potansiyel',   body: 'Teklif aşamasındaki firmalara odaklanın.',      cta: 'Görüntüle', color: C.red    },
-                        { Icon: AlertTriangle,  title: 'Yenileme riski',      body: 'Süresi yaklaşan poliçeler için iletişim kurun.', cta: 'İncele',    color: C.red },
-                        { Icon: CalendarDays,   title: 'Randevu hazırlığı',   body: 'Yaklaşan randevular için öneri alın.',           cta: 'Planla',    color: EK?.violet ?? C.violet },
-                        { Icon: BarChart3,      title: 'Cross-sell fırsatı',  body: 'Elementer teklifi uygun firmalar var.',          cta: 'Teklif',    color: EK?.violet ?? C.violet },
+                        { Icon: Flame,          title: t('pipe.smartHighPotentialTitle'), body: t('pipe.smartHighPotentialBody'), cta: t('pipe.view'),   color: C.red    },
+                        { Icon: AlertTriangle,  title: t('pipe.smartRenewalTitle'),       body: t('pipe.smartRenewalBody'),       cta: t('pipe.review'), color: C.red },
+                        { Icon: CalendarDays,   title: t('pipe.smartAppointmentTitle'),   body: t('pipe.smartAppointmentBody'),   cta: t('pipe.plan'),   color: EK?.violet ?? C.violet },
+                        { Icon: BarChart3,      title: t('pipe.smartCrossSellTitle'),     body: t('pipe.smartCrossSellBody'),     cta: t('pipe.quote'),  color: EK?.violet ?? C.violet },
                       ].map(s => (
                         <SmartCard key={s.title} {...s} />
                       ))}
@@ -817,13 +836,13 @@ export function KanbanBoard({
 
                   {/* Günlük özet */}
                   <section className="rounded-[16px] border bg-white p-[16px] shadow-sm" style={{ borderColor: C.line }}>
-                    <h3 className="font-black text-[13px] mb-[12px]" style={{ color: C.text }}>Günlük Özet</h3>
+                    <h3 className="font-black text-[13px] mb-[12px]" style={{ color: C.text }}>{t('pipe.dailySummary')}</h3>
                     <div className="space-y-[12px]">
                       {[
-                        { Icon: FileText,    text: 'Yeni teklifler',    sub: 'Bugün oluşturulan', color: EK?.violet ?? C.violet },
-                        { Icon: MessageSquare, text: 'Yanıt bekleyen', sub: 'Pipeline\'da aktif',  color: EK?.violet ?? C.violet },
-                        { Icon: CalendarDays,text: 'Randevular',       sub: 'Bu hafta planlı',    color: EK?.violet ?? C.violet },
-                        { Icon: AlertTriangle, text: 'Riskli fırsatlar', sub: 'Müzakere bekleyen', color: C.red },
+                        { Icon: FileText,    text: t('pipe.dailyNewQuotes'),    sub: t('pipe.dailyNewQuotesSub'), color: EK?.violet ?? C.violet },
+                        { Icon: MessageSquare, text: t('pipe.dailyAwaitingReply'), sub: t('pipe.dailyAwaitingReplySub'),  color: EK?.violet ?? C.violet },
+                        { Icon: CalendarDays,text: t('pipe.dailyAppointments'),       sub: t('pipe.dailyAppointmentsSub'),    color: EK?.violet ?? C.violet },
+                        { Icon: AlertTriangle, text: t('pipe.dailyRiskyOpps'), sub: t('pipe.dailyRiskyOppsSub'), color: C.red },
                       ].map(({ Icon, text, sub, color }) => (
                         <div key={text} className="flex gap-[10px] items-center">
                           <div className="h-[30px] w-[30px] rounded-[9px] grid place-items-center shrink-0"
@@ -849,7 +868,7 @@ export function KanbanBoard({
                     <div className="absolute right-[-40px] bottom-[-50px] h-[150px] w-[150px] rounded-full border border-white/20 pointer-events-none" />
                     <div className="text-[18px] font-black">alisales.ai</div>
                     <p className="mt-[12px] text-[12px] leading-[18px] text-white/80">
-                      Bağımsız sigortacılığın yeni nesli.
+                      {t('pipe.brandTagline')}
                     </p>
                   </section>
                   )}
@@ -878,7 +897,7 @@ export function KanbanBoard({
           </span>
           <button onClick={handleUndo}
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-xs font-medium transition-colors shrink-0">
-            <Undo2 size={11} />Geri al
+            <Undo2 size={11} />{t('pipe.undo')}
           </button>
           <button onClick={() => { clearTimeout(undo.timeoutId); setUndo(null) }}
             className="text-white/60 hover:text-white text-xs shrink-0 transition-colors">

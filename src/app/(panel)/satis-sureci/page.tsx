@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { KanbanBoard } from './_components/kanban-board'
 import { getSegment } from '@/lib/emlak-segment'
 import { BIREYSEL_KANBAN } from '@/lib/emlak-fixtures'
+import { getServerT } from '@/lib/i18n/server'
 
 export const revalidate = 60
 
@@ -33,6 +34,7 @@ export default async function SatisSureciPage({
   const isBireysel = isEmlak && segment === 'bireysel'
 
   const izin = await getMusterilerIzni()
+  const { t } = await getServerT()
 
   let initialColumns
   if (isEmlak) {
@@ -62,8 +64,8 @@ export default async function SatisSureciPage({
     <div className="space-y-0" style={isEmlak ? { padding: '24px 32px 0' } : {}}>
       {isBireysel && (
         <div className="mx-4 sm:mx-6 mt-4 mb-0 flex items-center gap-[8px] rounded-[10px] border border-amber-200 bg-amber-50 px-[14px] py-[8px]">
-          <span className="text-[12px] font-bold text-amber-700">Örnek veri</span>
-          <span className="text-[12px] text-amber-600">Bireysel segment — yerel fixture, Airtable bağlantısı yok.</span>
+          <span className="text-[12px] font-bold text-amber-700">{t('pipe.sampleData')}</span>
+          <span className="text-[12px] text-amber-600">{t('pipe.bireyselFixtureNote')}</span>
         </div>
       )}
       <KanbanBoard

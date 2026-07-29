@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { X, Phone, MessageCircle, MapPin, Flame, Clock, CheckCircle2, CalendarCheck, StickyNote, Sparkles } from 'lucide-react'
 import type { FirmaListeItem, AirtableRecord } from '@/lib/airtable'
+import { useT } from '@/lib/i18n/context'
 
 // emlak glass paleti (stok/rapor ile aynı)
 const E = {
@@ -11,13 +12,13 @@ const E = {
 }
 
 // Pipeline aşaması → durum rozeti
-function durumMeta(asama?: string): { label: string; bg: string; fg: string; icon: typeof CheckCircle2 } {
+function durumMeta(asama: string | undefined, t: (key: string) => string): { label: string; bg: string; fg: string; icon: typeof CheckCircle2 } {
   switch (asama) {
-    case 'Ulaşılamadı': return { label: 'Ulaşılamadı', bg: '#FEE2E2', fg: '#991B1B', icon: Clock }
-    case 'Randevu':     return { label: 'Randevu Alındı', bg: '#EDE9FE', fg: '#5b51a8', icon: CalendarCheck }
-    case 'Kazanıldı':   return { label: 'Kazanıldı', bg: '#D1FAE5', fg: '#065F46', icon: CheckCircle2 }
-    case 'Kaybedildi':  return { label: 'Kaybedildi', bg: '#F1F5F9', fg: '#64748B', icon: X }
-    default:            return { label: 'Ulaşıldı', bg: '#D1FAE5', fg: '#065F46', icon: CheckCircle2 }
+    case 'Ulaşılamadı': return { label: t('cust.notReached'), bg: '#FEE2E2', fg: '#991B1B', icon: Clock }
+    case 'Randevu':     return { label: t('cust.appointmentTaken'), bg: '#EDE9FE', fg: '#5b51a8', icon: CalendarCheck }
+    case 'Kazanıldı':   return { label: t('cust.won'), bg: '#D1FAE5', fg: '#065F46', icon: CheckCircle2 }
+    case 'Kaybedildi':  return { label: t('cust.lost'), bg: '#F1F5F9', fg: '#64748B', icon: X }
+    default:            return { label: t('cust.reached'), bg: '#D1FAE5', fg: '#065F46', icon: CheckCircle2 }
   }
 }
 
@@ -49,6 +50,7 @@ export function EmlakMusteriModal({
   record: AirtableRecord<FirmaListeItem> | null
   onClose: () => void
 }) {
+  const t = useT()
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
     document.addEventListener('keydown', onKey)
@@ -59,11 +61,11 @@ export function EmlakMusteriModal({
 
   if (!record) return null
   const f = record.fields
-  const ad = f['Firma Adı'] ?? 'Müşteri'
+  const ad = f['Firma Adı'] ?? t('cust.customerFallback')
   const initials = ad.split(' ').filter(Boolean).slice(0, 2).map(s => s[0]).join('').toUpperCase()
   const tel = (f['Genel Telefon'] ?? '').replace(/\s/g, '')
   const waHref = `https://wa.me/90${tel.replace(/^0/, '')}`
-  const durum = durumMeta(f['Pipeline Aşaması'])
+  const durum = durumMeta(f['Pipeline Aşaması'], t)
   const DurumIcon = durum.icon
   const skor = f['Sıcaklık Skoru'] ?? 0
   const gorusmeler = dummyGorusmeler(record)
@@ -101,21 +103,21 @@ export function EmlakMusteriModal({
               <DurumIcon size={13} /> {durum.label}
             </span>
             <span className="inline-flex items-center gap-[5px] rounded-full px-[10px] py-[4px] text-[12px] font-bold" style={{ background: E.surface, color: skor >= 7 ? E.coral : E.green2 }}>
-              <Flame size={13} /> {skor}/10 ilgi
+              <Flame size={13} /> {skor}/10 {t('cust.interest')}
             </span>
-            <span className="rounded-full px-[10px] py-[4px] text-[11px] font-bold bg-amber-50 border border-amber-200 text-amber-700">Örnek veri</span>
+            <span className="rounded-full px-[10px] py-[4px] text-[11px] font-bold bg-amber-50 border border-amber-200 text-amber-700">{t('cust.sampleData')}</span>
           </div>
 
           {/* Hızlı aksiyon */}
           <div className="flex gap-[8px]">
             <a href={`tel:${tel}`} className="flex items-center gap-[6px] h-[38px] rounded-[11px] border px-[14px] text-[13px] font-bold transition-colors hover:bg-green-50" style={{ borderColor: E.green2, color: E.green2 }}>
-              <Phone size={14} /> Ara
+              <Phone size={14} /> {t('cust.call')}
             </a>
             <a href={waHref} target="_blank" rel="noopener noreferrer" className="flex items-center gap-[6px] h-[38px] rounded-[11px] px-[14px] text-[13px] font-bold text-white transition-opacity hover:opacity-90" style={{ background: '#25D366' }}>
               <MessageCircle size={14} /> WhatsApp
             </a>
             <div className="ml-auto text-right">
-              <p className="text-[11px] text-slate-400">Danışman</p>
+              <p className="text-[11px] text-slate-400">{t('cust.advisor')}</p>
               <p className="text-[12px] font-bold" style={{ color: E.text }}>{f['Atanan Temsilci'] ?? '—'}</p>
             </div>
           </div>
@@ -123,7 +125,7 @@ export function EmlakMusteriModal({
           {/* Ali özeti */}
           <div className="rounded-[14px] p-[13px]" style={{ borderLeft: `3px solid ${E.lav}`, background: E.lavSoft }}>
             <p className="text-[11px] font-black uppercase tracking-wide mb-[5px] flex items-center gap-[5px]" style={{ color: E.lav }}>
-              <Sparkles size={12} /> Ali Özeti
+              <Sparkles size={12} /> {t('cust.aliSummary')}
             </p>
             <p className="text-[13px] leading-[19px]" style={{ color: '#48417e' }}>{dummyNot(record)}</p>
           </div>
@@ -131,7 +133,7 @@ export function EmlakMusteriModal({
           {/* Birikimli notlar */}
           <div>
             <p className="text-[11px] font-black uppercase tracking-wide mb-[8px] flex items-center gap-[5px]" style={{ color: E.green1 }}>
-              <StickyNote size={12} /> Birikimli Görüşme Notları
+              <StickyNote size={12} /> {t('cust.cumulativeNotes')}
             </p>
             <div className="rounded-[12px] p-[12px] text-[13px] leading-[19px]" style={{ background: E.surface, color: '#33433a', border: `1px solid ${E.line}` }}>
               {gorusmeler.map(g => g.not).join(' ')}
@@ -140,7 +142,7 @@ export function EmlakMusteriModal({
 
           {/* Görüşme geçmişi */}
           <div>
-            <p className="text-[11px] font-black uppercase tracking-wide mb-[8px]" style={{ color: E.green1 }}>Görüşme Geçmişi</p>
+            <p className="text-[11px] font-black uppercase tracking-wide mb-[8px]" style={{ color: E.green1 }}>{t('cust.conversationHistory')}</p>
             <div className="space-y-[8px]">
               {gorusmeler.map((g, i) => (
                 <div key={i} className="rounded-[12px] border p-[12px]" style={{ borderColor: E.line }}>
@@ -152,7 +154,7 @@ export function EmlakMusteriModal({
                 </div>
               ))}
             </div>
-            <p className="mt-[8px] text-[11px] text-slate-400">Demo görünümü — kayıt/düzenleme gerçek backend bağlanınca aktif olacak.</p>
+            <p className="mt-[8px] text-[11px] text-slate-400">{t('cust.demoViewNote')}</p>
           </div>
         </div>
       </div>

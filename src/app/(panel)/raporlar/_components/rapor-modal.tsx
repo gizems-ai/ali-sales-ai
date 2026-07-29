@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { X } from 'lucide-react'
+import { useT } from '@/lib/i18n/context'
 
 interface Props {
   recordId: string | null
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export function RaporModal({ recordId, onClose }: Props) {
+  const t = useT()
   const [html, setHtml] = useState<string | null>(null)
   const [baslik, setBaslik] = useState('')
   const [loading, setLoading] = useState(false)
@@ -25,7 +27,7 @@ export function RaporModal({ recordId, onClose }: Props) {
         setHtml(d.html)
         setBaslik(d.baslik)
       })
-      .catch(() => setError('Rapor yüklenemedi'))
+      .catch(() => setError(t('rep.raporYuklenemedi')))
       .finally(() => setLoading(false))
   }, [recordId])
 
@@ -45,7 +47,7 @@ export function RaporModal({ recordId, onClose }: Props) {
       <div className="relative w-full max-w-4xl rounded-2xl bg-white shadow-2xl flex flex-col max-h-[85vh]">
         {/* Başlık */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
-          <h2 className="text-sm font-semibold text-gray-800 truncate pr-4">{baslik || 'Rapor'}</h2>
+          <h2 className="text-sm font-semibold text-gray-800 truncate pr-4">{baslik || t('rep.rapor')}</h2>
           <button
             onClick={onClose}
             className="p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"

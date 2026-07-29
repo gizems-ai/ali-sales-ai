@@ -11,6 +11,7 @@ import {
 import { type FirmaDetay, type AirtableRecord, PIPELINE_ASAMALARI } from '@/lib/airtable'
 import { type MusterilerIzin } from '@/lib/musteriler-izin'
 import { TEMSILCILER } from '@/lib/temsilciler'
+import { useT } from '@/lib/i18n/context'
 
 // ── Tipleri ────────────────────────────────────────────────────────────────
 
@@ -93,11 +94,12 @@ function normTR(s: string) {
 // ── Alt bileşenler ─────────────────────────────────────────────────────────
 
 function BransBadge({ value }: { value: string }) {
+  const t = useT()
   const n = normTR(value)
   let bg = '#6B7280'; let label = value
-  if (n.includes('saglik')) { bg = '#10B981'; label = 'Sağlık' }
-  else if (n.includes('elem')) { bg = '#F97316'; label = 'Elementer' }
-  else if (n.includes('acib')) { bg = '#A855F7'; label = 'Acıbadem' }
+  if (n.includes('saglik')) { bg = '#10B981'; label = t('cust.branchSaglik') }
+  else if (n.includes('elem')) { bg = '#F97316'; label = t('cust.branchElementer') }
+  else if (n.includes('acib')) { bg = '#A855F7'; label = t('cust.branchAcibadem') }
   return (
     <span className="inline-flex items-center px-3 py-1 rounded-full text-white text-[13px] font-semibold shadow-sm"
       style={{ backgroundColor: bg }}>
@@ -107,8 +109,9 @@ function BransBadge({ value }: { value: string }) {
 }
 
 function ScoreCircle({ score }: { score: number }) {
+  const t = useT()
   const color = score >= 7 ? '#DC2626' : score >= 4 ? '#5B47E0' : '#9CA3AF'
-  const label = score >= 7 ? 'Sıcak' : score >= 4 ? 'Ilık' : 'Soğuk'
+  const label = score >= 7 ? t('cust.scoreHot') : score >= 4 ? t('cust.scoreWarm') : t('cust.scoreCold')
   return (
     <div className="flex items-center gap-1.5">
       <div className="h-10 w-10 rounded-full grid place-items-center text-white text-[15px] font-black shadow-sm"
@@ -268,6 +271,7 @@ interface HizliAksizonProps {
 }
 
 function HizliAksiyon({ record, izin, onAirtableUpdate, onPipelineChange, disabled }: HizliAksizonProps) {
+  const t = useT()
   const f = record.fields
   const [loading, setLoading] = useState<string | null>(null)
   const [pipelineAcik, setPipelineAcik] = useState(false)
@@ -321,7 +325,7 @@ function HizliAksiyon({ record, izin, onAirtableUpdate, onPipelineChange, disabl
   const buttons = [
     {
       key: 'arandi',
-      label: 'Arandı',
+      label: t('cust.called'),
       emoji: '📞',
       color: '#3B82F6',
       fields: { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, 'Bugün Aranacak': false },
@@ -329,7 +333,7 @@ function HizliAksiyon({ record, izin, onAirtableUpdate, onPipelineChange, disabl
     },
     {
       key: 'ulasildi',
-      label: 'Ulaşıldı',
+      label: t('cust.reached'),
       emoji: '✓',
       color: '#10B981',
       fields: { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, '2026 Ulaşıldı mı': true, 'Bugün Aranacak': false },
@@ -337,7 +341,7 @@ function HizliAksiyon({ record, izin, onAirtableUpdate, onPipelineChange, disabl
     },
     {
       key: 'ulasilamadi',
-      label: 'Ulaşılamadı',
+      label: t('cust.notReached'),
       emoji: '✗',
       color: '#DC2626',
       fields: { 'Son İletişim Tarihi': today, '2026 Arandı mı': true, 'Pipeline Aşaması': 'Ulaşılamadı', 'Bugün Aranacak': false },
@@ -345,7 +349,7 @@ function HizliAksiyon({ record, izin, onAirtableUpdate, onPipelineChange, disabl
     },
     {
       key: 'sonra',
-      label: 'Sonra Ara',
+      label: t('cust.callLater'),
       emoji: '📅',
       color: '#8B5CF6',
       fields: {},
@@ -392,7 +396,7 @@ function HizliAksiyon({ record, izin, onAirtableUpdate, onPipelineChange, disabl
           />
           <button onClick={doSonraAra}
             className="px-3 py-1.5 rounded-lg bg-white text-[12px] font-bold text-purple-700 hover:bg-purple-50 transition-colors">
-            Kaydet
+            {t('cust.save')}
           </button>
           <button onClick={() => setSonraAraAcik(false)}
             className="p-1.5 rounded-lg text-white/70 hover:text-white transition-colors">
@@ -408,7 +412,7 @@ function HizliAksiyon({ record, izin, onAirtableUpdate, onPipelineChange, disabl
           className="w-full flex items-center justify-between px-3 py-2 rounded-xl bg-white/15 hover:bg-white/25 transition-colors"
         >
           <div>
-            <span className="block text-[11px] text-white/70 font-medium uppercase tracking-wide">Pipeline Aşaması</span>
+            <span className="block text-[11px] text-white/70 font-medium uppercase tracking-wide">{t('cust.pipelineStage')}</span>
             <span className="text-[14px] font-bold text-white mt-0.5 flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full shrink-0" style={{ background: PIPELINE_RENK[f['Pipeline Aşaması'] ?? ''] ?? '#9CA3AF' }} />
               {f['Pipeline Aşaması'] ?? '—'}
@@ -439,17 +443,18 @@ function HizliAksiyon({ record, izin, onAirtableUpdate, onPipelineChange, disabl
 // ── Birikimli notlar bileşeni ─────────────────────────────────────────────
 
 function BirikimliNotlar({ metin }: { metin: string }) {
+  const t = useT()
   const [acik, setAcik] = useState(false)
   const satirlar = metin.split('\n')
   const uzun = satirlar.length > 5 || metin.length > 400
   const gosterilen = acik ? metin : satirlar.slice(0, 4).join('\n')
   return (
     <div className="rounded-xl bg-gray-50 border border-gray-100 p-3.5">
-      <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wide mb-2">Birikimli Görüşme Notları</p>
+      <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wide mb-2">{t('cust.cumulativeNotes')}</p>
       <p className="text-sm text-gray-700 whitespace-pre-wrap leading-relaxed">{gosterilen}{uzun && !acik && '…'}</p>
       {uzun && (
         <button onClick={() => setAcik(p => !p)} className="mt-2 text-xs text-[#5B47E0] hover:underline">
-          {acik ? 'Kapat' : 'Devamını gör'}
+          {acik ? t('cust.collapse') : t('cust.showMore')}
         </button>
       )}
     </div>
@@ -468,6 +473,7 @@ interface AktiviteSectionProps {
 }
 
 export function AktiviteSection({ firmaId, izin, em, isAdmin, externalLogs, onNewLog }: AktiviteSectionProps) {
+  const t = useT()
   const [loglar, setLoglar] = useState<AktiviteLog[]>(externalLogs ?? [])
   const [yukleniyor, setYukleniyor] = useState(!externalLogs)
   const [hata, setHata] = useState('')
@@ -488,11 +494,11 @@ export function AktiviteSection({ firmaId, izin, em, isAdmin, externalLogs, onNe
       const data = await res.json()
       setLoglar(data.records ?? [])
     } catch {
-      setHata('Aktiviteler yüklenemedi')
+      setHata(t('cust.activitiesLoadFailed'))
     } finally {
       setYukleniyor(false)
     }
-  }, [firmaId])
+  }, [firmaId, t])
 
   useEffect(() => {
     if (!externalLogs) loadLogs()
@@ -504,7 +510,7 @@ export function AktiviteSection({ firmaId, izin, em, isAdmin, externalLogs, onNe
   }, [externalLogs])
 
   async function handleEkle() {
-    if (!aramaSonucu) { setEkleHata('Arama sonucu seçin'); return }
+    if (!aramaSonucu) { setEkleHata(t('cust.selectCallResultError')); return }
     setEkleniyor(true)
     setEkleHata('')
     try {
@@ -516,7 +522,7 @@ export function AktiviteSection({ firmaId, izin, em, isAdmin, externalLogs, onNe
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       })
-      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error ?? 'Hata') }
+      if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error ?? t('cust.error')) }
       const yeni: AktiviteLog = await res.json()
       setLoglar(prev => [yeni, ...prev])
       onNewLog?.(yeni)
@@ -525,14 +531,14 @@ export function AktiviteSection({ firmaId, izin, em, isAdmin, externalLogs, onNe
       setRandevuAlindi(false)
       setTarih(new Date().toISOString().slice(0, 10))
     } catch (e) {
-      setEkleHata(e instanceof Error ? e.message : 'Eklenemedi')
+      setEkleHata(e instanceof Error ? e.message : t('cust.addFailed'))
     } finally {
       setEkleniyor(false)
     }
   }
 
   async function handleSil(logId: string) {
-    if (!confirm('Bu aktivite kaydı silinecek. Emin misin?')) return
+    if (!confirm(t('cust.deleteActivityConfirm'))) return
     try {
       const res = await fetch(`/api/aktivite/${logId}`, { method: 'DELETE' })
       if (!res.ok) return
@@ -544,52 +550,52 @@ export function AktiviteSection({ firmaId, izin, em, isAdmin, externalLogs, onNe
     <div>
       {/* Yeni aktivite ekleme */}
       <div className="rounded-xl border border-[#EDE9FE] bg-[#F5F3FF]/50 p-3 mb-3">
-        <p className="text-[11px] text-[#7C3AED] font-semibold uppercase tracking-wide mb-2">Aktivite Ekle</p>
+        <p className="text-[11px] text-[#7C3AED] font-semibold uppercase tracking-wide mb-2">{t('cust.addActivity')}</p>
         <div className="flex gap-2 mb-2">
           <select value={aramaSonucu} onChange={e => { setAramaSonucu(e.target.value); setEkleHata('') }}
             className="flex-1 px-2.5 py-1.5 rounded-lg border border-[#DDD6FE] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5B47E0]/30 focus:border-[#5B47E0]">
-            <option value="">Arama sonucu seç…</option>
+            <option value="">{t('cust.selectCallResult')}</option>
             {ARAMA_SONUCU_SECENEKLERI.map(s => <option key={s} value={s}>{s}</option>)}
           </select>
           <label className="flex items-center gap-1.5 cursor-pointer shrink-0">
             <input type="checkbox" checked={randevuAlindi} onChange={e => setRandevuAlindi(e.target.checked)}
               className="w-4 h-4 rounded border-gray-300 text-[#5B47E0]" />
-            <span className="text-xs text-gray-600 whitespace-nowrap">Randevu</span>
+            <span className="text-xs text-gray-600 whitespace-nowrap">{t('cust.appointment')}</span>
           </label>
         </div>
         {em && (
           <div className="flex gap-2 mb-2">
             <div className="flex-1">
-              <label className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Tarih</label>
+              <label className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">{t('cust.date')}</label>
               <input type="date" value={tarih} onChange={e => setTarih(e.target.value)}
                 className="mt-0.5 w-full px-2.5 py-1.5 rounded-lg border border-[#DDD6FE] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5B47E0]/30" />
             </div>
             {izin.tip === 'yönetici' && (
               <div className="flex-1">
-                <label className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">Temsilci</label>
+                <label className="text-[10px] text-gray-400 font-medium uppercase tracking-wide">{t('cust.rep')}</label>
                 <select value={temsilci} onChange={e => setTemsilci(e.target.value)}
                   className="mt-0.5 w-full px-2.5 py-1.5 rounded-lg border border-[#DDD6FE] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5B47E0]/30">
                   <option value="">—</option>
-                  {TEMSILCILER.map(t => <option key={t} value={t}>{t}</option>)}
+                  {TEMSILCILER.map(nm => <option key={nm} value={nm}>{nm}</option>)}
                 </select>
               </div>
             )}
           </div>
         )}
         <textarea rows={2} value={notMetni} onChange={e => setNotMetni(e.target.value)}
-          placeholder="Not (isteğe bağlı)…"
+          placeholder={t('cust.notePlaceholderOptional')}
           className="w-full px-2.5 py-1.5 rounded-lg border border-[#DDD6FE] text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5B47E0]/30 resize-none" />
         {ekleHata && <p className="text-[11px] text-red-500 mt-1">{ekleHata}</p>}
         <button onClick={handleEkle} disabled={!aramaSonucu || ekleniyor}
           className="mt-2 px-4 py-1.5 rounded-lg bg-[#5B47E0] text-white text-xs font-semibold hover:bg-[#4C3BC8] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-          {ekleniyor ? 'Ekleniyor…' : 'Kaydet'}
+          {ekleniyor ? t('cust.adding') : t('cust.save')}
         </button>
       </div>
 
       {/* Log listesi */}
       {yukleniyor && <div className="flex justify-center py-4"><div className="w-5 h-5 rounded-full border-2 border-[#5B47E0] border-t-transparent animate-spin" /></div>}
       {hata && <p className="text-xs text-red-500 py-2">{hata}</p>}
-      {!yukleniyor && loglar.length === 0 && <p className="text-xs text-gray-400 py-2 text-center">Henüz aktivite kaydı yok</p>}
+      {!yukleniyor && loglar.length === 0 && <p className="text-xs text-gray-400 py-2 text-center">{t('cust.noActivity')}</p>}
       {!yukleniyor && loglar.length > 0 && (
         <div className="space-y-2">
           {loglar.map(log => {
@@ -609,7 +615,7 @@ export function AktiviteSection({ firmaId, izin, em, isAdmin, externalLogs, onNe
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5 flex-wrap">
                     {sonuc && <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium border ${renkClass}`}>{sonuc}</span>}
-                    {lf['Randevu Alındı'] && <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-green-50 text-green-700 border border-green-100">Randevu</span>}
+                    {lf['Randevu Alındı'] && <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-green-50 text-green-700 border border-green-100">{t('cust.appointment')}</span>}
                   </div>
                   {lf['Not'] && <p className="text-xs text-gray-600 mt-1 leading-relaxed">{lf['Not']}</p>}
                 </div>
@@ -631,6 +637,7 @@ export function AktiviteSection({ firmaId, izin, em, isAdmin, externalLogs, onNe
 // ── Son Görüşmeler (ilk 3) ─────────────────────────────────────────────────
 
 function SonGorusmeler({ firmaId, isAdmin }: { firmaId: string; isAdmin: boolean }) {
+  const t = useT()
   const [loglar, setLoglar] = useState<AktiviteLog[]>([])
   const [yukleniyor, setYukleniyor] = useState(true)
   const [tumunu, setTumunu] = useState(false)
@@ -647,7 +654,7 @@ function SonGorusmeler({ firmaId, isAdmin }: { firmaId: string; isAdmin: boolean
   return (
     <div>
       {yukleniyor && <div className="flex justify-center py-3"><div className="w-4 h-4 rounded-full border-2 border-[#5B47E0] border-t-transparent animate-spin" /></div>}
-      {!yukleniyor && loglar.length === 0 && <p className="text-xs text-gray-400 text-center py-2">Henüz görüşme kaydı yok</p>}
+      {!yukleniyor && loglar.length === 0 && <p className="text-xs text-gray-400 text-center py-2">{t('cust.noConversation')}</p>}
       {gosterilen.map(log => {
         const lf = log.fields
         const sonuc = lf['Arama Sonucu']
@@ -657,7 +664,7 @@ function SonGorusmeler({ firmaId, isAdmin }: { firmaId: string; isAdmin: boolean
             <div className="flex items-center gap-2 mb-1">
               {lf['Tarih'] && <span className="text-[11px] text-gray-400">{formatTarihKisa(lf['Tarih'])}</span>}
               {sonuc && <span className={`px-2 py-0.5 rounded-full text-[11px] font-medium border ${renkClass}`}>{sonuc}</span>}
-              {lf['Randevu Alındı'] && <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-green-50 text-green-700 border border-green-100">Randevu</span>}
+              {lf['Randevu Alındı'] && <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-green-50 text-green-700 border border-green-100">{t('cust.appointment')}</span>}
               {lf['Temsilci'] && (
                 <span className="ml-auto w-6 h-6 rounded-full bg-[#EDE9FE] text-[#5B47E0] text-[10px] font-bold flex items-center justify-center">
                   {lf['Temsilci'].slice(0, 2).toUpperCase()}
@@ -671,7 +678,7 @@ function SonGorusmeler({ firmaId, isAdmin }: { firmaId: string; isAdmin: boolean
       {loglar.length > 3 && (
         <button onClick={() => setTumunu(v => !v)}
           className="text-xs text-[#5B47E0] hover:underline mt-1">
-          {tumunu ? 'Daha az göster' : `${loglar.length - 3} görüşme daha →`}
+          {tumunu ? t('cust.showLess') : t('cust.moreConversations').replace('{n}', String(loglar.length - 3))}
         </button>
       )}
     </div>
@@ -681,6 +688,7 @@ function SonGorusmeler({ firmaId, isAdmin }: { firmaId: string; isAdmin: boolean
 // ── Ana Modal bileşeni ────────────────────────────────────────────────────
 
 export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) {
+  const t = useT()
   const { airtable: { sistemAdi } } = useTenant()
   const [yukleDurum, setYukleDurum] = useState<YukleDurum>('bos')
   const [hataMsg, setHataMsg] = useState('')
@@ -734,11 +742,11 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
     const errors: Record<string, string> = {}
     const firmaAdi = (pend['Firma Adı'] ?? record?.fields['Firma Adı'])
     if ('Firma Adı' in pend && (!firmaAdi || String(firmaAdi).trim() === '')) {
-      errors['Firma Adı'] = 'Firma adı boş olamaz'
+      errors['Firma Adı'] = t('cust.companyNameRequired')
     }
     const mail = pend['Genel Mail']
     if (mail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(mail))) {
-      errors['Genel Mail'] = 'Geçersiz e-posta'
+      errors['Genel Mail'] = t('cust.invalidEmail')
     }
     setValErr(errors)
     return Object.keys(errors).length === 0
@@ -758,13 +766,13 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
       })
       if (!res.ok) { const d = await res.json().catch(() => ({})); throw new Error(d.error ?? `HTTP ${res.status}`) }
       setEm(false); setPend({})
-      showToast({ mesaj: `${record.fields['Firma Adı'] ?? 'Firma'} güncellendi`, undoFn: async () => {
+      showToast({ mesaj: `${record.fields['Firma Adı'] ?? t('cust.companyFallback')} ${t('cust.updated')}`, undoFn: async () => {
         setRecord(r => r ? { ...r, fields: { ...r.fields, ...prev } } : r)
         await fetch('/api/musteriler/update', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ recordId: record.id, fields: prev }) })
       }})
     } catch (e) {
       setRecord(r => r ? { ...r, fields: { ...r.fields, ...prev } } : r)
-      setSaveErr(e instanceof Error ? e.message : 'Kaydedilemedi')
+      setSaveErr(e instanceof Error ? e.message : t('cust.saveFailed'))
     } finally {
       setSaving(false)
     }
@@ -777,7 +785,7 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
     opts?: { randevuAlindi?: boolean; toastMesaj?: string },
   ) {
     if (!record) return
-    const firmaAdi = record.fields['Firma Adı'] ?? 'Firma'
+    const firmaAdi = record.fields['Firma Adı'] ?? t('cust.companyFallback')
     const prevFields: Partial<FirmaDetay> = {}
     for (const k of Object.keys(fields)) prevFields[k as keyof FirmaDetay] = record.fields[k as keyof FirmaDetay] as never
 
@@ -801,17 +809,17 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
 
     if (updateRes.status === 'rejected' || (updateRes.status === 'fulfilled' && !updateRes.value?.ok)) {
       setRecord(r => r ? { ...r, fields: { ...r.fields, ...prevFields } } : r)
-      showToast({ mesaj: `${firmaAdi}: Kaydedilemedi`, hataMi: true })
+      showToast({ mesaj: `${firmaAdi}: ${t('cust.saveFailed')}`, hataMi: true })
       return
     }
 
     const prevData = updateRes.status === 'fulfilled' ? await updateRes.value.json().catch(() => ({})) : {}
-    let mesaj = `${firmaAdi} · güncellendi`
+    let mesaj = `${firmaAdi} · ${t('cust.updated')}`
     if (opts?.toastMesaj) mesaj = `${firmaAdi} · ${opts.toastMesaj}`
-    else if (aramaSonucu === 'Ulaşıldı') mesaj = `${firmaAdi} · Ulaşıldı ✓`
-    else if (aramaSonucu === 'Cevap Yok') mesaj = `${firmaAdi} · Ulaşılamadı`
-    else if (aramaSonucu === 'Geri Aranacak') mesaj = `${firmaAdi} · Arandı kaydedildi`
-    else if ('Sonra Ara Tarihi' in fields) mesaj = `${firmaAdi} · Sonra ara tarihi ayarlandı`
+    else if (aramaSonucu === 'Ulaşıldı') mesaj = `${firmaAdi} · ${t('cust.reachedCheck')}`
+    else if (aramaSonucu === 'Cevap Yok') mesaj = `${firmaAdi} · ${t('cust.notReached')}`
+    else if (aramaSonucu === 'Geri Aranacak') mesaj = `${firmaAdi} · ${t('cust.calledSaved')}`
+    else if ('Sonra Ara Tarihi' in fields) mesaj = `${firmaAdi} · ${t('cust.callLaterSet')}`
     else if ('Pipeline Aşaması' in fields) mesaj = `${firmaAdi} · Pipeline: ${fields['Pipeline Aşaması']}`
 
     showToast({
@@ -857,9 +865,9 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
         setRecord(r => r ? { ...r, fields: { ...r.fields, 'Birikimli Görüşme Notları': data.fields['Birikimli Görüşme Notları'] } } : r)
       }
       setNotInput('')
-      showToast({ mesaj: `${record.fields['Firma Adı'] ?? 'Firma'} · Not eklendi` })
+      showToast({ mesaj: `${record.fields['Firma Adı'] ?? t('cust.companyFallback')} · ${t('cust.noteAdded')}` })
     } catch {
-      showToast({ mesaj: 'Not eklenemedi', hataMi: true })
+      showToast({ mesaj: t('cust.noteAddFailed'), hataMi: true })
     } finally {
       setNotEkleniyor(false)
     }
@@ -873,12 +881,12 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
   const temsilci = f['Atanan Temsilci']
   const oncelik = f['Öncelik']
   const checkboxAlanlar: Array<{ label: string; fk: keyof FirmaDetay }> = [
-    { label: 'Bugün Aranacak', fk: 'Bugün Aranacak' },
-    { label: '2026 Arandı', fk: '2026 Arandı mı' },
-    { label: '2026 Ulaşıldı', fk: '2026 Ulaşıldı mı' },
-    { label: 'Branş Onaylandı', fk: 'Branş Onaylandı' },
-    { label: 'Cross-Sell İmkânı', fk: 'Cross-Sell İmkânı' },
-    { label: 'Global Anlaşma', fk: 'Global Anlaşma' },
+    { label: t('cust.callToday'), fk: 'Bugün Aranacak' },
+    { label: t('cust.called2026'), fk: '2026 Arandı mı' },
+    { label: t('cust.reached2026'), fk: '2026 Ulaşıldı mı' },
+    { label: t('cust.branchApproved'), fk: 'Branş Onaylandı' },
+    { label: t('cust.crossSell'), fk: 'Cross-Sell İmkânı' },
+    { label: t('cust.globalDeal'), fk: 'Global Anlaşma' },
   ]
   const canWrite = izin.tip === 'yönetici' || (izin.tip === 'temsilci' && temsilci === izin.temsilci)
 
@@ -910,18 +918,18 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
                 {!em && (
                   <button onClick={() => { setEm(true); setPend({}); setSaveErr(null) }}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#5B47E0] text-white text-xs font-semibold hover:bg-[#4C3BC8] transition-colors">
-                    <Pencil size={12} /> Düzenle
+                    <Pencil size={12} /> {t('cust.edit')}
                   </button>
                 )}
                 {em && (
                   <>
                     <button onClick={() => { setEm(false); setPend({}); setValErr({}) }} disabled={saving}
                       className="px-3 py-1.5 rounded-lg border border-gray-200 text-xs font-semibold text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors">
-                      İptal
+                      {t('cust.cancel')}
                     </button>
                     <button onClick={handleKaydet} disabled={saving}
                       className="px-4 py-1.5 rounded-lg bg-[#5B47E0] text-white text-xs font-semibold hover:bg-[#4C3BC8] disabled:opacity-50 transition-colors">
-                      {saving ? 'Kaydediliyor…' : 'Kaydet'}
+                      {saving ? t('cust.saving') : t('cust.save')}
                     </button>
                   </>
                 )}
@@ -973,7 +981,7 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
         ) : (
           /* Minimal header when loading / error */
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
-            <p className="text-xs font-semibold text-[#5B47E0] uppercase tracking-widest">Firma Detayı</p>
+            <p className="text-xs font-semibold text-[#5B47E0] uppercase tracking-widest">{t('cust.companyDetail')}</p>
             <button onClick={() => { if (!em) onClose() }} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-400 transition-colors">
               <X size={18} />
             </button>
@@ -998,7 +1006,7 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
               {/* ── İLETİŞİM ─────────────────────────────────────────── */}
               {(f['Genel Telefon'] || f['Genel Mail'] || f['Web Sitesi'] || f['İl / İlçe']) && !em && (
                 <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                  <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wide mb-3">İletişim</p>
+                  <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wide mb-3">{t('cust.contact')}</p>
                   <div className="grid grid-cols-2 gap-2.5">
                     {f['Genel Telefon'] && (
                       <a href={`tel:${f['Genel Telefon']}`}
@@ -1007,7 +1015,7 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
                           <Phone size={14} className="text-[#5B47E0]" />
                         </div>
                         <div className="min-w-0">
-                          <span className="block text-[11px] text-gray-400">Telefon</span>
+                          <span className="block text-[11px] text-gray-400">{t('cust.phone')}</span>
                           <span className="block text-sm font-medium text-[#2563EB] truncate">{f['Genel Telefon']}</span>
                         </div>
                       </a>
@@ -1019,7 +1027,7 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
                           <Mail size={14} className="text-[#5B47E0]" />
                         </div>
                         <div className="min-w-0">
-                          <span className="block text-[11px] text-gray-400">E-posta</span>
+                          <span className="block text-[11px] text-gray-400">{t('cust.email')}</span>
                           <span className="block text-sm font-medium text-[#2563EB] truncate">{f['Genel Mail']}</span>
                         </div>
                       </a>
@@ -1057,13 +1065,13 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
                 <div className={`grid gap-3 ${f['Ali Özeti'] && f['Önerilen Açılış'] ? 'grid-cols-2' : 'grid-cols-1'}`}>
                   {f['Ali Özeti'] && (
                     <div className="rounded-xl p-3.5 shadow-sm" style={{ background: 'linear-gradient(135deg, #F5F3FF, #EDE9FE)', borderLeft: '4px solid #5B47E0' }}>
-                      <p className="text-[11px] font-bold text-[#5B47E0] uppercase tracking-wide mb-2">🔥 Ali Önerisi</p>
+                      <p className="text-[11px] font-bold text-[#5B47E0] uppercase tracking-wide mb-2">{t('cust.aliSuggestion')}</p>
                       <p className="text-[13px] leading-relaxed text-[#374151]">{f['Ali Özeti']}</p>
                     </div>
                   )}
                   {f['Önerilen Açılış'] && (
                     <div className="rounded-xl p-3.5 shadow-sm" style={{ background: 'linear-gradient(135deg, #F0FDF4, #DCFCE7)', borderLeft: '4px solid #10B981' }}>
-                      <p className="text-[11px] font-bold text-[#10B981] uppercase tracking-wide mb-2">💬 Önerilen Açılış</p>
+                      <p className="text-[11px] font-bold text-[#10B981] uppercase tracking-wide mb-2">{t('cust.suggestedOpening')}</p>
                       <p className="text-[13px] italic leading-relaxed text-[#374151]">{f['Önerilen Açılış']}</p>
                     </div>
                   )}
@@ -1072,7 +1080,7 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
 
               {/* ── NOT EKLE ──────────────────────────────────────────── */}
               <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                <p className="text-[13px] font-bold text-gray-800 mb-3">✏️ Görüşme Notu</p>
+                <p className="text-[13px] font-bold text-gray-800 mb-3">{t('cust.conversationNote')}</p>
                 {f['Birikimli Görüşme Notları'] && !em && (
                   <div className="mb-3">
                     <BirikimliNotlar metin={f['Birikimli Görüşme Notları']} />
@@ -1083,51 +1091,51 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
                 ) : (
                   <>
                     <textarea rows={3} value={notInput} onChange={e => setNotInput(e.target.value)}
-                      placeholder="Bugünkü görüşme notu…"
+                      placeholder={t('cust.todayNotePlaceholder')}
                       className="w-full px-3 py-2.5 rounded-lg border border-gray-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-[#5B47E0]/30 focus:border-[#5B47E0] resize-none transition-colors" />
                     <button onClick={handleNotEkle} disabled={!notInput.trim() || notEkleniyor}
                       className="mt-2 px-5 py-2 rounded-lg bg-[#5B47E0] text-white text-xs font-semibold hover:bg-[#4C3BC8] disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-                      {notEkleniyor ? 'Ekleniyor…' : '+ Ekle'}
+                      {notEkleniyor ? t('cust.adding') : t('cust.addPlus')}
                     </button>
                   </>
                 )}
               </div>
 
               {/* ── SON GÖRÜŞMELER ─────────────────────────────────────── */}
-              <CollapsibleSection title={`📋 Son Görüşmeler`} defaultOpen={true}>
+              <CollapsibleSection title={t('cust.recentConversations')} defaultOpen={true}>
                 <SonGorusmeler firmaId={record.id} isAdmin={isAdmin} />
               </CollapsibleSection>
 
               {/* ── SİGORTA BİLGİSİ ───────────────────────────────────── */}
-              <CollapsibleSection title="🏥 Sigorta Bilgisi">
+              <CollapsibleSection title={t('cust.insuranceInfo')}>
                 {em ? (
                   <div className="space-y-3">
-                    <EF label="Branş" fk="Branş" type="multiselect" opts={BRANŞLAR} em={em} rec={record} pend={pend} onCh={onCh} />
-                    <EF label="Vade Ayı Grubu" fk="Vade Ayı Grubu" type="select" opts={VADE_AYLARI} em={em} rec={record} pend={pend} onCh={onCh} />
-                    <EF label="Sağlık Poliçe Türü" fk="Sağlık Poliçe Türü" type="select" opts={SAGLIK_POLICE} em={em} rec={record} pend={pend} onCh={onCh} />
-                    <EF label="Sağlık Vade Tarihi" fk="Sağlık Vade Tarihi" type="date" em={em} rec={record} pend={pend} onCh={onCh} />
-                    <EF label="Elementer Ürün" fk="Elementer Ürün" em={em} rec={record} pend={pend} onCh={onCh} />
-                    <EF label="Elementer Vade" fk="Elementer Vade" type="date" em={em} rec={record} pend={pend} onCh={onCh} />
-                    <EF label="Mevcut Aracı Kurum" fk="Mevcut Aracı Kurum" em={em} rec={record} pend={pend} onCh={onCh} />
-                    <EF label="Ürün" fk="Ürün" type="select" opts={SAGLIK_POLICE} em={em} rec={record} pend={pend} onCh={onCh} />
-                    <EF label="Kişi Sayısı" fk="Kişi Sayısı" type="number" em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label={t('cust.branch')} fk="Branş" type="multiselect" opts={BRANŞLAR} em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label={t('cust.dueMonthGroup')} fk="Vade Ayı Grubu" type="select" opts={VADE_AYLARI} em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label={t('cust.healthPolicyType')} fk="Sağlık Poliçe Türü" type="select" opts={SAGLIK_POLICE} em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label={t('cust.healthDueDate')} fk="Sağlık Vade Tarihi" type="date" em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label={t('cust.elementaryProduct')} fk="Elementer Ürün" em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label={t('cust.elementaryDue')} fk="Elementer Vade" type="date" em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label={t('cust.currentBroker')} fk="Mevcut Aracı Kurum" em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label={t('cust.product')} fk="Ürün" type="select" opts={SAGLIK_POLICE} em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label={t('cust.personCount')} fk="Kişi Sayısı" type="number" em={em} rec={record} pend={pend} onCh={onCh} />
                   </div>
                 ) : (
                   <div className="grid grid-cols-2 gap-3">
                     {bransArr.length > 0 && (
                       <div className="col-span-2">
-                        <span className="text-[11px] text-gray-400 font-medium uppercase tracking-wide block mb-1">Branş</span>
+                        <span className="text-[11px] text-gray-400 font-medium uppercase tracking-wide block mb-1">{t('cust.branch')}</span>
                         <div className="flex flex-wrap gap-1.5">{bransArr.map(b => <BransBadge key={b} value={b} />)}</div>
                       </div>
                     )}
-                    <Alan label="Vade Ayı" value={f['Vade Ayı Grubu']} />
-                    <Alan label="Sağlık Poliçe" value={f['Sağlık Poliçe Türü']} />
-                    <Alan label="Sağlık Vade" value={f['Sağlık Vade Tarihi'] ? formatTarih(f['Sağlık Vade Tarihi']) : undefined} />
-                    <Alan label="Elementer Ürün" value={f['Elementer Ürün']} />
-                    <Alan label="Elementer Vade" value={f['Elementer Vade'] ? formatTarih(f['Elementer Vade']) : undefined} />
-                    <Alan label="Mevcut Aracı" value={f['Mevcut Aracı Kurum']} />
-                    <Alan label="Ürün" value={f['Ürün']} />
-                    <Alan label="Kişi Sayısı" value={f['Kişi Sayısı']} />
+                    <Alan label={t('cust.dueMonth')} value={f['Vade Ayı Grubu']} />
+                    <Alan label={t('cust.healthPolicy')} value={f['Sağlık Poliçe Türü']} />
+                    <Alan label={t('cust.healthDue')} value={f['Sağlık Vade Tarihi'] ? formatTarih(f['Sağlık Vade Tarihi']) : undefined} />
+                    <Alan label={t('cust.elementaryProduct')} value={f['Elementer Ürün']} />
+                    <Alan label={t('cust.elementaryDue')} value={f['Elementer Vade'] ? formatTarih(f['Elementer Vade']) : undefined} />
+                    <Alan label={t('cust.currentBrokerShort')} value={f['Mevcut Aracı Kurum']} />
+                    <Alan label={t('cust.product')} value={f['Ürün']} />
+                    <Alan label={t('cust.personCount')} value={f['Kişi Sayısı']} />
                     <div className="col-span-2 flex flex-wrap gap-2 pt-1">
                       {checkboxAlanlar.filter(c => Boolean(record.fields[c.fk])).map(c => <CheckBadge key={c.fk} label={c.label} />)}
                     </div>
@@ -1137,20 +1145,20 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
 
               {/* ── DURUM BİLGİSİ (edit mode) ─────────────────────────── */}
               {em && (
-                <CollapsibleSection title="📊 Durum Bilgisi" defaultOpen={true}>
+                <CollapsibleSection title={t('cust.statusInfo')} defaultOpen={true}>
                   <div className="space-y-3">
-                    <EF label="Öncelik" fk="Öncelik" type="select" opts={ONCELIKLER} em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label={t('cust.priority')} fk="Öncelik" type="select" opts={ONCELIKLER} em={em} rec={record} pend={pend} onCh={onCh} />
                     {izin.tip === 'yönetici' ? (
-                      <EF label="Atanan Temsilci" fk="Atanan Temsilci" type="select" opts={[...TEMSILCILER]} em={em} rec={record} pend={pend} onCh={onCh} />
+                      <EF label={t('cust.assignedRep')} fk="Atanan Temsilci" type="select" opts={[...TEMSILCILER]} em={em} rec={record} pend={pend} onCh={onCh} />
                     ) : (
-                      <Alan label="Atanan Temsilci" value={f['Atanan Temsilci']} />
+                      <Alan label={t('cust.assignedRep')} value={f['Atanan Temsilci']} />
                     )}
-                    <EF label="Sektör" fk="Sektör" type="select" opts={SEKTORLER} em={em} rec={record} pend={pend} onCh={onCh} />
-                    <EF label="Sonra Ara Tarihi" fk="Sonra Ara Tarihi" type="date" em={em} rec={record} pend={pend} onCh={onCh} />
-                    <EF label="Son İletişim Kanalı" fk="Son İletişim Kanalı" type="select" opts={ILETISIM_KANALLARI} em={em} rec={record} pend={pend} onCh={onCh} />
-                    <EF label="Son İletişim Tarihi" fk="Son İletişim Tarihi" type="date" em={em} rec={record} pend={pend} onCh={onCh} />
-                    <EF label="Son Durum 2026" fk="Son Durum 2026" em={em} rec={record} pend={pend} onCh={onCh} />
-                    <EF label="Kaybedilme Nedeni" fk="Kaybedilme Nedeni" em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label={t('cust.sector')} fk="Sektör" type="select" opts={SEKTORLER} em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label={t('cust.callLaterDate')} fk="Sonra Ara Tarihi" type="date" em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label={t('cust.lastContactChannel')} fk="Son İletişim Kanalı" type="select" opts={ILETISIM_KANALLARI} em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label={t('cust.lastContactDate')} fk="Son İletişim Tarihi" type="date" em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label={t('cust.lastStatus2026')} fk="Son Durum 2026" em={em} rec={record} pend={pend} onCh={onCh} />
+                    <EF label={t('cust.lossReason')} fk="Kaybedilme Nedeni" em={em} rec={record} pend={pend} onCh={onCh} />
                     <div className="grid grid-cols-2 gap-2 pt-1">
                       {checkboxAlanlar.map(c => <EF key={c.fk} label={c.label} fk={c.fk} type="checkbox" em={em} rec={record} pend={pend} onCh={onCh} />)}
                     </div>
@@ -1161,18 +1169,18 @@ export function FirmaModal({ recordId, izin, onClose, isAdmin = false }: Props) 
               {/* Durum — view modunda tek satır */}
               {!em && (f['Durum'] || f['Öncelik'] || f['Sonra Ara Tarihi'] || f['Son Durum 2026'] || f['Kaybedilme Nedeni']) && (
                 <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-                  <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wide mb-3">Durum</p>
+                  <p className="text-[11px] text-gray-400 font-semibold uppercase tracking-wide mb-3">{t('cust.status')}</p>
                   <div className="grid grid-cols-2 gap-3">
-                    <Alan label="Durum" value={f['Durum']} />
-                    <Alan label="Öncelik" value={f['Öncelik']} />
-                    <Alan label="Sonra Ara" value={f['Sonra Ara Tarihi'] ? formatTarih(f['Sonra Ara Tarihi']) : undefined} />
-                    <Alan label="Son Durum 2026" value={f['Son Durum 2026']} />
+                    <Alan label={t('cust.status')} value={f['Durum']} />
+                    <Alan label={t('cust.priority')} value={f['Öncelik']} />
+                    <Alan label={t('cust.callLater')} value={f['Sonra Ara Tarihi'] ? formatTarih(f['Sonra Ara Tarihi']) : undefined} />
+                    <Alan label={t('cust.lastStatus2026')} value={f['Son Durum 2026']} />
                   </div>
                   {f['Kaybedilme Nedeni'] && (
                     <div className="flex items-start gap-2 mt-3 p-3 rounded-lg bg-red-50 border border-red-100">
                       <AlertCircle size={14} className="text-red-400 shrink-0 mt-0.5" />
                       <div>
-                        <p className="text-[11px] text-red-400 font-semibold uppercase tracking-wide mb-0.5">Kaybedilme Nedeni</p>
+                        <p className="text-[11px] text-red-400 font-semibold uppercase tracking-wide mb-0.5">{t('cust.lossReason')}</p>
                         <p className="text-sm text-red-700">{f['Kaybedilme Nedeni']}</p>
                       </div>
                     </div>

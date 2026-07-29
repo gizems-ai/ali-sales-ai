@@ -3,7 +3,8 @@ import { Geist, Geist_Mono, Plus_Jakarta_Sans, Sora, Inter, Space_Mono } from "n
 import "./globals.css";
 import { ToastContainer } from "@/components/ui/toast";
 import { ClerkProvider } from '@clerk/nextjs'
-import { trTR } from '@clerk/localizations'
+import { trTR, enUS } from '@clerk/localizations'
+import { getLang } from '@/lib/i18n/server'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,18 +53,19 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const lang = await getLang()
   return (
     <ClerkProvider
-      localization={trTR}
+      localization={lang === 'en' ? enUS : trTR}
       signInFallbackRedirectUrl="/"
       signUpFallbackRedirectUrl="/"
     >
-      <html lang="tr">
+      <html lang={lang}>
         <body className={`${geistSans.variable} ${geistMono.variable} ${jakarta.variable} ${sora.variable} ${inter.variable} ${spaceMono.variable} antialiased`}>
           {children}
           <ToastContainer />

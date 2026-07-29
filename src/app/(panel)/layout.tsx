@@ -6,6 +6,8 @@ import { Topbar } from '@/components/panel/topbar'
 import { HideOnGelisim } from '@/components/panel/hide-on-gelisim'
 import { MobileNav } from '@/components/panel/mobile-nav'
 import { TenantProvider } from '@/lib/tenant-context'
+import { LanguageProvider } from '@/lib/i18n/context'
+import { getLang } from '@/lib/i18n/server'
 import { getTenantConfigFromRequest } from '@/lib/yetki'
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -27,9 +29,11 @@ export default async function PanelLayout({ children }: { children: React.ReactN
   if (!cfg) redirect('/login')
 
   const isEmlak = cfg.id === 'emlak_demo'
+  const lang = await getLang()
 
   return (
     <TenantProvider config={cfg}>
+      <LanguageProvider lang={lang}>
       <div className={isEmlak ? 'emlak-shell' : 'flex h-screen overflow-hidden bg-gray-50'}>
         <Sidebar />
         <div className={isEmlak ? 'min-w-0 flex flex-col' : 'flex flex-col flex-1 min-w-0 overflow-hidden'}>
@@ -40,6 +44,7 @@ export default async function PanelLayout({ children }: { children: React.ReactN
         </div>
         {!isEmlak && <MobileNav />}
       </div>
+      </LanguageProvider>
     </TenantProvider>
   )
 }

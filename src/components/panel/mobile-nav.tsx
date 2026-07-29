@@ -3,23 +3,25 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { LayoutDashboard, Users, Calendar, MessageSquare, BarChart3 } from 'lucide-react'
+import { useT } from '@/lib/i18n/context'
 
 const tabs = [
-  { href: '/', label: 'Ana Sayfa', icon: LayoutDashboard },
-  { href: '/musteriler', label: 'Müşteriler', icon: Users },
-  { href: '/ajanda', label: 'Ajanda', icon: Calendar },
-  { href: '/ali-sohbet', label: 'Ali', icon: MessageSquare },
-  { href: '/raporlar', label: 'Raporlar', icon: BarChart3 },
+  { href: '/', labelKey: 'mnav.home', icon: LayoutDashboard },
+  { href: '/musteriler', labelKey: 'mnav.musteriler', icon: Users },
+  { href: '/ajanda', labelKey: 'mnav.ajanda', icon: Calendar },
+  { href: '/ali-sohbet', labelKey: 'mnav.ali', icon: MessageSquare },
+  { href: '/raporlar', labelKey: 'mnav.raporlar', icon: BarChart3 },
 ]
 
 export function MobileNav() {
   const pathname = usePathname()
+  const t = useT()
   const isActive = (href: string) =>
     href === '/' ? pathname === '/' : pathname.startsWith(href)
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-100 flex">
-      {tabs.map(({ href, label, icon: Icon }) => {
+      {tabs.map(({ href, labelKey, icon: Icon }) => {
         const active = isActive(href)
         return (
           <Link
@@ -30,7 +32,7 @@ export function MobileNav() {
           >
             <Icon size={20} className={active ? '' : 'text-gray-400'} />
             <span className={`text-[10px] ${active ? 'font-semibold' : 'text-gray-400'}`}>
-              {label}
+              {t(labelKey)}
             </span>
           </Link>
         )
