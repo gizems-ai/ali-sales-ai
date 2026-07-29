@@ -1,0 +1,24 @@
+{
+  "//": "Store OS namespace'i için ayrı tip kontrolü. Kabul kriteri: Store OS",
+  "// ": "hatasız derlenmeli — next.config.mjs'deki ignoreBuildErrors bayrağına",
+  "//  ": "güvenilmiyor. Çalıştır: npx tsc -p tsconfig.storeos.json",
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "incremental": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noUncheckedIndexedAccess": false
+  },
+  "include": [
+    "next-env.d.ts",
+    "src/app/storeos/**/*.ts",
+    "src/app/storeos/**/*.tsx",
+    "src/app/api/storeos/**/*.ts",
+    "src/lib/storeos/**/*.ts",
+    "src/components/storeos/**/*.ts",
+    "src/components/storeos/**/*.tsx",
+    "scripts/storeos/**/*.ts"
+  ],
+  "exclude": ["node_modules"]
+}
