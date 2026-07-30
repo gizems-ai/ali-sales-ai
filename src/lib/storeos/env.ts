@@ -40,6 +40,24 @@ export const env = {
   /** Store OS'in yayınlandığı prod host'u. Host izolasyon kontrolü bunu kullanır. */
   get host() { return istege('STOREOS_HOST') },
 
+  /**
+   * Aktif depo. 'bellek' = süreç-içi (Gün 2 varsayılanı, dış bağımlılık yok).
+   * 'airtable' = kalıcı. Airtable kimlik bilgileri tanımlıysa varsayılan
+   * otomatik 'airtable' olur — yanlışlıkla prod'da bellek deposuna düşmemek için.
+   */
+  get depo(): 'bellek' | 'airtable' {
+    const acik = istege('STOREOS_DEPO')
+    if (acik === 'bellek' || acik === 'airtable') return acik
+    const airtableHazir = !!process.env.STOREOS_AIRTABLE_BASE_ID && !!process.env.STOREOS_AIRTABLE_API_KEY
+    return airtableHazir ? 'airtable' : 'bellek'
+  },
+
+  /** İmza zaman damgası toleransı (saniye). */
+  get imzaToleransSn(): number {
+    const n = Number(istege('STOREOS_IMZA_TOLERANS_SN', '300'))
+    return Number.isFinite(n) && n > 0 ? n : 300
+  },
+
   get prodMu() { return process.env.VERCEL_ENV === 'production' },
 }
 

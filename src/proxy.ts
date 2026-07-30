@@ -6,6 +6,7 @@ const isPublic = createRouteMatcher([
   '/register(.*)',
   '/api/(.*)',
   '/broker/kayit(.*)', // QR onboarding — giriş yapmamış yeni broker erişir
+  '/storeos/giris(.*)', // Store OS kendi giriş sayfası — root layout'un signInFallbackRedirectUrl="/" döngüsünü kırar
 ])
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {

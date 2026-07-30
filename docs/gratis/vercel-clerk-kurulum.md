@@ -12,7 +12,7 @@ Kodda hiçbir dallanma yok — izolasyon tamamen ortam değişkeni ve host seviy
 
 1. Vercel → **Add New → Project** → aynı GitHub reposunu seç: `gizems-ai/ali-sales-ai`
    (Vercel "bu repo zaten bağlı" diyecek, **Create anyway** de.)
-2. Proje adı: `gratis-storeos`
+2. Proje adı: `ali-storeos`
 3. **Settings → Git → Production Branch = `storeos-demo`**
    ⚠️ Varsayılan `main`'dir. Değiştirmezsen Gratis projesi emlak kodunu prod'a alır.
 4. **Settings → Build & Development → Build Command → Override:**
@@ -32,7 +32,7 @@ Kodda hiçbir dallanma yok — izolasyon tamamen ortam değişkeni ve host seviy
    (Vercel'de `exit 1` = derle, `exit 0` = atla.) Bu olmadan Gratis projesi her
    `emlak-demo` push'unda da build alır.
 
-### 1b. Ters yön — KARAR SENİN
+### 1b. Ters yön — KARAR VERİLDİ: dokunma
 
 `storeos-demo` branch'i GitHub'a gidince **mevcut `ali-sales-ai` Vercel projesi de**
 bu branch için preview deployment üretir. O preview'da `VERCEL_ENV !== 'production'`
@@ -41,26 +41,20 @@ olduğu için `storeosHostuMu()` `true` döner ve `/storeos` açılabilir hale g
 Veri sızıntısı **yok** (Store OS env değişkenleri o projede tanımlı değil, Airtable
 istemcisi ilk çağrıda hata verir), ama gereksiz build ve gereksiz yüzey.
 
-İki seçenek:
-- **(A) Önerilen:** mevcut `ali-sales-ai` projesine de Ignored Build Step ekle:
-  ```
-  if [ "$VERCEL_GIT_COMMIT_REF" = "storeos-demo" ]; then exit 0; else exit 1; fi
-  ```
-  Geri alınabilir, prod deployment'ları etkilemez. **Ama bu canlı projenin ayarı —
-  onayın olmadan dokunma diye buraya yazdım, uygulamadım.**
-- **(B) Hiçbir şey yapma.** Preview'lar zararsız, sadece gürültü.
+**Karar (2026-07-30): hiçbir şey yapılmayacak.** Gürültü bedava, canlı projenin
+build konfigürasyonunu kurcalamak değil. Preview'lar zararsız kalsın.
 
 ---
 
 ## 2. Domain
 
-1. Vercel → `gratis-storeos` → **Settings → Domains → Add**
-2. Öneri: **`gratis-storeos.alisales.ai`**
+1. Vercel → `ali-storeos` → **Settings → Domains → Add**
+2. Öneri: **`storeos.alisales.ai`**
    - Tire kullan, **alt çizgi kullanma** (Cloud API webhook alan adlarında alt
      çizgi ve port desteklenmiyor).
    - `PROD_HOST_MAP`'te (`src/lib/tenant-guard.ts:9-14`) **olmadığından emin ol** —
      olursa emlak/sigorta tenant'ı çözülür. Şu an listede değil, doğru.
-3. DNS: `alisales.ai` sağlayıcında `CNAME gratis-storeos → cname.vercel-dns.com`
+3. DNS: `alisales.ai` sağlayıcında `CNAME storeos → cname.vercel-dns.com`
 4. Domain bağlanınca **bana haber ver** — `src/lib/storeos/host-guard.ts:11`
    içindeki `STOREOS_PROD_HOSTLARI` listesine ekleyeceğim. Liste boş kaldığı
    sürece prod'da `/storeos` **404** döner (kasıtlı: yanlış domain'den asla açılmasın).
@@ -87,23 +81,25 @@ istemcisi ilk çağrıda hata verir), ama gereksiz build ve gereksiz yüzey.
 5. Kullanıcıların Clerk `user_…` id'lerini `Kullanicilar` tablosundaki
    `Clerk User ID` alanına yaz.
 
-### Bilinen açık nokta — giriş sonrası yönlendirme
+### Giriş sonrası yönlendirme — ÇÖZÜLDÜ (Gün 2)
 
 `src/app/layout.tsx:63` içinde `signInFallbackRedirectUrl="/"` sabit. Yani Gratis
 kullanıcısı giriş yapınca `/` (emlak dashboard'u) hedeflenir → orada tenant
 çözülemez → `/login`'e geri döner → **döngü.**
 
-Bunu kodda tek satırla çözebilirim ama `src/proxy.ts`'e dokunmayı gerektiriyor
-(bkz. Gün 1 raporundaki soru). Karar gelene kadar geçici çözüm: jüriye verilecek
-bağlantı doğrudan `https://gratis-storeos.alisales.ai/storeos` olsun ve giriş
-`/login` üzerinden yapılıp adres çubuğundan `/storeos`'a gidilsin. Demo günü
-kabul edilebilir değil — Gün 2'de kapatılmalı.
+Çözüm uygulandı: `src/proxy.ts`'in `isPublic` listesine `/storeos/giris(.*)`
+eklendi (dördüncü onaylı istisna, tek satır). `/storeos/giris` Store OS'in kendi
+Clerk `<SignIn>` sayfası ve `forceRedirectUrl="/storeos"` veriyor — root
+layout'un `signInFallbackRedirectUrl` değeri ezildiği için döngü oluşmuyor.
+
+**Jüriye verilecek bağlantı: `https://storeos.alisales.ai/storeos`**
+Oturumsuz gelen `/storeos/giris`'e yönlenir, giriş yapar, `/storeos`'a düşer.
 
 ---
 
 ## 4. Ortam değişkenleri
 
-`gratis-storeos` projesinde, **Production + Preview + Development** üçü için:
+`ali-storeos` projesinde, **Production + Preview + Development** üçü için:
 
 | Değişken | Değer |
 |---|---|
@@ -115,7 +111,7 @@ kabul edilebilir değil — Gün 2'de kapatılmalı.
 | `STOREOS_WA_INBOUND_TOKEN` | `openssl rand -hex 32` |
 | `STOREOS_N8N_WA_WEBHOOK_URL` | `https://n8n.alisales.ai/webhook/storeos-wa-giden` |
 | `STOREOS_KANAL` | `konsol` (gerçek hat bağlanınca `whatsapp`) |
-| `STOREOS_HOST` | `gratis-storeos.alisales.ai` |
+| `STOREOS_HOST` | `storeos.alisales.ai` |
 | `STOREOS_ADMIN_CLERK_IDS` | senin Clerk user id'in |
 
 **Emlak/sigorta değişkenlerinin hiçbirini bu projeye ekleme** —
@@ -130,7 +126,7 @@ Deploy bittikten ve `STOREOS_PROD_HOSTLARI` doldurulduktan sonra çalıştır.
 `H` = Gratis host'un.
 
 ```bash
-H=https://gratis-storeos.alisales.ai
+H=https://storeos.alisales.ai
 
 # A) Emlak panel sayfaları — oturumsuz
 for p in / /musteriler /raporlar /satis-sureci /stok /firsatlar /broker; do

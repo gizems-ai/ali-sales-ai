@@ -10,8 +10,8 @@
 
 /** Store OS'in sunulduğu prod host'ları. Tam eşleşme — substring match YOK. */
 export const STOREOS_PROD_HOSTLARI = new Set<string>([
-  // Gün 1'de domain bağlanınca doldurulacak, örn:
-  // 'gratis-storeos.alisales.ai',
+  // Domain bağlanınca doldurulacak (karar: müşteri adı domain'e gömülmez):
+  // 'storeos.alisales.ai',
 ])
 
 /**

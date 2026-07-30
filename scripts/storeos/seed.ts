@@ -13,6 +13,7 @@
 //   · --sifirla YALNIZ `Veri Tipi = demo` kayıtları siler.
 // ════════════════════════════════════════════════════════════════════════════
 
+import { varsayilanKurallar } from '../../src/lib/storeos/depo/bellek'
 import { TABLO } from '../../src/lib/storeos/tipler'
 import type {
   Magaza, Kamera, Kullanici, Kural, Metrik,
@@ -101,66 +102,16 @@ const kullanicilar: Partial<Kullanici>[] = kullaniciTanimlari.map(u => ({
   ...u, 'Magaza Kodu': MAGAZA, 'Aktif': true,
 }))
 
-const kurallar: Partial<Kural>[] = [
-  {
-    'Kural Adi': 'Kasa kuyrugu esigi',
-    'Olay Tipi': 'queue.threshold_exceeded',
-    'Kosullar JSON': JSON.stringify([{ alan: 'metadata.kisi', operator: '>=', deger: 6 }]),
-    'Severity': 'high',
-    'Gorev Basligi': 'Kasa kuyrugu {kisi} kisiye ulasti — ek kasa ac',
-    'Gorev Aciklamasi': '{magaza} kasa alaninda bekleme {bekleme_sn} sn. Ek kasa acilmasi gerekiyor.',
-    'Hedef Rol': 'magaza_muduru', 'Oncelik': 'kritik',
-    'SLA Dakika': 10, 'Eskalasyon Dakika': 5, 'Eskalasyon Rolu': 'bolge_muduru',
-    'Bildirim Kanali': 'whatsapp', 'Kanit Gerekli': false, 'Sira': 10, 'Aktif': true,
-  },
-  {
-    'Kural Adi': 'Kasa kuyrugu erken uyari',
-    'Olay Tipi': 'queue.threshold_exceeded',
-    'Kosullar JSON': JSON.stringify([
-      { alan: 'metadata.kisi', operator: '>=', deger: 4 },
-      { alan: 'metadata.kisi', operator: '<', deger: 6 },
-    ]),
-    'Severity': 'medium',
-    'Gorev Basligi': 'Kasa kuyrugu artiyor ({kisi} kisi)',
-    'Gorev Aciklamasi': 'Kuyruk esige yaklasiyor, izlemede kal.',
-    'Hedef Rol': 'magaza_muduru', 'Oncelik': 'normal',
-    'SLA Dakika': 20, 'Eskalasyon Dakika': 15, 'Eskalasyon Rolu': 'magaza_muduru',
-    'Bildirim Kanali': 'panel', 'Kanit Gerekli': false, 'Sira': 20, 'Aktif': true,
-  },
-  {
-    'Kural Adi': 'Raf stok dustu',
-    'Olay Tipi': 'shelf.stock_low',
-    'Kosullar JSON': JSON.stringify([{ alan: 'metadata.doluluk', operator: '<=', deger: 30 }]),
-    'Severity': 'medium',
-    'Gorev Basligi': '{reyon} rafi bosaldi (%{doluluk})',
-    'Gorev Aciklamasi': '{reyon} reyonunda raf doluluğu %{doluluk}. Depodan takviye gerekiyor.',
-    'Hedef Rol': 'personel', 'Oncelik': 'yuksek',
-    'SLA Dakika': 30, 'Eskalasyon Dakika': 20, 'Eskalasyon Rolu': 'magaza_muduru',
-    'Bildirim Kanali': 'whatsapp', 'Kanit Gerekli': true, 'Sira': 30, 'Aktif': true,
-  },
-  {
-    'Kural Adi': 'Kamera baglantisi koptu',
-    'Olay Tipi': 'camera.offline',
-    'Kosullar JSON': JSON.stringify([]),
-    'Severity': 'high',
-    'Gorev Basligi': '{kamera} kamerasi cevrimdisi',
-    'Gorev Aciklamasi': 'Kamera baglantisi koptu. Teknik ekibe bildirildi.',
-    'Hedef Rol': 'merkez', 'Oncelik': 'yuksek',
-    'SLA Dakika': 60, 'Eskalasyon Dakika': 30, 'Eskalasyon Rolu': 'merkez',
-    'Bildirim Kanali': 'panel', 'Kanit Gerekli': false, 'Sira': 40, 'Aktif': true,
-  },
-  {
-    'Kural Adi': 'ISG islak zemin',
-    'Olay Tipi': 'safety.wet_floor',
-    'Kosullar JSON': JSON.stringify([{ alan: 'confidence', operator: '>=', deger: 0.7 }]),
-    'Severity': 'critical',
-    'Gorev Basligi': 'Islak zemin tespit edildi — {bolge}',
-    'Gorev Aciklamasi': 'Musteri guvenligi riski. Uyari levhasi koy ve temizlik cagir.',
-    'Hedef Rol': 'guvenlik', 'Oncelik': 'kritik',
-    'SLA Dakika': 5, 'Eskalasyon Dakika': 3, 'Eskalasyon Rolu': 'magaza_muduru',
-    'Bildirim Kanali': 'whatsapp', 'Kanit Gerekli': true, 'Sira': 5, 'Aktif': true,
-  },
-]
+// KURAL KAYNAĞI TEK YERDE.
+// Kurallar `src/lib/storeos/depo/bellek.ts` içindeki varsayilanKurallar()'dan
+// gelir; seed onları Airtable'a YAZAR. Böylece bellek deposu ile Airtable
+// deposu birbirinden ayrışamaz — Gün 2'de tam olarak bu ayrışma yaşandı
+// (seed'de 'queue.threshold_exceeded' + 'metadata.kisi', bellekte kilitli
+// sözleşmenin 'store.queue.threshold_exceeded' + 'metadata.queueLength' adları).
+//
+// YALNIZ FAZ 1 tipleri kuralı vardır. Faz 2 tipleri (raf, ISG, güvenlik)
+// bilinçli olarak kuralsızdır: olay kabul edilir, kaydedilir, görev üretmez.
+const kurallar: Partial<Kural>[] = varsayilanKurallar()
 
 // ─── Metrikler ───────────────────────────────────────────────────────────────
 
