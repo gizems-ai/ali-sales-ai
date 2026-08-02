@@ -150,3 +150,227 @@
   color: #1c2a22;
   -webkit-font-smoothing: antialiased;
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   Store OS teması — TAMAMI `.storeos-root` altında kapsanmıştır.
+   Bu blok, madde 1'de onaylanan tek globals.css istisnasıdır. Kural: buradaki
+   HİÇBİR seçici `.storeos-root` olmadan başlamaz; mevcut panel (emlak/sigorta)
+   stilleri etkilenemez. Yeni seçici eklerken bu kural bozulmayacak.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.storeos-root {
+  --so-zemin:      #0d0e12;
+  --so-yuzey:      #16181f;
+  --so-yuzey-2:    #1d2028;
+  --so-cizgi:      #2a2e39;
+  --so-metin:      #e8eaf0;
+  --so-metin-soluk:#9aa0b0;
+  --so-metin-silik:#6b7181;
+
+  /* Gratis kurumsal pembesi — vurgu rengi. */
+  --so-marka:      #e5007d;
+  --so-marka-soluk:#ff4da6;
+  --so-marka-zemin:rgba(229, 0, 125, .12);
+
+  --so-info:       #4c9aff;
+  --so-low:        #46c8a0;
+  --so-medium:     #f5b74e;
+  --so-high:       #ff8a3d;
+  --so-critical:   #ff4d5e;
+
+  --so-radius:     14px;
+  --so-radius-sm:  9px;
+
+  min-height: 100vh;
+  background: var(--so-zemin);
+  color: var(--so-metin);
+  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-variant-numeric: tabular-nums;
+}
+
+.storeos-root *, .storeos-root *::before, .storeos-root *::after { box-sizing: border-box; }
+
+/* ── Kabuk ─────────────────────────────────────────────────────────────── */
+
+.storeos-root .so-kabuk {
+  display: grid;
+  grid-template-columns: 232px 1fr;
+  min-height: 100vh;
+}
+@media (max-width: 900px) {
+  .storeos-root .so-kabuk { grid-template-columns: 1fr; }
+  .storeos-root .so-yan { display: none; }
+}
+
+.storeos-root .so-yan {
+  background: var(--so-yuzey);
+  border-right: 1px solid var(--so-cizgi);
+  padding: 20px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.storeos-root .so-logo {
+  display: flex; align-items: center; gap: 9px;
+  padding: 0 8px 18px;
+  font-size: 17px; font-weight: 700; letter-spacing: -.02em;
+}
+.storeos-root .so-logo-nokta {
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--so-marka);
+  box-shadow: 0 0 0 4px var(--so-marka-zemin);
+}
+
+.storeos-root .so-nav-baslik {
+  padding: 16px 8px 6px;
+  font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--so-metin-silik);
+}
+.storeos-root .so-nav-oge {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 9px 10px;
+  border-radius: var(--so-radius-sm);
+  font-size: 13.5px; color: var(--so-metin-soluk);
+  text-decoration: none;
+  transition: background .12s ease, color .12s ease;
+}
+.storeos-root .so-nav-oge:hover { background: var(--so-yuzey-2); color: var(--so-metin); }
+.storeos-root .so-nav-oge[aria-current="page"] {
+  background: var(--so-marka-zemin); color: #ffd6ea; font-weight: 600;
+}
+.storeos-root .so-nav-oge[data-yakinda="1"] { opacity: .45; cursor: default; }
+
+.storeos-root .so-ana { display: flex; flex-direction: column; min-width: 0; }
+
+.storeos-root .so-ust {
+  display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--so-cizgi);
+  background: var(--so-yuzey);
+  position: sticky; top: 0; z-index: 5;
+}
+.storeos-root .so-ust h1 { font-size: 16px; font-weight: 650; letter-spacing: -.01em; margin: 0; }
+.storeos-root .so-ust-sag { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+
+.storeos-root .so-govde { padding: 22px 24px 56px; display: flex; flex-direction: column; gap: 20px; }
+
+/* ── Yüzeyler ──────────────────────────────────────────────────────────── */
+
+.storeos-root .so-kart {
+  background: var(--so-yuzey);
+  border: 1px solid var(--so-cizgi);
+  border-radius: var(--so-radius);
+  padding: 16px;
+  min-width: 0;
+}
+.storeos-root .so-kart-baslik {
+  display: flex; align-items: center; gap: 8px;
+  margin: 0 0 14px;
+  font-size: 13px; font-weight: 650; color: var(--so-metin);
+}
+.storeos-root .so-kart-baslik .so-sag { margin-left: auto; }
+
+.storeos-root .so-izgara { display: grid; gap: 14px; }
+.storeos-root .so-izgara-kpi { grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); }
+.storeos-root .so-izgara-2 { grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+
+/* ── KPI ───────────────────────────────────────────────────────────────── */
+
+.storeos-root .so-kpi-etiket {
+  font-size: 11.5px; color: var(--so-metin-soluk);
+  display: flex; align-items: center; gap: 6px; margin-bottom: 8px;
+}
+.storeos-root .so-kpi-deger {
+  font-size: 25px; font-weight: 680; letter-spacing: -.025em; line-height: 1.1;
+}
+.storeos-root .so-kpi-birim { font-size: 13px; font-weight: 500; color: var(--so-metin-soluk); margin-left: 3px; }
+.storeos-root .so-kpi-alt { margin-top: 6px; font-size: 11.5px; color: var(--so-metin-silik); }
+
+/* ── Rozetler ──────────────────────────────────────────────────────────── */
+
+.storeos-root .so-rozet {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 2px 8px; border-radius: 999px;
+  font-size: 10.5px; font-weight: 600; letter-spacing: .01em;
+  border: 1px solid transparent; white-space: nowrap;
+}
+
+/* DÜRÜSTLÜK KURALI (madde 11): `veri_tipi = demo` olan her sayı bu etiketi
+   taşır. Silik ama okunur — jüri sahneden görebilmeli, ekranı da boğmamalı. */
+.storeos-root .so-ornek {
+  display: inline-flex; align-items: center;
+  padding: 1px 6px; border-radius: 5px;
+  font-size: 9.5px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+  color: #c8a24a; background: rgba(200, 162, 74, .13); border: 1px solid rgba(200, 162, 74, .28);
+}
+
+.storeos-root .so-sev-info     { color: var(--so-info);     background: rgba(76,154,255,.12);  border-color: rgba(76,154,255,.28); }
+.storeos-root .so-sev-low      { color: var(--so-low);      background: rgba(70,200,160,.12);  border-color: rgba(70,200,160,.28); }
+.storeos-root .so-sev-medium   { color: var(--so-medium);   background: rgba(245,183,78,.12);  border-color: rgba(245,183,78,.28); }
+.storeos-root .so-sev-high     { color: var(--so-high);     background: rgba(255,138,61,.13);  border-color: rgba(255,138,61,.30); }
+.storeos-root .so-sev-critical { color: var(--so-critical); background: rgba(255,77,94,.14);   border-color: rgba(255,77,94,.34); }
+.storeos-root .so-notr         { color: var(--so-metin-soluk); background: var(--so-yuzey-2); border-color: var(--so-cizgi); }
+
+/* ── Listeler ──────────────────────────────────────────────────────────── */
+
+.storeos-root .so-satir {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 2px;
+  border-bottom: 1px solid var(--so-cizgi);
+  font-size: 13px;
+}
+.storeos-root .so-satir:last-child { border-bottom: none; }
+.storeos-root .so-satir-ana { min-width: 0; flex: 1; }
+.storeos-root .so-satir-baslik {
+  font-weight: 550; color: var(--so-metin);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.storeos-root .so-satir-alt { margin-top: 3px; font-size: 11.5px; color: var(--so-metin-silik); }
+
+.storeos-root .so-liste { max-height: 380px; overflow-y: auto; margin: -4px -2px; padding: 0 2px; }
+
+/* ── Durum ekranları ───────────────────────────────────────────────────── */
+
+.storeos-root .so-durum {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 8px; padding: 34px 16px; text-align: center;
+}
+.storeos-root .so-durum-baslik { font-size: 13.5px; font-weight: 600; }
+.storeos-root .so-durum-metin { font-size: 12px; color: var(--so-metin-silik); max-width: 44ch; line-height: 1.5; }
+.storeos-root .so-durum-hata .so-durum-baslik { color: var(--so-critical); }
+
+.storeos-root .so-dugme {
+  padding: 7px 14px; border-radius: var(--so-radius-sm);
+  border: 1px solid var(--so-cizgi); background: var(--so-yuzey-2);
+  color: var(--so-metin); font-size: 12.5px; font-weight: 550; cursor: pointer;
+}
+.storeos-root .so-dugme:hover { border-color: var(--so-marka); color: #ffd6ea; }
+
+/* ── İskelet (yükleniyor) ──────────────────────────────────────────────── */
+
+.storeos-root .so-iskelet {
+  border-radius: 6px;
+  background: linear-gradient(90deg, var(--so-yuzey-2) 25%, #262a34 50%, var(--so-yuzey-2) 75%);
+  background-size: 200% 100%;
+  animation: so-parla 1.4s ease-in-out infinite;
+}
+@keyframes so-parla { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+/* ── Canlılık göstergesi ───────────────────────────────────────────────── */
+
+.storeos-root .so-nabiz {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--so-metin-silik);
+}
+.storeos-root .so-nabiz-nokta {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--so-low);
+  animation: so-nabiz 2s ease-in-out infinite;
+}
+.storeos-root .so-nabiz[data-durum="hata"] .so-nabiz-nokta { background: var(--so-critical); animation: none; }
+@keyframes so-nabiz { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .storeos-root .so-iskelet, .storeos-root .so-nabiz-nokta { animation: none; }
+}

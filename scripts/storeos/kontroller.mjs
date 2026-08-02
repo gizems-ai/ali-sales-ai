@@ -4,7 +4,7 @@
 //
 //    node scripts/storeos/kontroller.mjs
 //
-//  Sırayla: TypeScript · import kuralı · sözleşme doğrulama · imza ·
+//  Sırayla: TypeScript · import kuralı · CSS kapsamı · sözleşme doğrulama · imza ·
 //  idempotency · durum makinesi · adapter. Herhangi biri düşerse çıkış kodu 1.
 //
 //  NEDEN package.json'a script eklenmedi: package.json onaylı istisna listesinde
@@ -17,11 +17,13 @@ import { spawnSync } from 'node:child_process'
 const ADIMLAR = [
   ['TypeScript (storeos namespace)', 'npx', ['tsc', '-p', 'tsconfig.storeos.json']],
   ['Import kuralı',                  'node', ['scripts/storeos/import-denetci.mjs']],
+  ['CSS kapsam kuralı',              'node', ['scripts/storeos/css-denetci.mjs']],
   ['Sözleşme doğrulama (negatif)',   'npx', ['-y', 'tsx', 'src/lib/storeos/olay-sozlesmesi.test.ts']],
   ['İmza doğrulama',                 'npx', ['-y', 'tsx', 'src/lib/storeos/imza.test.ts']],
   ['Idempotency / alım zinciri',     'npx', ['-y', 'tsx', 'src/lib/storeos/olay-alim.test.ts']],
   ['Görev durum makinesi',           'npx', ['-y', 'tsx', 'src/lib/storeos/gorev.test.ts']],
   ['Adapter dönüşümü',               'npx', ['-y', 'tsx', 'src/lib/storeos/adapters/adapter.test.ts']],
+  ['Pano toplayıcı',                 'npx', ['-y', 'tsx', 'src/lib/storeos/dashboard/pano.test.ts']],
 ]
 
 const dusen = []

@@ -41,6 +41,12 @@ export const env = {
   get host() { return istege('STOREOS_HOST') },
 
   /**
+   * Demoda tek mağaza var. Panonun hangi mağazayı gösterdiği tek yerden okunur;
+   * çoklu mağazaya geçişte burası kullanıcının mağaza atamasına bağlanacak.
+   */
+  get magazaKodu() { return istege('STOREOS_MAGAZA_KODU', '0178') },
+
+  /**
    * Aktif depo. 'bellek' = süreç-içi (Gün 2 varsayılanı, dış bağımlılık yok).
    * 'airtable' = kalıcı. Airtable kimlik bilgileri tanımlıysa varsayılan
    * otomatik 'airtable' olur — yanlışlıkla prod'da bellek deposuna düşmemek için.

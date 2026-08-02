@@ -20,6 +20,7 @@ import type {
   BildirimDeposu, Depo, DenetimDeposu, GorevDeposu,
   KuralDeposu, OlayDeposu, ReferansDeposu,
 } from './tipler'
+import { varsayilanMetrikler } from './demo-metrikler'
 
 // ─── Varsayılan referans veri (seed.ts ile aynı mağaza) ──────────────────────
 
@@ -168,6 +169,9 @@ interface BellekDurumu {
 
 function bosDurum(): BellekDurumu {
   const m = varsayilanMagaza()
+  // Metrikler seed'le AYNI fonksiyondan gelir (demo-metrikler.ts). Bellek
+  // deposunun Airtable'dan farklı sayı göstermesi diye bir şey olmamalı.
+  const gun = new Date().toISOString().slice(0, 10)
   return {
     olaylar: new Map(),
     gorevler: new Map(),
@@ -177,7 +181,13 @@ function bosDurum(): BellekDurumu {
     magazalar: new Map([[m['Kod'], m]]),
     kameralar: varsayilanKameralar(),
     kullanicilar: varsayilanKullanicilar(),
-    metrikler: [],
+    metrikler: varsayilanMetrikler({
+      magazaKodu: MAGAZA_KODU,
+      gun,
+      zaman: new Date(`${gun}T14:30:00+03:00`).toISOString(),
+      acilisSaati: 10,
+      kapanisSaati: 22,
+    }),
     gorevSayaci: 0,
   }
 }
