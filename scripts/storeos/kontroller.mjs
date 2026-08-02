@@ -4,8 +4,8 @@
 //
 //    node scripts/storeos/kontroller.mjs
 //
-//  Sırayla: TypeScript · import kuralı · imza · idempotency · durum makinesi ·
-//  adapter. Herhangi biri düşerse çıkış kodu 1.
+//  Sırayla: TypeScript · import kuralı · sözleşme doğrulama · imza ·
+//  idempotency · durum makinesi · adapter. Herhangi biri düşerse çıkış kodu 1.
 //
 //  NEDEN package.json'a script eklenmedi: package.json onaylı istisna listesinde
 //  değil. Bu dosya scripts/storeos/ içinde, izole ağacın içinde kalıyor.
@@ -17,6 +17,7 @@ import { spawnSync } from 'node:child_process'
 const ADIMLAR = [
   ['TypeScript (storeos namespace)', 'npx', ['tsc', '-p', 'tsconfig.storeos.json']],
   ['Import kuralı',                  'node', ['scripts/storeos/import-denetci.mjs']],
+  ['Sözleşme doğrulama (negatif)',   'npx', ['-y', 'tsx', 'src/lib/storeos/olay-sozlesmesi.test.ts']],
   ['İmza doğrulama',                 'npx', ['-y', 'tsx', 'src/lib/storeos/imza.test.ts']],
   ['Idempotency / alım zinciri',     'npx', ['-y', 'tsx', 'src/lib/storeos/olay-alim.test.ts']],
   ['Görev durum makinesi',           'npx', ['-y', 'tsx', 'src/lib/storeos/gorev.test.ts']],

@@ -7,10 +7,14 @@
 //  tek ve dar.
 // ════════════════════════════════════════════════════════════════════════════
 
-import type { AlanHatasi, VisionEvent } from '../olay-sozlesmesi'
+import type { AlanHatasi, UyariKodu, VisionEvent } from '../olay-sozlesmesi'
 
 export type AdapterSonucu =
-  | { basarili: true; olay: VisionEvent; uyarilar: string[] }
+  /**
+   * `uyarilar` insan içindir (log, panel), `uyariKodlari` makine içindir:
+   * yanıt gövdesindeki `warnings` dizisi ve partnerin kendi alarmı bunu okur.
+   */
+  | { basarili: true; olay: VisionEvent; uyarilar: string[]; uyariKodlari: UyariKodu[] }
   | { basarili: false; hatalar: AlanHatasi[] }
 
 export interface Adapter {

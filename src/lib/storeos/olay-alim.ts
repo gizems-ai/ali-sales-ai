@@ -15,7 +15,7 @@ import { DENETIM_AKSIYONLARI, denetimYaz } from './denetim'
 import { kuraldanGorevUret } from './gorev'
 import { degerlendir } from './kural-motoru'
 import { govdeyiDiziyeCevir } from './olay-sozlesmesi'
-import type { AlanHatasi, VisionEvent } from './olay-sozlesmesi'
+import type { AlanHatasi, UyariKodu, VisionEvent } from './olay-sozlesmesi'
 import type { OlayKaydi } from './tipler'
 
 export type OlaySonucDurumu = 'kabul' | 'yinelenen' | 'reddedildi'
@@ -25,7 +25,10 @@ export interface OlaySonucu {
   /** Reddedilende olmayabilir. */
   olayId?: string
   hatalar?: AlanHatasi[]
+  /** İnsan okuyacak uyarı metinleri. */
   uyarilar?: string[]
+  /** Makine okuyacak uyarı kodları. Yanıttaki `warnings` bunlardan doğar. */
+  uyariKodlari?: UyariKodu[]
   /** Kural motoru özeti — "neden görev çıktı / çıkmadı". */
   kuralOzeti?: string
   uretilenGorevler?: string[]
@@ -36,6 +39,12 @@ export interface AlimSonucu {
   yinelenen: number
   reddedilen: number
   adapter: string
+  /**
+   * Gövdedeki TÜM olayların uyarı kodlarının tekilleştirilmiş birleşimi.
+   * 200/202 alan ama sessizce hiçbir şey tetiklemeyen partner'ın (ör. olay
+   * tipini yanlış yazan) bunu fark etmesi için yanıt gövdesine konur.
+   */
+  uyariKodlari: UyariKodu[]
   sonuclar: OlaySonucu[]
 }
 
@@ -81,6 +90,7 @@ export async function olaylariAl(g: AlimGirdi): Promise<AlimSonucu> {
   if ('hata' in secim) {
     return {
       kabul: 0, yinelenen: 0, reddedilen: ogeler.length, adapter: 'bilinmiyor',
+      uyariKodlari: [],
       sonuclar: ogeler.map(() => ({
         durum: 'reddedildi' as const,
         hatalar: [{ alan: 'X-StoreOS-Adapter', sebep: secim.hata }],
@@ -90,6 +100,7 @@ export async function olaylariAl(g: AlimGirdi): Promise<AlimSonucu> {
 
   const adapter = secim.adapter
   const sonuclar: OlaySonucu[] = []
+  const tumUyariKodlari = new Set<UyariKodu>()
   let kabul = 0, yinelenen = 0, reddedilen = 0
 
   for (const [i, ham] of ogeler.entries()) {
@@ -113,13 +124,17 @@ export async function olaylariAl(g: AlimGirdi): Promise<AlimSonucu> {
     }
 
     const olay = cevrim.olay
+    cevrim.uyariKodlari.forEach(k => tumUyariKodlari.add(k))
     const alindi = g.simdi ?? new Date().toISOString()
 
     // ── 2. Idempotency ──
     const ilkKez = await d.olaylar.yazIlkKez(olayaKayit(olay, adapter.ad, alindi))
     if (!ilkKez) {
       yinelenen++
-      sonuclar.push({ durum: 'yinelenen', olayId: olay.id, uyarilar: cevrim.uyarilar })
+      sonuclar.push({
+        durum: 'yinelenen', olayId: olay.id,
+        uyarilar: cevrim.uyarilar, uyariKodlari: cevrim.uyariKodlari,
+      })
       await denetimYaz(d, {
         aktor: g.aktor, aktorTipi: g.aktorTipi,
         aksiyon: DENETIM_AKSIYONLARI.olayYinelenen,
@@ -180,10 +195,15 @@ export async function olaylariAl(g: AlimGirdi): Promise<AlimSonucu> {
       durum: 'kabul',
       olayId: olay.id,
       uyarilar: cevrim.uyarilar,
+      uyariKodlari: cevrim.uyariKodlari,
       kuralOzeti: motor.ozet,
       uretilenGorevler: uretilen,
     })
   }
 
-  return { kabul, yinelenen, reddedilen, adapter: adapter.ad, sonuclar }
+  return {
+    kabul, yinelenen, reddedilen, adapter: adapter.ad,
+    uyariKodlari: [...tumUyariKodlari],
+    sonuclar,
+  }
 }

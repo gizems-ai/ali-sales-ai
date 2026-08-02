@@ -46,24 +46,35 @@ const SEVERITY_HARITASI: Record<number, string> = {
   1: 'info', 2: 'low', 3: 'medium', 4: 'high', 5: 'critical',
 }
 
-/** payload anahtarları → kanonik metadata anahtarları (METADATA_ANAHTARLARI ile aynı). */
-const METADATA_HARITASI: Record<string, string> = {
-  register:   'registerId',
-  people:     'queueLength',
-  wait_sec:   'avgWaitSeconds',
-  limit:      'threshold',
-  count:      'count',
-  zone:       'zoneId',
-  shelf:      'shelfId',
-  fill_rate:  'fillRate',
-  occupancy:  'occupancy',
-  capacity:   'capacity',
-  dwell_sec:  'avgDwellSeconds',
-  reason:     'reason',
-  fps:        'frameRate',
-  last_seen:  'lastSeenAt',
-  hazard:     'hazardType',
-  incident:   'incidentType',
+/**
+ * payload anahtarları → kanonik metadata anahtarları.
+ * Sağ taraf OTORİTER tabloyla (METADATA_ANAHTARLARI) birebir aynı olmalıdır;
+ * `adapter.test.ts` bunu doğrular.
+ */
+export const METADATA_HARITASI: Record<string, string> = {
+  register:        'registerId',
+  people:          'queueLength',
+  wait_sec:        'avgWaitSeconds',
+  max_wait_sec:    'maxWaitSeconds',
+  count:           'count',
+  period_sec:      'periodSeconds',
+  persons:         'personCount',
+  density:         'densityLevel',
+  zone:            'zoneId',
+  shelf:           'shelfId',
+  fill_rate_pct:   'fillRatePercent',
+  missing_facings: 'missingFacings',
+  dwell_sec:       'avgDwellSeconds',
+  reason:          'reason',
+  issue:           'issue',
+  last_seen:       'lastSeenAt',
+  issue_type:      'issueType',
+  expected_sku:    'expectedSku',
+  detected_sku:    'detectedSku',
+  grid_w:          'gridWidth',
+  grid_h:          'gridHeight',
+  values:          'values',
+  period_min:      'periodMinutes',
 }
 
 /** epoch ms + dakika cinsinden offset → offsetli ISO 8601. */
@@ -150,6 +161,6 @@ export const ornekVendorAdapter: Adapter = {
     // güvenmez. Sözleşme tek kapıdır.
     const s = olayDogrula(kanonik, onek)
     if (!s.basarili) return { basarili: false, hatalar: s.hatalar }
-    return { basarili: true, olay: s.veri, uyarilar: s.uyarilar }
+    return { basarili: true, olay: s.veri, uyarilar: s.uyarilar, uyariKodlari: s.uyariKodlari }
   },
 }

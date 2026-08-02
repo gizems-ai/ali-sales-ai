@@ -23,6 +23,6 @@ export const genericAdapter: Adapter = {
   cevir(ham: unknown, onek = ''): AdapterSonucu {
     const s = olayDogrula(ham, onek)
     if (!s.basarili) return { basarili: false, hatalar: s.hatalar }
-    return { basarili: true, olay: s.veri, uyarilar: s.uyarilar }
+    return { basarili: true, olay: s.veri, uyarilar: s.uyarilar, uyariKodlari: s.uyariKodlari }
   },
 }

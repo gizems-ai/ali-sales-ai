@@ -6,12 +6,25 @@
 //  src/proxy.ts `/api/*`'ı public bıraktığı için route kendi kontrolünü yapar.
 //
 //  Durum kodları (sözleşmede ilan edildi):
-//   202  en az bir olay kabul edildi
-//   200  tümü yinelenen (at-least-once — partner tekrar göndermiş, sorun yok)
-//   400  gövde bozuk / tüm olaylar doğrulamayı geçemedi → SEBEP gövdede
+//   202  en az bir olay kabul edildi (KISMİ BAŞARI dahil — aşağı bak)
+//   200  hiçbiri kabul edilmedi, hiçbiri reddedilmedi → tümü yinelenen
+//        (at-least-once — partner tekrar göndermiş, sorun yok)
+//   400  hiçbiri kabul edilmedi ve en az biri reddedildi → SEBEP gövdede
 //   401  imza eksik veya geçersiz
 //   413  gövde çok büyük
 //   500  sunucu yapılandırması eksik veya beklenmeyen hata (partner TEKRAR DENER)
+//
+//  ── DİZİDE TEK BOZUK ELEMAN: KISMİ KABUL (karar, Gün 3) ────────────────────
+//  Dizi gönderiminde geçerli elemanlar İŞLENİR, bozuk olan reddedilir. Tüm
+//  gövde reddedilmez.
+//  Gerekçe: bunlar bağımsız fiziksel olaylar, bir işlem değil. 200 olayın
+//  199'unu bir alan hatası yüzünden çöpe atmak mağazayı kör bırakır ve partner
+//  tekrar gönderdiğinde 199'u ZATEN kabul edilmiş olur (idempotency) — yani
+//  "hepsini reddet" davranışı yeniden denemeyle de düzelmez, sadece gecikme
+//  yaratır. Bedeli: partner 202 alıp bir kısmının düştüğünü fark etmeyebilir.
+//  Bunun karşılığı `sonuclar[]` içindeki eleman-bazlı durum + `reddedilen`
+//  sayacı + her ret için denetim kaydıdır. Sözleşmede yazılıdır: partner
+//  `reddedilen > 0` durumunu alarma bağlamalıdır.
 // ════════════════════════════════════════════════════════════════════════════
 
 import { NextResponse } from 'next/server'
@@ -119,11 +132,14 @@ export async function POST(req: Request) {
     yinelenen: sonuc.yinelenen,
     reddedilen: sonuc.reddedilen,
     adapter: sonuc.adapter,
+    // Makine okunur uyarı kodları. 202 alıp hiçbir şey tetiklenmemesinin
+    // sessizce kaybolmaması için — ör. ["bilinmeyen_olay_tipi"].
+    warnings: sonuc.uyariKodlari,
     sonuclar: sonuc.sonuclar,
   }
 
   if (sonuc.kabul > 0) return NextResponse.json(govdeCevap, { status: 202 })
-  if (sonuc.reddedilen > 0 && sonuc.yinelenen === 0) return NextResponse.json(govdeCevap, { status: 400 })
+  if (sonuc.reddedilen > 0) return NextResponse.json(govdeCevap, { status: 400 })
   return NextResponse.json(govdeCevap, { status: 200 })
 }
 

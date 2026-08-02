@@ -1,38 +1,34 @@
 // ════════════════════════════════════════════════════════════════════════════
 //  Store OS — HMAC-SHA256 istek imzası (partner → /api/storeos/olay)
 //
-//  Sözleşme `X-StoreOS-Signature` başlığında HMAC-SHA256 taahhüt ediyor.
-//  Bu dosya İKİ biçimi de kabul eder:
+//  TEK KABUL EDİLEN BİÇİM:
 //
-//    1) t=<unix_sn>,v1=<hex>      ← TERCİH EDİLEN. Zaman damgası imzaya dahil,
-//                                    replay penceresi uygulanabilir.
-//    2) <hex>  |  sha256=<hex>    ← GERİYE UYUM. Yalnız gövde imzalanır.
-//                                    Replay koruması YOK (aynı gövde sonsuza
-//                                    dek geçerli imzayla tekrar gönderilebilir).
-//                                    Idempotency bunu zararsızlaştırır ama
-//                                    kriptografik koruma değildir.
+//      X-StoreOS-Signature: t=<unix_saniye>,v1=<hex>
+//      imzalanan metin    : `${unix_saniye}.${ham_govde}`
 //
-//  Biçim 1 ilan edilen sözleşmeyi BOZMAZ (başlık adı ve algoritma aynı), sadece
-//  içeriğini zenginleştirir. Gökhan'a giden dokümana eklenmesi gerekiyor —
-//  Gün 2 raporunda soru olarak duruyor.
+//  Zaman damgası ±300 sn toleransın dışındaysa istek reddedilir (replay).
 //
-//  İmzalanan metin:
-//    biçim 1 → `${zamanDamgasi}.${hamGovde}`
-//    biçim 2 → `${hamGovde}`
+//  ── DÜZ HEX BİÇİMİ KALDIRILDI (Gün 3) ──────────────────────────────────────
+//  Gün 2'de geriye uyum için `<hex>` / `sha256=<hex>` de kabul ediliyordu.
+//  KALDIRILDI. Gerekçe: düz hex'te zaman damgası imzaya dahil olmadığı için
+//  aynı gövde süresiz geçerli kalıyordu; saldırgan `t=` kısmını atarak eski
+//  biçime düşüp replay penceresini KALICI OLARAK bypass edebilirdi. Henüz
+//  kimse entegre olmadığı için kırdığımız tek istemci kendi simülatörümüzdü.
+//
 //  HAM GÖVDE imzalanır — JSON.parse/stringify round-trip'i imzayı bozar.
 // ════════════════════════════════════════════════════════════════════════════
 
 import { createHmac, timingSafeEqual } from 'node:crypto'
 
-/** Zaman damgası toleransı. Dışında kalan istek reddedilir. */
+/** Zaman damgası toleransı (±). Dışında kalan istek reddedilir. */
 export const VARSAYILAN_TOLERANS_SN = 300
 
 export interface ImzaDogrulamaSonucu {
   gecerli: boolean
   /** Reddedildiyse partnere dönecek sebep. */
   sebep?: string
-  /** Kullanılan biçim — denetim kaydına yazılır. */
-  bicim?: 'zaman-damgali' | 'ham'
+  /** Denetim kaydına yazılır. Tek biçim var; alan ileride yeni sürüm için. */
+  bicim?: 'zaman-damgali'
 }
 
 function hmac(sir: string, metin: string): string {
@@ -44,8 +40,8 @@ function esitMi(a: string, b: string): boolean {
   const ab = Buffer.from(a, 'utf8')
   const bb = Buffer.from(b, 'utf8')
   if (ab.length !== bb.length) {
-    // timingSafeEqual farklı uzunlukta fırlatır. Uzunluk zaten gizli değil
-    // (hex uzunluğu sabit), yine de erken dönüşü tek noktada tutuyoruz.
+    // timingSafeEqual farklı uzunlukta fırlatır. Hex uzunluğu zaten sabit ve
+    // gizli değil; erken dönüşü tek noktada tutuyoruz.
     return false
   }
   return timingSafeEqual(ab, bb)
@@ -54,11 +50,10 @@ function esitMi(a: string, b: string): boolean {
 /**
  * İmza üretir. Simülatör ve testler bunu kullanır; partner kendi tarafında
  * aynı algoritmayı uygular.
- * @param zamanDamgasiSn  verilmezse biçim 2 (ham) üretilir.
+ * @param zamanDamgasiSn unix saniye. Verilmezse `Date.now()` kullanılır.
  */
 export function imzaUret(hamGovde: string, sir: string, zamanDamgasiSn?: number): string {
-  if (zamanDamgasiSn === undefined) return hmac(sir, hamGovde)
-  const t = Math.floor(zamanDamgasiSn)
+  const t = Math.floor(zamanDamgasiSn ?? Date.now() / 1000)
   return `t=${t},v1=${hmac(sir, `${t}.${hamGovde}`)}`
 }
 
@@ -91,51 +86,43 @@ export interface ImzaDogrulaGirdi {
   /** Şimdi (unix saniye). Test edilebilirlik için parametre. */
   simdiSn: number
   toleransSn?: number
-  /** Ham biçim (zaman damgasız imza) kabul edilsin mi? */
-  hamBicimeIzinVer?: boolean
 }
+
+const BICIM_METNI = "İmza biçimi 't=<unix_saniye>,v1=<hex>' olmalı."
 
 export function imzaDogrula(g: ImzaDogrulaGirdi): ImzaDogrulamaSonucu {
   const tolerans = g.toleransSn ?? VARSAYILAN_TOLERANS_SN
-  const hamIzin = g.hamBicimeIzinVer ?? true
 
   if (!g.sir) {
     // Yapılandırma hatası — partnerin suçu değil. Çağıran bunu 500'e çevirir.
     return { gecerli: false, sebep: 'Sunucuda imza sırrı yapılandırılmamış.' }
   }
   if (!g.baslik || g.baslik.trim() === '') {
-    return { gecerli: false, sebep: 'X-StoreOS-Signature başlığı eksik.' }
+    return { gecerli: false, sebep: `X-StoreOS-Signature başlığı eksik. ${BICIM_METNI}` }
   }
 
-  const baslik = g.baslik.trim()
-  const zd = zamanDamgaliAyristir(baslik)
+  const zd = zamanDamgaliAyristir(g.baslik.trim())
+  if (!zd) {
+    // Düz hex artık BURADA biter — sessizce eski biçime düşmek yok.
+    return { gecerli: false, sebep: `İmza biçimi tanınmadı. ${BICIM_METNI}` }
+  }
 
-  if (zd) {
-    const fark = Math.abs(g.simdiSn - zd.t)
-    if (fark > tolerans) {
-      return {
-        gecerli: false,
-        bicim: 'zaman-damgali',
-        sebep: `İmza zaman damgası tolerans dışı (${fark} sn, sınır ${tolerans} sn). Sunucu saatinizi kontrol edin.`,
-      }
+  if (!/^[0-9a-fA-F]{64}$/.test(zd.v1)) {
+    return { gecerli: false, bicim: 'zaman-damgali', sebep: 'v1 64 karakterlik hex olmalı (HMAC-SHA256).' }
+  }
+
+  const fark = Math.abs(g.simdiSn - zd.t)
+  if (fark > tolerans) {
+    return {
+      gecerli: false,
+      bicim: 'zaman-damgali',
+      sebep: `İmza zaman damgası tolerans dışı (${fark} sn, sınır ${tolerans} sn). Sunucu saatinizi kontrol edin.`,
     }
-    const beklenen = hmac(g.sir, `${zd.t}.${g.hamGovde}`)
-    if (!esitMi(beklenen, zd.v1.toLowerCase())) {
-      return { gecerli: false, bicim: 'zaman-damgali', sebep: 'İmza doğrulanamadı.' }
-    }
-    return { gecerli: true, bicim: 'zaman-damgali' }
   }
 
-  // Ham biçim
-  if (!hamIzin) {
-    return { gecerli: false, sebep: "İmza biçimi 't=<unix>,v1=<hex>' olmalı." }
+  if (!esitMi(hmac(g.sir, `${zd.t}.${g.hamGovde}`), zd.v1.toLowerCase())) {
+    return { gecerli: false, bicim: 'zaman-damgali', sebep: 'İmza doğrulanamadı.' }
   }
-  const hex = baslik.startsWith('sha256=') ? baslik.slice(7) : baslik
-  if (!/^[0-9a-fA-F]{64}$/.test(hex)) {
-    return { gecerli: false, sebep: "İmza biçimi tanınmadı. Beklenen: 't=<unix>,v1=<hex>' veya 64 karakterlik hex." }
-  }
-  if (!esitMi(hmac(g.sir, g.hamGovde), hex.toLowerCase())) {
-    return { gecerli: false, bicim: 'ham', sebep: 'İmza doğrulanamadı.' }
-  }
-  return { gecerli: true, bicim: 'ham' }
+
+  return { gecerli: true, bicim: 'zaman-damgali' }
 }

@@ -4,16 +4,19 @@
 //  KİLİTLİ. Bu şema entegrasyon dokümanıyla partnere ilan edildi.
 //  Alan adı / tip / davranış değiştirilmez. Değişiklik gerekirse önce doküman.
 //
-//  ── DOĞRULAMA KÜTÜPHANESİ NOTU ─────────────────────────────────────────────
-//  Prompt "zod şeması" diyordu; `zod` bu repoda BEYAN EDİLMİŞ bir bağımlılık
-//  DEĞİL. node_modules'ta var ama Next 16'nın transitive'i olarak — yani bir
-//  Next yükseltmesinde sessizce kaybolabilir. package.json onaylı istisna
-//  listesinde olmadığı için kuramadım.
+//  ── DOĞRULAMA KÜTÜPHANESİ — KARAR VERİLDİ (Gün 3) ──────────────────────────
+//  zod EKLENMEYECEK. Elle doğrulama kalıcı.
+//  Gerekçe: buradaki hata mesajları partner sözleşmesinin parçası ("4xx
+//  gövdesinde sebep yazılı"); zod'un üreteceği generic mesajlar bunu bozardı.
+//  Ayrıca zod bu repoda beyan edilmiş bağımlılık değil (Next 16 transitive'i),
+//  bir yükseltmede sessizce kaybolabilirdi.
 //
-//  Bu yüzden doğrulama elle yazıldı ama YÜZEYİ zod-uyumlu:
+//  Yüzey yine de zod-uyumlu tutuldu:
 //      OlaySemasi.safeParse(x) → { basarili, veri } | { basarili:false, hatalar }
-//  zod onaylanırsa değişecek TEK yer bu dosyadaki `safeParse` gövdesidir;
-//  çağıran hiçbir kod değişmez. (Gün 2 raporunda soru olarak duruyor.)
+//  Karar tersine dönerse değişecek TEK yer bu dosyadaki `safeParse` gövdesidir.
+//
+//  Bunun bedeli: doğrulama artık hataların saklanabileceği yer. Negatif vaka
+//  testleri `olay-sozlesmesi.test.ts` içinde ve sıkı tutulmalı.
 // ════════════════════════════════════════════════════════════════════════════
 
 // ─── Kanonik tip ─────────────────────────────────────────────────────────────
@@ -85,30 +88,64 @@ export function bilinenTipMi(tip: string): boolean {
 }
 
 /**
- * Her Faz 1 tipi için BEKLENEN metadata anahtarları.
- * Doğrulamada ZORUNLU DEĞİL (eksikse olay yine kabul edilir) — kural motoru ve
- * entegrasyon dokümanı için referans. Kural koşulları bu anahtarlara bakar.
+ * Her olay tipi için BEKLENEN metadata anahtarları.
  *
- * AÇIK KONU: Bu anahtar sözlüğü Gökhan'a giden dokümanda YOK. Sözleşme metni
- * metadata'yı serbest bırakıyor; kural motoru ise anahtar adı bilmek zorunda.
- * Rapordaki soru bu.
+ * KAYNAK: partnere ilan edilen entegrasyon dokümanı (OTORİTER, 3 Ağu).
+ * Gün 2'de bu tabloyu tahmin etmiştim; tahmin yanlıştı ve otoriter tabloyla
+ * DEĞİŞTİRİLDİ. Farkların dökümü Gün 3 raporunda.
+ *
+ * Doğrulamada ZORUNLU DEĞİL — eksik anahtar olayı reddetmez, `warnings` içine
+ * `eksik_metadata_anahtari` kodu düşer. Gerekçe: eksik anahtar sessiz bir
+ * kural-eşleşmemesine yol açar; partner bunu 200 yanıtında görmeli.
  */
 export const METADATA_ANAHTARLARI: Record<string, readonly string[]> = {
-  'store.person_count.updated':      ['count', 'zoneId'],
+  'store.person_count.updated':      ['count', 'zoneId', 'periodSeconds'],
   'store.queue.length_changed':      ['registerId', 'queueLength', 'avgWaitSeconds'],
-  'store.queue.threshold_exceeded':  ['registerId', 'queueLength', 'avgWaitSeconds', 'threshold'],
-  'store.occupancy.updated':         ['occupancy', 'capacity', 'occupancyRate'],
+  'store.queue.threshold_exceeded':  ['registerId', 'queueLength', 'avgWaitSeconds', 'maxWaitSeconds'],
+  'store.occupancy.updated':         ['personCount', 'densityLevel'],
   'store.dwell_time.updated':        ['zoneId', 'avgDwellSeconds'],
   'store.zone.person_count':         ['zoneId', 'count'],
   'store.camera.offline':            ['lastSeenAt', 'reason'],
-  'store.camera.degraded':           ['reason', 'frameRate'],
+  'store.camera.degraded':           ['issue'],
   // Faz 2 — referans, kural yok
-  'store.shelf.stock_low':           ['zoneId', 'shelfId', 'fillRate'],
-  'store.planogram.non_compliant':   ['zoneId', 'shelfId', 'deviationRate'],
-  'store.safety.event_detected':     ['zoneId', 'hazardType'],
-  'store.security.event_detected':   ['zoneId', 'incidentType'],
-  'store.heatmap.snapshot':          ['rows', 'cols', 'cells'],
+  'store.shelf.stock_low':           ['zoneId', 'shelfId', 'fillRatePercent', 'missingFacings'],
+  'store.planogram.non_compliant':   ['zoneId', 'shelfId', 'issueType', 'expectedSku', 'detectedSku'],
+  'store.safety.event_detected':     ['issueType', 'zoneId'],
+  'store.security.event_detected':   ['issueType', 'zoneId'],
+  'store.heatmap.snapshot':          ['gridWidth', 'gridHeight', 'values', 'periodMinutes'],
 }
+
+/**
+ * Dokümanda enum olarak ilan edilen metadata değerleri.
+ * REFERANS — doğrulama bunları zorlamaz (bilinmeyen değer olayı reddetmez).
+ * Kural koşulları ve panel etiketleri bu listelere yaslanır.
+ */
+export const METADATA_ENUM_DEGERLERI = {
+  'store.occupancy.updated': {
+    densityLevel: ['low', 'medium', 'high'],
+  },
+  'store.camera.degraded': {
+    issue: ['blur', 'obstructed', 'low_light', 'tampered'],
+  },
+  'store.safety.event_detected': {
+    issueType: ['wet_floor', 'blocked_exit', 'improper_stacking', 'obstruction'],
+  },
+  'store.security.event_detected': {
+    issueType: ['abandoned_object', 'unauthorized_zone', 'tampering'],
+  },
+} as const
+
+// ─── Uyarı kodları ───────────────────────────────────────────────────────────
+// Makine okur. Yanıt gövdesindeki `warnings` dizisi BU kodları taşır; insan
+// metni ayrı alanda (`uyarilar`) döner. Partner koda göre alarm kurabilsin.
+
+export const UYARI_KODLARI = {
+  bilinmeyenOlayTipi:      'bilinmeyen_olay_tipi',
+  sozlesmeDisiAlan:        'sozlesme_disi_alan',
+  eksikMetadataAnahtari:   'eksik_metadata_anahtari',
+} as const
+
+export type UyariKodu = (typeof UYARI_KODLARI)[keyof typeof UYARI_KODLARI]
 
 // ─── Doğrulama ───────────────────────────────────────────────────────────────
 
@@ -120,7 +157,7 @@ export interface AlanHatasi {
 }
 
 export type DogrulamaSonucu<T> =
-  | { basarili: true; veri: T; uyarilar: string[] }
+  | { basarili: true; veri: T; uyarilar: string[]; uyariKodlari: UyariKodu[] }
   | { basarili: false; hatalar: AlanHatasi[] }
 
 /** ISO 8601 + ZORUNLU offset. Offsetsiz '2026-08-14T14:35:21' REDDEDİLİR. */
@@ -158,7 +195,9 @@ const BEKLENEN_ALANLAR = new Set([
 export function olayDogrula(ham: unknown, onek = ''): DogrulamaSonucu<VisionEvent> {
   const hatalar: AlanHatasi[] = []
   const uyarilar: string[] = []
+  const uyariKodlari: UyariKodu[] = []
   const h = (alan: string, sebep: string) => hatalar.push({ alan: onek + alan, sebep })
+  const u = (kod: UyariKodu, metin: string) => { uyariKodlari.push(kod); uyarilar.push(metin) }
 
   if (!duzObjeMi(ham)) {
     return { basarili: false, hatalar: [{ alan: onek.replace(/\.$/, '') || 'govde', sebep: 'Olay bir JSON nesnesi olmalı.' }] }
@@ -182,7 +221,10 @@ export function olayDogrula(ham: unknown, onek = ''): DogrulamaSonucu<VisionEven
   } else if (!OLAY_TIPI_BICIMI.test(eventType)) {
     h('eventType', "Biçim: küçük harf, nokta ayraçlı, en az iki parça. Örn. 'store.queue.threshold_exceeded'.")
   } else if (!bilinenTipMi(eventType)) {
-    uyarilar.push(`Bilinmeyen olay tipi '${eventType}' — kabul edildi, hiçbir kurala eşleşmeyecek.`)
+    // Reddetmiyoruz (bkz. bilinenTipMi yorumu) ama SESSİZ de kalmıyoruz:
+    // 'store.queu.length_changed' yazan partner 200 alıp haftalarca fark etmesin.
+    u(UYARI_KODLARI.bilinmeyenOlayTipi,
+      `Bilinmeyen olay tipi '${eventType}' — kabul edildi, hiçbir kurala eşleşmeyecek. Yazım hatası olabilir.`)
   }
 
   // ── occurredAt ──
@@ -240,7 +282,23 @@ export function olayDogrula(ham: unknown, onek = ''): DogrulamaSonucu<VisionEven
   // Sıkı reddetme partnerin alan eklemesini kırılma sebebi yapar; sessiz yutmak
   // ise hatayı gizler. Orta yol: yoksay + uyarıda listele.
   const fazladan = Object.keys(ham).filter(k => !BEKLENEN_ALANLAR.has(k))
-  if (fazladan.length) uyarilar.push(`Sözleşme dışı alanlar yoksayıldı: ${fazladan.join(', ')}.`)
+  if (fazladan.length) {
+    u(UYARI_KODLARI.sozlesmeDisiAlan, `Sözleşme dışı alanlar yoksayıldı: ${fazladan.join(', ')}.`)
+  }
+
+  // ── eksik metadata anahtarı: REDDETME, bildir ──
+  // Bilinmeyen olay tipiyle aynı sessiz kırılma sınıfı: anahtar adı yanlışsa
+  // kural eşleşmez, partner 202 alır, kimse fark etmez.
+  if (typeof eventType === 'string' && duzObjeMi(metadata)) {
+    const beklenen = METADATA_ANAHTARLARI[eventType]
+    if (beklenen) {
+      const eksik = beklenen.filter(k => !(k in metadata))
+      if (eksik.length) {
+        u(UYARI_KODLARI.eksikMetadataAnahtari,
+          `'${eventType}' için beklenen metadata anahtarları eksik: ${eksik.join(', ')}. Olay kabul edildi ama kural eşleşmeyebilir.`)
+      }
+    }
+  }
 
   if (hatalar.length) return { basarili: false, hatalar }
 
@@ -257,7 +315,7 @@ export function olayDogrula(ham: unknown, onek = ''): DogrulamaSonucu<VisionEven
   if (typeof ham.snapshotUrl === 'string') olay.snapshotUrl = ham.snapshotUrl
   if (typeof ham.clipUrl === 'string') olay.clipUrl = ham.clipUrl
 
-  return { basarili: true, veri: olay, uyarilar }
+  return { basarili: true, veri: olay, uyarilar, uyariKodlari }
 }
 
 /** Tekil veya dizi gövdeyi normalize eder. Sözleşme her ikisini de taahhüt eder. */

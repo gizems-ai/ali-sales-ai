@@ -8,7 +8,8 @@
 // ════════════════════════════════════════════════════════════════════════════
 
 import { adapterBul, adapterSec, genericAdapter, ornekVendorAdapter, VARSAYILAN_ADAPTER } from './index'
-import { epochtanIso } from './ornek-vendor'
+import { epochtanIso, METADATA_HARITASI } from './ornek-vendor'
+import { METADATA_ANAHTARLARI } from '../olay-sozlesmesi'
 
 let fail = 0
 function ok(ad: string, cond: boolean, extra = '') {
@@ -114,6 +115,16 @@ ok('başlık yoksa gövdeden tanınır', 'adapter' in otomatik && otomatik.adapt
 const kanonikOtomatik = adapterSec(null, KANONIK)
 ok('kanonik gövde generic\'e düşer',
    'adapter' in kanonikOtomatik && kanonikOtomatik.adapter.ad === 'generic')
+
+console.log('\n[6] METADATA HARİTASI ↔ OTORİTER TABLO')
+// Adapter'ın ürettiği kanonik anahtarlar, partner'a ilan edilen tabloda YOKSA
+// olay kabul edilir ama hiçbir kural eşleşmez — sessiz kayıp. Gün 3'te tam da
+// bu oldu (threshold/fillRate/hazardType uydurma adlardı). Bir daha olmasın.
+const otoriterAnahtarlar = new Set(Object.values(METADATA_ANAHTARLARI).flat())
+const yetimler = Object.entries(METADATA_HARITASI)
+  .filter(([, kanonik]) => !otoriterAnahtarlar.has(kanonik))
+  .map(([ham, kanonik]) => `${ham}→${kanonik}`)
+ok('haritanın her hedefi otoriter tabloda var', yetimler.length === 0, yetimler.join(', '))
 
 if (fail) { console.log(`\n✗ ${fail} kontrol BAŞARISIZ\n`); process.exit(1) }
 console.log('\n✓ tüm adapter dönüşüm kontrolleri geçti\n')

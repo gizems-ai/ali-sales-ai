@@ -86,13 +86,13 @@ const TANIMLAR: Record<Senaryo, SenaryoTanimi> = {
       id, storeCode: MAGAZA, cameraId: `${MAGAZA}-kasa`,
       eventType: 'store.queue.threshold_exceeded',
       occurredAt: simdi(), severity: 'high', confidence: 0.91,
-      metadata: { registerId: 'kasa-2', queueLength: 7, avgWaitSeconds: 252, threshold: 6 },
+      metadata: { registerId: 'kasa-2', queueLength: 7, avgWaitSeconds: 252, maxWaitSeconds: 180 },
     }),
     vendor: id => ({
       event_uuid: id, site: { code: MAGAZA, device: `${MAGAZA}-kasa` },
       kind: 'QUEUE_THRESHOLD', ts_ms: Date.now(), tz_offset_min: 180,
       level: 4, score: 91,
-      payload: { register: 'kasa-2', people: 7, wait_sec: 252, limit: 6 },
+      payload: { register: 'kasa-2', people: 7, wait_sec: 252, max_wait_sec: 180 },
     }),
   },
   'raf-stok-dustu': {
@@ -103,13 +103,14 @@ const TANIMLAR: Record<Senaryo, SenaryoTanimi> = {
       id, storeCode: MAGAZA, cameraId: `${MAGAZA}-kozmetik`,
       eventType: 'store.shelf.stock_low',
       occurredAt: simdi(), severity: 'medium', confidence: 0.78,
-      metadata: { zoneId: 'kozmetik', shelfId: 'KZ-04', fillRate: 0.22 },
+      // Otoriter tabloda oran DEĞİL yüzde: fillRatePercent (0-100).
+      metadata: { zoneId: 'kozmetik', shelfId: 'KZ-04', fillRatePercent: 22, missingFacings: 9 },
     }),
     vendor: id => ({
       event_uuid: id, site: { code: MAGAZA, device: `${MAGAZA}-kozmetik` },
       kind: 'SHELF_LOW', ts_ms: Date.now(), tz_offset_min: 180,
       level: 3, score: 78,
-      payload: { zone: 'kozmetik', shelf: 'KZ-04', fill_rate: 0.22 },
+      payload: { zone: 'kozmetik', shelf: 'KZ-04', fill_rate_pct: 22, missing_facings: 9 },
     }),
   },
   'kamera-offline': {
@@ -126,7 +127,7 @@ const TANIMLAR: Record<Senaryo, SenaryoTanimi> = {
       event_uuid: id, site: { code: MAGAZA, device: `${MAGAZA}-depo` },
       kind: 'CAMERA_DOWN', ts_ms: Date.now(), tz_offset_min: 180,
       level: 4, score: 100,
-      payload: { reason: 'rtsp_timeout' },
+      payload: { reason: 'rtsp_timeout', last_seen: simdi() },
     }),
   },
   'isg-islak-zemin': {
@@ -137,13 +138,13 @@ const TANIMLAR: Record<Senaryo, SenaryoTanimi> = {
       id, storeCode: MAGAZA, cameraId: `${MAGAZA}-giris`,
       eventType: 'store.safety.event_detected',
       occurredAt: simdi(), severity: 'critical', confidence: 0.84,
-      metadata: { zoneId: 'giris', hazardType: 'wet_floor' },
+      metadata: { zoneId: 'giris', issueType: 'wet_floor' },
     }),
     vendor: id => ({
       event_uuid: id, site: { code: MAGAZA, device: `${MAGAZA}-giris` },
       kind: 'SAFETY_ALERT', ts_ms: Date.now(), tz_offset_min: 180,
       level: 5, score: 84,
-      payload: { zone: 'giris', hazard: 'wet_floor' },
+      payload: { zone: 'giris', issue_type: 'wet_floor' },
     }),
   },
 }

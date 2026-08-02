@@ -4,6 +4,7 @@
 //  (Repo konvansiyonu: test framework yok, ok() + process.exit(1).)
 // ════════════════════════════════════════════════════════════════════════════
 
+import { createHmac } from 'node:crypto'
 import { imzaUret, imzaDogrula, VARSAYILAN_TOLERANS_SN } from './imza'
 
 let fail = 0
@@ -53,19 +54,28 @@ ok('tolerans parametresi geçersiz kılınabilir',
 ok('zaman damgası imzaya dahil — t değiştirilirse imza tutmaz',
    !imzaDogrula({ hamGovde: GOVDE, baslik: zd.replace(/^t=\d+/, `t=${SIMDI + 1}`), sir: SIR, simdiSn: SIMDI }).gecerli)
 
-console.log('\n[4] HAM BİÇİM (geriye uyum — ilan edilen sözleşme)')
-const ham = imzaUret(GOVDE, SIR)
-ok('zaman damgasız üretim düz 64 hex verir', /^[0-9a-f]{64}$/.test(ham), ham)
-ok('düz hex kabul edilir',
-   imzaDogrula({ hamGovde: GOVDE, baslik: ham, sir: SIR, simdiSn: SIMDI }).gecerli)
-ok('sha256= öneki kabul edilir',
-   imzaDogrula({ hamGovde: GOVDE, baslik: `sha256=${ham}`, sir: SIR, simdiSn: SIMDI }).gecerli)
-ok('BÜYÜK harf hex kabul edilir',
-   imzaDogrula({ hamGovde: GOVDE, baslik: ham.toUpperCase(), sir: SIR, simdiSn: SIMDI }).gecerli)
-ok('hamBicimeIzinVer=false → ham imza reddedilir (sıkılaştırma anahtarı çalışıyor)',
-   !imzaDogrula({ hamGovde: GOVDE, baslik: ham, sir: SIR, simdiSn: SIMDI, hamBicimeIzinVer: false }).gecerli)
-ok('ham biçimde zaman aşımı YOK (replay korumasız — bilinen kısıt)',
-   imzaDogrula({ hamGovde: GOVDE, baslik: ham, sir: SIR, simdiSn: SIMDI + 10_000_000 }).gecerli)
+console.log('\n[4] DÜZ HEX BİÇİMİ KALDIRILDI — replay bypass kapandı (Gün 3)')
+// Gün 2'de kabul edilen biçim. Bir saldırgan `t=` kısmını atıp buraya düşerek
+// replay penceresini kalıcı bypass edebiliyordu. Artık düşemez.
+const duzHex = createHmac('sha256', SIR).update(GOVDE, 'utf8').digest('hex')
+ok('düz 64-hex REDDEDİLİR',
+   !imzaDogrula({ hamGovde: GOVDE, baslik: duzHex, sir: SIR, simdiSn: SIMDI }).gecerli)
+ok('sha256= önekli hex REDDEDİLİR',
+   !imzaDogrula({ hamGovde: GOVDE, baslik: `sha256=${duzHex}`, sir: SIR, simdiSn: SIMDI }).gecerli)
+ok('ret sebebi doğru biçimi söyler',
+   (imzaDogrula({ hamGovde: GOVDE, baslik: duzHex, sir: SIR, simdiSn: SIMDI }).sebep ?? '')
+     .includes('t=<unix_saniye>,v1=<hex>'))
+ok('imzaUret zaman damgası verilmese de HER ZAMAN t=,v1= üretir',
+   /^t=\d+,v1=[0-9a-f]{64}$/.test(imzaUret(GOVDE, SIR)))
+ok('v1 hex değilse reddedilir',
+   !imzaDogrula({ hamGovde: GOVDE, baslik: `t=${SIMDI},v1=merhaba`, sir: SIR, simdiSn: SIMDI }).gecerli)
+ok('v1 BÜYÜK harf hex kabul edilir (hex büyük/küçük fark etmez)',
+   imzaDogrula({ hamGovde: GOVDE, baslik: zd.toUpperCase().replace('T=', 't=').replace('V1=', 'v1='),
+                 sir: SIR, simdiSn: SIMDI }).gecerli)
+ok('t eksik → reddedilir',
+   !imzaDogrula({ hamGovde: GOVDE, baslik: `v1=${duzHex}`, sir: SIR, simdiSn: SIMDI }).gecerli)
+ok('v1 eksik → reddedilir',
+   !imzaDogrula({ hamGovde: GOVDE, baslik: `t=${SIMDI}`, sir: SIR, simdiSn: SIMDI }).gecerli)
 
 if (fail) { console.log(`\n✗ ${fail} kontrol BAŞARISIZ\n`); process.exit(1) }
 console.log('\n✓ tüm imza kontrolleri geçti\n')
