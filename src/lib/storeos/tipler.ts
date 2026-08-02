@@ -229,9 +229,12 @@ export const METRIK_TIPLERI = [
   'etiket_uygunluk',
   'raf_doluluk',
   'kasa_acik',
-  'kuyruk_saatlik',      // Detay JSON: [{saat, ortalama, maksimum}]
+  'kuyruk_saatlik',      // Detay JSON: [{saat, birincil, ikincil}]
   'yogunluk_grid',       // Detay JSON: {satir, sutun, hucreler:number[]}
+  // Şekiller demo-metrikler.ts'te tanımlı (SaatlikNokta/IzgaraDetay/DagilimDetay).
+  // Alan adları GENELDİR (birincil/ikincil, etiket/deger): grafik bileşenleri
+  // metriğin ne olduğunu bilmeden çizebilsin diye.
   'satis_saatlik',
-  'personel_dagilimi',   // Detay JSON: [{rol, adet}]
+  'personel_dagilimi',   // Detay JSON: [{etiket, deger}]
 ] as const
 export type MetrikTipi = (typeof METRIK_TIPLERI)[number]
