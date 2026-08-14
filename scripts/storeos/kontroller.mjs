@@ -5,7 +5,8 @@
 //    node scripts/storeos/kontroller.mjs
 //
 //  Sırayla: TypeScript · import kuralı · CSS kapsamı · sözleşme doğrulama · imza ·
-//  idempotency · durum makinesi · adapter. Herhangi biri düşerse çıkış kodu 1.
+//  idempotency · durum makinesi · adapter · pano · liste. Herhangi biri düşerse
+//  çıkış kodu 1.
 //
 //  NEDEN package.json'a script eklenmedi: package.json onaylı istisna listesinde
 //  değil. Bu dosya scripts/storeos/ içinde, izole ağacın içinde kalıyor.
@@ -24,6 +25,7 @@ const ADIMLAR = [
   ['Görev durum makinesi',           'npx', ['-y', 'tsx', 'src/lib/storeos/gorev.test.ts']],
   ['Adapter dönüşümü',               'npx', ['-y', 'tsx', 'src/lib/storeos/adapters/adapter.test.ts']],
   ['Pano toplayıcı',                 'npx', ['-y', 'tsx', 'src/lib/storeos/dashboard/pano.test.ts']],
+  ['Liste toplayıcı (3 ekran)',      'npx', ['-y', 'tsx', 'src/lib/storeos/liste/liste.test.ts']],
 ]
 
 const dusen = []

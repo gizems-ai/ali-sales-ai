@@ -130,7 +130,7 @@ function detay<T>(m: Metrik | undefined): T | null {
  * HİÇ kayıt yoksa da 'demo' döner: bilinmeyen köken 'gercek' diye etiketlenmez
  * (madde 11 — seed verisi asla gerçek gibi sunulmaz, boşluk da öyle).
  */
-function veriTipiBirlesimi(tipler: (VeriTipi | undefined)[]): VeriTipi {
+export function veriTipiBirlesimi(tipler: (VeriTipi | undefined)[]): VeriTipi {
   const bilinen = tipler.filter((t): t is VeriTipi => t === 'demo' || t === 'gercek')
   if (bilinen.length === 0) return 'demo'
   return bilinen.some(t => t === 'demo') ? 'demo' : 'gercek'

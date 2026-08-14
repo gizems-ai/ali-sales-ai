@@ -374,3 +374,131 @@
 @media (prefers-reduced-motion: reduce) {
   .storeos-root .so-iskelet, .storeos-root .so-nabiz-nokta { animation: none; }
 }
+
+/* ── Liste ekranları (Gün 4: Alarmlar · Görevler · Denetim) ─────────────────
+   Kural aynen geçerli: her seçici `.storeos-root` ile başlar. Bu blok yalnız
+   liste ekranlarına aittir; pano sınıfları yukarıda ve DEĞİŞTİRİLMEDİ. */
+
+.storeos-root .so-alt-baslik {
+  margin: -6px 0 0; font-size: 12.5px; color: var(--so-metin-silik); max-width: 78ch;
+}
+
+/* Filtre çubuğu */
+.storeos-root .so-filtre-cubugu {
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+}
+.storeos-root .so-filtre-sag { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+.storeos-root .so-suzgec { display: flex; gap: 6px; flex-wrap: wrap; }
+.storeos-root .so-suzgec-oge {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 10px; border-radius: 999px;
+  border: 1px solid var(--so-cizgi); background: var(--so-yuzey);
+  color: var(--so-metin-soluk); font-size: 12px; font-family: inherit;
+  cursor: pointer; transition: border-color .12s, color .12s;
+}
+.storeos-root .so-suzgec-oge:hover { border-color: var(--so-marka-soluk); color: var(--so-metin); }
+.storeos-root .so-suzgec-oge[aria-pressed="true"] {
+  border-color: var(--so-marka); background: var(--so-marka-zemin); color: #ffd6ea;
+}
+/* Denetimde sayaçlar bilgi amaçlıdır — düğme gibi görünmemeli. */
+.storeos-root .so-suzgec-oge[data-bilgi="1"] { cursor: default; }
+.storeos-root .so-suzgec-oge[data-bilgi="1"]:hover { border-color: var(--so-cizgi); color: var(--so-metin-soluk); }
+.storeos-root .so-suzgec-adet {
+  font-size: 11px; color: var(--so-metin-silik); font-variant-numeric: tabular-nums;
+}
+
+.storeos-root .so-arama {
+  padding: 6px 11px; min-width: 190px; border-radius: var(--so-radius-sm);
+  border: 1px solid var(--so-cizgi); background: var(--so-yuzey);
+  color: var(--so-metin); font-size: 12.5px; font-family: inherit;
+}
+.storeos-root .so-arama::placeholder { color: var(--so-metin-silik); }
+.storeos-root .so-arama:focus { outline: none; border-color: var(--so-marka); }
+
+.storeos-root .so-entity {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 4px 6px 4px 10px; border-radius: 999px;
+  border: 1px solid var(--so-marka); background: var(--so-marka-zemin);
+  font-size: 11.5px; color: #ffd6ea;
+}
+.storeos-root .so-entity-etiket { color: var(--so-metin-silik); font-size: 10.5px; text-transform: uppercase; letter-spacing: .04em; }
+.storeos-root .so-entity code { font-size: 11.5px; }
+.storeos-root .so-entity-kapat {
+  border: none; background: none; color: inherit; cursor: pointer;
+  font-size: 15px; line-height: 1; padding: 0 4px; font-family: inherit;
+}
+
+/* Tavan uyarısı — sessiz kırpma yok */
+.storeos-root .so-tavan {
+  padding: 10px 14px; border-radius: var(--so-radius-sm);
+  border: 1px solid rgba(245,183,78,.28); background: rgba(245,183,78,.10);
+  color: var(--so-medium); font-size: 12px; line-height: 1.55;
+}
+.storeos-root .so-tavan strong { color: var(--so-metin); }
+
+/* Tablo — panonun `.so-liste`'sinden farklı: yükseklik sınırı YOK, sayfa kayar */
+.storeos-root .so-tablo { display: flex; flex-direction: column; }
+
+.storeos-root .so-tablo-satir { border-bottom: 1px solid var(--so-cizgi); }
+.storeos-root .so-tablo-satir:last-child { border-bottom: none; }
+
+.storeos-root .so-tablo-satir > summary,
+.storeos-root .so-tablo-satir-duz {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 4px; cursor: pointer; list-style: none;
+}
+.storeos-root .so-tablo-satir-duz { cursor: default; }
+.storeos-root .so-tablo-satir > summary::-webkit-details-marker { display: none; }
+.storeos-root .so-tablo-satir > summary:hover { background: var(--so-yuzey-2); }
+.storeos-root .so-tablo-satir[open] > summary { background: var(--so-yuzey-2); }
+.storeos-root .so-tablo-satir > summary:focus-visible { outline: 2px solid var(--so-marka); outline-offset: -2px; }
+
+.storeos-root .so-zaman {
+  font-size: 11.5px; color: var(--so-metin-soluk); white-space: nowrap; min-width: 84px;
+}
+.storeos-root .so-zaman-gecen { white-space: nowrap; }
+
+/* Açılan detay */
+.storeos-root .so-detay {
+  margin: 0; padding: 12px 14px 16px;
+  background: var(--so-zemin); border-top: 1px solid var(--so-cizgi);
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px 20px;
+}
+.storeos-root .so-alan { min-width: 0; }
+.storeos-root .so-alan-genis { grid-column: 1 / -1; }
+.storeos-root .so-alan dt {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--so-metin-silik); margin-bottom: 3px;
+}
+.storeos-root .so-alan dd {
+  margin: 0; font-size: 12.5px; color: var(--so-metin); line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.storeos-root .so-detay code {
+  font-size: 11.5px; color: var(--so-marka-soluk);
+  background: var(--so-yuzey-2); padding: 1px 5px; border-radius: 5px;
+}
+.storeos-root .so-ipucu { color: var(--so-metin-silik); }
+
+.storeos-root .so-metadata { display: flex; flex-wrap: wrap; gap: 6px; }
+.storeos-root .so-metadata-cift {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 8px; border-radius: var(--so-radius-sm);
+  border: 1px solid var(--so-cizgi); background: var(--so-yuzey);
+  font-size: 11.5px;
+}
+.storeos-root .so-metadata-cift b { font-weight: 600; color: var(--so-metin); }
+
+.storeos-root .so-baglar { display: flex; flex-wrap: wrap; gap: 14px; }
+.storeos-root .so-bag { color: var(--so-marka-soluk); text-decoration: none; font-size: 12.5px; }
+.storeos-root .so-bag:hover { text-decoration: underline; }
+
+.storeos-root .so-altbilgi {
+  margin: 0; font-size: 11.5px; color: var(--so-metin-silik); line-height: 1.6; max-width: 84ch;
+}
+
+@media (max-width: 720px) {
+  .storeos-root .so-filtre-sag { margin-left: 0; width: 100%; }
+  .storeos-root .so-arama { flex: 1; min-width: 0; }
+}

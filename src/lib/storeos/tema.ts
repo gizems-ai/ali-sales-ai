@@ -6,7 +6,7 @@
 //  adları var. Tek marka değişikliği = tek CSS bloğu, sıfır bileşen düzenlemesi.
 // ════════════════════════════════════════════════════════════════════════════
 
-import type { Severity } from './tipler'
+import type { GorevDurumu, Oncelik, Severity } from './tipler'
 
 /** SVG `fill`/`stroke` gibi CSS sınıfının yetmediği yerler için değişken adı. */
 export const DEGISKEN = {
@@ -37,6 +37,38 @@ const SEVERITY_ETIKETLERI: Record<Severity, string> = {
 
 export function severityEtiketi(s: Severity): string {
   return SEVERITY_ETIKETLERI[s] ?? s
+}
+
+// ─── Görev durumu / öncelik ──────────────────────────────────────────────────
+//
+// Bu iki eşleme Gün 3'te `kartlar.tsx` içinde yerel sabitti. Gün 4'te üç ekran
+// daha aynı etiketleri çizmeye başladığı için buraya alındı: durum makinesine
+// yeni bir durum eklendiğinde Türkçesinin unutulacağı tek bir yer kalsın.
+
+const GOREV_DURUM_ETIKETLERI: Record<GorevDurumu, string> = {
+  yeni: 'Yeni', atandi: 'Atandı', goruldu: 'Görüldü', basladi: 'Başladı',
+  beklemede: 'Beklemede', tamamlandi: 'Tamamlandı', onay_bekliyor: 'Onay bekliyor',
+  reddedildi: 'Reddedildi', suresi_gecti: 'Süresi geçti', iptal: 'İptal',
+}
+
+export function gorevDurumEtiketi(d: GorevDurumu): string {
+  return GOREV_DURUM_ETIKETLERI[d] ?? d
+}
+
+const ONCELIK_SINIFLARI: Record<Oncelik, string> = {
+  kritik: 'so-sev-critical', yuksek: 'so-sev-high', normal: 'so-notr', dusuk: 'so-notr',
+}
+
+export function oncelikSinifi(o: Oncelik): string {
+  return ONCELIK_SINIFLARI[o] ?? 'so-notr'
+}
+
+const ONCELIK_ETIKETLERI: Record<Oncelik, string> = {
+  kritik: 'Kritik', yuksek: 'Yüksek', normal: 'Normal', dusuk: 'Düşük',
+}
+
+export function oncelikEtiketi(o: Oncelik): string {
+  return ONCELIK_ETIKETLERI[o] ?? o
 }
 
 /** Isı haritası hücresi: 0–100 → marka pembesinin opaklığı. Ayrı palet yok. */

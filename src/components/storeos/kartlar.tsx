@@ -7,7 +7,9 @@ import type {
   AlarmSatiri, GorevOzeti, GorevSatiri, KameraSatiri, KpiKarti, MagazaOzeti,
   PersonelSatiri,
 } from '@/lib/storeos/dashboard/tipler'
-import { severityEtiketi, severitySinifi } from '@/lib/storeos/tema'
+import {
+  gorevDurumEtiketi, oncelikSinifi, severityEtiketi, severitySinifi,
+} from '@/lib/storeos/tema'
 import {
   BosDurum, IskeletListe, Kart, OrnekVeri, birimYaz, gecenSure, sayiYaz, saatYaz,
   tarihSaatYaz,
@@ -100,15 +102,8 @@ export function AlarmListesi({ alarmlar, simdiMs }: { alarmlar: AlarmSatiri[] | 
 
 // ─── Görevler ────────────────────────────────────────────────────────────────
 
-const DURUM_ETIKETLERI: Record<string, string> = {
-  yeni: 'Yeni', atandi: 'Atandı', goruldu: 'Görüldü', basladi: 'Başladı',
-  beklemede: 'Beklemede', tamamlandi: 'Tamamlandı', onay_bekliyor: 'Onay bekliyor',
-  reddedildi: 'Reddedildi', suresi_gecti: 'Süresi geçti', iptal: 'İptal',
-}
-
-const ONCELIK_SINIFI: Record<string, string> = {
-  kritik: 'so-sev-critical', yuksek: 'so-sev-high', normal: 'so-notr', dusuk: 'so-notr',
-}
+// Durum etiketleri ve öncelik sınıfları `tema.ts`'e taşındı (Gün 4) — aynı
+// eşlemeyi liste ekranları da kullanıyor, iki kopya kaymaya açıktı.
 
 export function GorevListesi({
   gorevler, ozet,
@@ -130,7 +125,7 @@ export function GorevListesi({
         <div className="so-liste">
           {gorevler.map(g => (
             <div key={g.gorevNo} className="so-satir">
-              <span className={`so-rozet ${ONCELIK_SINIFI[g.oncelik] ?? 'so-notr'}`}>{g.gorevNo}</span>
+              <span className={`so-rozet ${oncelikSinifi(g.oncelik)}`}>{g.gorevNo}</span>
               <div className="so-satir-ana">
                 <div className="so-satir-baslik">{g.baslik}</div>
                 <div className="so-satir-alt">
@@ -138,7 +133,7 @@ export function GorevListesi({
                 </div>
               </div>
               {g.gecikti && <span className="so-rozet so-sev-critical">gecikti</span>}
-              <span className="so-rozet so-notr">{DURUM_ETIKETLERI[g.durum] ?? g.durum}</span>
+              <span className="so-rozet so-notr">{gorevDurumEtiketi(g.durum)}</span>
               <OrnekVeri veriTipi={g.veriTipi} />
             </div>
           ))}

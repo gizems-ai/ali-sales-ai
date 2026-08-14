@@ -5,8 +5,9 @@
 //  kuralı). İhtiyaç duyulan yapı kopyalanmadı, sıfırdan ve çok daha küçük
 //  yazıldı: Store OS'in tenant/rol/menü mantığıyla işi yok.
 //
-//  Menüdeki gri satırlar Gün 4+ ekranlarıdır; tıklanabilir değil, çünkü
-//  demoda var olmayan bir ekrana götüren link jüriye yalan söyler.
+//  Menüdeki gri satırlar henüz yazılmamış ekranlardır; tıklanabilir değil,
+//  çünkü demoda var olmayan bir ekrana götüren link jüriye yalan söyler.
+//  Gün 4'te Alarmlar · Görevler · Denetim kaydı bu listeden çıktı.
 // ════════════════════════════════════════════════════════════════════════════
 
 import type { ReactNode } from 'react'
@@ -18,8 +19,8 @@ const NAV: { baslik: string; ogeler: NavOgesi[] }[] = [
     baslik: 'Operasyon',
     ogeler: [
       { ad: 'Pano', yol: '/storeos' },
-      { ad: 'Alarmlar', yakinda: true },
-      { ad: 'Görevler', yakinda: true },
+      { ad: 'Alarmlar', yol: '/storeos/alarmlar' },
+      { ad: 'Görevler', yol: '/storeos/gorevler' },
       { ad: 'Kameralar', yakinda: true },
     ],
   },
@@ -27,7 +28,7 @@ const NAV: { baslik: string; ogeler: NavOgesi[] }[] = [
     baslik: 'Yönetim',
     ogeler: [
       { ad: 'Kurallar', yakinda: true },
-      { ad: 'Denetim kaydı', yakinda: true },
+      { ad: 'Denetim kaydı', yol: '/storeos/denetim' },
       { ad: 'Mağazalar', yakinda: true },
     ],
   },
