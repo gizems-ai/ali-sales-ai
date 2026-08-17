@@ -12,7 +12,7 @@
 import { adapterSec } from './adapters'
 import { gorevIcinIlkBildirim } from './bildirim'
 import type { Depo } from './depo'
-import { DENETIM_AKSIYONLARI, denetimYaz } from './denetim'
+import { DENETIM_AKSIYONLARI, denetimKuyrukla, denetimYaz } from './denetim'
 import { kuraldanGorevUret } from './gorev'
 import { kanal as varsayilanKanal } from './kanal'
 import type { KanalArayuzu } from './kanal/tipler'
@@ -93,7 +93,15 @@ function olayaKayit(olay: VisionEvent, adapterAdi: string, alindi: string): Olay
   return k
 }
 
-export async function olaylariAl(g: AlimGirdi): Promise<AlimSonucu> {
+/**
+ * Zincirin giriş kapısı. Denetim satırları bu iş boyunca biriktirilir ve
+ * sonunda TEK yazımla gönderilir — bkz. `denetim.ts` toplu yazım notu.
+ */
+export function olaylariAl(g: AlimGirdi): Promise<AlimSonucu> {
+  return denetimKuyrukla(g.depo, () => olaylariAlIc(g))
+}
+
+async function olaylariAlIc(g: AlimGirdi): Promise<AlimSonucu> {
   const d = g.depo
   const ogeler = govdeyiDiziyeCevir(g.govde)
   const secim = adapterSec(g.adapterAdi, ogeler[0])

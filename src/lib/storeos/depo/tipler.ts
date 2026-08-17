@@ -79,6 +79,13 @@ export interface BildirimDeposu {
  */
 export interface DenetimDeposu {
   yaz(satir: DenetimSatiri): Promise<void>
+  /**
+   * Toplu ekleme — `yaz`'ın çoklu hâli, EKLEME dışında bir yetki taşımaz.
+   * Neden var: bir olay zinciri 6 denetim satırı üretiyor ve Airtable'da her
+   * satır ayrı bir istekti. 6 istek → 1. Ölçüm: `scripts/storeos/istek-butcesi.ts`.
+   * Sıra KORUNUR — denetim kaydı okunduğunda zincir sırayla anlaşılmalı.
+   */
+  yazCok(satirlar: DenetimSatiri[]): Promise<void>
   listele(filtre?: { entityId?: string; limit?: number }): Promise<DenetimSatiri[]>
 }
 

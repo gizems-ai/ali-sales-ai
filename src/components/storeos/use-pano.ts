@@ -4,7 +4,7 @@
 //  Store OS — İKİ KADEMELİ ANKET (polling)
 //
 //  SSE KURULMAYACAK (madde: açık talimat). Bunun yerine iki kademe:
-//    canli  →  2 sn  · alarmlar + görevler   ("15 sn içinde görünür" kriteri)
+//    canli  →  4 sn  · alarmlar + görevler   ("15 sn içinde görünür" kriteri)
 //    yavas  → 30 sn  · KPI, grafikler, ekip  (dakikada bir değişen veriler)
 //  İlk yükleme tek 'tam' isteğidir — açılışta iki istek atılmaz.
 //
@@ -22,7 +22,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { DashboardVerisi, Katman, PanoHatasi } from '@/lib/storeos/dashboard/tipler'
 
-export const ARALIK = { canli: 2_000, yavas: 30_000 } as const
+// 2 sn → 4 sn (17 Ağu 2026, ölçümle). Airtable transportu 4 istek/sn ile
+// kendini sınırlıyor ve anket bu bütçeyi zincirle PAYLAŞIYOR. 2 sn'de pano
+// tek başına 2.17 istek/sn yiyordu; olay→telefon gecikmesi ~13 sn'ye çıkıyordu.
+// 4 sn kabul kriterindeki 15 sn tavanının çok altında kalır, bütçeyi zincire
+// bırakır. Ölçüm: `scripts/storeos/istek-butcesi.ts`.
+export const ARALIK = { canli: 4_000, yavas: 30_000 } as const
 
 /** Ardışık hatada geri çekilme (ms). Son değer tekrarlanır. */
 const GERI_CEKILME = [4_000, 10_000, 30_000, 60_000]

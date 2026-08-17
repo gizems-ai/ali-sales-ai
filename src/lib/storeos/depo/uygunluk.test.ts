@@ -110,10 +110,10 @@ function bildirimKaydi(govde: string, gorevNo: string): Bildirim {
   }
 }
 
-function denetimSatiri(kayitId: string, entityId: string): DenetimSatiri {
+function denetimSatiri(kayitId: string, entityId: string, zaman = T0): DenetimSatiri {
   return {
     'Kayit ID': kayitId,
-    'Zaman': T0,
+    'Zaman': zaman,
     'Aktor': 'uygunluk-testi',
     'Aktor Tipi': 'system',
     'Aksiyon': 'test.uygunluk',
@@ -242,8 +242,8 @@ async function iddialar(d: Depo) {
   const denetimAnahtarlari = Object.keys(d.denetim)
   ok(`${e} denetim'de silme/güncelleme metodu YOK`,
      yasak.every(k => !denetimAnahtarlari.includes(k)), denetimAnahtarlari.join(','))
-  ok(`${e} denetim yalnız yaz+listele sunar`,
-     denetimAnahtarlari.sort().join(',') === 'listele,yaz', denetimAnahtarlari.join(','))
+  ok(`${e} denetim yalnız yaz+yazCok+listele sunar`,
+     denetimAnahtarlari.sort().join(',') === 'listele,yaz,yazCok', denetimAnahtarlari.join(','))
 
   await d.denetim.yaz(denetimSatiri(`${ETIKET}-den-1`, no1))
   await d.denetim.yaz(denetimSatiri(`${ETIKET}-den-2`, no1))
@@ -252,6 +252,25 @@ async function iddialar(d: Depo) {
      denetimListe.length >= 2, `${denetimListe.length}`)
   ok(`${e} denetim entityId filtresi çalışır`,
      denetimListe.every(s => s['Entity ID'] === no1))
+
+  // yazCok — `yaz`'ın toplu hâli. Sözleşme: EKLER (silmez) ve SIRAYI KORUR.
+  // Sıra önemli: denetim kaydı okunduğunda zincir sırayla anlaşılmalı.
+  // Zaman'lar bilerek ARTAN — okuma sırası her iki depoda da Zaman'a göredir,
+  // eşit damgada sıralama depo iç detayına kalırdı (kırılgan iddia olurdu).
+  await d.denetim.yazCok([
+    denetimSatiri(`${ETIKET}-cok-1`, no1, '2026-08-17T14:00:01+03:00'),
+    denetimSatiri(`${ETIKET}-cok-2`, no1, '2026-08-17T14:00:02+03:00'),
+    denetimSatiri(`${ETIKET}-cok-3`, no1, '2026-08-17T14:00:03+03:00'),
+  ])
+  const denetimListe2 = await d.denetim.listele({ entityId: no1 })
+  ok(`${e} yazCok önceki satırları SİLMEZ (2+3=5)`,
+     denetimListe2.length >= 5, `${denetimListe2.length}`)
+  const cokIdler = denetimListe2.map(s => s['Kayit ID']).filter(k => k.startsWith(`${ETIKET}-cok-`))
+  ok(`${e} yazCok üç satırın hepsini yazar`, cokIdler.length === 3, cokIdler.join(','))
+  ok(`${e} yazCok sırayı korur`,
+     cokIdler.join(',') === `${ETIKET}-cok-1,${ETIKET}-cok-2,${ETIKET}-cok-3`, cokIdler.join(','))
+  ok(`${e} yazCok boş dizide patlamaz`,
+     await d.denetim.yazCok([]).then(() => true, () => false))
 
   // ── 7. Referans veri ───────────────────────────────────────────────────────
   ok(`${e} magaza(0178) bulunur`, (await d.referans.magaza(MAGAZA))?.['Kod'] === MAGAZA)

@@ -286,6 +286,7 @@ export class BellekDeposu implements Depo {
   // APPEND-ONLY: burada bilinçli olarak yalnız `yaz` ve `listele` var.
   denetim: DenetimDeposu = {
     yaz: async (satir) => { this.d.denetim.push({ ...satir }) },
+    yazCok: async (satirlar) => { for (const s of satirlar) this.d.denetim.push({ ...s }) },
     listele: async (f) => {
       let liste = [...this.d.denetim]
       if (f?.entityId) liste = liste.filter(s => s['Entity ID'] === f.entityId)

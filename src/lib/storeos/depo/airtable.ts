@@ -168,6 +168,12 @@ export class AirtableDeposu implements Depo {
   // Airtable şema seviyesinde append-only zorlayamıyor; garanti burasıdır.
   denetim: DenetimDeposu = {
     yaz: async (satir) => { await olustur<DenetimSatiri>(TABLO.denetim, [satir]) },
+    // Airtable POST'u istek başına en fazla 10 kayıt alır ve sırayı korur.
+    yazCok: async (satirlar) => {
+      for (let i = 0; i < satirlar.length; i += 10) {
+        await olustur<DenetimSatiri>(TABLO.denetim, satirlar.slice(i, i + 10))
+      }
+    },
     listele: async (f) => {
       const kayitlar = await listele<DenetimSatiri>(TABLO.denetim, {
         formul: f?.entityId ? `{Entity ID} = ${alintila(f.entityId)}` : undefined,

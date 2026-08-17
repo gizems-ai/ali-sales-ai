@@ -8,7 +8,25 @@
 //
 //  Bu dosyaya `sil`, `guncelle`, `temizle`, `duzelt` adlı bir fonksiyon eklemek
 //  kabul kriterini ihlal eder. Eklemeden önce sözleşmeyi değiştirin.
+//
+//  ── TOPLU YAZIM (17 Ağu 2026) ──────────────────────────────────────────────
+//  Bir olay zinciri 6 denetim satırı üretiyor ve Airtable'da her satır AYRI bir
+//  POST'tu. Depo katmanı kendini 4 istek/sn ile sınırladığı için bu 6 istek,
+//  jürinin telefonuna mesaj gitmesini geciktiren en büyük tek kalemdi.
+//  Çözüm: `denetimKuyrukla()` ile sarılan iş boyunca satırlar bellekte birikir,
+//  iş bitince TEK POST ile yazılır (Airtable POST'u 10 kayıt alır).
+//
+//  BEDELİ — bilinçli kabul edildi: satırlar işin SONUNDA yazılır. Süreç işin
+//  ortasında sert biçimde ölürse (SIGKILL, lambda timeout) o zincirin denetim
+//  satırları kaybolur. Kabul gerekçesi: (a) `bosalt()` finally'de çalışır, yani
+//  iş HATA FIRLATSA da satırlar yazılır; (b) demo ölçeğinde tek süreç var;
+//  (c) alternatif olan 6 ayrı POST demonun ölçülen darboğazıydı.
+//  Gerçek üründe doğru cevap kalıcı bir kuyruktur (Postgres/SQS).
+//
+//  Kuyruk EKLEME dışında bir yetki taşımaz — silme/güncelleme yolu yine yok.
 // ════════════════════════════════════════════════════════════════════════════
+
+import { AsyncLocalStorage } from 'node:async_hooks'
 
 import type { Depo } from './depo'
 import type { AktorTipi, DenetimSatiri } from './tipler'
@@ -95,11 +113,59 @@ export async function denetimYaz(d: Depo, g: DenetimGirdi): Promise<void> {
   if (sonrasi !== undefined) satir['Sonrasi JSON'] = sonrasi
   if (g.ip) satir['IP'] = g.ip
 
+  // Kuyruk açıksa yazma, biriktir — `denetimKuyrukla` sonunda tek POST'la yazar.
+  const kuyruk = DENETIM_KUYRUGU.getStore()
+  if (kuyruk) {
+    kuyruk.satirlar.push(satir)
+    return
+  }
+
   try {
     await d.denetim.yaz(satir)
   } catch (e) {
     console.error('[storeos] denetim kaydi yazilamadi', {
       aksiyon: g.aksiyon, entityId: g.entityId, hata: (e as Error).message,
+    })
+  }
+}
+
+// ─── Kuyruk ──────────────────────────────────────────────────────────────────
+
+interface Kuyruk {
+  satirlar: DenetimSatiri[]
+}
+
+const DENETIM_KUYRUGU = new AsyncLocalStorage<Kuyruk>()
+
+/**
+ * `is` boyunca üretilen denetim satırlarını biriktirir, bitince TEK toplu
+ * yazımla gönderir. İç içe çağrılırsa dıştaki kuyruk kullanılır (satırlar en
+ * dıştaki iş bitince yazılır) — çift boşaltma olmaz.
+ *
+ * Boşaltma `finally` içindedir: `is` hata fırlatsa bile o ana kadarki denetim
+ * satırları yazılır. Hatanın kendisi yutulmaz, aynen yukarı gider.
+ */
+export async function denetimKuyrukla<T>(d: Depo, is: () => Promise<T>): Promise<T> {
+  if (DENETIM_KUYRUGU.getStore()) return is()   // zaten kuyruk içindeyiz
+  const k: Kuyruk = { satirlar: [] }
+  try {
+    return await DENETIM_KUYRUGU.run(k, is)
+  } finally {
+    await bosalt(d, k)
+  }
+}
+
+/** Biriken satırları yazar. `denetimYaz` gibi hata FIRLATMAZ. */
+async function bosalt(d: Depo, k: Kuyruk): Promise<void> {
+  if (k.satirlar.length === 0) return
+  const satirlar = k.satirlar.splice(0, k.satirlar.length)
+  try {
+    await d.denetim.yazCok(satirlar)
+  } catch (e) {
+    console.error('[storeos] denetim kuyrugu yazilamadi', {
+      adet: satirlar.length,
+      ilk: satirlar[0]?.['Aksiyon'],
+      hata: (e as Error).message,
     })
   }
 }

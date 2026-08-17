@@ -23,7 +23,7 @@
 
 import { bildirimGonder, aliciBul } from './bildirim'
 import type { Depo } from './depo'
-import { DENETIM_AKSIYONLARI, denetimYaz } from './denetim'
+import { DENETIM_AKSIYONLARI, denetimKuyrukla, denetimYaz } from './denetim'
 import { gecisYap, gorevErtele } from './gorev'
 import { butonIdCoz } from './kanal/buton'
 import type { GelenYanit, KanalArayuzu } from './kanal/tipler'
@@ -52,7 +52,12 @@ export interface YanitGirdi {
   simdi?: string
 }
 
-export async function yanitiIsle(g: YanitGirdi): Promise<YanitSonucu> {
+/** Denetim satırları biriktirilip tek yazımla gider — bkz. `denetim.ts`. */
+export function yanitiIsle(g: YanitGirdi): Promise<YanitSonucu> {
+  return denetimKuyrukla(g.depo, () => yanitiIsleIc(g))
+}
+
+async function yanitiIsleIc(g: YanitGirdi): Promise<YanitSonucu> {
   const d = g.depo
   const simdi = g.simdi ?? g.yanit.zaman ?? new Date().toISOString()
   const kaynak = g.kaynak ?? 'n8n'

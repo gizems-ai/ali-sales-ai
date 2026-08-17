@@ -32,7 +32,7 @@
 import { aliciBul, bildirimGonder, bildirimIdUret } from './bildirim'
 import type { Kademe } from './bildirim'
 import type { Depo } from './depo'
-import { DENETIM_AKSIYONLARI, denetimYaz } from './denetim'
+import { DENETIM_AKSIYONLARI, denetimKuyrukla, denetimYaz } from './denetim'
 import { nihaiMi } from './gorev'
 import type { KanalArayuzu } from './kanal/tipler'
 import type { Gorev, Kullanici, Rol } from './tipler'
@@ -75,7 +75,12 @@ export interface EskalasyonRaporu {
   simdi: string
 }
 
-export async function eskalasyonKontrol(g: EskalasyonGirdi): Promise<EskalasyonRaporu> {
+/** Denetim satırları biriktirilip tek yazımla gider — bkz. `denetim.ts`. */
+export function eskalasyonKontrol(g: EskalasyonGirdi): Promise<EskalasyonRaporu> {
+  return denetimKuyrukla(g.depo, () => eskalasyonKontrolIc(g))
+}
+
+async function eskalasyonKontrolIc(g: EskalasyonGirdi): Promise<EskalasyonRaporu> {
   const d = g.depo
   const simdi = g.simdi ?? new Date().toISOString()
   const simdiMs = Date.parse(simdi)
