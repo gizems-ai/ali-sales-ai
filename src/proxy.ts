@@ -1,5 +1,6 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 import { NextResponse, type NextRequest } from 'next/server'
+import { storeosAdanmisHostMu } from '@/lib/storeos/host-guard'
 
 const isPublic = createRouteMatcher([
   '/login(.*)',
@@ -10,10 +11,32 @@ const isPublic = createRouteMatcher([
 ])
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
+  // ── Store OS host'unda yön tayini (17 Ağu 2026) ─────────────────────────────
+  // Store OS'e AYRILMIŞ host'ta panelin `/` ve `/login` kapıları çalışmaz: o
+  // host'ta çözülecek emlak/sigorta tenant'ı yok. `(panel)/layout.tsx` tenant
+  // bulamayınca `/login`e atar, `/login`deki <SignIn forceRedirectUrl="/">
+  // oturumu olan kullanıcıyı tekrar `/`e yollar → ekran yanıp söner (canlıda
+  // yaşandı). Kullanıcıyı kendi kapısına gönderiyoruz.
+  //
+  // KAPSAM: yalnız STOREOS_PROD_HOSTLARI'nda LİSTELİ host'lar. Emlak/sigorta
+  // host'ları ve preview URL'leri listede olmadığı için bu blok onlarda hiç
+  // çalışmaz — mevcut davranış birebir korunur.
+  const storeosHost = storeosAdanmisHostMu(req.headers.get('host') ?? '')
+  const yol = req.nextUrl.pathname
+  if (storeosHost && (yol === '/' || yol.startsWith('/login') || yol.startsWith('/register'))) {
+    return NextResponse.redirect(new URL('/storeos', req.url))
+  }
+
   if (isPublic(req)) return
 
   const { userId, sessionClaims } = await auth()
   if (!userId) {
+    // Store OS alanında oturumsuz kullanıcı panelin /login'ine DEĞİL, Store OS'in
+    // kendi giriş sayfasına gider. Yol tabanlı kural: emlak/sigorta'da /storeos
+    // diye bir yol yok, dolayısıyla onlarda hiç tetiklenmez.
+    if (yol === '/storeos' || yol.startsWith('/storeos/')) {
+      return NextResponse.redirect(new URL('/storeos/giris', req.url))
+    }
     const loginUrl = new URL('/login', req.url)
     return NextResponse.redirect(loginUrl)
   }

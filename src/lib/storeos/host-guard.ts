@@ -47,6 +47,24 @@ export function storeosHostuMu(host: string, prodDeployMi: boolean): boolean {
   return true
 }
 
+/**
+ * Bu host YALNIZCA Store OS'e mi ayrılmış? (`storeosHostuMu`den farklı: orası
+ * prod-dışında her host'a "evet" der, geliştirme serbest olsun diye.)
+ *
+ * Kullanım yeri: proxy'de yön tayini. Store OS'e ayrılmış bir host'ta panelin
+ * `/` ve `/login` kapıları anlamsızdır — o host'ta çözülecek emlak/sigorta
+ * tenant'ı YOKTUR, `(panel)/layout.tsx` tenant bulamayıp `/login`e geri atar ve
+ * `/login`deki `<SignIn forceRedirectUrl="/">` oturumu olan kullanıcıyı tekrar
+ * `/`e yollar → sonsuz döngü (17 Ağu 2026'da canlıda yaşandı).
+ *
+ * "Serbest" davranış BİLEREK yok: liste dışı hiçbir host bu yolu tetiklemez,
+ * dolayısıyla emlak/sigorta host'ları ve preview URL'leri etkilenemez.
+ */
+export function storeosAdanmisHostMu(host: string): boolean {
+  const h = host.trim().toLowerCase()
+  return STOREOS_PROD_HOSTLARI.has(h) || envHostlari().has(h)
+}
+
 /** localhost / 127.x tespiti — geliştirme kolaylığı. */
 export function yerelMi(host: string): boolean {
   return host.startsWith('localhost') || host.startsWith('127.') || host.startsWith('[::1]')
