@@ -164,3 +164,125 @@ BEKLENEN: 307 → /login. Çünkü (panel)/layout.tsx:26-27 tenant çözemez
 Mekanizma bugün lokal olarak doğrulandı — `tenantIdForRequest()` Gratis host'u
 için `x-tenant-id` forge edilse bile `null` dönüyor (`src/lib/tenant-guard.ts:32-35`).
 Canlı testin bunu üretimde teyit etmesi gerekiyor.
+
+---
+---
+
+# UYGULAMA KAYDI — 17 Ağustos 2026
+
+Yukarısı **plandı**. Aşağısı **fiilen yapılan**. Çeliştikleri yerde aşağısı geçerlidir.
+
+## Gerçekleşen değerler
+
+| | Plan | Gerçek |
+|---|---|---|
+| Vercel proje adı | `ali-storeos` | **`store-os`** |
+| Project ID | — | `prj_Qkq6WsHKN4AyuOscawMOXejObGyO` |
+| Team / scope | — | `gizem-burtecins-projects` (`team_29rp74OI5UKxrh75jQX9opsf`) |
+| Repo | gizems-ai/ali-sales-ai | aynı ✔ |
+| Prod URL | storeos.alisales.ai | **`https://store-os-two.vercel.app`** (geçici) |
+| İkinci alias | — | `store-os-gizem-burtecins-projects.vercel.app` |
+| Clerk instance | Gratis Store OS (dev) | `positive-fly-7090.clerk.accounts.dev` ✔ (`pk_test_`/`sk_test_`) |
+
+**Canlı bağlantı (bugün): `https://store-os-two.vercel.app/storeos/giris`**
+
+## Yapılan adımlar
+
+1. **`vercel link`** → `store-os`. Emlak/ali projelerine dokunulmadı.
+   `.vercel/project.json` yedeği: değişiklik öncesi `ali-sales-ai`
+   (`prj_CTFNNquOpEUS0m9Z3hvaJaWl1vwH`) idi.
+   ⚠️ **Dizin şu an `store-os`'a bağlı bırakıldı.** Gerekçe: çalışma dalı
+   `storeos-demo`. Bağlantı `ali-sales-ai`'de kalsaydı bu dizinde atılacak bir
+   `vercel --prod` **Store OS kodunu crm.alisales.ai üretimine** basardı.
+   Emlak/sigorta işine dönerken önce relink et:
+   ```bash
+   npx vercel link --yes --project ali-sales-ai --scope gizem-burtecins-projects
+   ```
+
+2. **Build Command override** (API ile):
+   `rm -rf public/decks && next build` — deck sızıntısını kapatır (test C ✔).
+
+3. **Ignored Build Step** (API ile):
+   `if [ "$VERCEL_GIT_COMMIT_REF" = "storeos-demo" ]; then exit 1; else exit 0; fi`
+   Yani bu projede **yalnız `storeos-demo`** build alır.
+
+4. **`storeos-demo` GitHub'a push edildi** (daha önce yalnız yereldeydi — ilk
+   build'in `main`'den alınıp Clerk hatası vermesinin asıl sebebi buydu).
+   Push öncesi sır taraması yapıldı: `.env.local` gitignore'da, diffte
+   `pat…`/`sk_…`/`vca_…` deseni yok.
+   Yan etki (bilinen ve önceden karara bağlanmış, bkz. §1b): `ali-sales-ai` ve
+   `emlak-crm` projelerinde birer **preview** deployment tetiklendi.
+   **Doğrulandı: ikisinin de production deployment'ı değişmedi.**
+
+5. **Ortam değişkenleri** — 22 anahtar × 3 ortam (production/preview/development).
+   `preview` hedefinde CLI değeri `--value` ile komut satırında istiyor (sır
+   argv'ye düşerdi); o yüzden preview REST API ile yazıldı.
+
+   Eklenenler: 14 `STOREOS_*` anahtarı (`.env.local`'den birebir) +
+   `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` / `CLERK_SECRET_KEY` (**Store OS Clerk
+   instance'ının değerleri** — panelin root layout'u bu adları arıyor, ilk
+   build tam da bunların yokluğundan patlamıştı) + `STOREOS_DEPO=airtable`,
+   `STOREOS_HOST`, `STOREOS_PROD_HOSTLARI`, 3 Clerk yönlendirme URL'i.
+
+   **Eklenmeyenler (bilinçli):** `AIRTABLE_TOKEN`, `DIALOG360_KEY`,
+   `N8N_ALI_WEBHOOK_URL`, Supabase, Gemini. Build bunlarsız geçti — yani panel
+   tarafı bu projede gerçekten emlak sırlarına ihtiyaç duymuyor.
+
+6. **`STOREOS_PROD_HOSTLARI` artık env'den okunuyor** (commit `f0c9628`).
+   Kod içindeki küme duruyor; env virgülle ayrık **ek** host verir. Geçici
+   Vercel URL'i için kod değiştirmek gerekmesin diye. Tam eşleşme korundu.
+
+7. **Deploy:** `vercel --prod`. Build **geçti** (~40 sn).
+
+## İzolasyon testi — canlı sonuç (17 Ağu)
+
+`H=https://store-os-two.vercel.app`
+
+| Test | Beklenen | Gerçek | |
+|---|---|---|---|
+| A · `/ /musteriler /raporlar /satis-sureci /stok /firsatlar /broker` | 307→/login | **7/7 307 → /login** | ✔ |
+| B · `/api/musteriler` `/api/raporlar` | 403 | **404** (tenant çözülemiyor) | ✔ daha sıkı |
+| B · `/api/kanban/move` | 405 | **405** | ✔ |
+| C · `/decks/Babacan_Revenue_OS.html` | 404 | **404** | ✔ |
+| D · `/storeos` | 404 DEĞİL | **307 → /login** | ✔ |
+| D · `/storeos/giris` | 200 | **200** (Clerk + "Store OS" render ediyor) | ✔ |
+| D · `/api/storeos/saglik` | — | **403 Forbidden** | ✔ host kapısı geçti, auth istiyor |
+| E · `emlak.alisales.ai/storeos` | 404 | **307 → /login** | ⚠ aşağıya bak |
+| E · `crm.alisales.ai/storeos` | 404 | **307 → /login** | ⚠ aşağıya bak |
+
+**E maddesi düzeltmesi.** Plan "404" bekliyordu; gerçekte **307 → /login** geliyor.
+Sebep: `src/proxy.ts` middleware'i auth kontrolünü host kapısından ÖNCE yapıyor.
+Oturumsuz kullanıcı 404'ü hiç görmez, login'e sürülür. **404 kapısı auth'un
+ARKASINDA duruyor** — yani emlak'ta oturumu olan biri `/storeos`'a giderse
+`storeosHostuMu()` false döner ve `notFound()` çalışır. Sızıntı yok, ama
+"oturumsuz 404" iddiası yanlıştı; kayda geçti.
+
+**D maddesi notu — jüri bağlantısı.** Plan "jüriye `/storeos` ver, `/storeos/giris`'e
+yönlenir" diyordu. Gerçekte `/storeos` oturumsuzken **`/login`**'e (emlak'ın giriş
+sayfası) gidiyor — middleware'deki `loginUrl` sabit. Düzeltmek `src/proxy.ts`'te
+6. istisnayı gerektirir (onay bekliyor). O güne kadar:
+**jüriye verilecek bağlantı `/storeos/giris`'tir, `/storeos` değil.**
+
+## AÇIK — benim yapamadığım tek madde
+
+**Production Branch hâlâ `main`.** `storeos-demo` yapılamadı: Vercel REST API'sinin
+`PATCH /v9/projects/{id}` gövdesinde branch alanı yok (doğrulandı), `POST
+/v9/projects/{id}/link` `productionBranch` alanını **sessizce yok sayıyor** (iki kez
+denendi, GET hep `main` döndü), CLI 59.1.3'ün `project update` komutunda da branch
+bayrağı yok. **Dashboard'dan elle yapılman gerekiyor:**
+
+> Vercel → `store-os` → Settings → Git → Production Branch → `storeos-demo` → Save
+
+Bu ayar yapılana kadar durum:
+- `storeos-demo`'ya push → **preview** deployment üretir, production'ı güncellemez.
+- Production yalnız elle `npx vercel --prod --yes` ile güncellenir.
+- `main`'e push → Ignored Build Step nedeniyle **hiç build almaz** (yani emlak
+  kodunun kazara Store OS production'ına düşmesi mümkün değil).
+
+## Henüz KANITLANMAYAN
+
+Canlı ortamda Airtable'a gerçekten ulaşıldığı **doğrulanmadı** — Store OS'in tüm
+okuma uçları Clerk oturumu istiyor, oturumsuz curl bunu gösteremiyor. Kanıtlamanın
+iki yolu var: (a) jüri kullanıcısıyla giriş yapıp panoyu açmak, (b) imzalı bir olay
+POST'u atmak — bu gerçek WhatsApp mesajı üretir (telefon kilidi açık olduğu için
+yalnız `STOREOS_DEMO_TELEFON`'a gider). Onay verilirse (b) 1 dakikada koşar.
