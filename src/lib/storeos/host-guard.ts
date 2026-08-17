@@ -8,22 +8,41 @@
 //  sinyali asla söz sahibi değil) aynen korunmuştur.
 // ════════════════════════════════════════════════════════════════════════════
 
-/** Store OS'in sunulduğu prod host'ları. Tam eşleşme — substring match YOK. */
+/**
+ * Store OS'in sunulduğu prod host'ları. Tam eşleşme — substring match YOK.
+ *
+ * Kalıcı domain buraya yazılır. Geçici host'lar (Vercel'in ürettiği
+ * `*.vercel.app` adresleri gibi) `STOREOS_PROD_HOSTLARI` ORTAM DEĞİŞKENİNE
+ * yazılır — virgülle ayrılmış liste. Gerekçe: geçici bir URL için kod
+ * değiştirip yeniden deploy etmek gerekmesin; kalıcı domain gelince env
+ * temizlenip buraya tek satır eklenir.
+ */
 export const STOREOS_PROD_HOSTLARI = new Set<string>([
   // Domain bağlanınca doldurulacak (karar: müşteri adı domain'e gömülmez):
   // 'storeos.alisales.ai',
 ])
 
+/** Env'den gelen ek host'lar. Boşsa boş küme — varsayılan yine "kapalı". */
+function envHostlari(): Set<string> {
+  const ham = process.env.STOREOS_PROD_HOSTLARI ?? ''
+  return new Set(ham.split(',').map(s => s.trim().toLowerCase()).filter(Boolean))
+}
+
 /**
  * Bu host Store OS'i sunabilir mi?
  *
- *  1) Host STOREOS_PROD_HOSTLARI'nda → evet.
+ *  1) Host STOREOS_PROD_HOSTLARI'nda (kod veya env) → evet.
  *  2) Prod deployment'ında listede değilse → HAYIR. (Ham *.vercel.app URL'i de
- *     production'dır; oradan Store OS açılmaz.)
+ *     production'dır; listeye yazılmadıkça oradan Store OS açılmaz.)
  *  3) Prod-dışı (preview/localhost) → evet, geliştirme için serbest.
+ *
+ * Not: eşleşme küçük harfe indirgenerek yapılır (Host başlığı büyük/küçük harf
+ * duyarsızdır), ama yine TAM eşleşmedir — substring/suffix eşleşmesi YOK.
  */
 export function storeosHostuMu(host: string, prodDeployMi: boolean): boolean {
-  if (STOREOS_PROD_HOSTLARI.has(host)) return true
+  const h = host.trim().toLowerCase()
+  if (STOREOS_PROD_HOSTLARI.has(h)) return true
+  if (envHostlari().has(h)) return true
   if (prodDeployMi) return false
   return true
 }
