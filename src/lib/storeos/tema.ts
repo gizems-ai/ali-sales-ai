@@ -71,9 +71,18 @@ export function oncelikEtiketi(o: Oncelik): string {
   return ONCELIK_ETIKETLERI[o] ?? o
 }
 
-/** Isı haritası hücresi: 0–100 → marka pembesinin opaklığı. Ayrı palet yok. */
+/**
+ * Isı haritası hücresi: 0–100 → marka morunun opaklığı. Ayrı palet YOK.
+ *
+ * Buradaki tek gömülü renk, `--so-marka` (#6C43DC) değerinin RGB karşılığıdır.
+ * CSS değişkeni kullanılamıyor çünkü opaklık hücre başına hesaplanıyor ve
+ * satır içi `style` olarak veriliyor. Marka rengi değişirse burası da değişir —
+ * `scripts/storeos/css-denetci.mjs` bu eşleşmeyi denetler.
+ */
+export const MARKA_RGB = '108, 67, 220'
+
 export function isiRengi(deger: number): string {
   const o = Math.max(0, Math.min(100, deger)) / 100
   // 0 = neredeyse yüzey, 100 = tam marka. Karşıtlık için taban 0.06.
-  return `rgba(229, 0, 125, ${(0.06 + o * 0.86).toFixed(3)})`
+  return `rgba(${MARKA_RGB}, ${(0.06 + o * 0.86).toFixed(3)})`
 }

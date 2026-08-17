@@ -38,9 +38,15 @@ export function Kabuk({ children, aktif = '/storeos' }: { children: ReactNode; a
   return (
     <div className="so-kabuk">
       <nav className="so-yan" aria-label="Store OS menü">
+        {/* Marka satırı brief'ten: "gratis × Ali CRM · Store Intelligence".
+            Renkler burada DEĞİL, globals.css'teki `.storeos-root` bloğunda. */}
         <div className="so-logo">
-          <span className="so-logo-nokta" aria-hidden="true" />
-          Store OS
+          <div className="so-logo-ust">
+            <span className="so-logo-gratis">gratis</span>
+            <span className="so-logo-carpi" aria-hidden="true">×</span>
+            <span className="so-logo-ali">Ali CRM</span>
+          </div>
+          <div className="so-logo-alt">Store Intelligence</div>
         </div>
         {NAV.map(bolum => (
           <div key={bolum.baslik}>

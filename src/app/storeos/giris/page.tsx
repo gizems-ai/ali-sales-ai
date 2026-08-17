@@ -31,11 +31,25 @@ export default function StoreOsGirisSayfasi() {
       }}
     >
       <div style={{ display: 'grid', gap: 24, justifyItems: 'center' }}>
+        {/* Marka satırı panelin kabuğundakiyle aynı: gratis × Ali CRM.
+            Bu sayfa `.storeos-root`un DIŞINDA render olur (host guard'dan önce),
+            dolayısıyla --so-* değişkenleri burada tanımlı değil; renkler brief
+            paletinden birebir yazılır. css-denetci.mjs bu dosyayı bu gerekçeyle
+            beyaz listeye alır. */}
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: 13, letterSpacing: '.14em', textTransform: 'uppercase', color: '#6c43dc', fontWeight: 600 }}>
-            Store OS
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, justifyContent: 'center' }}>
+            <span style={{ fontSize: 26, fontWeight: 800, letterSpacing: '-.035em', color: '#e5007d' }}>
+              gratis
+            </span>
+            <span style={{ fontSize: 15, color: '#8a84a0' }}>×</span>
+            <span style={{ fontSize: 21, fontWeight: 700, letterSpacing: '-.02em', color: '#241d3a' }}>
+              Ali CRM
+            </span>
           </div>
-          <div style={{ marginTop: 6, fontSize: 14, color: '#5b5570' }}>
+          <div style={{ marginTop: 6, fontSize: 11.5, letterSpacing: '.14em', textTransform: 'uppercase', color: '#6c43dc', fontWeight: 600 }}>
+            Store Intelligence
+          </div>
+          <div style={{ marginTop: 8, fontSize: 14, color: '#5b5570' }}>
             Mağaza operasyon paneli
           </div>
         </div>
