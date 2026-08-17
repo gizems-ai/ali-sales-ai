@@ -44,6 +44,41 @@ export interface SaatlikNokta { saat: string; birincil: number; ikincil: number 
 export interface IzgaraDetay { satir: number; sutun: number; hucreler: number[] }
 export interface DagilimDetay { etiket: string; deger: number }
 
+/**
+ * Skaler KPI'ların kart detayı: dünkü değer (karşılaştırma) + gün içi mini
+ * trend. Şema DEĞİŞMEDİ — `Detay JSON` alanı zaten vardı, seri metrikleri
+ * için kullanılıyordu; skaler metrikler de artık dolduruyor.
+ *
+ * Trendin son noktası HER ZAMAN `Deger` alanına eşittir: kartın büyük sayısı
+ * ile çizginin bittiği yer birbirini tutmazsa jüri haklı olarak sorar.
+ */
+export interface KpiDetay { onceki: number; trend: number[] }
+
+const TREND_NOKTA = 8
+
+/** Ölçünün doğasını korur: tam sayı metrik (kişi, adet) ondalığa düşmez. */
+function yuvarla(v: number, tamsayi: boolean): number {
+  return tamsayi ? Math.round(v) : Math.round(v * 100) / 100
+}
+
+/**
+ * `oynaklik`: değerin yüzde kaçı kadar salınacağı. Kişi sayısı gibi oynak
+ * metrikler yüksek, sıcaklık gibi durağanlar düşük alır — hepsi aynı genlikte
+ * zıplarsa ekran sahte görünür.
+ */
+function kpiDetay(tip: string, gun: string, deger: number, oynaklik: number): KpiDetay {
+  const tam = Number.isInteger(deger)
+  const salinim = (anahtar: string) => (sec(anahtar, 0, 2000) / 1000) - 1   // -1 … +1
+  const trend = Array.from({ length: TREND_NOKTA }, (_, i) =>
+    i === TREND_NOKTA - 1
+      ? yuvarla(deger, tam)
+      : yuvarla(deger * (1 + (salinim(`trend-${tip}-${gun}-${i}`) * oynaklik) / 100), tam))
+  return {
+    onceki: yuvarla(deger * (1 + (salinim(`onceki-${tip}-${gun}`) * oynaklik) / 100), tam),
+    trend,
+  }
+}
+
 export const REYONLAR = ['Kozmetik', 'Kisisel Bakim', 'Parfum', 'Sac Bakim', 'Temizlik'] as const
 
 export interface DemoMetrikGirdi {
@@ -110,18 +145,23 @@ export function varsayilanMetrikler(g: DemoMetrikGirdi): Metrik[] {
     { etiket: 'Guvenlik', deger: 1 },
   ]
 
+  /** Skaler KPI: (tip, değer, birim, kaynak, oynaklık%). Detay JSON otomatik. */
+  const kpi = (
+    tip: string, deger: number, birim: string, kaynak: Metrik['Kaynak'], oynaklik: number,
+  ): Metrik => yap(tip, deger, birim, kaynak, kpiDetay(tip, GUN, deger, oynaklik))
+
   return [
-    yap('ziyaretci',         sec(`ziyaretci-${GUN}`, 1150, 1980),   'kisi',  'camera'),
-    yap('satis_tutari',      sec(`satis-${GUN}`, 68000, 142000),    'TL',    'pos'),
-    yap('kasa_bekleme_sn',   sec(`bekleme-${GUN}`, 95, 260),        'sn',    'camera'),
-    yap('donusum_orani',     secOndalik(`donusum-${GUN}`, 18, 34),  'yuzde', 'pos'),
-    yap('aktif_personel',    9,                                     'adet',  'manual'),
-    yap('kuyruk_kisi',       7,                                     'kisi',  'camera'),
-    yap('yogunluk',          sec(`yogunluk-${GUN}`, 55, 92),        'yuzde', 'camera'),
-    yap('ortalama_kalis_dk', sec(`kalis-${GUN}`, 9, 24),            'dk',    'camera'),
-    yap('ic_sicaklik',       secOndalik(`sicaklik-${GUN}`, 21, 26), 'C',     'sensor'),
-    yap('etiket_uygunluk',   sec(`etiket-${GUN}`, 88, 99),          'yuzde', 'manual'),
-    yap('kasa_acik',         5,                                     'adet',  'pos'),
+    kpi('ziyaretci',         sec(`ziyaretci-${GUN}`, 1150, 1980),   'kisi',  'camera', 14),
+    kpi('satis_tutari',      sec(`satis-${GUN}`, 68000, 142000),    'TL',    'pos',    16),
+    kpi('kasa_bekleme_sn',   sec(`bekleme-${GUN}`, 95, 260),        'sn',    'camera', 22),
+    kpi('donusum_orani',     secOndalik(`donusum-${GUN}`, 18, 34),  'yuzde', 'pos',    11),
+    kpi('aktif_personel',    9,                                     'adet',  'manual',  9),
+    kpi('kuyruk_kisi',       7,                                     'kisi',  'camera', 30),
+    kpi('yogunluk',          sec(`yogunluk-${GUN}`, 55, 92),        'yuzde', 'camera', 18),
+    kpi('ortalama_kalis_dk', sec(`kalis-${GUN}`, 9, 24),            'dk',    'camera', 12),
+    kpi('ic_sicaklik',       secOndalik(`sicaklik-${GUN}`, 21, 26), 'C',     'sensor',  3),
+    kpi('etiket_uygunluk',   sec(`etiket-${GUN}`, 88, 99),          'yuzde', 'manual',  4),
+    kpi('kasa_acik',         5,                                     'adet',  'pos',    12),
     yap('kuyruk_saatlik',    0, 'sn',    'camera', kuyrukSaatlik),
     yap('satis_saatlik',     0, 'TL',    'pos',    satisSaatlik),
     yap('yogunluk_grid',     0, 'yuzde', 'camera', yogunlukGrid),

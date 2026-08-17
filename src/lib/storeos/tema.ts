@@ -12,8 +12,10 @@ import type { GorevDurumu, Oncelik, Severity } from './tipler'
 export const DEGISKEN = {
   marka:       'var(--so-marka)',
   markaSoluk:  'var(--so-marka-soluk)',
+  markaZemin:  'var(--so-marka-zemin)',
   cizgi:       'var(--so-cizgi)',
   yuzey2:      'var(--so-yuzey-2)',
+  metin:       'var(--so-metin)',
   metinSoluk:  'var(--so-metin-soluk)',
   metinSilik:  'var(--so-metin-silik)',
   info:        'var(--so-info)',
@@ -69,6 +71,67 @@ const ONCELIK_ETIKETLERI: Record<Oncelik, string> = {
 
 export function oncelikEtiketi(o: Oncelik): string {
   return ONCELIK_ETIKETLERI[o] ?? o
+}
+
+// ─── Roller ──────────────────────────────────────────────────────────────────
+//
+// Rol → Türkçe etiket. `toplayici.ts` bunu satırlara yazıyor, yan menü de
+// oturumdaki kullanıcının rolünü aynı sözlükle yazıyor; iki kopya kaymaya
+// açıktı, tek yer burası.
+
+const ROL_ETIKETLERI: Record<string, string> = {
+  magaza_muduru: 'Mağaza Müdürü',
+  bolge_muduru:  'Bölge Müdürü',
+  personel:      'Personel',
+  guvenlik:      'Güvenlik',
+  merkez:        'Merkez',
+}
+
+export function rolEtiketi(rol: string): string {
+  return ROL_ETIKETLERI[rol] ?? rol
+}
+
+// ─── Pano düzeni (Gün 7) ─────────────────────────────────────────────────────
+//
+// İkon ve sınıf eşlemeleri VERİ DEĞİL, sunumdur — bu yüzden `toplayici.ts`'te
+// değil burada. Bilinmeyen metrik tipi kırmızıya düşmez, nötr bir işaret alır.
+
+const KPI_IKONLARI: Record<string, string> = {
+  ziyaretci:         '👥',
+  satis_tutari:      '🛒',
+  kasa_bekleme_sn:   '⏱',
+  donusum_orani:     '◎',
+  aktif_personel:    '👤',
+  kuyruk_kisi:       '👥',
+  yogunluk:          '◍',
+  ortalama_kalis_dk: '⏱',
+  ic_sicaklik:       '🌡',
+  etiket_uygunluk:   '🏷',
+  kasa_acik:         '▤',
+}
+
+export function kpiIkonu(anahtar: string): string {
+  return KPI_IKONLARI[anahtar] ?? '◇'
+}
+
+/**
+ * Sağlık skoru → sınıf adı ve renk değişkeni. Eşikler `toplayici.ts`'teki
+ * `skorSinifAdi` ile AYNI olmalı; etiket metni orada, renk burada durur.
+ */
+export function skorRengi(deger: number): string {
+  if (deger >= 85) return DEGISKEN.low
+  if (deger >= 70) return DEGISKEN.marka
+  if (deger >= 50) return DEGISKEN.medium
+  return DEGISKEN.critical
+}
+
+/** Dağılım/donut dilim renkleri — sabit sıra, tekrar ederse başa döner. */
+export const DILIM_RENKLERI = [
+  DEGISKEN.marka, DEGISKEN.low, DEGISKEN.medium, DEGISKEN.metinSilik, DEGISKEN.high,
+] as const
+
+export function dilimRengi(i: number): string {
+  return DILIM_RENKLERI[i % DILIM_RENKLERI.length]
 }
 
 /**

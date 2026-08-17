@@ -197,6 +197,38 @@
   --so-radius:     20px;
   --so-radius-sm:  12px;
 
+  /* ── Düzen ölçüleri ───────────────────────────────────────────────────── */
+  --so-bosluk:     16px;   /* ızgara boşluk ritmi — tüm satırlar aynı nefes */
+  --so-yan-menu:   236px;
+
+  /* Gratis kurumsal sarısı — pembe gibi YALNIZ marka öğelerinde (hızlı işlem
+     düğmesi, skor göstergesinin ikinci yayı). Durum rengi DEĞİL: "dikkat"
+     sarısı ayrı token (`--so-medium`). */
+  --so-gratis-sari:#ffd400;
+
+  /* Kamera yer tutucusu — tek koyu yüzey. Gerçek yayın bağlanınca <video>
+     bunun üstüne biner; token kalır, arkasındaki karartma aynı olsun diye. */
+  --so-kamera-zemin:        linear-gradient(135deg, #3b2f52, #5a4a7a);
+  --so-kamera-zemin-2:      linear-gradient(135deg, #463a63, #67558c);
+  --so-kamera-metin:        rgba(255, 255, 255, .58);
+  --so-kamera-etiket-zemin: rgba(0, 0, 0, .55);
+  --so-kamera-etiket-metin: #ffffff;
+
+  /* ── Takma adlar ──────────────────────────────────────────────────────────
+     Düzen referansı (17 Ağu 2026) bu adları kullanıyor. İki sözlük tek değere
+     bakar: burada `var()` ile bağlandıkları için kayma imkânsız, yeni bileşen
+     hangi adı yazarsa yazsın aynı rengi alır. */
+  --so-kart-bg:     var(--so-yuzey);
+  --so-kart-kenar:  1px solid var(--so-cizgi-kart);
+  --so-kart-golge:  var(--so-golge);
+  --so-kart-radius: var(--so-radius);
+  --so-metin-2:     var(--so-metin-soluk);
+  --so-metin-3:     var(--so-metin-silik);
+  --so-normal:      var(--so-low);
+  --so-dikkat:      var(--so-medium);
+  --so-uyari:       var(--so-high);
+  --so-kritik:      var(--so-critical);
+
   min-height: 100vh;
   background: var(--so-zemin-gradyan);
   background-attachment: fixed;
@@ -212,7 +244,7 @@
 
 .storeos-root .so-kabuk {
   display: grid;
-  grid-template-columns: 232px 1fr;
+  grid-template-columns: var(--so-yan-menu) 1fr;
   min-height: 100vh;
 }
 @media (max-width: 900px) {
@@ -224,18 +256,18 @@
   background: rgba(255, 255, 255, .70);
   backdrop-filter: blur(12px);
   border-right: 1px solid var(--so-cizgi-kart);
-  padding: 20px 14px;
+  padding: 18px 14px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 16px;
 }
 
 /* Marka satırı: "gratis × Ali CRM · Store Intelligence".
    `gratis` müşterinin kelime markasıdır ve kendi pembesiyle yazılır;
    arayüzün vurgu rengi yine mordur. İkisi karışmasın diye ayrı token. */
 .storeos-root .so-logo {
-  display: flex; flex-direction: column; gap: 3px;
-  padding: 0 8px 18px;
+  display: flex; flex-direction: column; gap: 2px;
+  padding: 2px 6px 0;
 }
 .storeos-root .so-logo-ust {
   display: flex; align-items: baseline; gap: 7px;
@@ -546,4 +578,330 @@
 @media (max-width: 720px) {
   .storeos-root .so-filtre-sag { margin-left: 0; width: 100%; }
   .storeos-root .so-arama { flex: 1; min-width: 0; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   PANO DÜZENİ (17 Ağu 2026) — düzen referansının React karşılığı.
+   Kural aynen: her seçici `.storeos-root` ile başlar. Renkler yalnız yukarıdaki
+   token'lardan gelir; bu blokta ham renk YOKTUR (tek istisna: kamera yer
+   tutucusunun koyu gradyanı, kendi token'ında tanımlıdır).
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* ── Yan menü: mağaza seçici ───────────────────────────────────────────────── */
+
+.storeos-root .so-magaza-secici {
+  display: flex; align-items: center; gap: 9px;
+  background: var(--so-kart-bg); border: var(--so-kart-kenar);
+  border-radius: 14px; padding: 10px 12px; box-shadow: var(--so-kart-golge);
+  width: 100%; text-align: left; font-family: inherit; color: inherit;
+}
+.storeos-root .so-magaza-ikon {
+  width: 30px; height: 30px; border-radius: 9px; flex: 0 0 auto;
+  background: var(--so-marka-zemin); display: grid; place-items: center;
+  font-size: 15px;
+}
+.storeos-root .so-magaza-ad  { font-weight: 650; font-size: 12.5px; line-height: 1.2; }
+.storeos-root .so-magaza-kod { font-size: 10.5px; color: var(--so-metin-3); }
+.storeos-root .so-canli-nokta {
+  display: inline-flex; align-items: center; gap: 4px; margin-top: 2px;
+  font-size: 9.5px; font-weight: 600; color: var(--so-normal);
+}
+.storeos-root .so-canli-nokta::before {
+  content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--so-normal);
+}
+
+/* ── Yan menü: liste ───────────────────────────────────────────────────────── */
+
+.storeos-root .so-menu { display: flex; flex-direction: column; gap: 1px; }
+.storeos-root .so-nav-ikon { width: 15px; text-align: center; font-size: 13px; opacity: .85; flex: 0 0 auto; }
+.storeos-root .so-nav-metin { flex: 1; min-width: 0; }
+.storeos-root .so-yakinda {
+  margin-left: auto; font-size: 8.5px; font-weight: 600;
+  background: var(--so-yuzey-2); color: var(--so-metin-3);
+  padding: 2px 6px; border-radius: 6px;
+}
+
+/* ── Yan menü: Ali Asistan kartı + kullanıcı ───────────────────────────────── */
+
+.storeos-root .so-ai-kart {
+  margin-top: auto;
+  background: linear-gradient(160deg, var(--so-marka-zemin), var(--so-yuzey-2));
+  border: var(--so-kart-kenar); border-radius: 16px; padding: 12px;
+  position: relative; overflow: hidden;
+}
+.storeos-root .so-ai-baslik {
+  display: flex; align-items: center; gap: 6px;
+  font-weight: 700; font-size: 12.5px; color: var(--so-marka-koyu);
+}
+.storeos-root .so-ai-metin { font-size: 11px; color: var(--so-metin-2); margin: 6px 0 10px; max-width: 74%; }
+.storeos-root .so-ai-kart .so-dugme { width: 100%; justify-content: center; text-align: center; }
+.storeos-root .so-ai-avatar {
+  position: absolute; right: -4px; bottom: -2px;
+  width: 58px; height: 58px; border-radius: 50%;
+  background: var(--so-marka-zemin); display: grid; place-items: center; font-size: 24px;
+  pointer-events: none;
+}
+
+.storeos-root .so-kullanici { display: flex; align-items: center; gap: 8px; padding: 2px 6px; }
+.storeos-root .so-avatar {
+  width: 28px; height: 28px; border-radius: 50%; flex: 0 0 auto;
+  background: var(--so-marka-zemin); display: grid; place-items: center;
+  font-size: 11px; font-weight: 700; color: var(--so-marka-koyu);
+}
+.storeos-root .so-kullanici-ad  { font-size: 11.5px; font-weight: 650; }
+.storeos-root .so-kullanici-rol { font-size: 10px; color: var(--so-metin-3); }
+
+/* Menü Gün 6'da yedi maddeydi, artık on beş: aynı satır yüksekliğiyle 1080p
+   ekranda Ali Asistan kartı ile kullanıcı satırı katlanın altında kalıyordu.
+   Sıkıştırma yalnız yan menüde; liste ekranlarındaki ölçüler değişmedi. */
+.storeos-root .so-yan { gap: 14px; }
+.storeos-root .so-menu .so-nav-oge { padding: 7px 10px; font-size: 12.5px; justify-content: flex-start; }
+.storeos-root .so-menu .so-nav-baslik { padding: 12px 8px 4px; }
+.storeos-root .so-menu .so-menu + .so-menu { margin-top: 0; }
+
+/* ── Üst bar (yalnız pano) ─────────────────────────────────────────────────────
+   Liste ekranlarındaki `.so-ust` yapışkan başlık olarak KALIR; pano referansta
+   akış içinde, daha iri başlıkla duruyor. Bu yüzden ayrı değiştirici sınıf. */
+
+.storeos-root .so-ust-pano {
+  position: static; background: none; backdrop-filter: none;
+  border-bottom: none; padding: 20px 24px 0; align-items: flex-start;
+}
+.storeos-root .so-ust-pano h1 {
+  font-size: 21px; font-weight: 750; letter-spacing: -.01em;
+  display: flex; align-items: center; gap: 9px; flex-wrap: wrap;
+}
+.storeos-root .so-ust-alt {
+  display: flex; gap: 14px; flex-wrap: wrap;
+  margin-top: 4px; font-size: 11.5px; color: var(--so-metin-2);
+}
+.storeos-root .so-rozet-canli {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 9.5px; font-weight: 700; color: var(--so-normal);
+  background: var(--so-yuzey-2); padding: 3px 8px; border-radius: 20px;
+}
+.storeos-root .so-rozet-canli::before {
+  content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--so-normal);
+}
+.storeos-root .so-pilula {
+  background: var(--so-kart-bg); border: var(--so-kart-kenar); border-radius: 11px;
+  padding: 7px 11px; font-size: 11.5px; font-weight: 550; box-shadow: var(--so-kart-golge);
+  white-space: nowrap;
+}
+.storeos-root .so-dugme-hizli {
+  background: var(--so-gratis-sari); border: 1px solid var(--so-gratis-sari);
+  color: var(--so-metin); font-weight: 700;
+}
+.storeos-root .so-dugme-hizli:hover {
+  background: var(--so-gratis-sari); border-color: var(--so-gratis-sari); color: var(--so-metin);
+}
+
+/* ── ÖRNEK VERİ: tek bant + kart köşesinde nokta ───────────────────────────────
+   DÜRÜSTLÜK KURALI (madde 11) korunuyor, gösterim biçimi değişti: 13 rozet
+   görsel gürültü yaratıyordu. Bant kaldırılmaz; nokta da işaretin kendisidir. */
+
+.storeos-root .so-ornek-bant {
+  display: flex; align-items: center; gap: 8px;
+  background: var(--so-yuzey-2); border: 1px solid var(--so-cizgi);
+  border-left: 3px solid var(--so-dikkat);
+  border-radius: 12px; padding: 9px 13px; font-size: 11.5px; color: var(--so-metin-2);
+  line-height: 1.5;
+}
+.storeos-root .so-ornek-bant b { color: var(--so-metin); font-weight: 700; }
+.storeos-root .so-ornek-nokta {
+  position: absolute; top: 11px; right: 11px;
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--so-dikkat); opacity: .8;
+}
+.storeos-root .so-kart { position: relative; }
+
+/* ── Kart başlığı / detay linki ────────────────────────────────────────────── */
+
+.storeos-root .so-detay-link {
+  font-size: 11px; color: var(--so-marka); font-weight: 600; text-decoration: none;
+}
+.storeos-root .so-detay-link:hover { text-decoration: underline; }
+
+/* Boş panel: SABİT yükseklik — ekranın ortasını kaplamaz. */
+.storeos-root .so-bos {
+  min-height: 132px; padding: 12px 10px; gap: 5px;
+}
+.storeos-root .so-bos .so-durum-metin { max-width: 34ch; font-size: 11px; }
+.storeos-root .so-bos .so-durum-baslik { font-size: 12.5px; }
+
+/* ── SATIR 1 — sağlık skoru (kahraman) + 5 KPI ─────────────────────────────── */
+
+.storeos-root .so-satir-kpi {
+  display: grid; grid-template-columns: 1.35fr repeat(5, 1fr); gap: var(--so-bosluk);
+}
+.storeos-root .so-skor-kart {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px; padding: 12px;
+}
+.storeos-root .so-skor-etiket { font-size: 11.5px; color: var(--so-metin-2); font-weight: 600; }
+.storeos-root .so-skor-deger  { font-size: 30px; font-weight: 800; letter-spacing: -.03em; line-height: 1; margin-top: -26px; }
+.storeos-root .so-skor-sinif  { font-size: 11px; color: var(--so-metin-2); }
+.storeos-root .so-skor-alt    { font-size: 10.5px; color: var(--so-metin-3); margin-top: 3px; text-align: center; }
+
+.storeos-root .so-kpi-ust {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 11px; color: var(--so-metin-2); font-weight: 600;
+}
+.storeos-root .so-satir-kpi .so-kpi-deger { font-size: 22px; font-weight: 780; margin: 5px 0 3px; }
+.storeos-root .so-kpi-delta { font-size: 10.5px; font-weight: 650; color: var(--so-metin-3); }
+.storeos-root .so-yukari { color: var(--so-normal); }
+.storeos-root .so-asagi  { color: var(--so-uyari); }
+.storeos-root .so-kpi-trend { margin-top: 8px; height: 26px; width: 100%; display: block; }
+
+/* ── SATIR 2 — kamera | anlık durum | öneriler + görevler ──────────────────── */
+
+.storeos-root .so-satir-orta {
+  display: grid; grid-template-columns: 1.5fr 1fr 1.25fr; gap: var(--so-bosluk); align-items: start;
+}
+.storeos-root .so-sutun { display: flex; flex-direction: column; gap: var(--so-bosluk); }
+
+.storeos-root .so-kamera-ana {
+  border-radius: 13px; overflow: hidden; position: relative; aspect-ratio: 16 / 9;
+  background: var(--so-kamera-zemin);
+  display: grid; place-items: center; text-align: center;
+  color: var(--so-kamera-metin); font-size: 11px; padding: 10px;
+}
+.storeos-root .so-kamera-etiket {
+  position: absolute; top: 8px; left: 8px;
+  background: var(--so-kamera-etiket-zemin); color: var(--so-kamera-etiket-metin);
+  font-size: 9px; font-weight: 700; padding: 3px 7px; border-radius: 6px; letter-spacing: .04em;
+}
+.storeos-root .so-kamera-serit { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 9px; }
+.storeos-root .so-kamera-kucuk {
+  aspect-ratio: 16 / 10; border-radius: 9px; background: var(--so-kamera-zemin-2);
+}
+.storeos-root .so-kamera-ad { font-size: 10px; font-weight: 600; margin-top: 4px; }
+.storeos-root .so-kamera-durum { font-size: 9px; color: var(--so-metin-3); display: flex; align-items: center; gap: 3px; }
+.storeos-root .so-kamera-durum::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: currentColor; }
+.storeos-root .so-kamera-durum[data-durum="online"]   { color: var(--so-normal); }
+.storeos-root .so-kamera-durum[data-durum="degraded"] { color: var(--so-dikkat); }
+.storeos-root .so-kamera-durum[data-durum="offline"]  { color: var(--so-kritik); }
+
+.storeos-root .so-durum-satir {
+  display: flex; align-items: center; gap: 9px;
+  padding: 7.5px 0; border-bottom: 1px solid var(--so-yuzey-2); font-size: 12px;
+}
+.storeos-root .so-durum-satir:last-child { border-bottom: none; }
+.storeos-root .so-durum-ad { color: var(--so-metin-2); flex: 1; min-width: 0; }
+.storeos-root .so-durum-deger { font-weight: 700; white-space: nowrap; }
+/* Yalnız savunulabilir iki metrik renklenir (eşikler `kartlar.tsx` içinde,
+   tek yerde). Her satırı renklendirmek "her şey acil" demek olurdu. */
+.storeos-root .so-durum-deger[data-vurgu="iyi"]    { color: var(--so-normal); }
+.storeos-root .so-durum-deger[data-vurgu="dikkat"] { color: var(--so-uyari); }
+.storeos-root .so-durum-deger[data-vurgu="kritik"] { color: var(--so-kritik); }
+
+/* Veri eksikliğini AÇIKÇA yazan not satırı (kasa kırılımı, kamera yayını…).
+   Sahte kutu çizmek yerine neyin olmadığını söylemek için var. */
+.storeos-root .so-kart-not {
+  margin-top: 9px; font-size: 10px; line-height: 1.45; color: var(--so-metin-3);
+}
+
+/* Öneriler — MOR = AI önerisi (brief) */
+.storeos-root .so-oneri {
+  display: flex; gap: 9px; padding: 10px; border-radius: 13px; margin-bottom: 8px;
+  border: 1px solid transparent; background: var(--so-yuzey-2);
+}
+.storeos-root .so-oneri:last-child { margin-bottom: 0; }
+.storeos-root .so-oneri-bilgi  { background: var(--so-marka-zemin); border-color: var(--so-cizgi); }
+.storeos-root .so-oneri-dikkat { background: var(--so-yuzey-2); border-color: var(--so-dikkat); }
+.storeos-root .so-oneri-kritik { background: var(--so-yuzey-2); border-color: var(--so-kritik); }
+.storeos-root .so-oneri-ikon {
+  width: 26px; height: 26px; border-radius: 9px; flex: 0 0 auto;
+  display: grid; place-items: center; font-size: 13px; background: var(--so-yuzey);
+}
+.storeos-root .so-oneri-govde  { flex: 1; min-width: 0; }
+.storeos-root .so-oneri-baslik { font-size: 11.5px; font-weight: 680; line-height: 1.35; }
+.storeos-root .so-oneri-alt    { font-size: 10.5px; color: var(--so-metin-2); margin-top: 2px; }
+.storeos-root .so-oneri-sag    { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; }
+.storeos-root .so-oneri-saat   { font-size: 10px; color: var(--so-metin-3); white-space: nowrap; }
+
+.storeos-root .so-dugme-kucuk { padding: 4.5px 10px; font-size: 10.5px; border-radius: 8px; white-space: nowrap; }
+/* Bazı düğmeler gerçek link (öneri kartındaki "İncele"): görünüşü düğme,
+   davranışı bağlantı olmalı — orta tıkla yeni sekme çalışsın diye <button>
+   yapılmadı. Link varsayılanları burada sıfırlanıyor. */
+.storeos-root a.so-dugme {
+  display: inline-flex; align-items: center; justify-content: center;
+  text-decoration: none;
+}
+
+.storeos-root .so-gorev-satir {
+  display: flex; align-items: center; gap: 9px;
+  padding: 8px 0; border-bottom: 1px solid var(--so-yuzey-2);
+}
+.storeos-root .so-gorev-satir:last-child { border-bottom: none; }
+.storeos-root .so-kutucuk {
+  width: 15px; height: 15px; border-radius: 5px; flex: 0 0 auto;
+  border: 1.5px solid var(--so-cizgi);
+}
+.storeos-root .so-kutucuk[data-tamam="1"] { background: var(--so-normal); border-color: var(--so-normal); }
+.storeos-root .so-gorev-govde  { flex: 1; min-width: 0; }
+.storeos-root .so-gorev-ad     { font-size: 11.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.storeos-root .so-gorev-atanan { font-size: 10px; color: var(--so-metin-3); }
+.storeos-root .so-oncelik { font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 6px; white-space: nowrap; }
+
+/* ── SATIR 3 / SATIR 4 ─────────────────────────────────────────────────────── */
+
+.storeos-root .so-satir-uc   { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: var(--so-bosluk); }
+.storeos-root .so-satir-dort { display: grid; grid-template-columns: 1.4fr 1.1fr .9fr .9fr; gap: var(--so-bosluk); }
+
+.storeos-root .so-ikili { display: grid; grid-template-columns: 150px 1fr; gap: 12px; align-items: start; }
+.storeos-root .so-ikili-dar { grid-template-columns: 120px 1fr; align-items: center; }
+
+.storeos-root .so-mini-kutu { background: var(--so-yuzey-2); border-radius: 11px; padding: 9px 10px; margin-bottom: 7px; }
+.storeos-root .so-mini-kutu:last-child { margin-bottom: 0; }
+.storeos-root .so-mini-etiket { font-size: 10px; color: var(--so-metin-2); font-weight: 600; }
+.storeos-root .so-mini-deger  { font-size: 17px; font-weight: 750; margin-top: 1px; }
+.storeos-root .so-mini-alt    { font-size: 9.5px; color: var(--so-metin-3); font-weight: 600; }
+
+.storeos-root .so-stok-satir {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 6.5px 0; font-size: 11.5px;
+}
+.storeos-root .so-stok-rozet { font-size: 9.5px; font-weight: 650; padding: 2.5px 8px; border-radius: 7px; white-space: nowrap; }
+
+/* Referansta dört sabit kasa kutusu vardı; demoda kasa BAZINDA kırılım yok,
+   üç gerçek toplam var. auto-fit ile üçü de aynı ritimde yerleşir. */
+.storeos-root .so-kasa-izgara { display: grid; grid-template-columns: repeat(auto-fit, minmax(88px, 1fr)); gap: 7px; }
+.storeos-root .so-kasa-hucre { border-radius: 11px; padding: 9px 7px; text-align: center; background: var(--so-yuzey-2); }
+.storeos-root .so-kasa-hucre[data-durum="acik"] { background: var(--so-marka-zemin); }
+.storeos-root .so-kasa-hucre[data-durum="kapali"] { opacity: .5; }
+.storeos-root .so-kasa-ad   { font-size: 10px; font-weight: 650; }
+.storeos-root .so-kasa-alt  { font-size: 9px; color: var(--so-metin-3); margin-top: 2px; }
+
+.storeos-root .so-donut-sarmal { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.storeos-root .so-legend { display: flex; flex-direction: column; gap: 4px; font-size: 10.5px; flex: 1; min-width: 100px; }
+.storeos-root .so-legend div { display: flex; align-items: center; gap: 6px; }
+.storeos-root .so-legend i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex: 0 0 auto; }
+.storeos-root .so-legend b { margin-left: auto; font-variant-numeric: tabular-nums; }
+
+.storeos-root .so-hizli-izgara { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
+.storeos-root .so-hizli {
+  border-radius: 12px; padding: 11px 6px; text-align: center;
+  background: var(--so-yuzey-2); border: 1px solid transparent;
+  color: var(--so-metin); font-family: inherit;
+}
+.storeos-root .so-hizli:disabled { opacity: .55; cursor: default; }
+.storeos-root .so-hizli-ikon { font-size: 16px; display: block; margin-bottom: 4px; }
+.storeos-root .so-hizli-ad   { font-size: 9.5px; font-weight: 600; line-height: 1.25; display: block; }
+
+/* ── Daralma ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1500px) {
+  .storeos-root .so-satir-kpi  { grid-template-columns: 1.35fr repeat(3, 1fr); }
+  .storeos-root .so-satir-dort { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 1180px) {
+  .storeos-root .so-satir-kpi  { grid-template-columns: 1.35fr repeat(2, 1fr); }
+  .storeos-root .so-satir-orta { grid-template-columns: 1fr; }
+  .storeos-root .so-satir-uc   { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .storeos-root .so-satir-kpi  { grid-template-columns: 1fr 1fr; }
+  .storeos-root .so-satir-dort { grid-template-columns: 1fr; }
+  .storeos-root .so-ikili      { grid-template-columns: 1fr; }
 }

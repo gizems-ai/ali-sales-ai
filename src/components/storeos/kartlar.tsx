@@ -1,28 +1,92 @@
 // ════════════════════════════════════════════════════════════════════════════
-//  Store OS — KPI kartları, alarm listesi, görev listesi.
+//  Store OS — üst satır: sağlık skoru (kahraman) + KPI kartları + anlık durum.
+//
+//  Gün 6'da on bir metrik düz bir ızgaradaydı; hiçbiri diğerinden önemli
+//  görünmüyordu. Gün 7 düzeni ikiye ayırdı: BEŞ büyük kart (her biri mini trend
+//  ve düne göre karşılaştırma taşır) + kalanlar "Anlık Durum" listesinde.
+//  Ayrımı `toplayici.ts` yapar (`yerlesim`), bileşen yalnız filtreler.
+//
 //  Aptal bileşenler: veri props ile gelir, hiçbiri kendi isteğini atmaz.
 // ════════════════════════════════════════════════════════════════════════════
 
 import type {
-  AlarmSatiri, GorevOzeti, GorevSatiri, KameraSatiri, KpiKarti, MagazaOzeti,
-  PersonelSatiri,
+  KpiKarti, MagazaOzeti, SaglikSkoru,
 } from '@/lib/storeos/dashboard/tipler'
+import { DEGISKEN, kpiIkonu, skorRengi } from '@/lib/storeos/tema'
+import { MiniTrend, YarimGosterge } from './grafikler'
 import {
-  gorevDurumEtiketi, oncelikSinifi, severityEtiketi, severitySinifi,
-} from '@/lib/storeos/tema'
-import {
-  BosDurum, IskeletListe, Kart, OrnekVeri, birimYaz, gecenSure, sayiYaz, saatYaz,
-  tarihSaatYaz,
+  BosDurum, Iskelet, Kart, OrnekNokta, degerYaz, sayiYaz,
 } from './temel'
 
-// ─── KPI ─────────────────────────────────────────────────────────────────────
+// ─── Düne göre karşılaştırma ─────────────────────────────────────────────────
 
-export function KpiIzgarasi({ kartlar }: { kartlar: KpiKarti[] | null }) {
-  if (kartlar === null) return <div className="so-izgara so-izgara-kpi"><IskeletListe adet={6} /></div>
-  if (kartlar.length === 0) {
+interface Delta { metin: string; sinif: string }
+
+/**
+ * `onceki` YOKSA hiçbir şey çizilmez — uydurulmuş bir "%0 vs dün" gösterilmez.
+ * Renk kararı işaretin yönünden değil `iyiYon`dan gelir: kasa bekleme süresinin
+ * düşmesi yeşildir, ziyaretçi sayısının düşmesi değil.
+ */
+function delta(k: KpiKarti): Delta | null {
+  if (k.onceki === null) return null
+  const fark = k.deger - k.onceki
+  if (fark === 0) return { metin: 'dün ile aynı', sinif: '' }
+
+  const arttiIyi = fark > 0 === (k.iyiYon === 'artis')
+  const sinif = arttiIyi ? 'so-yukari' : 'so-asagi'
+  const ok = fark > 0 ? '↑' : '↓'
+  const mutlak = Math.abs(fark)
+
+  // Oran anlamlı olmayan birimlerde MUTLAK fark yazılır: yüzde bir metrikte
+  // "%18'den %21'e" bir "%16 artış" değil, "3 puan"dır.
+  if (k.birim === 'yuzde') return { metin: `${ok} ${sayiYaz(mutlak)} puan vs dün`, sinif }
+  if (k.birim === 'sn' || k.birim === 'C') return { metin: `${ok} ${degerYaz(mutlak, k.birim)} vs dün`, sinif }
+  if (k.onceki === 0) return { metin: `${ok} ${sayiYaz(mutlak)} vs dün`, sinif }
+
+  const oran = Math.round((fark / k.onceki) * 100)
+  return { metin: `${ok} %${sayiYaz(Math.abs(oran))} vs dün`, sinif }
+}
+
+// ─── Sağlık skoru — kahraman öğe ─────────────────────────────────────────────
+
+export function SkorKart({ skor }: { skor: SaglikSkoru | null }) {
+  if (skor === null) {
+    return (
+      <div className="so-kart so-skor-kart">
+        <Iskelet yukseklik={74} genislik="132px" />
+      </div>
+    )
+  }
+  return (
+    <div className="so-kart so-skor-kart">
+      <OrnekNokta veriTipi={skor.veriTipi} />
+      <div className="so-skor-etiket">Mağaza Sağlık Skoru</div>
+      <YarimGosterge deger={skor.deger} renk={skorRengi(skor.deger)} />
+      <div className="so-skor-deger">{sayiYaz(skor.deger)}</div>
+      <div className="so-skor-sinif">{skor.sinif}</div>
+      <div className="so-skor-alt">{skor.gerekce}</div>
+    </div>
+  )
+}
+
+// ─── Beş KPI kartı ───────────────────────────────────────────────────────────
+
+export function KpiSeridi({ kartlar }: { kartlar: KpiKarti[] | null }) {
+  if (kartlar === null) {
+    return (
+      <>
+        {Array.from({ length: 5 }, (_, i) => (
+          <div key={i} className="so-kart"><Iskelet yukseklik={78} /></div>
+        ))}
+      </>
+    )
+  }
+  const kart = kartlar.filter(k => k.yerlesim === 'kart')
+  if (kart.length === 0) {
     return (
       <Kart>
         <BosDurum
+          sabit
           baslik="Henüz metrik yok"
           metin="Bu mağaza için gösterge verisi bulunamadı. Seed çalıştırıldıysa birkaç saniye içinde görünür."
         />
@@ -30,169 +94,132 @@ export function KpiIzgarasi({ kartlar }: { kartlar: KpiKarti[] | null }) {
     )
   }
   return (
-    <div className="so-izgara so-izgara-kpi">
-      {kartlar.map(k => (
-        <div key={k.anahtar} className="so-kart">
-          <div className="so-kpi-etiket">
-            {k.etiket}
-            <OrnekVeri veriTipi={k.veriTipi} />
-          </div>
-          <div className="so-kpi-deger">
-            {sayiYaz(k.deger)}
-            {birimYaz(k.birim) && <span className="so-kpi-birim">{birimYaz(k.birim)}</span>}
-          </div>
-          {k.alt && <div className="so-kpi-alt">{k.alt}</div>}
-        </div>
-      ))}
-    </div>
-  )
-}
-
-// ─── Mağaza başlığı ──────────────────────────────────────────────────────────
-
-export function MagazaBasligi({ magaza }: { magaza: MagazaOzeti | null }) {
-  if (!magaza) return <h1>Store OS</h1>
-  const kasa = magaza.kasaAcik === null
-    ? `${magaza.kasaToplam} kasa`
-    : `${sayiYaz(magaza.kasaAcik)}/${sayiYaz(magaza.kasaToplam)} kasa açık`
-  return (
     <>
-      <h1>{magaza.kod} · {magaza.ad}</h1>
-      <span className={`so-rozet ${magaza.durum === 'online' ? 'so-sev-low' : magaza.durum === 'warning' ? 'so-sev-medium' : 'so-sev-critical'}`}>
-        {magaza.durum === 'online' ? 'Normal' : magaza.durum === 'warning' ? 'Dikkat' : 'Kapalı'}
-      </span>
-      <span className="so-nabiz">{magaza.sehir} · {magaza.acilis}–{magaza.kapanis} · {kasa}</span>
-      <OrnekVeri veriTipi={magaza.veriTipi} />
+      {kart.map(k => {
+        const d = delta(k)
+        return (
+          <div key={k.anahtar} className="so-kart">
+            <OrnekNokta veriTipi={k.veriTipi} />
+            <div className="so-kpi-ust">
+              <span aria-hidden="true">{kpiIkonu(k.anahtar)}</span>
+              {k.etiket}
+            </div>
+            <div className="so-kpi-deger">{degerYaz(k.deger, k.birim)}</div>
+            {d && <div className={`so-kpi-delta ${d.sinif}`.trim()}>{d.metin}</div>}
+            {k.trend && (
+              <MiniTrend
+                noktalar={k.trend}
+                renk={d?.sinif === 'so-asagi' ? DEGISKEN.medium : DEGISKEN.marka}
+              />
+            )}
+          </div>
+        )
+      })}
     </>
   )
 }
 
-// ─── Alarmlar ────────────────────────────────────────────────────────────────
+// ─── Anlık durum ─────────────────────────────────────────────────────────────
 
-export function AlarmListesi({ alarmlar, simdiMs }: { alarmlar: AlarmSatiri[] | null; simdiMs: number }) {
-  return (
-    <Kart baslik="Canlı alarmlar" sag={alarmlar ? <span className="so-nabiz">{alarmlar.length} olay</span> : null}>
-      {alarmlar === null ? <IskeletListe /> : alarmlar.length === 0 ? (
-        <BosDurum
-          baslik="Henüz olay gelmedi"
-          metin="Kameralardan olay ulaştığında burada anında listelenir. Boş liste bir hata değildir."
-        />
-      ) : (
-        <div className="so-liste">
-          {alarmlar.map(a => (
-            <div key={a.olayId} className="so-satir">
-              <span className={severitySinifi(a.severity)}>{severityEtiketi(a.severity)}</span>
-              <div className="so-satir-ana">
-                <div className="so-satir-baslik">{a.baslik}</div>
-                <div className="so-satir-alt">
-                  {a.kameraAdi ?? 'kamera yok'} · {saatYaz(a.olustu)} · {gecenSure(a.olustu, simdiMs)}
-                </div>
-              </div>
-              {a.gorevUretti
-                ? <span className="so-rozet so-sev-low">görev açıldı</span>
-                : <span className="so-rozet so-notr" title="Bu olay tipi için tanımlı kural yok — olay kaydedildi, görev üretilmedi.">kural yok</span>}
-              <OrnekVeri veriTipi={a.veriTipi} />
-            </div>
-          ))}
-        </div>
-      )}
-    </Kart>
-  )
+/**
+ * Eşikler burada, tek yerde. Yalnız savunulabilir iki metrik renklenir:
+ * yoğunluk (mağaza doluluğu) ve etiket uygunluğu. Gerisi nötr kalır —
+ * her satırı renklendirmek "her şey acil" demektir, hiçbir şey demektir.
+ */
+function vurgu(anahtar: string, deger: number): string | undefined {
+  if (anahtar === 'yogunluk') {
+    if (deger >= 85) return 'kritik'
+    if (deger >= 70) return 'dikkat'
+    return 'iyi'
+  }
+  if (anahtar === 'etiket_uygunluk') {
+    if (deger >= 95) return 'iyi'
+    if (deger >= 85) return 'dikkat'
+    return 'kritik'
+  }
+  return undefined
 }
 
-// ─── Görevler ────────────────────────────────────────────────────────────────
-
-// Durum etiketleri ve öncelik sınıfları `tema.ts`'e taşındı (Gün 4) — aynı
-// eşlemeyi liste ekranları da kullanıyor, iki kopya kaymaya açıktı.
-
-export function GorevListesi({
-  gorevler, ozet,
+export function AnlikDurum({
+  kpiler, magaza,
 }: {
-  gorevler: GorevSatiri[] | null
-  ozet: GorevOzeti | null
+  kpiler: KpiKarti[] | null
+  magaza: MagazaOzeti | null
 }) {
-  const sag = ozet
-    ? <span className="so-nabiz">{ozet.acik} açık · {ozet.gecikmis} gecikmiş · {ozet.tamamlandi} tamam</span>
-    : null
+  if (kpiler === null) {
+    return <Kart baslik="Anlık Durum"><Iskelet yukseklik={132} /></Kart>
+  }
+  const satirlar = kpiler.filter(k => k.yerlesim === 'durum' && k.anahtar !== 'kasa_acik')
+  const kasaKpi = kpiler.find(k => k.anahtar === 'kasa_acik')
+  const kasaAcik = magaza?.kasaAcik ?? kasaKpi?.deger ?? null
+
+  if (satirlar.length === 0 && kasaAcik === null) {
+    return (
+      <Kart baslik="Anlık Durum">
+        <BosDurum sabit baslik="Ölçüm yok" metin="Sensör ve kasa verisi ulaştığında bu liste dolar." />
+      </Kart>
+    )
+  }
+
+  const ornek = kpiler.some(k => k.veriTipi === 'demo') ? 'demo' : 'gercek'
   return (
-    <Kart baslik="Görevler" sag={sag}>
-      {gorevler === null ? <IskeletListe /> : gorevler.length === 0 ? (
-        <BosDurum
-          baslik="Açık görev yok"
-          metin="Bir kural eşleştiğinde görev otomatik oluşur ve ilgili kişiye WhatsApp'tan gider."
-        />
-      ) : (
-        <div className="so-liste">
-          {gorevler.map(g => (
-            <div key={g.gorevNo} className="so-satir">
-              <span className={`so-rozet ${oncelikSinifi(g.oncelik)}`}>{g.gorevNo}</span>
-              <div className="so-satir-ana">
-                <div className="so-satir-baslik">{g.baslik}</div>
-                <div className="so-satir-alt">
-                  {g.atananAd ?? g.atananRol} · son teslim {tarihSaatYaz(g.sonTeslim)}
-                </div>
-              </div>
-              {g.gecikti && <span className="so-rozet so-sev-critical">gecikti</span>}
-              <span className="so-rozet so-notr">{gorevDurumEtiketi(g.durum)}</span>
-              <OrnekVeri veriTipi={g.veriTipi} />
-            </div>
-          ))}
+    <Kart baslik="Anlık Durum" ornek={ornek}>
+      {kasaAcik !== null && magaza && (
+        <div className="so-durum-satir">
+          <span aria-hidden="true">{kpiIkonu('kasa_acik')}</span>
+          <span className="so-durum-ad">Kasalar</span>
+          <span className="so-durum-deger">
+            {sayiYaz(kasaAcik)} / {sayiYaz(magaza.kasaToplam)} açık
+          </span>
         </div>
       )}
+      {satirlar.map(k => (
+        <div key={k.anahtar} className="so-durum-satir">
+          <span aria-hidden="true">{kpiIkonu(k.anahtar)}</span>
+          <span className="so-durum-ad">{k.etiket}</span>
+          <span className="so-durum-deger" data-vurgu={vurgu(k.anahtar, k.deger)}>
+            {degerYaz(k.deger, k.birim)}
+          </span>
+        </div>
+      ))}
     </Kart>
   )
 }
 
-// ─── Kameralar ───────────────────────────────────────────────────────────────
+// ─── Üst bar başlığı ─────────────────────────────────────────────────────────
 
-const KAMERA_SINIFI: Record<string, string> = {
-  online: 'so-sev-low', degraded: 'so-sev-medium', offline: 'so-sev-critical',
+const MAGAZA_ROZETI: Record<string, { sinif: string; etiket: string }> = {
+  online:  { sinif: 'so-sev-low',      etiket: 'Normal' },
+  warning: { sinif: 'so-sev-medium',   etiket: 'Dikkat' },
+  offline: { sinif: 'so-sev-critical', etiket: 'Kapalı' },
 }
 
-export function KameraListesi({ kameralar }: { kameralar: KameraSatiri[] | null }) {
+export function MagazaBasligi({ magaza }: { magaza: MagazaOzeti | null }) {
+  if (!magaza) {
+    return (
+      <div>
+        <h1>Store OS</h1>
+        <div className="so-ust-alt"><Iskelet yukseklik={12} genislik="240px" /></div>
+      </div>
+    )
+  }
+  const rozet = MAGAZA_ROZETI[magaza.durum] ?? { sinif: 'so-notr', etiket: magaza.durum }
+  const kasa = magaza.kasaAcik === null
+    ? `${sayiYaz(magaza.kasaToplam)} kasa`
+    : `${sayiYaz(magaza.kasaAcik)} / ${sayiYaz(magaza.kasaToplam)} kasa açık`
   return (
-    <Kart baslik="Kameralar">
-      {kameralar === null ? <IskeletListe adet={4} /> : kameralar.length === 0 ? (
-        <BosDurum baslik="Kamera tanımlı değil" metin="Mağazaya kamera eklendiğinde burada görünür." />
-      ) : (
-        <div>
-          {kameralar.map(k => (
-            <div key={k.kameraId} className="so-satir">
-              <div className="so-satir-ana">
-                <div className="so-satir-baslik">{k.ad}</div>
-                <div className="so-satir-alt">{k.bolgeAdi} · {k.yetenekler.join(', ') || 'yetenek tanımsız'}</div>
-              </div>
-              <span className={`so-rozet ${KAMERA_SINIFI[k.durum] ?? 'so-notr'}`}>{k.durum}</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </Kart>
-  )
-}
-
-// ─── Personel ────────────────────────────────────────────────────────────────
-
-export function PersonelListesi({ personel }: { personel: PersonelSatiri[] | null }) {
-  return (
-    <Kart baslik="Vardiyadaki ekip">
-      {personel === null ? <IskeletListe adet={4} /> : personel.length === 0 ? (
-        <BosDurum baslik="Personel kaydı yok" metin="Kullanıcılar tablosuna kayıt eklendiğinde burada listelenir." />
-      ) : (
-        <div>
-          {personel.map(p => (
-            <div key={p.kullaniciId} className="so-satir">
-              <div className="so-satir-ana">
-                <div className="so-satir-baslik">{p.adSoyad}</div>
-                <div className="so-satir-alt">{p.rol}</div>
-              </div>
-              <span className={`so-rozet ${p.acikGorev > 0 ? 'so-sev-medium' : 'so-notr'}`}>
-                {p.acikGorev} açık görev
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-    </Kart>
+    <div>
+      <h1>
+        {magaza.ad}
+        {magaza.durum === 'online'
+          ? <span className="so-rozet-canli">CANLI</span>
+          : <span className={`so-rozet ${rozet.sinif}`}>{rozet.etiket}</span>}
+      </h1>
+      <div className="so-ust-alt">
+        <span>{magaza.kod} · {magaza.sehir}, {magaza.bolge}</span>
+        <span>Açılış {magaza.acilis} · Kapanış {magaza.kapanis}</span>
+        <span>{kasa}</span>
+      </div>
+    </div>
   )
 }
