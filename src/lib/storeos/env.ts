@@ -13,6 +13,12 @@ function istege(ad: string, varsayilan = ''): string {
   return process.env[ad] ?? varsayilan
 }
 
+/**
+ * Demo telefon kilidini kapatan TEK kabul edilen değer. Bilerek uzun ve
+ * bilerek ne yaptığını söylüyor; `.env`'de bunu gören biri sonucunu bilir.
+ */
+export const KILIT_KAPATMA_SOZU = 'kapali-gercek-alicilara-gonder'
+
 export const env = {
   /** Airtable — Store OS'e AYRILMIŞ base. Emlak/sigorta base'leriyle ilgisi yok. */
   get airtableBaseId() { return zorunlu('STOREOS_AIRTABLE_BASE_ID') },
@@ -40,6 +46,24 @@ export const env = {
    * bilinçli olarak yok.
    */
   get cronToken() { return istege('STOREOS_CRON_TOKEN') },
+
+  /**
+   * DEMO TELEFON KİLİDİ — güvenlik kapısı, bağlantı kolaylığı değil.
+   *
+   * Kilit AÇIKKEN dışarı çıkan her mesajın hedef numarası bu numarayla
+   * değiştirilir. Amaç: `Kullanicilar` tablosuna gerçek numaralar girildiği
+   * gün, demo/prova sırasında hiçbir mesajın yanlışlıkla gerçek bir Gratis
+   * çalışanına gitmemesi.
+   *
+   * VARSAYILAN AÇIK. Kapatmak için `STOREOS_TELEFON_KILIDI` değişkeninin
+   * TAM OLARAK aşağıdaki cümleye eşit olması gerekir — 'false'/'0'/'kapali'
+   * kabul edilmez. Yanlışlıkla yazılamayacak kadar uzun olması bilinçli:
+   * kilidi kapatmak bir karardır, bir yazım hatası değil.
+   */
+  get demoTelefon() { return istege('STOREOS_DEMO_TELEFON').trim() },
+  get telefonKilidiAcik(): boolean {
+    return istege('STOREOS_TELEFON_KILIDI').trim() !== KILIT_KAPATMA_SOZU
+  },
 
   /** Aktif bildirim kanalı. Gerçek 360Dialog hattı bağlanana kadar 'konsol'. */
   get kanal(): 'whatsapp' | 'konsol' {

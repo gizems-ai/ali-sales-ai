@@ -175,6 +175,13 @@ export interface Bildirim {
   'Kanal': Kanal
   'Alici Kullanici ID': string
   'Alici Telefon': string
+  /**
+   * Mesajın GERÇEKTEN gittiği numara. Demo telefon kilidi açıkken
+   * 'Alici Telefon'dan farklıdır (bkz. kanal/telefon-kilidi.ts).
+   * Gelen yanıtın numara kapısı bu alanla karşılaştırır — kilit açıkken
+   * yanıt demo telefonundan gelir, görevin sahibinin numarasından değil.
+   */
+  'Gonderilen Telefon'?: string
   'Template'?: string              // oturum penceresinde boş (serbest mesaj)
   'Govde': string
   'Gonderim Zamani': string        // ISO

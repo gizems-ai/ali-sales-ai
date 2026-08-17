@@ -29,6 +29,59 @@ kanal konsola DÜŞMEZ; gönderim başarısız olur, bildirim kaydı `Durum='hat
 olarak kalır ve panelde görünür. Gerekçe: "mesaj gitti sanılan" bir demo, hiç
 gitmemesinden daha pahalıdır.
 
+### 1.1 Demo telefon kilidi — güvenlik kapısı
+
+`src/lib/storeos/kanal/telefon-kilidi.ts`
+
+Demo süresince **hiçbir mesajın gerçek bir Gratis çalışanına gitmemesi** için
+giden numara `STOREOS_DEMO_TELEFON`'a kilitlenir. Bu bir bağlantı kolaylığı
+değil, güvenlik kapısıdır: seed'e gerçek numaralar girildiği gün kilidi
+kaldırmayı unutmak, yanlış kişiye mesaj göndermekle sonuçlanmamalı.
+
+| Durum | Davranış |
+|---|---|
+| Kilit açık (varsayılan), hedef geçerli | Mesaj `STOREOS_DEMO_TELEFON`'a gider |
+| Kilit açık, hedef boş/E.164 değil | **Dışarı çıkan kanalda gönderim reddedilir** (fail-closed, `tekrarDenenebilir=false`) |
+| Kilit açık, hedef boş, kanal `konsol`/`panel` | Gönderim sürer, `console.warn` basılır (mesaj süreçten çıkmıyor) |
+| Kilit kapalı | Numara aynen geçer |
+
+**Varsayılan AÇIK.** Env hiç tanımlanmasa da açıktır. Kapatmanın tek yolu:
+
+```
+STOREOS_TELEFON_KILIDI=kapali-gercek-alicilara-gonder
+```
+
+`false` / `0` / `kapali` / `off` kilidi **kapatmaz** — kazayla kapanabilen bir
+bayrak, kapı değildir.
+
+**İki katman (defense in depth).**
+
+1. `bildirim.ts` gönderimden önce etkin numarayı çözer (`hedefiCoz`) — böylece
+   kayıt ve denetim gerçeği söyler.
+2. `kanal/index.ts` her kanalı `kilitle()` ile sarar — `bildirim.ts`'i atlayan
+   ileride yazılacak bir çağıran da sızdıramaz.
+
+Kanal arayüzündeki `disaCikar: boolean` alanı bunu tipe bağlar: yeni bir kanal
+eklendiğinde "bu mesaj süreçten çıkıyor mu" sorusu cevaplanmak zorundadır.
+
+**Ezme görünür.** Kilit devredeyken:
+
+- Bildirim kaydına `Gonderilen Telefon` yazılır (`Alici Telefon` görevin
+  sahibinin numarası olarak kalır — semantik bozulmaz).
+- Denetimdeki `bildirim.gonderildi` satırının `not` alanı:
+  `demo telefon kilidi: hedef ezildi <istenen> → <etkin>`
+- Denetim satırının `Sonrasi JSON` alanında `gonderilenTelefon` + `kilit: 'demo-telefon'`
+- Gönderim logunda, kanala verilmeden hemen önce `[storeos:kilit] ...` satırı basılır.
+
+**Gelen yönü etkiler.** 4. kapı (numara doğrulaması) artık
+`Gonderilen Telefon ?? Alici Telefon` ile karşılaştırır. Kilit açıkken yanıt
+demo telefonundan gelir; bu değişiklik olmadan her yanıt `telefon_uyusmuyor`
+ile reddedilirdi. Kapı **gevşemedi** — üçüncü bir numaradan gelen yanıt hâlâ
+reddediliyor (`zincir.test.ts` bölüm 9).
+
+Testler: `npx -y tsx src/lib/storeos/kanal/telefon-kilidi.test.ts` (birim) ve
+`zincir.test.ts` bölüm 9 (uçtan uca).
+
 ---
 
 ## 2. Giden gövde (panel → n8n)
@@ -142,7 +195,8 @@ Görev değişmeden önce **altı kapı**:
 1. Buton id çözülüyor mu? → yoksa serbest metin
 2. Sağlayıcı mesaj id'si tanınıyor mu? → `bildirim_yok`
 3. Buton **o** bildirime mi ait? → `bildirim_uyusmuyor`
-4. Gönderen numara alıcı mı? → `telefon_uyusmuyor`
+4. Gönderen numara beklenen numara mı? → `telefon_uyusmuyor`
+   (beklenen = `Gonderilen Telefon ?? Alici Telefon`; bkz. 1.1 demo telefon kilidi)
 5. Bu bildirime daha önce yanıt verilmiş mi? → `yinelenen`
 6. Görev geçişi geçerli mi? → `gecis_reddedildi`
 

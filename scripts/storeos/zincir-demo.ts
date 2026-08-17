@@ -91,8 +91,16 @@ async function main(): Promise<void> {
   baslik('② BİLDİRİM → KANAL')
   const b0 = s0?.bildirimler?.[0]
   const bildirim = b0?.bildirimId ? await depo.bildirimler.getir(b0.bildirimId) : null
+  // Demo telefon kilidi açıkken mesaj alıcının kendi numarasına değil
+  // STOREOS_DEMO_TELEFON'a gider; simülasyondaki yanıt da oradan gelmeli.
+  const etkinTelefon = bildirim
+    ? (bildirim['Gonderilen Telefon'] ?? bildirim['Alici Telefon'])
+    : ''
   halka(4, 'bildirim üretildi', !!bildirim,
-    bildirim ? `${bildirim['Bildirim ID']} → ${bildirim['Alici Telefon']}` : (b0?.not ?? 'bildirim yok'))
+    bildirim
+      ? `${bildirim['Bildirim ID']} → ${etkinTelefon}` +
+        (bildirim['Gonderilen Telefon'] ? ` (kilit: ${bildirim['Alici Telefon']} ezildi)` : '')
+      : (b0?.not ?? 'bildirim yok'))
   halka(5, 'kanala gitti', bildirim?.['Durum'] === 'gonderildi',
     bildirim ? `durum=${bildirim['Durum']} sağlayıcı id=${bildirim['Saglayici Mesaj ID'] ?? '—'}` : '—')
 
@@ -112,7 +120,7 @@ async function main(): Promise<void> {
       aksiyon: 'kabul',
       bildirimId: bildirim['Bildirim ID'],
       saglayiciMesajId: bildirim['Saglayici Mesaj ID'] ?? '',
-      gonderenTelefon: bildirim['Alici Telefon'],
+      gonderenTelefon: etkinTelefon,
       zaman: T1,
     })
     const sonuc = await yanitiIsle({ depo, kanal, yanit, kaynak: 'simulator', simdi: T1 })

@@ -113,7 +113,12 @@ export async function yanitiIsle(g: YanitGirdi): Promise<YanitSonucu> {
   }
 
   // ── 4. Kimlik: gönderen numara ──
-  if (g.yanit.gonderenTelefon && !telefonEslesmesi(bildirim['Alici Telefon'], g.yanit.gonderenTelefon)) {
+  // Mesajın FİİLEN gittiği numarayla karşılaştırıyoruz. Demo telefon kilidi
+  // açıkken mesaj demo numarasına gider ve yanıt da oradan gelir; 'Alici
+  // Telefon' ise görevin sahibinin (placeholder olabilen) numarasıdır.
+  // Kilit kapalıyken ikisi zaten aynıdır — tek kod yolu, iki mod.
+  const beklenenTelefon = bildirim['Gonderilen Telefon'] ?? bildirim['Alici Telefon']
+  if (g.yanit.gonderenTelefon && !telefonEslesmesi(beklenenTelefon, g.yanit.gonderenTelefon)) {
     await denetimYaz(d, {
       aktor, aktorTipi: 'kullanici', aksiyon: DENETIM_AKSIYONLARI.gorevYetkiRed,
       entityTipi: 'gorev', entityId: kimlik.gorevNo,

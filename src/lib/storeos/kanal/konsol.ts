@@ -26,6 +26,8 @@ function fnv1a(s: string): string {
 
 export class KonsolKanali implements KanalArayuzu {
   readonly ad = 'konsol' as const
+  /** stdout süreçten çıkmaz — telefon kilidi burada fail-closed davranmaz. */
+  readonly disaCikar = false
 
   async gonder(m: GidenMesaj): Promise<GonderimSonucu> {
     const satirlar = [

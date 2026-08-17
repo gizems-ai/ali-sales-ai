@@ -6,6 +6,7 @@
 
 import { env } from '../env'
 import { KonsolKanali } from './konsol'
+import { kilitle } from './telefon-kilidi'
 import { WhatsAppKanali } from './whatsapp'
 import type { KanalArayuzu } from './tipler'
 
@@ -14,8 +15,8 @@ export { BUTON_AKSIYONLARI, butonAksiyonuMu } from './tipler'
 export { butonIdCoz, butonIdUret, BUTON_ETIKETLERI } from './buton'
 
 const KUTU = globalThis as unknown as {
-  __storeosKonsolKanal?: KonsolKanali
-  __storeosWaKanal?: WhatsAppKanali
+  __storeosKonsolKanal?: KanalArayuzu
+  __storeosWaKanal?: KanalArayuzu
 }
 
 export function kanal(): KanalArayuzu {
@@ -29,16 +30,21 @@ export function kanal(): KanalArayuzu {
     // yüzünden görev üretimi de dururdu. Boş URL ile kurup gönderimi
     // başarısız bırakmak, hatayı doğru halkada tutar.
     if (!KUTU.__storeosWaKanal) {
-      KUTU.__storeosWaKanal = new WhatsAppKanali(env.n8nGidenWebhookVarsa)
+      KUTU.__storeosWaKanal = kilitle(new WhatsAppKanali(env.n8nGidenWebhookVarsa))
     }
     return KUTU.__storeosWaKanal
   }
-  if (!KUTU.__storeosKonsolKanal) KUTU.__storeosKonsolKanal = new KonsolKanali()
-  return KUTU.__storeosKonsolKanal
+  return konsolKanaliniZorla()
 }
 
-/** Testler için: kanalı açıkça konsol yap. */
+/**
+ * Testler ve zincir demosu için: kanalı açıkça konsol yap.
+ *
+ * Bu da kilidin arkasından geçer. Konsol dışarı çıkmadığı için kilit burada
+ * gönderimi ENGELLEMEZ, ama hedefin ezildiğini logda gösterir — jüri önünde
+ * konsol kanalıyla koşarken de "bu mesaj demo numarasına giderdi" görünür.
+ */
 export function konsolKanaliniZorla(): KanalArayuzu {
-  if (!KUTU.__storeosKonsolKanal) KUTU.__storeosKonsolKanal = new KonsolKanali()
+  if (!KUTU.__storeosKonsolKanal) KUTU.__storeosKonsolKanal = kilitle(new KonsolKanali())
   return KUTU.__storeosKonsolKanal
 }

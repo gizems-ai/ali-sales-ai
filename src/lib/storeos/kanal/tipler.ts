@@ -73,6 +73,16 @@ export interface GelenYanit {
 
 export interface KanalArayuzu {
   readonly ad: Kanal
+  /**
+   * Bu kanal mesajı SÜRECİN DIŞINA çıkarıyor mu?
+   * konsol/panel = false (stdout, kimseye ulaşmaz) · whatsapp = true.
+   *
+   * Demo telefon kilidi bu bayrağa göre davranır: dışarı çıkan bir kanalda
+   * hedef numara doğrulanamıyorsa gönderim REDDEDİLİR (fail-closed);
+   * çıkmayan kanalda yalnız uyarı basılır. Yeni bir kanal eklendiğinde bu
+   * alanı doldurmak zorunludur — unutulamaz, tip zorlar.
+   */
+  readonly disaCikar: boolean
   gonder(mesaj: GidenMesaj): Promise<GonderimSonucu>
   /**
    * Ham gelen gövdeyi kanal-bağımsız `GelenYanit`'e çevirir.

@@ -30,6 +30,8 @@ const ZAMAN_ASIMI_MS = 10_000
 
 export class WhatsAppKanali implements KanalArayuzu {
   readonly ad = 'whatsapp' as const
+  /** Gerçek telefona çıkar — demo telefon kilidi burada FAIL-CLOSED. */
+  readonly disaCikar = true
 
   constructor(private readonly webhookUrl: string) {}
 

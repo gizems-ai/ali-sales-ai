@@ -392,6 +392,7 @@ async function main() {
   const d9 = bellekDeposunuZorla(); await d9.sifirla()
   const kirikKanal = {
     ad: 'whatsapp' as const,
+    disaCikar: true,
     gonder: async () => ({ basarili: false as const, hata: 'n8n 502: bad gateway', tekrarDenenebilir: true }),
     gelenCoz: () => null,
   }
@@ -418,6 +419,67 @@ async function main() {
   ok("'panel' kanallı kuralda da bildirim kaydı üretildi", panelBildirim.durum === 'gonderildi')
   ok('kayıtta kanal panel yazıyor',
     panelBildirim.durum === 'gonderildi' && panelBildirim.bildirim['Kanal'] === 'panel')
+
+  // ═══ 9. DEMO TELEFON KİLİDİ ZİNCİRİN İÇİNDE ═══════════════════════════════
+  //
+  // Birim testi kapının kendisini kanıtlıyor (kanal/telefon-kilidi.test.ts).
+  // Buradaki soru farklı: kilit AÇIKKEN zincir hâlâ kapanıyor mu? Kritik
+  // nokta gelen yönde — mesaj demo numarasına gidiyorsa yanıt da oradan
+  // gelir, ve numara kapısı görevin sahibinin numarasını beklerse zincir
+  // tam da kilidi açtığımız gün kırılırdı.
+  console.log('\n9) Demo telefon kilidi açıkken zincir kapanıyor')
+  const oncekiDemo = process.env.STOREOS_DEMO_TELEFON
+  process.env.STOREOS_DEMO_TELEFON = '+905303227450'
+  const T1 = '2026-08-14T14:05:00+03:00'
+
+  const dk1 = bellekDeposunuZorla(); await dk1.sifirla()
+  const alimK1 = await sessizce(() => olaylariAl({
+    depo: dk1, kanal: KANAL, govde: KUYRUK_OLAYI('evt-t-011'), adapterAdi: 'generic',
+    aktor: 'test', aktorTipi: 'partner', kaynak: 'simulator', simdi: T0,
+  }))
+  const gNoK1 = alimK1.sonuclar[0]?.uretilenGorevler?.[0] ?? ''
+  const bK1 = await dk1.bildirimler.getir(bildirimIdUret(gNoK1, 'ilk'))
+  ok('görevin sahibinin numarası kayıtta korundu',
+    !!bK1 && bK1['Alici Telefon'] !== '+905303227450', bK1?.['Alici Telefon'])
+  ok('fiilen gönderilen numara demo telefonu',
+    bK1?.['Gonderilen Telefon'] === '+905303227450', bK1?.['Gonderilen Telefon'])
+
+  // Demo telefonundan gelen yanıt KABUL edilmeli.
+  const yanitK1 = sahteButonYaniti({
+    gorevNo: gNoK1, aksiyon: 'kabul',
+    bildirimId: bK1!['Bildirim ID'],
+    saglayiciMesajId: bK1!['Saglayici Mesaj ID'] ?? '',
+    gonderenTelefon: '+905303227450',
+    zaman: T1,
+  })
+  const sK1 = await sessizce(() => yanitiIsle({ depo: dk1, kanal: KANAL, yanit: yanitK1, kaynak: 'simulator', simdi: T1 }))
+  ok('demo telefonundan gelen yanıt kabul edildi', sK1.durum === 'uygulandi', sK1.durum)
+
+  // Üçüncü bir numaradan gelen yanıt hâlâ REDDEDİLMELİ — kilit, numara
+  // kapısını gevşetmez; yalnız beklenen numarayı değiştirir.
+  const dk2 = bellekDeposunuZorla(); await dk2.sifirla()
+  const alimK2 = await sessizce(() => olaylariAl({
+    depo: dk2, kanal: KANAL, govde: KUYRUK_OLAYI('evt-t-012'), adapterAdi: 'generic',
+    aktor: 'test', aktorTipi: 'partner', kaynak: 'simulator', simdi: T0,
+  }))
+  const gNoK2 = alimK2.sonuclar[0]?.uretilenGorevler?.[0] ?? ''
+  const bK2 = await dk2.bildirimler.getir(bildirimIdUret(gNoK2, 'ilk'))
+  const sK2 = await sessizce(() => yanitiIsle({
+    depo: dk2, kanal: KANAL, kaynak: 'simulator', simdi: T1,
+    yanit: sahteButonYaniti({
+      gorevNo: gNoK2, aksiyon: 'kabul',
+      bildirimId: bK2!['Bildirim ID'],
+      saglayiciMesajId: bK2!['Saglayici Mesaj ID'] ?? '',
+      gonderenTelefon: '+905559998877',
+      zaman: T1,
+    }),
+  }))
+  ok('yabancı numaradan gelen yanıt hâlâ reddediliyor',
+    sK2.durum === 'reddedildi' && sK2.kod === 'telefon_uyusmuyor',
+    `${sK2.durum}/${sK2.durum === 'reddedildi' ? sK2.kod : ''}`)
+
+  if (oncekiDemo === undefined) delete process.env.STOREOS_DEMO_TELEFON
+  else process.env.STOREOS_DEMO_TELEFON = oncekiDemo
 
   console.log(`\n${fail === 0 ? '✓ tüm zincir kontrolleri geçti' : `✗ ${fail} kontrol düştü`}\n`)
   if (fail) process.exit(1)

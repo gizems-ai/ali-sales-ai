@@ -25,7 +25,7 @@ const BEKLENEN: Record<string, string[]> = {
   [TABLO.olaylar]: ['Olay ID', 'Magaza Kodu', 'Kamera ID', 'Olay Tipi', 'Olustu', 'Alindi', 'Severity', 'Guven', 'Metadata JSON', 'Snapshot URL', 'Klip URL', 'Kaynak Adapter', 'Islendi', 'Eslesen Kural', 'Veri Tipi'],
   [TABLO.kurallar]: ['Kural Adi', 'Olay Tipi', 'Kosullar JSON', 'Severity', 'Gorev Basligi', 'Gorev Aciklamasi', 'Hedef Rol', 'Oncelik', 'SLA Dakika', 'Eskalasyon Dakika', 'Eskalasyon Rolu', 'Bildirim Kanali', 'Kanit Gerekli', 'Sira', 'Aktif'],
   [TABLO.gorevler]: ['Gorev No', 'Baslik', 'Aciklama', 'Magaza Kodu', 'Kaynak Olay ID', 'Kural', 'Gerekce', 'Atanan Kullanici ID', 'Atanan Rol', 'Oncelik', 'Durum', 'Olusturuldu', 'Son Teslim', 'Goruldu', 'Baslandi', 'Tamamlandi', 'Kanit Gerekli', 'Kanit URL', 'Veri Tipi'],
-  [TABLO.bildirimler]: ['Bildirim ID', 'Gorev No', 'Olay ID', 'Kanal', 'Alici Kullanici ID', 'Alici Telefon', 'Template', 'Govde', 'Gonderim Zamani', 'Durum', 'Saglayici Mesaj ID', 'Yanit', 'Yanit Zamani', 'Hata'],
+  [TABLO.bildirimler]: ['Bildirim ID', 'Gorev No', 'Olay ID', 'Kanal', 'Alici Kullanici ID', 'Alici Telefon', 'Gonderilen Telefon', 'Template', 'Govde', 'Gonderim Zamani', 'Durum', 'Saglayici Mesaj ID', 'Yanit', 'Yanit Zamani', 'Hata'],
   [TABLO.denetim]: ['Kayit ID', 'Zaman', 'Aktor', 'Aktor Tipi', 'Aksiyon', 'Entity Tipi', 'Entity ID', 'Oncesi JSON', 'Sonrasi JSON', 'IP', 'Kaynak'],
   [TABLO.metrikler]: ['Kayit ID', 'Magaza Kodu', 'Metrik Tipi', 'Deger', 'Birim', 'Zaman', 'Kaynak', 'Veri Tipi', 'Detay JSON'],
 }

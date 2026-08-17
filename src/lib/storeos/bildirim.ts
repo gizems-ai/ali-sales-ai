@@ -25,6 +25,7 @@ import type { Depo } from './depo'
 import { DENETIM_AKSIYONLARI, denetimYaz } from './denetim'
 import { BUTON_ETIKETLERI, butonIdUret } from './kanal/buton'
 import { BUTON_AKSIYONLARI } from './kanal/tipler'
+import { ezmeNotu, hedefiCoz } from './kanal/telefon-kilidi'
 import type { ButonAksiyonu, GidenButon, KanalArayuzu } from './kanal/tipler'
 import type { Bildirim, Gorev, Kullanici, Kanal } from './tipler'
 
@@ -115,6 +116,15 @@ export async function bildirimGonder(g: BildirimGirdi): Promise<BildirimSonucu> 
     return { durum: 'alici_yok', sebep }
   }
 
+  // ── DEMO TELEFON KİLİDİ ──
+  // Etkin numara BURADA çözülür, kanal çağrısından önce. Sebep: kayıt gerçeği
+  // söylemeli. 'Alici Telefon' görevin sahibinin numarası (kime ait olduğu),
+  // 'Gonderilen Telefon' mesajın fiilen gittiği yer. Gelen yanıtın numara
+  // kapısı ikincisiyle karşılaştırır; yoksa kilit açıkken gelen her yanıt
+  // 'telefon_uyusmuyor' ile reddedilirdi.
+  const cozum = hedefiCoz(telefon)
+  const etkinTelefon = cozum.engel ? telefon : cozum.telefon
+
   const govde = mesajGovdesi(g.gorev, g.kademe, simdi)
   const taslak: Bildirim = {
     'Bildirim ID': bildirimId,
@@ -126,6 +136,7 @@ export async function bildirimGonder(g: BildirimGirdi): Promise<BildirimSonucu> 
     'Gonderim Zamani': simdi,
     'Durum': 'kuyrukta',
   }
+  if (etkinTelefon !== telefon) taslak['Gonderilen Telefon'] = etkinTelefon
   if (g.gorev['Kaynak Olay ID']) taslak['Olay ID'] = g.gorev['Kaynak Olay ID']
 
   // ── IDEMPOTENCY KAPISI ──
@@ -151,14 +162,22 @@ export async function bildirimGonder(g: BildirimGirdi): Promise<BildirimSonucu> 
     sonrasi: {
       gorevNo, kademe: g.kademe, kanal: taslak['Kanal'],
       alici: g.alici['Kullanici ID'], telefon,
+      // Kilit açıksa denetim kaydı da ezmeyi görsün — logda görünüp
+      // denetimde görünmeyen bir şey, demo sonrası kanıtlanamaz.
+      ...(etkinTelefon !== telefon ? { gonderilenTelefon: etkinTelefon, kilit: 'demo-telefon' } : {}),
     },
     kaynak: 'api', zaman: simdi,
   })
 
   // ── Kanala ver ──
+  // Ezme GÖNDERİM LOGUNDA görünsün. Sarmalayıcı (kilitle()) bu noktada susar,
+  // çünkü numarayı ona zaten ezilmiş veriyoruz — satırı bu katman basmalı.
+  if (etkinTelefon !== telefon) {
+    console.warn(`[storeos:kilit] ${ezmeNotu(telefon, etkinTelefon)}  (bildirim ${bildirimId})`)
+  }
   const sonuc = await g.kanal.gonder({
     bildirimId,
-    aliciTelefon: telefon,
+    aliciTelefon: etkinTelefon,
     aliciAd: g.alici['Ad Soyad'],
     govde,
     butonlar: butonlar(gorevNo, bildirimId),
@@ -190,7 +209,10 @@ export async function bildirimGonder(g: BildirimGirdi): Promise<BildirimSonucu> 
     entityTipi: 'bildirim', entityId: bildirimId,
     sonrasi: {
       gorevNo, kanal: g.kanal.ad, saglayiciMesajId: sonuc.saglayiciMesajId,
-      not: sonuc.not,
+      // Kilit notu burada da duruyor: 'bildirim.gonderildi' satırına tek başına
+      // bakan biri mesajın nereye gittiğini görebilsin.
+      not: [sonuc.not, etkinTelefon !== telefon ? ezmeNotu(telefon, etkinTelefon) : null]
+        .filter(Boolean).join(' | ') || undefined,
     },
     kaynak: 'api', zaman: simdi,
   })
@@ -256,6 +278,8 @@ export async function aliciBul(d: Depo, gorev: Gorev): Promise<Kullanici | null>
 function sessizKanal(temel: KanalArayuzu): KanalArayuzu {
   return {
     ad: 'panel',
+    // Süreçten çıkmaz: 'panel' kanalı hiçbir mesaj göndermez, yalnız kayıt üretir.
+    disaCikar: false,
     gonder: async (m) => ({
       basarili: true,
       saglayiciMesajId: `panel-${m.bildirimId}`,

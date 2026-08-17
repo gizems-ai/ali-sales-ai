@@ -155,15 +155,20 @@ URL-encode'unda mevcut panelde tekrarlayan kaçış hatalarına yol açtı.
 | 3 | `Olay ID` | Single line text | |
 | 4 | `Kanal` | Single select | `whatsapp`, `panel`, `konsol` |
 | 5 | `Alici Kullanici ID` | Single line text | |
-| 6 | `Alici Telefon` | Phone number | E.164 |
-| 7 | `Template` | Single line text | oturum penceresinde boş kalır |
-| 8 | `Govde` | Long text | |
-| 9 | `Gonderim Zamani` | Date | include time |
-| 10 | `Durum` | Single select | `kuyrukta`, `gonderildi`, `teslim`, `okundu`, `yanitlandi`, `hata` |
-| 11 | `Saglayici Mesaj ID` | Single line text | **360Dialog message id — inbound eşleşmesi bununla** |
-| 12 | `Yanit` | Single select | `kabul`, `devret`, `ertele` |
-| 13 | `Yanit Zamani` | Date | include time |
-| 14 | `Hata` | Long text | |
+| 6 | `Alici Telefon` | Phone number | E.164 — görevin sahibinin numarası |
+| 7 | `Gonderilen Telefon` | Phone number | E.164 — mesajın GERÇEKTEN gittiği numara; demo telefon kilidi açıkken 6'dan farklıdır |
+| 8 | `Template` | Single line text | oturum penceresinde boş kalır |
+| 9 | `Govde` | Long text | |
+| 10 | `Gonderim Zamani` | Date | include time |
+| 11 | `Durum` | Single select | `kuyrukta`, `gonderildi`, `teslim`, `okundu`, `yanitlandi`, `hata` |
+| 12 | `Saglayici Mesaj ID` | Single line text | **360Dialog message id — inbound eşleşmesi bununla** |
+| 13 | `Yanit` | Single select | `kabul`, `devret`, `ertele` |
+| 14 | `Yanit Zamani` | Date | include time |
+| 15 | `Hata` | Long text | |
+
+> `Gonderilen Telefon` boşsa mesaj alıcının kendi numarasına gitmiştir. Gelen
+> yanıtın numara kapısı önce bu alana, yoksa `Alici Telefon`'a bakar
+> (`src/lib/storeos/inbound.ts`, kapı 4).
 
 ## 8. `DenetimKaydi` — APPEND-ONLY
 
