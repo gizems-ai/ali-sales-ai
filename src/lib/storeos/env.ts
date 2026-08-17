@@ -40,6 +40,13 @@ export const env = {
   get n8nGidenWebhookVarsa() { return istege('STOREOS_N8N_WA_WEBHOOK_URL') },
 
   /**
+   * Panel → n8n paylaşılan sırrı. n8n webhook'u genel internete açıktır;
+   * bu token olmadan orası "herkesin WhatsApp gönderebildiği bir uç" olurdu.
+   * Boşsa header gönderilmez ve n8n 401 döner — sessizce açık kalmaz.
+   */
+  get n8nGidenToken() { return istege('STOREOS_N8N_WA_TOKEN').trim() },
+
+  /**
    * Eskalasyon kontrolünü makineden (cron) tetiklemek için token.
    * ZORUNLU DEĞİL: tanımlı değilse makine yolu KAPALIDIR ve uç nokta yalnız
    * Clerk oturumuyla çağrılabilir. "Tanımsızsa herkese açık" davranışı

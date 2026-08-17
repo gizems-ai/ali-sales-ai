@@ -30,7 +30,7 @@ export function kanal(): KanalArayuzu {
     // yüzünden görev üretimi de dururdu. Boş URL ile kurup gönderimi
     // başarısız bırakmak, hatayı doğru halkada tutar.
     if (!KUTU.__storeosWaKanal) {
-      KUTU.__storeosWaKanal = kilitle(new WhatsAppKanali(env.n8nGidenWebhookVarsa))
+      KUTU.__storeosWaKanal = kilitle(new WhatsAppKanali(env.n8nGidenWebhookVarsa, env.n8nGidenToken))
     }
     return KUTU.__storeosWaKanal
   }

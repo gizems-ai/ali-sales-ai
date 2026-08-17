@@ -33,7 +33,13 @@ export class WhatsAppKanali implements KanalArayuzu {
   /** Gerçek telefona çıkar — demo telefon kilidi burada FAIL-CLOSED. */
   readonly disaCikar = true
 
-  constructor(private readonly webhookUrl: string) {}
+  /**
+   * @param webhookUrl STOREOS_N8N_WA_WEBHOOK_URL
+   * @param token      STOREOS_N8N_WA_TOKEN — n8n tarafındaki kapının sırrı.
+   *                   Boş bırakılırsa header hiç gönderilmez ve n8n 401 döner;
+   *                   "token yoksa serbest geç" davranışı bilinçli olarak yok.
+   */
+  constructor(private readonly webhookUrl: string, private readonly token = '') {}
 
   async gonder(m: GidenMesaj): Promise<GonderimSonucu> {
     if (!this.webhookUrl) {
@@ -61,13 +67,18 @@ export class WhatsAppKanali implements KanalArayuzu {
     try {
       const y = await fetch(this.webhookUrl, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: {
+          'content-type': 'application/json',
+          ...(this.token ? { 'x-storeos-token': this.token } : {}),
+        },
         body: JSON.stringify(govde),
         signal: iptal.signal,
       })
       const metin = await y.text()
       if (!y.ok) {
         // 5xx tekrar denenebilir, 4xx bizim gövdemiz yanlış demektir.
+        // 401/403 = kapı reddetti (token yanlış ya da numara izin listesinde
+        // değil) — tekrar denemek düzeltmez, yapılandırma değişmeli.
         return {
           basarili: false,
           hata: `n8n ${y.status}: ${metin.slice(0, 300)}`,

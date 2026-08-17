@@ -3,6 +3,7 @@
 //
 //     npx -y tsx scripts/storeos/zincir-demo.ts
 //     npx -y tsx scripts/storeos/zincir-demo.ts --sessiz     (mesaj gövdesi yok)
+//     npx -y tsx scripts/storeos/zincir-demo.ts --gercek-wa  (GERÇEK telefona)
 //
 //  Koştuğu hat:
 //     olay POST → kural eşleşir → görev doğar → bildirim üretilir → kanala
@@ -11,7 +12,11 @@
 //
 //  HTTP KULLANMAZ. `olaylariAl` ve `yanitiIsle` doğrudan çağrılır — sunucu
 //  ayakta olmadan, Airtable olmadan, telefon olmadan koşar. Kanal 'konsol'.
-//  Gerçek WhatsApp'ı denemek için: STOREOS_KANAL=whatsapp + webhook URL.
+//
+//  `--gercek-wa` verilirse kanal env'den seçilir (STOREOS_KANAL=whatsapp ⇒
+//  n8n → 360Dialog → telefon). GERÇEK MESAJ GİDER. Demo telefon kilidi açık
+//  olduğu için hedef STOREOS_DEMO_TELEFON'dur; buton yanıtı hâlâ simüle
+//  edilir (360Dialog gelen webhook'u echo bot'a bağlı — bkz. n8n-storeos.md).
 //
 //  ÇIKIŞ KODU: her halka yeşilse 0, bir halka bile kırmızıysa 1.
 //  Bu yüzden hem demo hem sağlık kontrolü — kontroller.mjs bunu çalıştırır.
@@ -21,13 +26,14 @@ import { bellekDeposunuZorla } from '../../src/lib/storeos/depo'
 import type { Depo } from '../../src/lib/storeos/depo'
 import { eskalasyonKontrol } from '../../src/lib/storeos/eskalasyon'
 import { yanitiIsle } from '../../src/lib/storeos/inbound'
-import { konsolKanaliniZorla } from '../../src/lib/storeos/kanal'
+import { kanal as kanaliSec, konsolKanaliniZorla } from '../../src/lib/storeos/kanal'
 import { sahteButonYaniti } from '../../src/lib/storeos/kanal/sahte-inbound'
 import { listeTopla } from '../../src/lib/storeos/liste/toplayici'
 import { BOS_FILTRE } from '../../src/lib/storeos/liste/tipler'
 import { olaylariAl } from '../../src/lib/storeos/olay-alim'
 
 const SESSIZ = process.argv.includes('--sessiz')
+const GERCEK_WA = process.argv.includes('--gercek-wa')
 const MAGAZA = '0178'
 
 // Sabit zaman: çıktı iki koşuda birebir aynı olsun (Math.random yok, Date.now yok).
@@ -51,7 +57,7 @@ function baslik(s: string): void {
 async function main(): Promise<void> {
   const depo: Depo = bellekDeposunuZorla()
   await depo.sifirla()
-  const kanal = konsolKanaliniZorla()
+  const kanal = GERCEK_WA ? kanaliSec() : konsolKanaliniZorla()
 
   console.log('\n══ STORE OS — ZİNCİR DEMOSU ═══════════════════════════════════')
   console.log(`   Depo: ${depo.ad}   ·   Kanal: ${kanal.ad}   ·   Mağaza: ${MAGAZA}`)
