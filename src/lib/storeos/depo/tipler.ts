@@ -55,6 +55,14 @@ export interface GorevDeposu {
 
 export interface BildirimDeposu {
   olustur(bildirim: Bildirim): Promise<Bildirim>
+  /**
+   * IDEMPOTENT YAZIM — `OlayDeposu.yazIlkKez` ile aynı gerekçe.
+   * Bildirim ID deterministiktir (`b-<GorevNo>-<kademe>`), yani "bu görev için
+   * bu bildirim gitti mi?" sorusu okuma yapmadan cevaplanabilir. Kural iki kez
+   * tetiklenirse kullanıcı iki mesaj almaz.
+   * Dönüş `ilkKez=false` ise `bildirim` MEVCUT kayıttır, yeni yazılan değil.
+   */
+  olusturIlkKez(bildirim: Bildirim): Promise<{ ilkKez: boolean; bildirim: Bildirim }>
   getir(bildirimId: string): Promise<Bildirim | null>
   /** 360Dialog inbound eşleşmesi — sağlayıcı mesaj id'sinden bul. */
   saglayiciMesajIdIle(mesajId: string): Promise<Bildirim | null>

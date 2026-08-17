@@ -5,8 +5,12 @@
 //    node scripts/storeos/kontroller.mjs
 //
 //  Sırayla: TypeScript · import kuralı · CSS kapsamı · sözleşme doğrulama · imza ·
-//  idempotency · durum makinesi · adapter · pano · liste. Herhangi biri düşerse
-//  çıkış kodu 1.
+//  idempotency · durum makinesi · adapter · pano · liste · zincir birimleri ·
+//  zincir uçtan uca. Herhangi biri düşerse çıkış kodu 1.
+//
+//  SON ADIM UÇTAN UCA KOŞAR: olay → kural → görev → bildirim → kanal → buton
+//  yanıtı → durum değişimi → denetim → panel. Yani bu komut yeşilse zincirin
+//  tamamı yeşildir; ayrıca elle bakmak gerekmez.
 //
 //  NEDEN package.json'a script eklenmedi: package.json onaylı istisna listesinde
 //  değil. Bu dosya scripts/storeos/ içinde, izole ağacın içinde kalıyor.
@@ -26,6 +30,8 @@ const ADIMLAR = [
   ['Adapter dönüşümü',               'npx', ['-y', 'tsx', 'src/lib/storeos/adapters/adapter.test.ts']],
   ['Pano toplayıcı',                 'npx', ['-y', 'tsx', 'src/lib/storeos/dashboard/pano.test.ts']],
   ['Liste toplayıcı (3 ekran)',      'npx', ['-y', 'tsx', 'src/lib/storeos/liste/liste.test.ts']],
+  ['Zincir (kanal/bildirim/yetki)',  'npx', ['-y', 'tsx', 'src/lib/storeos/zincir.test.ts']],
+  ['Zincir uçtan uca (12 halka)',    'npx', ['-y', 'tsx', 'scripts/storeos/zincir-demo.ts', '--sessiz']],
 ]
 
 const dusen = []

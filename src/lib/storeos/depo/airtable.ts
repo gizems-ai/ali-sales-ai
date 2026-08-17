@@ -128,6 +128,17 @@ export class AirtableDeposu implements Depo {
       await olustur<Bildirim>(TABLO.bildirimler, [b])
       return b
     },
+    // OKU-SONRA-YAZ: Airtable'da koşullu yazma yok. Yarış penceresi bir
+    // istek genişliğindedir ve bildirim üretimi tek hattan (olay alımı /
+    // eskalasyon cron'u) aktığı için pratikte kapalıdır. Gerçek garanti
+    // Airtable'da 'Bildirim ID' alanına konacak UNIQUE kısıtıdır — kurulum
+    // dokümanına yazıldı. Bellek deposunda bu çağrı zaten atomiktir.
+    olusturIlkKez: async (b) => {
+      const k = await tekil<Bildirim>(TABLO.bildirimler, `{Bildirim ID} = ${alintila(b['Bildirim ID'])}`)
+      if (k) return { ilkKez: false, bildirim: alanlar(k) }
+      await olustur<Bildirim>(TABLO.bildirimler, [b])
+      return { ilkKez: true, bildirim: b }
+    },
     getir: async (id) => {
       const k = await tekil<Bildirim>(TABLO.bildirimler, `{Bildirim ID} = ${alintila(id)}`)
       return k ? alanlar(k) : null

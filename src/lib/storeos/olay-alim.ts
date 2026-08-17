@@ -3,20 +3,23 @@
 //
 //  Zincirin tek gövdesi:
 //    ham payload → adapter → doğrulama → idempotency → kayıt → kural motoru
-//                → görev → denetim
+//                → görev → BİLDİRİM → kanal → denetim
 //
 //  HTTP'den BAĞIMSIZ. Route bunu çağırır, simülatör de doğrudan çağırabilir.
 //  Böylece zincir sunucu ayakta olmadan da uçtan uca koşturulabiliyor.
 // ════════════════════════════════════════════════════════════════════════════
 
 import { adapterSec } from './adapters'
+import { gorevIcinIlkBildirim } from './bildirim'
 import type { Depo } from './depo'
 import { DENETIM_AKSIYONLARI, denetimYaz } from './denetim'
 import { kuraldanGorevUret } from './gorev'
+import { kanal as varsayilanKanal } from './kanal'
+import type { KanalArayuzu } from './kanal/tipler'
 import { degerlendir } from './kural-motoru'
 import { govdeyiDiziyeCevir } from './olay-sozlesmesi'
 import type { AlanHatasi, UyariKodu, VisionEvent } from './olay-sozlesmesi'
-import type { OlayKaydi } from './tipler'
+import type { Kanal, OlayKaydi } from './tipler'
 
 export type OlaySonucDurumu = 'kabul' | 'yinelenen' | 'reddedildi'
 
@@ -32,6 +35,8 @@ export interface OlaySonucu {
   /** Kural motoru özeti — "neden görev çıktı / çıkmadı". */
   kuralOzeti?: string
   uretilenGorevler?: string[]
+  /** Görev başına bildirim sonucu — "mesaj gitti mi?" tek bakışta. */
+  bildirimler?: { gorevNo: string; durum: string; bildirimId?: string; not?: string }[]
 }
 
 export interface AlimSonucu {
@@ -60,6 +65,12 @@ export interface AlimGirdi {
   ip?: string
   /** Test edilebilirlik: alım zamanı. */
   simdi?: string
+  /**
+   * Bildirimin çıkacağı kanal. Verilmezse env'den seçilir (STOREOS_KANAL).
+   * Testler ve zincir demosu burayı doldurarak gerçek HTTP'ye çıkmadan
+   * uçtan uca koşabiliyor.
+   */
+  kanal?: KanalArayuzu
 }
 
 function olayaKayit(olay: VisionEvent, adapterAdi: string, alindi: string): OlayKaydi {
@@ -99,6 +110,7 @@ export async function olaylariAl(g: AlimGirdi): Promise<AlimSonucu> {
   }
 
   const adapter = secim.adapter
+  const kanalUygulamasi = g.kanal ?? varsayilanKanal()
   const sonuclar: OlaySonucu[] = []
   const tumUyariKodlari = new Set<UyariKodu>()
   let kabul = 0, yinelenen = 0, reddedilen = 0
@@ -175,6 +187,7 @@ export async function olaylariAl(g: AlimGirdi): Promise<AlimSonucu> {
     // ── 4. Görev üretimi ──
     const magaza = await d.referans.magaza(olay.storeCode)
     const uretilen: string[] = []
+    const bildirimler: NonNullable<OlaySonucu['bildirimler']> = []
     for (const { kural, karar } of motor.eslesenler) {
       const atanan = await d.referans.rolIcinKullanici(olay.storeCode, kural['Hedef Rol'])
       const gorev = await kuraldanGorevUret(d, {
@@ -183,7 +196,26 @@ export async function olaylariAl(g: AlimGirdi): Promise<AlimSonucu> {
         atananKullaniciId: atanan?.['Kullanici ID'],
         simdi: alindi,
       })
-      if (gorev) uretilen.push(gorev['Gorev No'])
+      if (!gorev) continue
+      uretilen.push(gorev['Gorev No'])
+
+      // ── 5. Bildirim ──
+      // Gönderim hatası zinciri KIRMAZ: görev zaten oluştu ve panelde duruyor.
+      // Hata bildirim kaydında 'hata' olarak kalır, sessizce yutulmaz.
+      const bs = await gorevIcinIlkBildirim({
+        depo: d, kanal: kanalUygulamasi, gorev,
+        hedefKanal: (kural['Bildirim Kanali'] ?? 'panel') as Kanal,
+        simdi: alindi,
+      })
+      bildirimler.push(
+        bs.durum === 'alici_yok'
+          ? { gorevNo: gorev['Gorev No'], durum: bs.durum, not: bs.sebep }
+          : {
+              gorevNo: gorev['Gorev No'], durum: bs.durum,
+              bildirimId: bs.bildirim['Bildirim ID'],
+              not: bs.durum === 'hata' ? bs.hata : undefined,
+            },
+      )
     }
 
     await d.olaylar.isaretle(olay.id, {
@@ -198,6 +230,7 @@ export async function olaylariAl(g: AlimGirdi): Promise<AlimSonucu> {
       uyariKodlari: cevrim.uyariKodlari,
       kuralOzeti: motor.ozet,
       uretilenGorevler: uretilen,
+      bildirimler,
     })
   }
 

@@ -24,10 +24,15 @@ export const DENETIM_AKSIYONLARI = {
   gorevOlusturuldu: 'gorev.olusturuldu',
   gorevDurum:       'gorev.durum',
   gorevGecisRed:    'gorev.gecis_reddedildi',
+  gorevErtelendi:   'gorev.ertelendi',
+  gorevDevredildi:  'gorev.devredildi',
+  gorevYetkiRed:    'gorev.yetki_reddedildi',
   bildirimKuyruk:   'bildirim.kuyruga_alindi',
   bildirimGonderim: 'bildirim.gonderildi',
   bildirimYanit:    'bildirim.yanit',
   bildirimHata:     'bildirim.hata',
+  bildirimCozulemedi: 'bildirim.cozulemedi',
+  eskalasyon:       'eskalasyon.tetiklendi',
 } as const
 
 export type DenetimAksiyonu = (typeof DENETIM_AKSIYONLARI)[keyof typeof DENETIM_AKSIYONLARI]

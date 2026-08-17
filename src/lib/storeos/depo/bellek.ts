@@ -259,6 +259,12 @@ export class BellekDeposu implements Depo {
       this.d.bildirimler.set(b['Bildirim ID'], { ...b })
       return { ...b }
     },
+    olusturIlkKez: async (b) => {
+      const mevcut = this.d.bildirimler.get(b['Bildirim ID'])
+      if (mevcut) return { ilkKez: false, bildirim: { ...mevcut } }
+      this.d.bildirimler.set(b['Bildirim ID'], { ...b })
+      return { ilkKez: true, bildirim: { ...b } }
+    },
     getir: async (id) => this.d.bildirimler.get(id) ?? null,
     saglayiciMesajIdIle: async (mesajId) =>
       [...this.d.bildirimler.values()].find(b => b['Saglayici Mesaj ID'] === mesajId) ?? null,

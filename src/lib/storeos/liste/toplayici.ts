@@ -299,6 +299,12 @@ const AKSIYON_ETIKETLERI: Record<string, string> = {
   'bildirim.gonderildi':      'Bildirim gönderildi',
   'bildirim.yanit':           'Bildirime yanıt geldi',
   'bildirim.hata':            'Bildirim hatası',
+  // Gün 5 — zincirin gelen yönü
+  'gorev.ertelendi':          'Görev ertelendi',
+  'gorev.devredildi':         'Görev devredildi',
+  'gorev.yetki_reddedildi':   'Yetki reddedildi',
+  'bildirim.cozulemedi':      'Yanıt çözülemedi',
+  'eskalasyon.tetiklendi':    'Eskalasyon tetiklendi',
 }
 
 function aksiyonEtiketi(a: string): string {

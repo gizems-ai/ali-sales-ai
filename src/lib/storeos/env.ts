@@ -27,6 +27,20 @@ export const env = {
   /** Panel → n8n giden WhatsApp webhook'u. */
   get n8nGidenWebhook() { return zorunlu('STOREOS_N8N_WA_WEBHOOK_URL') },
 
+  /**
+   * Aynı değişkenin FIRLATMAYAN okuması. Kanal kurucusu bunu kullanır:
+   * yapılandırma eksikliği gönderimi başarısız yapmalı, olay alımını değil.
+   */
+  get n8nGidenWebhookVarsa() { return istege('STOREOS_N8N_WA_WEBHOOK_URL') },
+
+  /**
+   * Eskalasyon kontrolünü makineden (cron) tetiklemek için token.
+   * ZORUNLU DEĞİL: tanımlı değilse makine yolu KAPALIDIR ve uç nokta yalnız
+   * Clerk oturumuyla çağrılabilir. "Tanımsızsa herkese açık" davranışı
+   * bilinçli olarak yok.
+   */
+  get cronToken() { return istege('STOREOS_CRON_TOKEN') },
+
   /** Aktif bildirim kanalı. Gerçek 360Dialog hattı bağlanana kadar 'konsol'. */
   get kanal(): 'whatsapp' | 'konsol' {
     return istege('STOREOS_KANAL', 'konsol') === 'whatsapp' ? 'whatsapp' : 'konsol'

@@ -65,13 +65,24 @@ export interface GecisGirdi {
   /** 'Başkasına ata' akışı — atanan kullanıcıyı da değiştirir. */
   yeniAtanan?: string
   not?: string
+  /**
+   * İYİMSER KİLİT. Çağıran, görevi hangi durumda GÖRDÜĞÜNÜ söyler. Kayıt o
+   * durumda değilse geçiş uygulanmaz ve `cakisma` döner (API'de 409).
+   *
+   * Neden gerekli: iki kişi aynı anda "Kabul Et"e basarsa ikisinin de geçişi
+   * geçerlidir (atandi → basladi) ve ikisi de başarılı yanıt alır — ama işi
+   * kimin aldığı belirsiz kalır. Beklenen durum verildiğinde ikincisi 409
+   * alır ve ekranı tazeler. Verilmezse (ör. sistem/cron çağrıları) kontrol
+   * atlanır; bu bilinçli bir kolaylık, çünkü eskalasyonun kimseyle yarışı yok.
+   */
+  beklenenDurum?: GorevDurumu
   /** Test edilebilirlik. */
   simdi?: string
 }
 
 export type GecisSonucu =
   | { basarili: true; gorev: Gorev }
-  | { basarili: false; sebep: string; kod: 'bulunamadi' | 'gecersiz_gecis' }
+  | { basarili: false; sebep: string; kod: 'bulunamadi' | 'gecersiz_gecis' | 'cakisma' }
 
 /** Durum → hangi zaman damgası alanına yazılır. */
 const ZAMAN_ALANI: Partial<Record<GorevDurumu, keyof Gorev>> = {
@@ -84,6 +95,22 @@ export async function gecisYap(d: Depo, g: GecisGirdi): Promise<GecisSonucu> {
   const mevcut = await d.gorevler.getir(g.gorevNo)
   if (!mevcut) {
     return { basarili: false, kod: 'bulunamadi', sebep: `Görev bulunamadı: ${g.gorevNo}` }
+  }
+
+  // ── İyimser kilit: geçiş kurallarından ÖNCE bakılır ──
+  // Sıra önemli: çakışmayı "geçersiz geçiş" diye raporlamak yanıltıcı olur.
+  // Kullanıcı yanlış bir şey yapmadı; sadece ekranı bayatlamıştı.
+  if (g.beklenenDurum && mevcut['Durum'] !== g.beklenenDurum) {
+    const sebep = `Görev artık '${mevcut['Durum']}' durumunda (siz '${g.beklenenDurum}' görüyordunuz). Başka biri değiştirmiş olabilir.`
+    await denetimYaz(d, {
+      aktor: g.aktor, aktorTipi: g.aktorTipi,
+      aksiyon: DENETIM_AKSIYONLARI.gorevGecisRed,
+      entityTipi: 'gorev', entityId: g.gorevNo,
+      oncesi: { durum: mevcut['Durum'] },
+      sonrasi: { istenenDurum: g.hedef, beklenenDurum: g.beklenenDurum, red: 'cakisma' },
+      kaynak: g.kaynak, zaman: g.simdi,
+    })
+    return { basarili: false, kod: 'cakisma', sebep }
   }
 
   const sebep = gecisSebebi(mevcut['Durum'], g.hedef)
@@ -118,6 +145,64 @@ export async function gecisYap(d: Depo, g: GecisGirdi): Promise<GecisSonucu> {
   })
 
   return { basarili: true, gorev: yeni }
+}
+
+// ─── Erteleme ────────────────────────────────────────────────────────────────
+
+/**
+ * '5 Dakika Ertele' butonunun karşılığı.
+ *
+ * TASARIM KARARI — erteleme DURUM DEĞİŞTİRMEZ, son teslimi öteler.
+ * Alternatif 'beklemede'ye geçirmekti; reddedildi çünkü 'beklemede' "iş
+ * başlamış ama duruyor" demek. Ertelemede iş henüz başlamamıştır; durumu
+ * beklemede yapmak paneli ve eskalasyon sayaçlarını yanlış bilgilendirirdi.
+ * Ayrıca geçiş tablosuna yalnız bu buton için yeni kenar eklemek gerekirdi.
+ *
+ * Bedeli: erteleme durum sütununda görünmez. Karşılığı, denetim kaydındaki
+ * `gorev.ertelendi` satırı ve panelde okunabilen yeni 'Son Teslim'.
+ */
+export const ERTELEME_DAKIKA = 5
+
+export type ErtelemeSonucu =
+  | { basarili: true; gorev: Gorev; yeniSonTeslim: string }
+  | { basarili: false; sebep: string; kod: 'bulunamadi' | 'nihai_durum' }
+
+export async function gorevErtele(d: Depo, g: {
+  gorevNo: string
+  dakika?: number
+  aktor: string
+  aktorTipi: 'kullanici' | 'system' | 'partner'
+  kaynak: 'api' | 'panel' | 'n8n' | 'cron' | 'simulator'
+  simdi?: string
+}): Promise<ErtelemeSonucu> {
+  const mevcut = await d.gorevler.getir(g.gorevNo)
+  if (!mevcut) return { basarili: false, kod: 'bulunamadi', sebep: `Görev bulunamadı: ${g.gorevNo}` }
+  if (nihaiMi(mevcut['Durum'])) {
+    return {
+      basarili: false, kod: 'nihai_durum',
+      sebep: `'${mevcut['Durum']}' nihai bir durum; görev ertelenemez.`,
+    }
+  }
+
+  const simdi = g.simdi ?? new Date().toISOString()
+  const dakika = g.dakika ?? ERTELEME_DAKIKA
+  // Taban ŞU AN, eski son teslim değil: zaten gecikmiş bir görevde eski
+  // teslime 5 dk eklemek yine geçmişte bir tarih üretirdi.
+  const taban = Math.max(Date.parse(mevcut['Son Teslim']), Date.parse(simdi))
+  const yeniSonTeslim = new Date(taban + dakika * 60_000).toISOString()
+
+  const yeni = await d.gorevler.guncelle(g.gorevNo, { 'Son Teslim': yeniSonTeslim })
+
+  await denetimYaz(d, {
+    aktor: g.aktor, aktorTipi: g.aktorTipi,
+    aksiyon: DENETIM_AKSIYONLARI.gorevErtelendi,
+    entityTipi: 'gorev', entityId: g.gorevNo,
+    oncesi: { sonTeslim: mevcut['Son Teslim'], durum: mevcut['Durum'] },
+    sonrasi: { sonTeslim: yeniSonTeslim, dakika, not: 'Durum değişmedi — erteleme yalnız son teslimi öteler.' },
+    kaynak: g.kaynak, zaman: simdi,
+  })
+
+  return { basarili: true, gorev: yeni, yeniSonTeslim }
 }
 
 // ─── Kuraldan görev üretimi ──────────────────────────────────────────────────
