@@ -132,16 +132,59 @@ async function yaz(tablo: string, kayitlar: Record<string, unknown>[]) {
   console.log(`  [yazildi] ${tablo.padEnd(14)} ${String(kayitlar.length).padStart(3)} kayit`)
 }
 
-/** YALNIZ Veri Tipi='demo' kayıtları siler. 'gercek' işaretliye dokunmaz. */
-async function demoyuSil(tablo: string) {
-  const { records } = await at(tablo, { method: 'GET' }, `?filterByFormula=${encodeURIComponent("{Veri Tipi}='demo'")}&pageSize=100`)
-  if (!records.length) { console.log(`  [sifirla] ${tablo.padEnd(14)} silinecek demo kaydi yok`); return }
-  if (!YAZ) { console.log(`  [kuru-sifirla] ${tablo.padEnd(14)} ${records.length} demo kaydi silinecekti`); return }
-  for (let i = 0; i < records.length; i += 10) {
-    const q = records.slice(i, i + 10).map((r: { id: string }) => `records[]=${r.id}`).join('&')
-    await at(tablo, { method: 'DELETE' }, `?${q}`)
+/**
+ * Sıfırlanacak tablolar ve her birinin silme politikası.
+ *
+ * ⚠ TABLO.denetim BU LİSTEDE YOK ve EKLENMEYECEK — append-only (kabul kriteri 5).
+ *   Silme yolu yalnız burada var; denetim buraya girerse garanti kalkar.
+ *
+ * `veriTipi: true`  → yalnız `Veri Tipi='demo'` satırları silinir ('gercek' korunur).
+ * `veriTipi: false` → tablonun TAMAMI silinir. Bu tablolarda `Veri Tipi` alanı
+ *   yok; hepsi tanımı gereği demo kurulum verisidir.
+ *
+ * 17 Ağu — CANLI KOŞUDA YAKALANAN İKİ HATA (bu liste onun düzeltmesidir):
+ *   1. Referans tablolar sıfırlanmıyordu ama `--yaz` yine ekliyordu:
+ *      Kurallar 6→12, Magazalar 1→2 oldu. Çift kural = HER OLAYDA ÇİFT GÖREV
+ *      ve ÇİFT WhatsApp mesajı. Provada fark edilmesi zor, jüri önünde ölümcül.
+ *   2. Bildirimler hiç silinmiyordu. `Bildirim ID` deterministiktir
+ *      (`b-<GorevNo>-<kademe>`); ikinci provada aynı G-000001 doğduğunda
+ *      `olusturIlkKez` "zaten var" der ve MESAJ HİÇ GİTMEZ.
+ */
+const SIFIRLANACAK: { tablo: string; veriTipi: boolean }[] = [
+  { tablo: TABLO.metrikler,    veriTipi: true  },
+  { tablo: TABLO.gorevler,     veriTipi: true  },
+  { tablo: TABLO.olaylar,      veriTipi: true  },
+  { tablo: TABLO.bildirimler,  veriTipi: false },
+  { tablo: TABLO.magazalar,    veriTipi: false },
+  { tablo: TABLO.kameralar,    veriTipi: false },
+  { tablo: TABLO.kullanicilar, veriTipi: false },
+  { tablo: TABLO.kurallar,     veriTipi: false },
+]
+
+async function sil(tablo: string, veriTipi: boolean) {
+  const sorgu = veriTipi
+    ? `?filterByFormula=${encodeURIComponent("{Veri Tipi}='demo'")}&pageSize=100`
+    : '?pageSize=100'
+  const etiket = veriTipi ? 'demo kaydi' : 'kayit'
+
+  // Airtable sayfa başına en fazla 100 döner; tablo daha büyükse tur tur boşalt.
+  let toplam = 0
+  for (;;) {
+    const { records } = await at(tablo, { method: 'GET' }, sorgu)
+    if (!records.length) break
+    if (!YAZ) {
+      console.log(`  [kuru-sifirla] ${tablo.padEnd(14)} ${records.length} ${etiket} silinecekti`)
+      return
+    }
+    for (let i = 0; i < records.length; i += 10) {
+      const q = records.slice(i, i + 10).map((r: { id: string }) => `records[]=${r.id}`).join('&')
+      await at(tablo, { method: 'DELETE' }, `?${q}`)
+    }
+    toplam += records.length
+    if (records.length < 100) break
   }
-  console.log(`  [sifirla] ${tablo.padEnd(14)} ${records.length} demo kaydi silindi`)
+  if (!toplam) { console.log(`  [sifirla] ${tablo.padEnd(14)} silinecek ${etiket} yok`); return }
+  console.log(`  [sifirla] ${tablo.padEnd(14)} ${toplam} ${etiket} silindi`)
 }
 
 // ─── Ana akış ────────────────────────────────────────────────────────────────
@@ -156,9 +199,14 @@ async function main() {
   console.log(`Base: ${BASE.slice(0, 8)}…\n`)
 
   if (SIFIRLA) {
-    console.log('Sifirlama (yalniz Veri Tipi=demo):')
-    for (const t of [TABLO.metrikler, TABLO.gorevler, TABLO.olaylar]) await demoyuSil(t)
+    console.log(`Sifirlama (DenetimKaydi HARIC — append-only):`)
+    for (const { tablo, veriTipi } of SIFIRLANACAK) await sil(tablo, veriTipi)
     console.log('')
+  } else if (YAZ) {
+    // --sifirla'siz --yaz referans tablolara EKLER, uzerine yazmaz. Ikinci kez
+    // kosulursa kurallar cift olur ve her olay iki gorev uretir (17 Agu'da oldu).
+    console.log('UYARI: --sifirla verilmedi. Referans tablolar TEMIZLENMEDEN uzerine')
+    console.log('       eklenecek. Bos olmayan bir base\'de bu KAYITLARI CIFTLER.\n')
   }
 
   console.log('Yazma:')

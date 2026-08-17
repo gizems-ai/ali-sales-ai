@@ -1,12 +1,12 @@
 // ════════════════════════════════════════════════════════════════════════════
 //  Store OS — AIRTABLE DEPOSU
 //
-//  ⚠ DURUM: CANLI BASE'E KARŞI DOĞRULANMADI (Gün 2).
-//  Kod eksiksiz yazıldı ama base id/key gelmediği için tek bir HTTP isteği bile
-//  yapılmadı. Gün 3'te `sema-dogrula` + `seed --yaz` + zincir demosu bu depoyla
-//  koşulacak; o koşu geçmeden "çalışıyor" denmeyecek.
+//  ✔ DURUM: CANLI BASE'E KARŞI DOĞRULANDI — 17 Ağustos 2026, `Ali Store OS`
+//    (appXHVi7l5zzxLiGg). `depo/uygunluk.test.ts --airtable` bu uygulamayı
+//    bellek deposuyla AYNI 51 iddiaya soktu; hepsi geçti. Ayrıca gerçek zincir
+//    (olay→kural→görev→bildirim→buton yanıtı) bu depoyla uçtan uca koştu.
 //
-//  Bilinen açık noktalar (Gün 3'te kapanacak):
+//  Bilinen açık noktalar (kabul edilmiş, demo kapsamı dışına ertelendi):
 //   · yazIlkKez() Airtable'da ATOMİK DEĞİL. Airtable unique constraint sunmuyor;
 //     oku-sonra-yaz arasında yarış penceresi var. Aynı olay id'si aynı anda iki
 //     lambda'ya düşerse iki kayıt oluşabilir. Azaltma: okuma+yazma arası tek

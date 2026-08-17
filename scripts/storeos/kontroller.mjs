@@ -31,6 +31,11 @@ const ADIMLAR = [
   ['Pano toplayıcı',                 'npx', ['-y', 'tsx', 'src/lib/storeos/dashboard/pano.test.ts']],
   ['Liste toplayıcı (3 ekran)',      'npx', ['-y', 'tsx', 'src/lib/storeos/liste/liste.test.ts']],
   ['Demo telefon kilidi',            'npx', ['-y', 'tsx', 'src/lib/storeos/kanal/telefon-kilidi.test.ts']],
+  // --airtable BİLEREK VERİLMİYOR: kontroller çevrimdışı koşabilmeli ve canlı
+  // base'e yazmamalı. Airtable tarafını doğrulamak için elle:
+  //   set -a; . ./.env.local; set +a
+  //   npx -y tsx src/lib/storeos/depo/uygunluk.test.ts --airtable
+  ['Depo uygunluk (ortak sözleşme)', 'npx', ['-y', 'tsx', 'src/lib/storeos/depo/uygunluk.test.ts']],
   ['Zincir (kanal/bildirim/yetki)',  'npx', ['-y', 'tsx', 'src/lib/storeos/zincir.test.ts']],
   ['Zincir uçtan uca (12 halka)',    'npx', ['-y', 'tsx', 'scripts/storeos/zincir-demo.ts', '--sessiz']],
 ]

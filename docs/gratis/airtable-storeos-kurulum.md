@@ -6,9 +6,34 @@ de aynı kaynağı kullanır.
 
 ---
 
-## 0. Başlamadan
+> ## ⚠ BU BÖLÜM ARTIK ELLE YAPILMIYOR — 17 Ağustos 2026
+>
+> Base **programatik olarak** kuruldu:
+>
+> ```
+> npx -y tsx scripts/storeos/airtable-kur.ts            # kuru çalışma: ne kuracağını basar
+> npx -y tsx scripts/storeos/airtable-kur.ts --uygula   # Meta API ile gerçekten kurar
+> ```
+>
+> | | |
+> |---|---|
+> | **Base adı** | `Ali Store OS` (bu dokümandaki eski `GRATIS_STOREOS_DEMO` değil) |
+> | **Base ID** | `appXHVi7l5zzxLiGg` |
+> | **Kapsam** | 9 tablo · 110 alan · tek Meta API isteği |
+> | **Doğrulama** | `sema-dogrula.ts` → ŞEMA TAMAM · `depo/uygunluk.test.ts --airtable` → 51/51 |
+>
+> Aşağıdaki tablolar **şemanın otoritesi olarak** duruyor (alan adı/tip değişecekse
+> önce `tipler.ts`, sonra burası, sonra `airtable-kur.ts`). Elle kurulum adımları
+> yalnız base'i sıfırdan yeniden yaratmak gerekirse geçerlidir.
+>
+> **TUZAK — `precision`:** aşağıdaki tablolarda "precision `1` (tam sayı)" yazan
+> her yer **UI dilidir**. Meta API'de `precision` = ondalık basamak SAYISI, yani
+> tam sayı için `precision: 0`'dır. `1` yazılırsa Airtable `12.0` gösterir.
+> `airtable-kur.ts` doğru değeri (`0`) kullanır.
 
-1. Airtable'da **yeni bir base** aç. Adı: `GRATIS_STOREOS_DEMO`.
+## 0. Başlamadan (elle kurulum — arşiv)
+
+1. Airtable'da **yeni bir base** aç. Adı: `Ali Store OS`.
    Mevcut base'lerin (emlak `appGYQQR…`, sigorta `appjULA…`) hiçbirine dokunma.
 2. Base açılınca Airtable otomatik `Table 1` oluşturur ve içine `Name`, `Notes`,
    `Assignee`, `Status` alanları koyar. **`Notes`, `Assignee`, `Status` alanlarını sil.**
@@ -225,10 +250,28 @@ URL-encode'unda mevcut panelde tekrarlayan kaçış hatalarına yol açtı.
    ```
 3. Seed'i çalıştır:
    ```bash
-   npx -y tsx scripts/storeos/seed.ts          # ne yazacağını gösterir, yazmaz
-   npx -y tsx scripts/storeos/seed.ts --yaz    # gerçekten yazar
-   npx -y tsx scripts/storeos/seed.ts --sifirla --yaz   # demo kayıtlarını silip yeniden yazar
+   npx -y tsx scripts/storeos/seed.ts                   # ne yazacağını gösterir, yazmaz
+   npx -y tsx scripts/storeos/seed.ts --sifirla --yaz   # ← PROVA ARASI KOMUT BUDUR
    ```
 
-`--sifirla` **yalnız `Veri Tipi = demo`** olan kayıtları siler; `gercek`
-işaretli hiçbir şeye dokunmaz.
+   > **`--yaz`'ı `--sifirla` olmadan İKİNCİ kez çalıştırma.** Referans tablolar
+   > temizlenmeden üzerine eklenir; kurallar çiftlenir ve **her olay iki görev,
+   > iki WhatsApp mesajı** üretir. Script artık bu durumda uyarı basıyor.
+
+4. Depoyu canlı base'e karşı doğrula (bellek deposuyla aynı sözleşmeyi tuttuğunu
+   kanıtlar; kendi test kayıtlarını siler):
+   ```bash
+   npx -y tsx src/lib/storeos/depo/uygunluk.test.ts --airtable
+   ```
+
+### `--sifirla` ne siler, ne silmez
+
+| Tablo | Politika |
+|---|---|
+| `Metrikler`, `Gorevler`, `Olaylar` | yalnız `Veri Tipi='demo'` — `gercek` korunur |
+| `Bildirimler` | **tamamı** — `Bildirim ID` deterministiktir (`b-<GorevNo>-<kademe>`); eski satır kalırsa ikinci provada mesaj HİÇ GİTMEZ |
+| `Magazalar`, `Kameralar`, `Kullanicilar`, `Kurallar` | **tamamı** — `Veri Tipi` alanı yok, hepsi kurulum verisi; silinmezse `--yaz` çiftler |
+| `DenetimKaydi` | **HİÇBİR ŞEY** — append-only, listede bilerek yok |
+
+Her ikisi de 17 Ağustos'taki ilk canlı `--sifirla` koşusunda yakalandı:
+o koşudan sonra `Kurallar` 6→12, `Magazalar` 1→2 olmuştu.
