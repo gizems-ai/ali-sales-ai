@@ -206,6 +206,34 @@
      sarısı ayrı token (`--so-medium`). */
   --so-gratis-sari:#ffd400;
 
+  /* ── İkon/sayaç çipi paleti ───────────────────────────────────────────────
+     Kaynak: src/app/(panel)/page.tsx — emlak panelindeki `EKpiCard` (iconBg /
+     iconStroke) ve `BriefCnt` varyantları. Değerler KOPYALANDI, senkronize
+     değildir: emlak paleti değişirse burası elle güncellenir.
+     Eşleme (KPI): ziyaretçi=yeşil · satış=mor · kasa bekleme=turuncu ·
+     dönüşüm=mavi · personel=sarı  (`tema.ts` → kpiCipRengi). */
+  --so-cip-yesil-bg:    linear-gradient(135deg, #aef0c2, #86e6a6);
+  --so-cip-yesil-ink:   #14622f;
+  --so-cip-mor-bg:      linear-gradient(135deg, #d8cdf4, #c2b2ec);
+  --so-cip-mor-ink:     #4b3a86;
+  --so-cip-turuncu-bg:  linear-gradient(135deg, #fbcdb9, #f3a98c);
+  --so-cip-turuncu-ink: #a8421d;
+  --so-cip-mavi-bg:     linear-gradient(135deg, #bccaf2, #92a6e6);
+  --so-cip-mavi-ink:    #36479a;
+  --so-cip-sari-bg:     linear-gradient(135deg, #fbf0a6, #f6e57e);
+  --so-cip-sari-ink:    #7c6611;
+  --so-cip-notr-bg:     var(--so-yuzey-2);
+  --so-cip-notr-ink:    var(--so-metin-soluk);
+
+  /* ── Ali kimliği ──────────────────────────────────────────────────────────
+     Emlak'taki mor hale deseni (0 0 0 4px / 8px çift halka) Store OS'in
+     marka moruyla yeniden kuruldu; çevrimiçi noktası emlaktaki değerdir. */
+  --so-ali-halka:       0 0 0 4px rgba(108, 67, 220, .20), 0 0 0 8px rgba(108, 67, 220, .08);
+  --so-ali-glow:        linear-gradient(135deg, #6c43dc, #e5007d);
+  --so-ali-rozet-zemin: #241d3a;
+  --so-cevrimici:       #4fdc7a;
+  --so-cevrimici-halka: 0 0 0 3px rgba(79, 220, 122, .25);
+
   /* Kamera yer tutucusu — tek koyu yüzey. Gerçek yayın bağlanınca <video>
      bunun üstüne biner; token kalır, arkasındaki karartma aynı olsun diye. */
   --so-kamera-zemin:        linear-gradient(135deg, #3b2f52, #5a4a7a);
@@ -213,6 +241,23 @@
   --so-kamera-metin:        rgba(255, 255, 255, .58);
   --so-kamera-etiket-zemin: rgba(0, 0, 0, .55);
   --so-kamera-etiket-metin: #ffffff;
+
+  /* Demo kamera karesi (tepeden görünüm şeması). Gerçek yayın değildir ve
+     öyle görünmez: kare açıkça "DEMO GÖRÜNTÜ" etiketi taşır. Kişiler
+     ANONİM daireler olarak çizilir — yüz/biyometri yok (madde 11). */
+  --so-kam-zemin:  #2a2140;
+  --so-kam-zemin2: #3d3159;
+  --so-kam-zemin3: #171122;
+  --so-kam-cizgi:  rgba(255, 255, 255, .10);
+  --so-kam-raf:    rgba(255, 255, 255, .13);
+  --so-kam-kasa:   rgba(255, 212, 0, .26);
+  --so-kam-kisi:   rgba(174, 240, 194, .82);
+  --so-kam-kutu:   rgba(174, 240, 194, .55);
+  --so-kam-kuyruk: rgba(243, 169, 140, .85);
+  --so-kam-kuyruk-kutu: rgba(243, 169, 140, .55);
+  --so-kam-hud:    rgba(255, 255, 255, .55);
+  --so-kam-rec:    #ff5a6a;
+  --so-kam-tarama: rgba(174, 240, 194, .30);
 
   /* ── Takma adlar ──────────────────────────────────────────────────────────
      Düzen referansı (17 Ağu 2026) bu adları kullanıyor. İki sözlük tek değere
@@ -639,8 +684,10 @@
   position: absolute; right: -4px; bottom: -2px;
   width: 58px; height: 58px; border-radius: 50%;
   background: var(--so-marka-zemin); display: grid; place-items: center; font-size: 24px;
-  pointer-events: none;
+  pointer-events: none; overflow: hidden;
 }
+/* Avatar görseli daireyi taşırmadan doldursun (kaynak kare, 320×320). */
+.storeos-root .so-ai-avatar img { width: 100%; height: 100%; object-fit: cover; }
 
 .storeos-root .so-kullanici { display: flex; align-items: center; gap: 8px; padding: 2px 6px; }
 .storeos-root .so-avatar {
@@ -744,14 +791,37 @@
 .storeos-root .so-skor-alt    { font-size: 10.5px; color: var(--so-metin-3); margin-top: 3px; text-align: center; }
 
 .storeos-root .so-kpi-ust {
-  display: flex; align-items: center; gap: 6px;
+  display: flex; align-items: flex-start; gap: 6px;
   font-size: 11px; color: var(--so-metin-2); font-weight: 600;
 }
+.storeos-root .so-kpi-etiket { flex: 1; min-width: 0; line-height: 1.3; padding-top: 2px; }
 .storeos-root .so-satir-kpi .so-kpi-deger { font-size: 22px; font-weight: 780; margin: 5px 0 3px; }
 .storeos-root .so-kpi-delta { font-size: 10.5px; font-weight: 650; color: var(--so-metin-3); }
 .storeos-root .so-yukari { color: var(--so-normal); }
 .storeos-root .so-asagi  { color: var(--so-uyari); }
 .storeos-root .so-kpi-trend { margin-top: 8px; height: 26px; width: 100%; display: block; }
+
+/* ── KPI ikon çipi (emlak `EKpiCard` deseni) ───────────────────────────────
+   Kartın SAĞ ÜSTÜNDE yumuşak köşeli renkli kare. Renk metriği ayırt etmek
+   içindir, durum bildirmez — eşik/uyarı rengi ayrı token ailesinde. */
+.storeos-root .so-kpi-cip {
+  width: 32px; height: 32px; border-radius: 10px; flex: 0 0 auto;
+  display: grid; place-items: center; font-size: 15px; line-height: 1;
+}
+.storeos-root .so-kpi-cip[data-renk="yesil"]   { background: var(--so-cip-yesil-bg);   color: var(--so-cip-yesil-ink); }
+.storeos-root .so-kpi-cip[data-renk="mor"]     { background: var(--so-cip-mor-bg);     color: var(--so-cip-mor-ink); }
+.storeos-root .so-kpi-cip[data-renk="turuncu"] { background: var(--so-cip-turuncu-bg); color: var(--so-cip-turuncu-ink); }
+.storeos-root .so-kpi-cip[data-renk="mavi"]    { background: var(--so-cip-mavi-bg);    color: var(--so-cip-mavi-ink); }
+.storeos-root .so-kpi-cip[data-renk="sari"]    { background: var(--so-cip-sari-bg);    color: var(--so-cip-sari-ink); }
+.storeos-root .so-kpi-cip[data-renk="notr"]    { background: var(--so-cip-notr-bg);    color: var(--so-cip-notr-ink); }
+
+/* Örnek-veri noktası KPI kartında çipin altına düşerdi; satıra alınıp
+   çipin soluna konur. İşaret kaybolmaz (madde 11), yeri değişir. */
+.storeos-root .so-kpi-kart .so-ornek-nokta { position: static; margin: 5px 1px 0 0; }
+
+/* MADDE C — trend serisi olmayan kart kocaman beyaz boşluk bırakmasın:
+   ızgara gerdirmesinden çıkar, içeriği kadar yer kaplar. */
+.storeos-root .so-kpi-kart[data-trendsiz="1"] { align-self: start; }
 
 /* ── SATIR 2 — kamera | anlık durum | öneriler + görevler ──────────────────── */
 
@@ -889,7 +959,225 @@
 .storeos-root .so-hizli-ikon { font-size: 16px; display: block; margin-bottom: 4px; }
 .storeos-root .so-hizli-ad   { font-size: 9.5px; font-weight: 600; line-height: 1.25; display: block; }
 
+/* ════════════════════════════════════════════════════════════════════════════
+   ALİ KİMLİĞİ (18 Ağu 2026) — üst brief şeridi + sağ kolon asistan kartı.
+   Desen kaynağı: emlak panelindeki "Briefing strip" ve "ALİ ASİSTANIN" kartı
+   (src/app/(panel)/page.tsx). Kod import EDİLMEDİ, yapı yeniden yazıldı;
+   renkler yalnız yukarıdaki --so-* token'larından gelir.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.storeos-root .so-ali-serit {
+  display: flex; align-items: center; gap: 16px;
+  background: var(--so-kart-bg); border: var(--so-kart-kenar);
+  border-radius: var(--so-kart-radius); box-shadow: var(--so-kart-golge);
+  padding: 16px 18px; position: relative; overflow: hidden;
+}
+/* Sol accent çubuğu — emlakta 5px gradyan şerit. */
+.storeos-root .so-ali-serit::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+  background: var(--so-ali-glow);
+}
+.storeos-root .so-ali-halka {
+  width: 54px; height: 54px; flex: 0 0 auto; border-radius: 50%;
+  background: var(--so-ali-glow); padding: 2.5px;
+}
+.storeos-root .so-ali-halka img {
+  width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+  background: var(--so-zemin); display: block;
+}
+.storeos-root .so-ali-metin { flex: 1; min-width: 0; }
+.storeos-root .so-ali-baslik-2 {
+  font-size: 15px; font-weight: 750; letter-spacing: -.01em; line-height: 1.35;
+}
+.storeos-root .so-ali-baslik-2 b { color: var(--so-marka-koyu); font-weight: 800; }
+.storeos-root .so-ali-alt {
+  font-size: 11.5px; color: var(--so-metin-2); margin-top: 3px; font-weight: 550;
+}
+
+/* Üç sayaç çipi — emlak `BriefCnt` ölçüleri. */
+.storeos-root .so-sayac-grup { display: flex; gap: 9px; flex: 0 0 auto; flex-wrap: wrap; }
+.storeos-root .so-sayac {
+  display: flex; align-items: center; gap: 9px;
+  padding: 9px 13px; border-radius: 14px; min-width: 92px;
+}
+.storeos-root .so-sayac[data-renk="yesil"]   { background: var(--so-cip-yesil-bg);   color: var(--so-cip-yesil-ink); }
+.storeos-root .so-sayac[data-renk="sari"]    { background: var(--so-cip-sari-bg);    color: var(--so-cip-sari-ink); }
+.storeos-root .so-sayac[data-renk="mor"]     { background: var(--so-cip-mor-bg);     color: var(--so-cip-mor-ink); }
+.storeos-root .so-sayac-ikon {
+  width: 26px; height: 26px; border-radius: 8px; flex: 0 0 auto;
+  display: grid; place-items: center; font-size: 13px;
+  background: rgba(255, 255, 255, .55);
+}
+.storeos-root .so-sayac-n     { font-size: 17px; font-weight: 800; line-height: 1; }
+.storeos-root .so-sayac-etiket{ font-size: 10.5px; font-weight: 700; margin-top: 2px; opacity: .85; }
+
+/* ── Sağ kolon: ALİ ASİSTANIN kartı ───────────────────────────────────────── */
+
+.storeos-root .so-ali-kart { text-align: center; }
+.storeos-root .so-ali-kart-etiket {
+  font-size: 10.5px; letter-spacing: .17em; font-weight: 800;
+  color: var(--so-marka-koyu); text-align: left;
+}
+.storeos-root .so-ali-kart-ad {
+  font-size: 26px; font-weight: 800; line-height: 1; margin-top: 6px; text-align: left;
+}
+.storeos-root .so-ali-buyuk {
+  position: relative; width: 108px; height: 108px; margin: 14px auto 0;
+}
+.storeos-root .so-ali-buyuk::before {
+  content: ""; position: absolute; inset: -7px; border-radius: 50%;
+  background: var(--so-ali-glow); filter: blur(16px); opacity: .38;
+}
+.storeos-root .so-ali-buyuk img {
+  position: relative; width: 100%; height: 100%; border-radius: 50%;
+  object-fit: cover; box-shadow: var(--so-ali-halka); background: var(--so-zemin);
+  display: block;
+}
+.storeos-root .so-ali-cevrimici {
+  display: inline-flex; align-items: center; gap: 7px; margin-top: 16px;
+  background: var(--so-ali-rozet-zemin); color: var(--so-kamera-etiket-metin);
+  border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 700;
+}
+.storeos-root .so-ali-cevrimici::before {
+  content: ""; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--so-cevrimici); box-shadow: var(--so-cevrimici-halka);
+}
+.storeos-root .so-ali-oneri {
+  font-size: 12.5px; line-height: 1.6; color: var(--so-metin-2);
+  margin: 14px 0 0; text-align: left;
+}
+.storeos-root .so-ali-oneri b { color: var(--so-metin); font-weight: 700; }
+.storeos-root .so-dugme-ali {
+  width: 100%; margin-top: 14px; height: 40px; border-radius: 12px;
+  background: var(--so-marka); border: 1px solid var(--so-marka);
+  color: var(--so-kamera-etiket-metin); font-weight: 800; font-size: 13px;
+}
+.storeos-root .so-dugme-ali:hover {
+  background: var(--so-marka-koyu); border-color: var(--so-marka-koyu);
+  color: var(--so-kamera-etiket-metin);
+}
+.storeos-root .so-dugme-ali:disabled { opacity: .78; cursor: default; }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   DEMO KAMERA KARESİ — tepeden görünüm şeması (madde C).
+   Gerçek yayın YOK; "GÖRÜNTÜ YOK" yazan boş kutu da yok. Kare, kameranın
+   ne ürettiğini gösterir: anonim kişi işaretleri + kuyruk tespiti. Kişiler
+   DAİREDİR, yüz/biyometri yoktur ve kare "DEMO GÖRÜNTÜ" etiketi taşır.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.storeos-root .so-kam-sahne { width: 100%; height: 100%; display: block; }
+.storeos-root .so-kam-sahne .zemin  { fill: var(--so-kam-zemin3); }
+.storeos-root .so-kam-sahne .kat    { fill: var(--so-kam-zemin); }
+.storeos-root .so-kam-sahne .kat2   { fill: var(--so-kam-zemin2); }
+.storeos-root .so-kam-sahne .cizgi  { stroke: var(--so-kam-cizgi); stroke-width: .7; fill: none; }
+.storeos-root .so-kam-sahne .raf    { fill: var(--so-kam-raf); }
+.storeos-root .so-kam-sahne .kasa   { fill: var(--so-kam-kasa); }
+.storeos-root .so-kam-sahne .kisi   { fill: var(--so-kam-kisi); }
+.storeos-root .so-kam-sahne .kisi-k { fill: var(--so-kam-kuyruk); }
+.storeos-root .so-kam-sahne .kutu   { stroke: var(--so-kam-kutu); stroke-width: .9; fill: none; }
+.storeos-root .so-kam-sahne .kutu-k { stroke: var(--so-kam-kuyruk-kutu); stroke-width: 1.1; fill: none; stroke-dasharray: 3 2; }
+.storeos-root .so-kam-sahne .hud    { fill: var(--so-kam-hud); font-size: 5px; font-weight: 700; letter-spacing: .08em; }
+.storeos-root .so-kam-sahne .hud-k  { fill: var(--so-kam-kuyruk); font-size: 5px; font-weight: 700; }
+.storeos-root .so-kam-sahne .rec    { fill: var(--so-kam-rec); }
+.storeos-root .so-kam-sahne .kose   { stroke: var(--so-kam-hud); stroke-width: 1; fill: none; }
+.storeos-root .so-kam-sahne .tarama { fill: var(--so-kam-tarama); }
+
+/* Hareket: kayan tarama çizgisi + yanıp sönen REC. Donmuş kare hissini
+   kırar; video kadar ağır değildir, tek bir <svg> içinde kalır. */
+@keyframes so-tarama { 0% { transform: translateY(0); } 100% { transform: translateY(220px); } }
+@keyframes so-rec    { 0%, 55% { opacity: 1; } 56%, 100% { opacity: .18; } }
+.storeos-root .so-kam-sahne .tarama { animation: so-tarama 6s linear infinite; }
+.storeos-root .so-kam-sahne .rec    { animation: so-rec 1.6s steps(1, end) infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .storeos-root .so-kam-sahne .tarama { animation: none; opacity: 0; }
+  .storeos-root .so-kam-sahne .rec    { animation: none; }
+}
+
+/* Kamera kartında ana kare artık boş değil: metin katmanı üstte durur. */
+.storeos-root .so-kamera-ana { padding: 0; place-items: stretch; }
+.storeos-root .so-kamera-alt {
+  position: absolute; left: 8px; right: 8px; bottom: 7px;
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  font-size: 9.5px; font-weight: 650; color: var(--so-kamera-etiket-metin);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .7);
+}
+.storeos-root .so-kamera-kucuk { position: relative; overflow: hidden; }
+
+/* ── Modül haritası (/storeos/moduller) ───────────────────────────────────── */
+
+.storeos-root .so-modul-sayaclar {
+  display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;
+}
+
+.storeos-root .so-modul-tablo { display: flex; flex-direction: column; }
+
+.storeos-root .so-modul-satir {
+  display: grid; grid-template-columns: 190px 1.1fr 1.4fr 132px;
+  gap: 8px 16px; align-items: start;
+  padding: 13px 4px; border-bottom: 1px solid var(--so-cizgi);
+  /* Menüden gelen `#slug` bağlantısında satır başlığın altında kalmasın. */
+  scroll-margin-top: 20px;
+}
+.storeos-root .so-modul-satir:last-child { border-bottom: none; }
+.storeos-root .so-modul-satir:target { background: var(--so-yuzey-2); }
+
+.storeos-root .so-modul-basSatir {
+  padding-top: 2px; padding-bottom: 8px;
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--so-metin-silik);
+}
+
+.storeos-root .so-modul-ad {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 13px; font-weight: 700; color: var(--so-metin); min-width: 0;
+}
+.storeos-root .so-modul-ikon {
+  width: 28px; height: 28px; border-radius: 9px; flex: none;
+  display: grid; place-items: center; font-size: 14px;
+  background: var(--so-cip-notr-bg); color: var(--so-cip-notr-ink);
+}
+.storeos-root .so-modul-satir[data-durum="canli"] .so-modul-ikon {
+  background: var(--so-cip-yesil-bg); color: var(--so-cip-yesil-ink);
+}
+.storeos-root .so-modul-satir[data-durum="hat-hazir"] .so-modul-ikon {
+  background: var(--so-cip-mavi-bg); color: var(--so-cip-mavi-ink);
+}
+.storeos-root .so-modul-satir[data-durum="sozlesme"] .so-modul-ikon {
+  background: var(--so-cip-sari-bg); color: var(--so-cip-sari-ink);
+}
+
+.storeos-root .so-modul-metin { font-size: 12.5px; line-height: 1.55; color: var(--so-metin-soluk); }
+.storeos-root .so-modul-hat { font-size: 11.5px; line-height: 1.55; color: var(--so-metin-silik); }
+
+.storeos-root .so-modul-rozet {
+  justify-self: start; white-space: nowrap;
+  padding: 4px 9px; border-radius: 999px;
+  font-size: 10.5px; font-weight: 700;
+  background: var(--so-cip-notr-bg); color: var(--so-cip-notr-ink);
+}
+.storeos-root .so-modul-rozet[data-durum="canli"] {
+  background: var(--so-cip-yesil-bg); color: var(--so-cip-yesil-ink);
+}
+.storeos-root .so-modul-rozet[data-durum="hat-hazir"] {
+  background: var(--so-cip-mavi-bg); color: var(--so-cip-mavi-ink);
+}
+.storeos-root .so-modul-rozet[data-durum="sozlesme"] {
+  background: var(--so-cip-sari-bg); color: var(--so-cip-sari-ink);
+}
+
 /* ── Daralma ──────────────────────────────────────────────────────────────── */
+
+@media (max-width: 1180px) {
+  .storeos-root .so-ali-serit { flex-wrap: wrap; }
+  .storeos-root .so-sayac-grup { width: 100%; }
+  .storeos-root .so-modul-satir { grid-template-columns: 180px 1fr 132px; }
+  .storeos-root .so-modul-hat { grid-column: 2 / -1; }
+  .storeos-root .so-modul-basSatir { display: none; }
+}
+@media (max-width: 760px) {
+  .storeos-root .so-modul-satir { grid-template-columns: 1fr; }
+  .storeos-root .so-modul-hat { grid-column: auto; }
+}
 
 @media (max-width: 1500px) {
   .storeos-root .so-satir-kpi  { grid-template-columns: 1.35fr repeat(3, 1fr); }

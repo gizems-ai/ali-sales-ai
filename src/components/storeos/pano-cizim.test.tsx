@@ -21,8 +21,12 @@ import type { ReactElement } from 'react'
 // yüklenir ve bellek deposunun tekil örneği ikiye ayrılır (depo `undefined`
 // görünür). Toplayıcı da göreli import ediyor; aynı örneği paylaşmalıyız.
 import { bellekDeposunuZorla } from '../../lib/storeos/depo'
+import { BellekDeposu } from '../../lib/storeos/depo/bellek'
 import { olaylariAl } from '../../lib/storeos/olay-alim'
+import { panoyuTohumla } from '../../lib/storeos/demo-tohum'
+import { MODULLER, modulYolu } from '../../lib/storeos/moduller'
 import { panoTopla } from '../../lib/storeos/dashboard/toplayici'
+import { AliKarti, AliSeridi, aliOzeti } from './ali'
 import { AnlikDurum, KpiSeridi, MagazaBasligi, SkorKart } from './kartlar'
 import { DonutDagilimi, IzgaraHaritasi } from './grafikler'
 import {
@@ -172,7 +176,14 @@ async function main() {
     oncekisiz.length === 0 || !kpiHtml.includes('%0 vs dün'),
     `oncekisiz=${oncekisiz.length}`)
   ok('kasa paneli eksik kırılımı açıkça söylüyor', (html['KasaPaneli'] ?? '').includes('so-kart-not'))
-  ok('kamera karesi yer tutucu olduğunu yazıyor', (html['KameraPaneli'] ?? '').includes('YER TUTUCU'))
+
+  // Kamera karesi ARTIK çizim (Gün 7 · madde C): "GÖRÜNTÜ YOK · YER TUTUCU"
+  // jüriye kırık ekran gibi görünüyordu. Dürüstlük kaybolmadı, yer değiştirdi:
+  // kare üstünde "DEMO GÖRÜNTÜ" yazıyor ve yüz tanıma yapılmadığı söyleniyor.
+  const kam = html['KameraPaneli'] ?? ''
+  ok('kamera karesi "görüntü yok" demiyor', !kam.includes('GÖRÜNTÜ YOK'))
+  ok('kamera karesi demo olduğunu yazıyor', kam.includes('DEMO GÖRÜNTÜ'))
+  ok('kamera karesi yüz tanıma yapılmadığını yazıyor', kam.includes('yüz tanıma yok'))
 
   // ── 6. Yeni düzenin ASIL vaatleri gerçekten ekranda mı ───────────────────
   // Delta ve mini trend "olsa iyi olur" değil, Gün 7'nin iki maddesi. Veri
@@ -191,6 +202,74 @@ async function main() {
   ok('sağlık skoru yarım daire gösterge çizdi',
     (html['SkorKart'] ?? '').includes('stroke-dasharray') && (html['SkorKart'] ?? '').includes('so-skor-deger'))
   ok('sağlık skoru gerekçesini yazıyor', (v.saglikSkoru?.gerekce ?? '').length > 10, v.saglikSkoru?.gerekce)
+
+  // ── 7. Ali kimliği (madde A) ─────────────────────────────────────────────
+  // Şerit ile sağ kolon kartı AYNI sayaca bakmalı; iki ayrı hesap olsaydı
+  // jüri ekranda çelişen iki sayı görürdü.
+  console.log('\n── Ali kimliği ──')
+  const ozet = aliOzeti(v.alarmlar, v.gorevOzeti)
+  ok('Ali özeti üretildi', ozet !== null)
+  ok('sayaçlar kural motorundan geliyor',
+    (ozet?.oneri ?? 0) + (ozet?.uyari ?? 0) === (v.alarmlar?.length ?? -1),
+    JSON.stringify(ozet))
+  ok('görev sayacı görev özetinden geliyor', ozet?.gorev === (v.gorevOzeti?.acik ?? -1), String(ozet?.gorev))
+
+  const serit = ciz('AliSeridi', <AliSeridi ozet={ozet} uretildi={v.uretildi} />)
+  ok('Ali şeridi çizildi', serit.includes('so-ali-serit'))
+  ok('şeritte üç sayaç çipi var', (serit.match(/so-sayac"/g) ?? []).length === 3,
+    String((serit.match(/so-sayac"/g) ?? []).length))
+  ok('şeritte avatar görseli var', serit.includes('ali-avatar'))
+
+  const aliKart = ciz('AliKarti', <AliKarti alarmlar={v.alarmlar} ozet={ozet} skor={v.saglikSkoru} />)
+  ok('Ali kartı çizildi', aliKart.includes('so-ali-kart'))
+  ok('Ali kartı çevrimiçi rozeti taşıyor', aliKart.includes('so-ali-cevrimici'))
+  // Madde listesi değil CÜMLE: nokta ile biten, düz metin bir öneri.
+  // (Kart içinde <b> var; etiketleri ve React'in yorum ayraçlarını atıyoruz.)
+  const cumle = (/class="so-ali-oneri">([\s\S]*?)<\/div>/.exec(aliKart)?.[1] ?? '')
+    .replace(/<!--[\s\S]*?-->/g, '').replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim()
+  ok('öneri madde listesi değil cümle',
+    cumle.length >= 40 && cumle.endsWith('.') && !cumle.includes('<li'), cumle.slice(0, 110))
+  ok('Ali kartı null veride de çizilir',
+    ciz('AliKarti (null)', <AliKarti alarmlar={null} ozet={null} skor={null} />).length > 0)
+
+  // ── 8. KPI ikon çipleri (madde B) ────────────────────────────────────────
+  console.log('\n── KPI ikon çipleri ──')
+  const cipler = kpiHtml.match(/so-kpi-cip" data-renk="([a-z]+)"/g) ?? []
+  ok('beş kartın beşinde de renkli çip var', cipler.length === 5, String(cipler.length))
+  ok('çip renkleri birbirinden farklı', new Set(cipler).size === 5, cipler.join(','))
+  ok('hiçbir kart nötr çipe düşmedi', !kpiHtml.includes('data-renk="notr"'))
+
+  // ── 9. Açılış tohumu (madde C: ekran boş açılmasın) ──────────────────────
+  // TEMİZ depo: `bellekDeposu()` tekildir, yukarıdaki iki test olayı tohumun
+  // sayılarına karışırdı. Burada açıkça yeni bir örnek kuruyoruz.
+  console.log('\n── açılış tohumu ──')
+  const t = new BellekDeposu()
+  const tohum = await panoyuTohumla(t, SIMDI)
+  ok('tohum beş olayı da kabul etti', tohum.kabul === 5, JSON.stringify(tohum))
+  const tv = await panoTopla({ depo: t, magazaKodu: MAGAZA, katman: 'tam', simdi: SIMDI })
+  ok('pano alarmla açılıyor', (tv.alarmlar?.length ?? 0) >= 5, String(tv.alarmlar?.length))
+  ok('pano açık görevle açılıyor', (tv.gorevOzeti?.acik ?? 0) === 3, String(tv.gorevOzeti?.acik))
+  ok('gecikmiş görev yok (SLA aşılmadı)', (tv.gorevOzeti?.gecikmis ?? -1) === 0, String(tv.gorevOzeti?.gecikmis))
+  // 100/100 bir mağaza gerçekçi değil; tohum skoru 80'ler bandına oturtmalı.
+  const skor = tv.saglikSkoru?.deger ?? -1
+  ok('sağlık skoru 80\'ler bandında', skor >= 78 && skor <= 89, String(skor))
+  ok('skor gerekçesi "ceza kalemi yok" değil', tv.saglikSkoru?.gerekce !== 'ceza kalemi yok', tv.saglikSkoru?.gerekce)
+  ok('tohum ikinci koşuda çoğalmıyor', (await panoyuTohumla(t, SIMDI)).yinelenen === 5)
+
+  // ── 10. Modül haritası (madde D) ─────────────────────────────────────────
+  // Menüdeki on bir gri madde artık var olan bir ekrana iniyor. Ölü çapa
+  // kalırsa jüri tıklar ve hiçbir şey olmaz — bunu burada yakalıyoruz.
+  console.log('\n── modül haritası ──')
+  ok('on beş modül tanımlı', MODULLER.length === 15, String(MODULLER.length))
+  ok('slug\'lar benzersiz', new Set(MODULLER.map(m => m.slug)).size === MODULLER.length)
+  const canliler = MODULLER.filter(m => m.durum === 'canli')
+  ok('dört modülün çalışan ekranı var', canliler.length === 4, String(canliler.length))
+  ok('yalnız canlı modüllerde doğrudan yol var',
+    MODULLER.every(m => (m.yol !== undefined) === (m.durum === 'canli')))
+  ok('ekranı olmayan madde modül haritasına iniyor',
+    MODULLER.filter(m => !m.yol).every(m => modulYolu(m) === `/storeos/moduller#${m.slug}`))
+  ok('her modül ne yaptığını ve neyin hazır olduğunu yazıyor',
+    MODULLER.every(m => m.ozet.length > 30 && m.hazir.length > 20))
 
   console.log(fail === 0 ? '\n✓ tüm pano çizim kontrolleri geçti' : `\n✗ ${fail} kontrol düştü`)
   process.exit(fail === 0 ? 0 : 1)

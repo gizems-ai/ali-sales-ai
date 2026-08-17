@@ -19,7 +19,7 @@ import { headers } from 'next/headers'
 import { panoTopla } from '@/lib/storeos/dashboard/toplayici'
 import { katmanMi } from '@/lib/storeos/dashboard/tipler'
 import type { PanoHatasi } from '@/lib/storeos/dashboard/tipler'
-import { depo } from '@/lib/storeos/depo'
+import { depoHazir } from '@/lib/storeos/hazirlik'
 import { env } from '@/lib/storeos/env'
 import { storeosHostuMu } from '@/lib/storeos/host-guard'
 
@@ -45,7 +45,7 @@ export async function GET(istek: Request): Promise<Response> {
   const magazaKodu = env.magazaKodu
 
   try {
-    const veri = await panoTopla({ depo: depo(), magazaKodu, katman: ham })
+    const veri = await panoTopla({ depo: await depoHazir(), magazaKodu, katman: ham })
     return Response.json(veri, {
       // Anket eden bir uç nokta; ara katman önbelleği yanıtı dondurmasın.
       headers: { 'Cache-Control': 'no-store' },

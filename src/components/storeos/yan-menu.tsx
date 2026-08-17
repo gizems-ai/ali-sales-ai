@@ -6,48 +6,26 @@
 //  Panelin `src/components/sidebar.tsx` bileşeni BURAYA GİRMEZ (izolasyon
 //  kuralı); yapı kopyalanmadı, sıfırdan yazıldı.
 //
-//  Menü on beş madde: referanstaki sıra ve gruplama korundu. AMA referansta
-//  "aktif" görünen altı madde (Canlı İzleme, Analizler, Operasyon, Kasa &
-//  Kuyruk, Raf & Stok, Personel) burada `yakında` işaretlidir — Gün 4'te
-//  konulan kural değişmedi: var olmayan bir ekrana giden link jüriye yalan
-//  söyler. Dört madde gerçekten çalışır; on bir madde mimarinin kapsamını
-//  gösterir ve tıklanmaz. Ekran yazıldıkça `yol` alanı eklenir, başka bir şey
-//  değişmez.
+//  Menü on beş madde: referanstaki sıra ve gruplama korundu; kaynağı
+//  `lib/storeos/moduller.ts` — menü kendi listesini tutmaz.
+//
+//  GÜN 7 DEĞİŞİKLİĞİ: on bir madde eskiden gri ve tıklanamazdı ("yakında").
+//  Kural hâlâ aynı — var olmayan bir ekrana link koymuyoruz — ama artık o on
+//  bir madde VAR OLAN bir ekrana, `/storeos/moduller#<slug>` modül haritasına
+//  iniyor ve durumunu orada okuyor. Yalan yok, ölü link de yok. Bir modülün
+//  ekranı yazıldığında `moduller.ts`teki `yol` alanı dolar; burası değişmez.
 // ════════════════════════════════════════════════════════════════════════════
 
 import { useUser } from '@clerk/nextjs'
+import Image from 'next/image'
+import { MODULLER, modulYolu } from '@/lib/storeos/moduller'
 import { rolEtiketi } from '@/lib/storeos/tema'
 import { useMagaza } from './magaza-baglami'
 
-interface NavOgesi { ad: string; ikon: string; yol?: string }
-
-const NAV: { baslik: string; ogeler: NavOgesi[] }[] = [
-  {
-    baslik: 'Operasyon',
-    ogeler: [
-      { ad: 'Mağaza Özeti',     ikon: '◧', yol: '/storeos' },
-      { ad: 'Canlı İzleme',     ikon: '◉' },
-      { ad: 'Mağaza Analizleri', ikon: '◔' },
-      { ad: 'Operasyon',        ikon: '◈' },
-      { ad: 'Kasa & Kuyruk',    ikon: '◫' },
-      { ad: 'Raf & Stok',       ikon: '▤' },
-      { ad: 'Görevler',         ikon: '◇', yol: '/storeos/gorevler' },
-      { ad: 'Alarmlar',         ikon: '△', yol: '/storeos/alarmlar' },
-    ],
-  },
-  {
-    baslik: 'Yönetim',
-    ogeler: [
-      { ad: 'Personel',        ikon: '▦' },
-      { ad: 'Kampanyalar',     ikon: '◍' },
-      { ad: 'Bakım & Arıza',   ikon: '◐' },
-      { ad: 'İSG & Güvenlik',  ikon: '⬡' },
-      { ad: 'Denetim Kaydı',   ikon: '▣', yol: '/storeos/denetim' },
-      { ad: 'Raporlar',        ikon: '◑' },
-      { ad: 'Ayarlar',         ikon: '⚙' },
-    ],
-  },
-]
+const NAV = (['Operasyon', 'Yönetim'] as const).map(baslik => ({
+  baslik,
+  ogeler: MODULLER.filter(m => m.bolum === baslik),
+}))
 
 /** "Gizem Burteçin" → "GB". Ad yoksa e-postanın ilk harfi, o da yoksa nokta. */
 function bashafler(ad: string | null | undefined, eposta: string | undefined): string {
@@ -101,25 +79,23 @@ export function YanMenu({ aktif }: { aktif: string }) {
         {NAV.map(bolum => (
           <div key={bolum.baslik} className="so-menu">
             <div className="so-nav-baslik">{bolum.baslik}</div>
-            {bolum.ogeler.map(o => (
-              o.yol ? (
+            {bolum.ogeler.map(o => {
+              const yol = modulYolu(o)
+              return (
                 <a
-                  key={o.ad}
-                  href={o.yol}
+                  key={o.slug}
+                  href={yol}
                   className="so-nav-oge"
-                  aria-current={o.yol === aktif ? 'page' : undefined}
+                  // TAM eşleşme: `#slug` olmadan karşılaştırsaydık modül
+                  // haritası açıkken on bir madde birden "aktif" görünürdü.
+                  aria-current={yol === aktif ? 'page' : undefined}
+                  title={o.yol ? undefined : `Ekranı henüz yok — modül haritasındaki satırına gider (${o.ad}).`}
                 >
                   <span className="so-nav-ikon" aria-hidden="true">{o.ikon}</span>
                   <span className="so-nav-metin">{o.ad}</span>
                 </a>
-              ) : (
-                <span key={o.ad} className="so-nav-oge" data-yakinda="1" aria-disabled="true">
-                  <span className="so-nav-ikon" aria-hidden="true">{o.ikon}</span>
-                  <span className="so-nav-metin">{o.ad}</span>
-                  <span className="so-yakinda">yakında</span>
-                </span>
               )
-            ))}
+            })}
           </div>
         ))}
       </div>
@@ -127,8 +103,8 @@ export function YanMenu({ aktif }: { aktif: string }) {
       {/*
         Ali Asistan kartı. Düğme DEVRE DIŞI: sohbet ucu bu sürümde yok ve
         çalışmayan bir düğmeyi tıklanabilir bırakmak demoda en kötü an olurdu.
-        Avatar için `/public/storeos/ali-avatar.png` YOK; görsel eklenene kadar
-        emoji duruyor — eksik dosya kırık ikon olarak görünmesin.
+        Avatar `/storeos/ali-avatar.png` (Gün 7'de eklendi); pano şeridi ve sağ
+        kolon kartı da aynı görseli kullanır — Ali her yerde aynı yüz.
       */}
       <div className="so-ai-kart">
         <div className="so-ai-baslik">Ali Asistan <span aria-hidden="true">✦</span></div>
@@ -136,7 +112,9 @@ export function YanMenu({ aktif }: { aktif: string }) {
         <button type="button" className="so-dugme so-dugme-ana" disabled title="Sohbet ucu bu sürümde kapalı.">
           Ali&apos;ye Sor
         </button>
-        <div className="so-ai-avatar" aria-hidden="true">🙂</div>
+        <div className="so-ai-avatar" aria-hidden="true">
+          <Image src="/storeos/ali-avatar.png" alt="" width={112} height={112} />
+        </div>
       </div>
 
       <div className="so-kullanici">

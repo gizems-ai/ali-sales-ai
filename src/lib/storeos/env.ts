@@ -92,6 +92,14 @@ export const env = {
   get magazaKodu() { return istege('STOREOS_MAGAZA_KODU', '0178') },
 
   /**
+   * Pano açılış tohumu (madde C: "ekran asla boş açılmasın"). Varsayılan
+   * AÇIK ve YALNIZ bellek deposunda etkili — Airtable'a tohum yazılmaz.
+   * Kapatmak için STOREOS_DEMO_TOHUMU=kapali. Boş bir pano görmek isteyen
+   * (ör. gerçek veri hattını doğrulayan) biri bunu kullanır.
+   */
+  get demoTohumu(): boolean { return istege('STOREOS_DEMO_TOHUMU', 'acik') !== 'kapali' },
+
+  /**
    * Aktif depo. 'bellek' = süreç-içi (Gün 2 varsayılanı, dış bağımlılık yok).
    * 'airtable' = kalıcı. Airtable kimlik bilgileri tanımlıysa varsayılan
    * otomatik 'airtable' olur — yanlışlıkla prod'da bellek deposuna düşmemek için.

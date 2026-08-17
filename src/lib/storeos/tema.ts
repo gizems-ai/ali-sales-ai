@@ -115,6 +115,27 @@ export function kpiIkonu(anahtar: string): string {
 }
 
 /**
+ * KPI kartının sağ üst çipinin renk ADI (renk değeri değil — değerler
+ * `.storeos-root` içindeki `--so-cip-*` token'larında). Emlak panelindeki
+ * `EKpiCard` deseninin karşılığı: her metrik kendi rengiyle ayrışsın diye.
+ *
+ * Renk METRİĞİ ayırt eder, DURUM bildirmez: turuncu çip "kasa bekleme kötü"
+ * demek değildir. Eşik/uyarı renkleri ayrı ailede (`--so-uyari` vb.).
+ * Bilinmeyen metrik nötr çip alır — sessizce yeşile boyanmaz.
+ */
+const KPI_CIP_RENKLERI: Record<string, string> = {
+  ziyaretci:       'yesil',
+  satis_tutari:    'mor',
+  kasa_bekleme_sn: 'turuncu',
+  donusum_orani:   'mavi',
+  aktif_personel:  'sari',
+}
+
+export function kpiCipRengi(anahtar: string): string {
+  return KPI_CIP_RENKLERI[anahtar] ?? 'notr'
+}
+
+/**
  * Sağlık skoru → sınıf adı ve renk değişkeni. Eşikler `toplayici.ts`'teki
  * `skorSinifAdi` ile AYNI olmalı; etiket metni orada, renk burada durur.
  */

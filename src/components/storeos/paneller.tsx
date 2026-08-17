@@ -19,6 +19,7 @@ import {
   gorevDurumEtiketi, oncelikEtiketi, oncelikSinifi, severityEtiketi,
 } from '@/lib/storeos/tema'
 import { SikisikSeri } from './grafikler'
+import { KameraKaresi } from './kamera-karesi'
 import {
   BosDurum, Iskelet, Kart, degerYaz, gecenSure, saatYaz, sayiYaz, sureYaz,
   tarihSaatYaz,
@@ -37,10 +38,27 @@ function veriTipiOzeti(kayitlar: { veriTipi: string }[]): 'demo' | 'gercek' {
 // ─── Kamera ──────────────────────────────────────────────────────────────────
 //
 // Canlı RTSP akışı demoda YOK. Kutular gerçek kamera kaydının adını, bölgesini
-// ve durumunu gösterir; görüntü alanı açıkça yer tutucudur. Kamera ızgarası
-// üç kareden aşağı düşmez (kesme listesi ④).
+// ve durumunu gösterir; görüntü alanı DEMO GÖRÜNTÜ etiketli tepeden görünüm
+// şemasıdır (bkz. kamera-karesi.tsx) — canlı yayın gibi sunulmaz. Kamera
+// ızgarası üç kareden aşağı düşmez (kesme listesi ④).
+//
+// 18 Ağu 2026: eski hal boş bir kutuda "GÖRÜNTÜ YOK · YER TUTUCU" yazıyordu;
+// dürüsttü ama jüri ekranında bozuk görünüyordu. Şema aynı bilgiyi verir
+// (yayın yok, bu bir demodur) ve kameranın ne ürettiğini de gösterir.
 
-export function KameraPaneli({ kameralar }: { kameralar: KameraSatiri[] | null }) {
+/** Kamera ID'sinden kısa HUD kodu: "0178-kasa" → "CAM · KASA". */
+function kameraKodu(kameraId: string): string {
+  const son = kameraId.split('-').pop() ?? kameraId
+  return `CAM · ${son.toLocaleUpperCase('tr-TR')}`
+}
+
+export function KameraPaneli({
+  kameralar, kuyrukKisi,
+}: {
+  kameralar: KameraSatiri[] | null
+  /** Kuyruk şeridinde çizilecek kişi sayısı — GERÇEK KPI'dan gelir. */
+  kuyrukKisi?: number | null
+}) {
   if (kameralar === null) {
     return <Kart baslik="Canlı Mağaza İzleme"><Iskelet yukseklik={200} /></Kart>
   }
@@ -65,13 +83,17 @@ export function KameraPaneli({ kameralar }: { kameralar: KameraSatiri[] | null }
       sag={<span className="so-nabiz">{kameralar.length} kamera</span>}
     >
       <div className="so-kamera-ana">
-        <span className="so-kamera-etiket">GÖRÜNTÜ YOK · YER TUTUCU</span>
-        {ana.ad} · {ana.bolgeAdi}
+        <KameraKaresi kod={kameraKodu(ana.kameraId)} kuyruk={kuyrukKisi ?? 0} />
+        <span className="so-kamera-etiket">DEMO GÖRÜNTÜ</span>
+        <div className="so-kamera-alt">
+          <span>{ana.ad} · {ana.bolgeAdi}</span>
+          <span>anonim sayım · yüz tanıma yok</span>
+        </div>
       </div>
       <div className="so-kamera-serit">
         {serit.map(k => (
           <div key={k.kameraId}>
-            <div className="so-kamera-kucuk" />
+            <div className="so-kamera-kucuk"><KameraKaresi mini kod={kameraKodu(k.kameraId)} /></div>
             <div className="so-kamera-ad" title={k.ad}>{k.ad}</div>
             <div className="so-kamera-durum" data-durum={k.durum}>
               {k.durum === 'online' ? 'Bağlı' : k.durum === 'degraded' ? 'Bozuk' : 'Çevrimdışı'}

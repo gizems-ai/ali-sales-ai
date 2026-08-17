@@ -27,7 +27,7 @@
 
 import { auth } from '@clerk/nextjs/server'
 import { headers } from 'next/headers'
-import { depo } from '@/lib/storeos/depo'
+import { depoHazir } from '@/lib/storeos/hazirlik'
 import { env } from '@/lib/storeos/env'
 import { storeosHostuMu } from '@/lib/storeos/host-guard'
 import { listeTopla } from '@/lib/storeos/liste/toplayici'
@@ -56,7 +56,7 @@ export async function GET(istek: Request): Promise<Response> {
 
   try {
     const veri = await listeTopla({
-      depo: depo(),
+      depo: await depoHazir(),
       magazaKodu: env.magazaKodu,
       gorunum,
       filtre: filtreCoz(ad => parametreler.get(ad)),

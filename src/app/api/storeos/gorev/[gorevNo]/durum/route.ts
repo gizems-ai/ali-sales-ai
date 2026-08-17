@@ -22,7 +22,7 @@
 
 import { auth } from '@clerk/nextjs/server'
 import { headers } from 'next/headers'
-import { depo } from '@/lib/storeos/depo'
+import { depoHazir } from '@/lib/storeos/hazirlik'
 import { DENETIM_AKSIYONLARI, denetimYaz } from '@/lib/storeos/denetim'
 import { env } from '@/lib/storeos/env'
 import { gecisYap, gorevErtele } from '@/lib/storeos/gorev'
@@ -49,7 +49,7 @@ export async function POST(
   if (!userId) return Response.json({ hata: 'Oturum gerekli' }, { status: 403 })
 
   const { gorevNo } = await ctx.params
-  const d = depo()
+  const d = await depoHazir()
 
   let govde: Record<string, unknown>
   try {

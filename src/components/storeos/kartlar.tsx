@@ -12,7 +12,7 @@
 import type {
   KpiKarti, MagazaOzeti, SaglikSkoru,
 } from '@/lib/storeos/dashboard/tipler'
-import { DEGISKEN, kpiIkonu, skorRengi } from '@/lib/storeos/tema'
+import { DEGISKEN, kpiCipRengi, kpiIkonu, skorRengi } from '@/lib/storeos/tema'
 import { MiniTrend, YarimGosterge } from './grafikler'
 import {
   BosDurum, Iskelet, Kart, OrnekNokta, degerYaz, sayiYaz,
@@ -97,16 +97,27 @@ export function KpiSeridi({ kartlar }: { kartlar: KpiKarti[] | null }) {
     <>
       {kart.map(k => {
         const d = delta(k)
+        // MADDE C: trend serisi yoksa kart ızgara gerdirmesinden çıkar
+        // (`align-self: start`) — kocaman beyaz boşluk bırakmak yerine küçülür.
+        const trendVar = Boolean(k.trend && k.trend.length >= 2)
         return (
-          <div key={k.anahtar} className="so-kart">
-            <OrnekNokta veriTipi={k.veriTipi} />
+          <div
+            key={k.anahtar}
+            className="so-kart so-kpi-kart"
+            data-trendsiz={trendVar ? undefined : '1'}
+          >
             <div className="so-kpi-ust">
-              <span aria-hidden="true">{kpiIkonu(k.anahtar)}</span>
-              {k.etiket}
+              <span className="so-kpi-etiket">{k.etiket}</span>
+              <OrnekNokta veriTipi={k.veriTipi} />
+              {/* Renkli ikon çipi — emlak `EKpiCard` deseni. Renk adı
+                  `tema.ts`'ten, renk DEĞERİ `.storeos-root` token'ından. */}
+              <span className="so-kpi-cip" data-renk={kpiCipRengi(k.anahtar)} aria-hidden="true">
+                {kpiIkonu(k.anahtar)}
+              </span>
             </div>
             <div className="so-kpi-deger">{degerYaz(k.deger, k.birim)}</div>
             {d && <div className={`so-kpi-delta ${d.sinif}`.trim()}>{d.metin}</div>}
-            {k.trend && (
+            {trendVar && k.trend && (
               <MiniTrend
                 noktalar={k.trend}
                 renk={d?.sinif === 'so-asagi' ? DEGISKEN.medium : DEGISKEN.marka}

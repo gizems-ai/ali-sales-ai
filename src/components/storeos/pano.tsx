@@ -8,6 +8,7 @@
 //  artırmaz — `DashboardVerisi`'ne alan eklemek yeter.
 //
 //  DÜZEN (Gün 7, düzen referansının React karşılığı):
+//    satır 0 · Ali brief şeridi (avatar + üç sayaç) — sayaçlar kural motorundan
 //    satır 1 · sağlık skoru (kahraman) + 5 KPI kartı
 //    satır 2 · kamera | anlık durum | (öneriler + görevler)
 //    satır 3 · kuyruk | raf & stok | ısı haritası
@@ -17,6 +18,7 @@
 // ════════════════════════════════════════════════════════════════════════════
 
 import { useEffect } from 'react'
+import { AliKarti, AliSeridi, aliOzeti } from './ali'
 import { AnlikDurum, KpiSeridi, MagazaBasligi, SkorKart } from './kartlar'
 import { DonutDagilimi, IzgaraHaritasi } from './grafikler'
 import { useMagazaYayini } from './magaza-baglami'
@@ -59,6 +61,12 @@ export function Pano() {
   const bos = yukleniyor ? null : veri ?? null
   const alarmSayisi = veri?.alarmlar?.length ?? null
 
+  // Ali'nin üç sayacı TEK yerde hesaplanır; şerit ve sağ kolon kartı aynı
+  // sayıya bakar. Kaynak kural motorunun çıktısı — sabit sayı yok.
+  const aliOzet = aliOzeti(bos?.alarmlar ?? null, bos?.gorevOzeti ?? null)
+  // Kamera karesindeki kuyruk çizimi de gerçek KPI'dan beslenir.
+  const kuyrukKisi = bos?.kpiler?.find(k => k.anahtar === 'kuyruk_kisi')?.deger ?? null
+
   return (
     <>
       <header className="so-ust so-ust-pano">
@@ -94,6 +102,10 @@ export function Pano() {
             birlikte madde 11'i karşılar; on üç ayrı rozet kaldırıldı. */}
         {veri && <OrnekBant veriTipi={veri.veriTipi} />}
 
+        {/* ── 0 · Ali brief şeridi ───────────────────────────────────────────
+            Sayaçlar kural motorundan gelir (`aliOzeti`), uydurulmaz. */}
+        <AliSeridi ozet={aliOzet} uretildi={veri?.uretildi ?? null} />
+
         {/* ── 1 · Sağlık skoru + KPI ─────────────────────────────────────── */}
         <section className="so-satir-kpi">
           <SkorKart skor={bos?.saglikSkoru ?? null} />
@@ -102,9 +114,14 @@ export function Pano() {
 
         {/* ── 2 · Kamera | anlık durum | öneriler + görevler ──────────────── */}
         <section className="so-satir-orta">
-          <KameraPaneli kameralar={bos?.kameralar ?? null} />
+          <KameraPaneli kameralar={bos?.kameralar ?? null} kuyrukKisi={kuyrukKisi} />
           <AnlikDurum kpiler={bos?.kpiler ?? null} magaza={veri?.magaza ?? null} />
           <div className="so-sutun">
+            <AliKarti
+              alarmlar={bos?.alarmlar ?? null}
+              ozet={aliOzet}
+              skor={bos?.saglikSkoru ?? null}
+            />
             <OneriPaneli alarmlar={bos?.alarmlar ?? null} simdiMs={simdiMs} />
             <GorevPaneli gorevler={bos?.gorevler ?? null} ozet={veri?.gorevOzeti ?? null} />
           </div>
