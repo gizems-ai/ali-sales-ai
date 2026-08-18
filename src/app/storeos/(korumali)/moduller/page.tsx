@@ -26,7 +26,7 @@ export const dynamic = 'force-dynamic'
 
 const BOLUMLER = ['Operasyon', 'Yönetim'] as const
 
-const SIRA: ModulDurumu[] = ['canli', 'hat-hazir', 'sozlesme', 'plan']
+const SIRA: ModulDurumu[] = ['canli', 'ekran-demo', 'hat-hazir', 'sozlesme', 'plan']
 
 export default function ModullerSayfasi() {
   const sayim = durumSayimi()
@@ -35,16 +35,22 @@ export default function ModullerSayfasi() {
     <Kabuk aktif="/storeos/moduller">
       <header className="so-ust">
         <h1>Modül Haritası</h1>
-        <span className="so-nabiz">{MODULLER.length} modül · {sayim.canli} ekran canlı</span>
+        <span className="so-nabiz">
+          {MODULLER.length} modül · {sayim.canli} ekran canlı · {sayim['ekran-demo']} ekran örnek veriyle
+        </span>
       </header>
 
       <div className="so-govde">
         <Kart>
           <p className="so-altbilgi">
-            Store OS&apos;in kapsamı on beş modül. Bu demoda <b>{sayim.canli} ekran</b> uçtan uca
-            çalışıyor; kalan {MODULLER.length - sayim.canli} modülün büyük kısmında olay
-            sözleşmesi, alım hattı ve kural motoru zaten işliyor — eksik olan yalnızca kendi
-            ekranı. Aşağıdaki tablo hangisinin hangi aşamada olduğunu olduğu gibi gösterir.
+            Store OS&apos;in kapsamı on beş modül ve <b>on beşinin de ekranı var</b> — menüde gri
+            madde kalmadı. Ayrım şurada: <b>{sayim.canli} ekran</b> uçtan uca çalışıyor, yani
+            olay → kural → görev → WhatsApp → panel → denetim zinciri gerçek veriyle işliyor.
+            Kalan <b>{sayim['ekran-demo']} ekran</b> gezilebilir ama <b>salt okunur</b> ve örnek
+            (seed) veriyle beslenir; her birinin tepesinde bu uyarı sabit durur. Bu on bir
+            modülün çoğunda olay sözleşmesi, alım hattı ve kural motoru zaten işliyor — eksik
+            olan, ekranın o hatta bağlanması. Aşağıdaki tablo hangisinin hangi aşamada olduğunu
+            olduğu gibi gösterir.
           </p>
           <div className="so-modul-sayaclar">
             {SIRA.map(d => (
@@ -87,7 +93,8 @@ export default function ModullerSayfasi() {
           {/* Kesme listesi kararının ekrandaki izi — jüri sorarsa cevap burada. */}
           Bu ekran, on bir yarım modül ekranı yerine bilinçli olarak tek özet tablo olarak
           yazıldı. Bir modülün ekranı yazıldığında satırı burada kalır, yalnız durumu
-          &quot;ekran canlı&quot;ya döner ve menüdeki bağlantısı doğrudan o ekrana gider.
+          &quot;ekran hazır · örnek veri&quot;ye, gerçek zincire bağlandığında da &quot;ekran
+          canlı&quot;ya döner; menüdeki bağlantısı doğrudan o ekrana gider.
         </p>
       </div>
     </Kabuk>

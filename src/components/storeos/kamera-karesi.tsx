@@ -32,7 +32,7 @@ const KUTULU = [0, 4, 8, 11]
 const KASALAR: Array<[number, number]> = [[24, 60], [122, 60], [220, 62]]
 
 export function KameraKaresi({
-  kod, kuyruk = 0, mini = false,
+  kod, kuyruk = 0, mini = false, varyant = 0,
 }: {
   /** Sağ üstte yazan kamera kısa kodu (ör. "CAM 02"). */
   kod: string
@@ -40,10 +40,22 @@ export function KameraKaresi({
   kuyruk?: number
   /** Şerit küçük kareleri: HUD ve tespit kutuları çizilmez. */
   mini?: boolean
+  /**
+   * Sahne çeşitlemesi (18 Ağu 2026 · kapsam gösterisi). Altı kameralık ızgarada
+   * altı özdeş kare "tek görüntü altı kez kopyalanmış" gibi okunuyordu. Varyant
+   * yalnız SIRAYI kaydırır: kişi konumları hâlâ SABİT diziden gelir, `Math.random`
+   * yok, aynı varyant her zaman aynı kareyi verir.
+   */
+  varyant?: number
 }) {
   const kuyrukN = Math.max(0, Math.min(8, Math.round(kuyruk)))
   // Kuyruk 2. kasanın önünde, kasadan yukarı doğru dizilir.
   const kuyrukNoktalari = Array.from({ length: kuyrukN }, (_, i) => 126 - i * 8)
+
+  // Kaydırma + görünen kişi sayısı varyanta bağlı. Dizinin kendisi sabit.
+  const kaydir = ((varyant % GEZENLER.length) + GEZENLER.length) % GEZENLER.length
+  const gorunen = GEZENLER.length - (varyant % 4)
+  const gezenler = Array.from({ length: gorunen }, (_, i) => GEZENLER[(i + kaydir) % GEZENLER.length])
 
   return (
     <svg
@@ -68,8 +80,8 @@ export function KameraKaresi({
       {/* Kasa bantları */}
       {KASALAR.map(([x, w]) => <rect key={x} className="kasa" x={x} y="140" width={w} height="12" rx="3" />)}
 
-      {/* Anonim kişiler — reyon alanı */}
-      {GEZENLER.map(([x, y], i) => (
+      {/* Anonim kişiler — reyon alanı (varyant diziyi kaydırır, üretmez) */}
+      {gezenler.map(([x, y], i) => (
         <g key={`g${i}`}>
           {!mini && KUTULU.includes(i) && (
             <rect className="kutu" x={x - 5.5} y={y - 5.5} width="11" height="11" rx="2" />

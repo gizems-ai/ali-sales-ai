@@ -267,8 +267,12 @@ async function main() {
   ok('slug\'lar benzersiz', new Set(MODULLER.map(m => m.slug)).size === MODULLER.length)
   const canliler = MODULLER.filter(m => m.durum === 'canli')
   ok('dört modülün çalışan ekranı var', canliler.length === 4, String(canliler.length))
-  ok('yalnız canlı modüllerde doğrudan yol var',
-    MODULLER.every(m => (m.yol !== undefined) === (m.durum === 'canli')))
+  // 18 Ağu 2026 (kapsam gösterisi): `ekran-demo` durumu eklendi. Bu modüllerin
+  // de gezilebilir bir ekranı VAR, ama salt okunur ve örnek veriyle beslenir.
+  // Kural değişmedi, genişledi: yol varsa ekran gerçekten yazılmış olmalı.
+  const EKRANLI = new Set(['canli', 'ekran-demo'])
+  ok('yalnız ekranı yazılmış modüllerde doğrudan yol var',
+    MODULLER.every(m => (m.yol !== undefined) === EKRANLI.has(m.durum)))
   ok('ekranı olmayan madde modül haritasına iniyor',
     MODULLER.filter(m => !m.yol).every(m => modulYolu(m) === `/storeos/moduller#${m.slug}`))
   ok('her modül ne yaptığını ve neyin hazır olduğunu yazıyor',

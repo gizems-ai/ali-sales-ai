@@ -76,12 +76,17 @@ export function YarimGosterge({ deger, renk }: { deger: number; renk: string }) 
 const S_G = 260
 const S_Y = 104
 
-export function SikisikSeri({ seri }: { seri: Seri | null }) {
+/**
+ * @param esik Yatay eşik çizgisi (ör. kuyruk için 180 sn). Verilmezse çizilmez —
+ *   panodaki mevcut iki kullanım bu prop'u geçmiyor, davranışları değişmedi.
+ */
+export function SikisikSeri({ seri, esik = null }: { seri: Seri | null; esik?: number | null }) {
   if (!seri || seri.noktalar.length < 2) {
     return <Iskelet yukseklik={S_Y} />
   }
   const n = seri.noktalar.length
   const tumu = seri.noktalar.flatMap(p => [p.birincil, ...(p.ikincil === null ? [] : [p.ikincil])])
+  if (esik !== null) tumu.push(esik)
   const enB = Math.max(...tumu)
   const enK = Math.min(...tumu, 0)
   const aralik = enB - enK || 1
@@ -100,6 +105,12 @@ export function SikisikSeri({ seri }: { seri: Seri | null }) {
     <svg viewBox={`0 0 ${S_G} ${S_Y}`} style={{ width: '100%', height: 'auto' }} role="img" aria-label={seri.baslik}>
       {ikincil && (
         <path d={yol(ikincil, x, y)} fill="none" stroke={DEGISKEN.metinSilik} strokeWidth="1.6" strokeDasharray="4 4" />
+      )}
+      {esik !== null && (
+        <>
+          <path d={`M6 ${y(esik).toFixed(1)} H${S_G - 6}`} stroke={DEGISKEN.critical} strokeWidth="1.2" strokeDasharray="5 3" fill="none" />
+          <text x={S_G - 6} y={y(esik) - 3} fontSize="7.5" fill={DEGISKEN.critical} textAnchor="end">eşik</text>
+        </>
       )}
       <path d={yol(seri.noktalar.map(p => p.birincil), x, y)} fill="none" stroke={DEGISKEN.marka} strokeWidth="2.2" strokeLinejoin="round" />
       {seri.noktalar.map((p, i) => (

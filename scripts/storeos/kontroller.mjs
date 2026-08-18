@@ -33,6 +33,10 @@ const ADIMLAR = [
   // Pano ÇİZİMİ: tsc "derlenir" der, bu "çalışır" der. Gün 7 düzeninin
   // vaatlerini (5 kart + delta + trend + skor + tek bant) veriye karşı ölçer.
   ['Pano çizimi (14 kutu)',          'npx', ['-y', 'tsx', 'src/components/storeos/pano-cizim.test.tsx']],
+  // Modül ÇİZİMİ: on bir kapsam ekranı tek şablondan doğuyor; şablon patlarsa
+  // on biri birden patlar. Dürüstlük işaretleri (örnek-veri bandı, salt-okunur
+  // dipnotu) da burada kilitli — bir sayfa onları kapatamaz.
+  ['Modül ekranı çizimi (11 ekran)', 'npx', ['-y', 'tsx', 'src/components/storeos/modul-cizim.test.tsx']],
   ['Demo telefon kilidi',            'npx', ['-y', 'tsx', 'src/lib/storeos/kanal/telefon-kilidi.test.ts']],
   // --airtable BİLEREK VERİLMİYOR: kontroller çevrimdışı koşabilmeli ve canlı
   // base'e yazmamalı. Airtable tarafını doğrulamak için elle:

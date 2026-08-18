@@ -89,7 +89,17 @@ export function YanMenu({ aktif }: { aktif: string }) {
                   // TAM eşleşme: `#slug` olmadan karşılaştırsaydık modül
                   // haritası açıkken on bir madde birden "aktif" görünürdü.
                   aria-current={yol === aktif ? 'page' : undefined}
-                  title={o.yol ? undefined : `Ekranı henüz yok — modül haritasındaki satırına gider (${o.ad}).`}
+                  // 18 Ağu 2026: on bir modülün ekranı yazıldı, gri madde kalmadı.
+                  // Menü artık dürüstlüğü ipucuyla taşıyor: örnek veriyle beslenen
+                  // ekranlar bunu üzerine gelince söylüyor, ekranın kendisinde de
+                  // sabit bant var.
+                  title={
+                    o.durum === 'ekran-demo'
+                      ? `${o.ad} — ekran hazır, salt okunur ve örnek veriyle besleniyor.`
+                      : o.yol
+                        ? undefined
+                        : `Ekranı henüz yok — modül haritasındaki satırına gider (${o.ad}).`
+                  }
                 >
                   <span className="so-nav-ikon" aria-hidden="true">{o.ikon}</span>
                   <span className="so-nav-metin">{o.ad}</span>
@@ -101,17 +111,24 @@ export function YanMenu({ aktif }: { aktif: string }) {
       </div>
 
       {/*
-        Ali Asistan kartı. Düğme DEVRE DIŞI: sohbet ucu bu sürümde yok ve
-        çalışmayan bir düğmeyi tıklanabilir bırakmak demoda en kötü an olurdu.
+        Ali Asistan kartı. 18 Ağu 2026'da düğme AÇILDI: `/storeos/ali` ekranı
+        yazıldı. Ekran altı hazır senaryoyu yanıtlar (doğal dil sorgusu hâlâ
+        yok, bunu kendi ekranında açıkça söylüyor) — yani düğme artık gerçek
+        bir yere gidiyor, ölü değil.
         Avatar `/storeos/ali-avatar.png` (Gün 7'de eklendi); pano şeridi ve sağ
         kolon kartı da aynı görseli kullanır — Ali her yerde aynı yüz.
       */}
       <div className="so-ai-kart">
         <div className="so-ai-baslik">Ali Asistan <span aria-hidden="true">✦</span></div>
         <div className="so-ai-metin">Mağazanızla ilgili sorularınızı yanıtlayayım.</div>
-        <button type="button" className="so-dugme so-dugme-ana" disabled title="Sohbet ucu bu sürümde kapalı.">
+        <a
+          className="so-dugme so-dugme-ana"
+          href="/storeos/ali"
+          aria-current={aktif === '/storeos/ali' ? 'page' : undefined}
+          title="Altı hazır senaryo — doğal dil sorgusu pilotta."
+        >
           Ali&apos;ye Sor
-        </button>
+        </a>
         <div className="so-ai-avatar" aria-hidden="true">
           <Image src="/storeos/ali-avatar.png" alt="" width={112} height={112} />
         </div>
