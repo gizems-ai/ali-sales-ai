@@ -29,7 +29,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { AliCevabi } from '@/lib/storeos/depo/demo-metrikler'
-import { ALI_SENARYOLARI } from '@/lib/storeos/depo/demo-metrikler'
+import { ALI_SENARYOLARI, kayipModulu } from '@/lib/storeos/depo/demo-metrikler'
 import type { DashboardVerisi } from '@/lib/storeos/dashboard/tipler'
 import { aliOzeti } from './ali'
 import type { AliOzeti } from './ali'
@@ -68,10 +68,18 @@ const ACILIS: Mesaj = {
 
 /** `{alarm}` / `{gorev}` / `{uyari}` → kural motorunun gerçek sayıları. */
 function doldur(metin: string, o: AliOzeti): string {
+  // Kayıp jetonları kural motorundan DEĞİL, kayıp modelinden gelir — ve panodaki
+  // kartla aynı fonksiyondan (`kayipModulu`). Ali'nin ağzından çıkan tutar ile
+  // ekrandaki tutar bu yüzden ayrışamaz.
+  const k = kayipModulu(new Date().toISOString().slice(0, 10))
   return metin
     .replace(/\{alarm\}/g, String(o.gelisme))
     .replace(/\{gorev\}/g, String(o.gorev))
     .replace(/\{uyari\}/g, String(o.uyari))
+    .replace(/\{kayip\}/g, `₺${k.toplam.toLocaleString('tr-TR')}`)
+    .replace(/\{kayipKisi\}/g, String(k.etkilenenKisi))
+    .replace(/\{kayipDun\}/g, `₺${k.dunToplam.toLocaleString('tr-TR')}`)
+    .replace(/\{kayipPay\}/g, `%${k.kalemler[0].yuzde}`)
 }
 
 export function AliSohbet() {

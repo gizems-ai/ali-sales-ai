@@ -1,7 +1,20 @@
 // ════════════════════════════════════════════════════════════════════════════
-//  /storeos/raporlar — RAPORLAR (kapsam gösterisi · 18 Ağu 2026)
+//  /storeos/raporlar — RAPORLAR (derinleştirildi · 19 Ağu 2026)
 //
-//  Günlük karne önizlemesi, haftalık karşılaştırma ve zamanlanmış rapor listesi.
+//  Gün sonu raporu (A4 önizleme), haftalık karşılaştırma ve zamanlanmış rapor
+//  listesi.
+//
+//  ── NEDEN A4 ÖNİZLEME ──────────────────────────────────────────────────────
+//  Panelin tamamı ekran içindir; mağaza müdürünün gün sonunda elinde tuttuğu
+//  şey ise bir sayfadır. Bu ekran o sayfayı gösteriyor: Ali'nin dört cümlelik
+//  notu, günün ölçüleri, tamamlanan görevler ve kritik olaylar. Tarayıcının
+//  yazdır komutu (⌘P) yalnız bu sayfayı basar — yan menü ve düğmeler kâğıda
+//  gitmez, örnek-veri bandı ile salt-okunur dipnotu BİLEREK gider.
+//
+//  ── ALİ'NİN NOTU ───────────────────────────────────────────────────────────
+//  Kural motorunun çıktı biçiminde (durum → neden → etki → öneri) ama bu
+//  ekranda örnek veriden derleniyor; canlı motora bağlı değil. Cümlelerdeki
+//  her sayı hemen altındaki ölçü kutularıyla aynı kaynaktan gelir.
 //
 //  ── DÜĞMELER BİLEREK ÇALIŞMIYOR ────────────────────────────────────────────
 //  PDF / Excel / E-posta düğmeleri DEVRE DIŞI ve "yakında" rozeti taşır.
@@ -14,44 +27,44 @@
 
 import { Kabuk } from '@/components/storeos/kabuk'
 import {
-  ModulEkrani, ModulTablo, ModulYakindaDugmeler,
+  ModulA4Rapor, ModulEkrani, ModulTablo, ModulYakindaDugmeler,
 } from '@/components/storeos/modul-sablonu'
-import { Kart } from '@/components/storeos/temel'
 import { raporModulu } from '@/lib/storeos/depo/demo-metrikler'
 
 export const dynamic = 'force-dynamic'
 
 export default function RaporlarSayfasi() {
   const gun = new Date().toISOString().slice(0, 10)
-  const { gunluk, haftalik, zamanlanmis } = raporModulu(gun)
+  const { gunluk, gunSonu, haftalik, zamanlanmis } = raporModulu(gun)
 
   return (
     <Kabuk aktif="/storeos/raporlar">
       <ModulEkrani
         baslik="Raporlar"
-        aciklama="Günlük mağaza karnesi, haftalık karşılaştırma ve zamanlanmış rapor dağıtımı."
+        aciklama="Gün sonu raporu, haftalık karşılaştırma ve zamanlanmış rapor dağıtımı."
         kpiler={[]}
-        ustSag={<span className="so-nabiz">günlük karne · {gun}</span>}
+        ustSag={<span className="so-nabiz">gün sonu raporu · {gun}</span>}
       >
-        <Kart
-          baslik="Günlük mağaza karnesi"
-          ornek="demo"
-          sag={<span className="so-kart-not">{gun} · gün sonu önizleme</span>}
-        >
-          <div className="so-vt">
-            {gunluk.map(s => (
-              <div key={s.etiket} className="so-vt-satir" style={{ gridTemplateColumns: '1.4fr .8fr 1fr' }}>
-                <span className="so-vt-ad">{s.etiket}</span>
-                <span>{s.deger}</span>
-                <span>{s.not}</span>
-              </div>
-            ))}
-          </div>
-          <ModulYakindaDugmeler
-            dugmeler={['PDF indir', 'Excel indir', 'E-posta gönder']}
-            not="Rapor üretimi ve dağıtımı Faz 2'de açılıyor. Bu demoda düğmeler bilerek devre dışı: boş dosya üreten bir düğme koymuyoruz."
-          />
-        </Kart>
+        <ModulA4Rapor
+          baslik="Gün sonu mağaza raporu"
+          ustBilgi="Gratis Store OS · Mağaza 0178 — İzmir Forum Bornova"
+          gun={gun}
+          aliNotu={gunSonu.aliNotu}
+          olculer={gunluk}
+          tamamlanan={gunSonu.tamamlanan}
+          kritikOlaylar={gunSonu.kritikOlaylar}
+          altBilgi={
+            'Bu rapor Store OS tarafından gün sonunda otomatik üretilir. Bu önizlemedeki '
+            + 'sayılar örnek (seed) veridir; pilotta mağazanın kendi ölçümleriyle dolar. '
+            + 'Ali\'nin notu kural motorunun çıktı biçiminde derlenmiştir.'
+          }
+          altEk={
+            <ModulYakindaDugmeler
+              dugmeler={['PDF indir', 'Excel indir', 'E-posta gönder']}
+              not="Rapor dosyası üretimi ve dağıtımı Faz 2'de açılıyor. Bu demoda düğmeler bilerek devre dışı: boş dosya üreten bir düğme koymuyoruz. Sayfanın kendisi tarayıcıdan yazdırılabilir."
+            />
+          }
+        />
 
         <ModulTablo
           baslik="Haftalık karşılaştırma"

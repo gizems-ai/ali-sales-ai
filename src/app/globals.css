@@ -258,6 +258,7 @@
   --so-kam-hud:    rgba(255, 255, 255, .55);
   --so-kam-rec:    #ff5a6a;
   --so-kam-tarama: rgba(174, 240, 194, .30);
+  --so-kam-damga-zemin: rgba(12, 10, 24, .55);   /* kare üstündeki zaman damgası kutusu */
 
   /* ── Takma adlar ──────────────────────────────────────────────────────────
      Düzen referansı (17 Ağu 2026) bu adları kullanıyor. İki sözlük tek değere
@@ -1417,3 +1418,523 @@
 .storeos-root a.so-kam-kart[aria-current="true"] {
   border-color: var(--so-marka); box-shadow: 0 0 0 2px var(--so-marka-zemin);
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+   ÇOK MAĞAZALI GÖRÜNÜM (19 Ağu 2026 · kozmetik derinleştirme)
+   Tıklanabilir tablo satırı + üç kutuluk uyarı şeridi. Yeni token yok.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.storeos-root a.so-vt-link { text-decoration: none; color: var(--so-metin-soluk); }
+.storeos-root a.so-vt-link:hover { background: var(--so-marka-zemin); }
+.storeos-root a.so-vt-link .so-vt-ad { text-decoration: underline; text-underline-offset: 3px; }
+/* Tıklanamayan satır: imleç "sebebi var" desin, tıklanabilir gibi durmasın. */
+.storeos-root .so-vt-satir[data-pasif] { cursor: help; }
+
+.storeos-root .so-serit {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px; padding: 12px 14px 14px;
+}
+.storeos-root .so-serit-kutu {
+  display: block; padding: 11px 12px; border-radius: var(--so-radius-sm);
+  border: 1px solid var(--so-cizgi); border-left-width: 3px;
+  background: var(--so-yuzey-2); text-decoration: none; min-width: 0;
+}
+.storeos-root a.so-serit-kutu:hover { border-color: var(--so-marka); }
+.storeos-root .so-serit-kutu[data-vurgu="iyi"]    { border-left-color: var(--so-low); }
+.storeos-root .so-serit-kutu[data-vurgu="dikkat"] { border-left-color: var(--so-medium); }
+.storeos-root .so-serit-kutu[data-vurgu="kritik"] { border-left-color: var(--so-critical); }
+.storeos-root .so-serit-ust {
+  font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--so-metin-silik);
+}
+.storeos-root .so-serit-ana {
+  margin-top: 3px; font-size: 14px; font-weight: 700; color: var(--so-metin);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.storeos-root .so-serit-alt {
+  margin-top: 3px; font-size: 11px; line-height: 1.5; color: var(--so-metin-soluk);
+}
+
+  /* ── OPERASYONEL KAYIP SATIŞ (19 Ağu 2026) ─────────────────────────────────
+     Tek büyük sayı + hemen altında modelin adı. Uyarı satırı `so-buyuk`un
+     ayrılmaz parçası: rengi silik değil OKUNUR, çünkü işi sayıyı küçültmek
+     değil, sayının cinsini söylemek. */
+  .storeos-root .so-buyuk {
+    padding: 6px 0 2px;
+  }
+  .storeos-root .so-buyuk-sayi {
+    font-size: 40px;
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--so-metin);
+    font-variant-numeric: tabular-nums;
+  }
+  .storeos-root .so-buyuk-alt {
+    margin-top: 4px;
+    font-size: 12px;
+    color: var(--so-metin-silik);
+  }
+  .storeos-root .so-buyuk-fark {
+    margin-top: 8px;
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--so-yuzey-2);
+    color: var(--so-metin-silik);
+  }
+  .storeos-root .so-buyuk-fark[data-yon="iyi"] { color: var(--so-low); }
+  .storeos-root .so-buyuk-fark[data-yon="kotu"] { color: var(--so-critical); }
+  .storeos-root .so-buyuk-uyari {
+    margin: 12px 0 0;
+    padding-top: 8px;
+    border-top: 1px solid var(--so-cizgi);
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--so-metin-silik);
+  }
+
+  /* Panodaki kayıp kartı: dört sütunlu satırın tamamını kaplar. */
+  .storeos-root .so-satir-kayip {
+    display: grid;
+    grid-template-columns: minmax(260px, 1fr) minmax(300px, 2fr);
+    gap: var(--so-bosluk);
+  }
+
+  /* ══ WHATSAPP AKIŞI (19 Ağu 2026) ══════════════════════════════════════════
+     Baloncuklar WhatsApp'ı TAKLİT ETMİYOR: yeşil sohbet zemini, tik ikonları
+     ve profil fotoğrafı yok. Amaç "bu bir WhatsApp ekran görüntüsü" izlenimi
+     vermek değil, panelden çıkan mesajın içeriğini ve akıbetini göstermek.
+     Sahte ekran görüntüsü, jüri gerçek telefonu istediğinde geri teper. */
+  .storeos-root .so-wa { display: flex; flex-direction: column; gap: 18px; }
+  .storeos-root .so-wa-grup { display: flex; flex-direction: column; gap: 6px; }
+  .storeos-root .so-wa-satir { display: flex; }
+  .storeos-root .so-wa-satir[data-yon="gelen"] { justify-content: flex-end; }
+  .storeos-root .so-wa-balon {
+    max-width: 560px;
+    padding: 11px 13px;
+    border: 1px solid var(--so-cizgi);
+    border-radius: var(--so-radius-sm);
+    background: var(--so-yuzey-2);
+  }
+  .storeos-root .so-wa-balon[data-yon="gelen"] {
+    background: var(--so-marka-zemin);
+    border-color: var(--so-marka);
+  }
+  .storeos-root .so-wa-kim {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 10.5px;
+    font-weight: 750;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+    color: var(--so-metin-silik);
+  }
+  .storeos-root .so-wa-rol {
+    padding: 1.5px 7px;
+    border-radius: 999px;
+    background: var(--so-cip-notr-bg);
+    color: var(--so-cip-notr-ink);
+    font-size: 9.5px;
+    letter-spacing: .02em;
+    text-transform: none;
+  }
+  /* Gövde `pre`: mesajdaki satır sonları gerçekte de anlam taşıyor
+     (başlık · boşluk · açıklama · künye). Paragrafa çevirmek mesajı değiştirmek olurdu. */
+  .storeos-root .so-wa-govde {
+    margin: 7px 0 0;
+    font-family: inherit;
+    font-size: 12.5px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--so-metin);
+  }
+  .storeos-root .so-wa-butonlar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 10px;
+    padding-top: 9px;
+    border-top: 1px solid var(--so-cizgi);
+  }
+  .storeos-root .so-wa-buton {
+    padding: 5px 11px;
+    border: 1px solid var(--so-cizgi);
+    border-radius: 8px;
+    background: var(--so-zemin);
+    font-size: 11px;
+    font-weight: 650;
+    color: var(--so-marka-koyu);
+  }
+  .storeos-root .so-wa-alt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    font-size: 10.5px;
+    color: var(--so-metin-silik);
+    font-variant-numeric: tabular-nums;
+  }
+  .storeos-root .so-wa-durum[data-durum="okundu"] { color: var(--so-low); font-weight: 650; }
+  .storeos-root .so-wa-yanit {
+    margin-top: 7px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--so-marka-koyu);
+  }
+  .storeos-root .so-wa-sonuc { color: var(--so-metin-soluk); }
+  .storeos-root .so-wa-iz {
+    padding-left: 2px;
+    font-size: 10.5px;
+    color: var(--so-metin-silik);
+  }
+  .storeos-root .so-wa-dipnot {
+    margin: 14px 0 0;
+    padding-top: 10px;
+    border-top: 1px solid var(--so-cizgi-kart);
+    font-size: 11px;
+    line-height: 1.55;
+    color: var(--so-metin-silik);
+  }
+  .storeos-root .so-wa-dipnot code {
+    padding: 1px 5px;
+    border-radius: 5px;
+    background: var(--so-yuzey-2);
+    font-size: 10.5px;
+  }
+
+  /* ══ GÜN SONU RAPORU · A4 (19 Ağu 2026) ════════════════════════════════════
+     Genişlik 794px = A4'ün 96 dpi karşılığı. Sayfa yüksekliği ZORLANMIYOR:
+     sabit yükseklik verip içeriği kırpmak, "rapor sığmadı" gibi okunurdu. */
+  .storeos-root .so-a4-cerceve { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+  .storeos-root .so-a4 {
+    width: 100%;
+    max-width: 794px;
+    padding: 34px 38px 26px;
+    background: var(--so-zemin);
+    border: 1px solid var(--so-cizgi);
+    border-radius: var(--so-radius-sm);
+    box-shadow: var(--so-golge);
+    color: var(--so-metin);
+  }
+  .storeos-root .so-a4-bas {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 2px solid var(--so-marka);
+  }
+  .storeos-root .so-a4-marka {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    color: var(--so-metin-silik);
+  }
+  .storeos-root .so-a4-baslik { margin: 4px 0 0; font-size: 21px; font-weight: 750; letter-spacing: -.01em; }
+  .storeos-root .so-a4-tarih { font-size: 12px; font-weight: 650; color: var(--so-metin-soluk); white-space: nowrap; }
+  .storeos-root .so-a4-not {
+    margin-top: 16px;
+    padding: 13px 15px;
+    border-left: 3px solid var(--so-marka);
+    border-radius: 0 var(--so-radius-sm) var(--so-radius-sm) 0;
+    background: var(--so-marka-zemin);
+  }
+  .storeos-root .so-a4-not-bas {
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: var(--so-marka-koyu);
+  }
+  .storeos-root .so-a4-not-metin { margin: 7px 0 0; font-size: 12.5px; line-height: 1.6; }
+  .storeos-root .so-a4-olculer {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    margin-top: 18px;
+    background: var(--so-cizgi);
+    border: 1px solid var(--so-cizgi);
+    border-radius: var(--so-radius-sm);
+    overflow: hidden;
+  }
+  .storeos-root .so-a4-olcu { padding: 11px 13px; background: var(--so-zemin); }
+  .storeos-root .so-a4-olcu-etiket { font-size: 10.5px; font-weight: 650; color: var(--so-metin-silik); }
+  .storeos-root .so-a4-olcu-deger {
+    margin-top: 3px;
+    font-size: 18px;
+    font-weight: 750;
+    font-variant-numeric: tabular-nums;
+  }
+  .storeos-root .so-a4-olcu-not { margin-top: 1px; font-size: 10px; color: var(--so-metin-silik); }
+  .storeos-root .so-a4-bolum { margin-top: 20px; }
+  .storeos-root .so-a4-bolum-bas {
+    margin: 0 0 6px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid var(--so-cizgi);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: .05em;
+    text-transform: uppercase;
+    color: var(--so-metin-soluk);
+  }
+  .storeos-root .so-a4-satir {
+    display: grid;
+    grid-template-columns: 54px 1fr auto;
+    gap: 10px;
+    padding: 7px 0;
+    border-bottom: 1px solid var(--so-cizgi-kart);
+    font-size: 12px;
+  }
+  .storeos-root .so-a4-satir:last-child { border-bottom: 0; }
+  .storeos-root .so-a4-saat { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--so-metin-soluk); }
+  .storeos-root .so-a4-kisi { font-size: 11px; color: var(--so-metin-silik); white-space: nowrap; }
+  .storeos-root .so-a4-sonuc { display: block; margin-top: 2px; font-size: 11px; color: var(--so-metin-silik); }
+  .storeos-root .so-a4-alt {
+    margin-top: 22px;
+    padding-top: 10px;
+    border-top: 1px solid var(--so-cizgi);
+    font-size: 10.5px;
+    line-height: 1.5;
+    color: var(--so-metin-silik);
+  }
+
+  /* Yazdırma: ekranda panel, kâğıtta yalnız rapor. Yan menü, başlık şeridi ve
+     devre dışı düğmeler kâğıda basılmaz — çıktı gerçek bir belge gibi görünsün.
+     Yazdırma düğmesi YOK; tarayıcının kendi komutu bunu zaten yapıyor. */
+  @media print {
+    /* Kâğıda GİTMEYENLER: yan menü, yapışkan başlık, devre dışı düğmeler ve
+       raporun altındaki ekran kartları (haftalık tablo, zamanlanmış listeler). */
+    .storeos-root .so-yan,
+    .storeos-root .so-ust,
+    .storeos-root .so-yakinda-kutu,
+    .storeos-root .so-govde > .so-kart,
+    .storeos-root .so-govde > .so-izgara { display: none !important; }
+    /* Kâğıda GİDENLER — bilerek: örnek-veri bandı ve salt-okunur dipnotu.
+       Yazdırılan sayfa panelden kopunca dürüstlük işaretleri de gitmiş olurdu;
+       elden ele dolaşan çıktının "gerçek ölçüm" sanılması bu demoda en pahalı
+       yanlış anlama olurdu. */
+    .storeos-root .so-ornek-bant,
+    .storeos-root .so-modul-dipnot { display: block !important; }
+    .storeos-root .so-kabuk { display: block; }
+    .storeos-root .so-ana { padding: 0; }
+    .storeos-root .so-a4 {
+      max-width: none;
+      border: 0;
+      box-shadow: none;
+      padding: 0;
+    }
+  }
+
+  /* ══ MÜŞTERİ YOLCULUĞU AKIŞI (19 Ağu 2026) ═════════════════════════════════
+     Kutu → ok → kutu. Dar ekranda `flex-wrap` ile satır sarar; ok o zaman
+     yatay kalır ama yerleşim kırılmaz (jüri ekranı geniş, bu bir emniyet). */
+  .storeos-root .so-akis {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: stretch;
+    gap: 4px;
+  }
+  .storeos-root .so-akis-adim {
+    position: relative;
+    flex: 1 1 110px;
+    min-width: 96px;
+    padding: 10px 10px 12px;
+    border: 1px solid var(--so-cizgi);
+    border-radius: var(--so-radius-sm);
+    background: var(--so-yuzey-2);
+    overflow: hidden;
+  }
+  .storeos-root .so-akis-adim[data-son="1"] {
+    border-color: var(--so-marka);
+    background: var(--so-marka-zemin);
+  }
+  .storeos-root .so-akis-ad {
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    color: var(--so-metin-silik);
+  }
+  .storeos-root .so-akis-kisi {
+    margin-top: 4px;
+    font-size: 19px;
+    font-weight: 750;
+    line-height: 1.1;
+    color: var(--so-metin);
+    font-variant-numeric: tabular-nums;
+  }
+  .storeos-root .so-akis-pay { margin-top: 1px; font-size: 11px; color: var(--so-metin-soluk); }
+  /* Dolgu: ilk adıma göre oran. Kutunun ALT kenarında ince bir şerit —
+     arka plan boyamak sayıların okunurluğunu düşürüyordu. */
+  .storeos-root .so-akis-dolgu {
+    position: absolute;
+    left: 0; bottom: 0;
+    height: 3px;
+    background: var(--so-marka-soluk);
+  }
+  .storeos-root .so-akis-adim[data-son="1"] .so-akis-dolgu { background: var(--so-marka); }
+  .storeos-root .so-akis-ok {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-width: 52px;
+    padding: 0 2px;
+  }
+  .storeos-root .so-akis-cizgi {
+    width: 100%;
+    height: 1px;
+    background: var(--so-cizgi);
+  }
+  .storeos-root .so-akis-dusus {
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--so-metin-silik);
+    font-variant-numeric: tabular-nums;
+  }
+  /* Ağır düşüş (≥%35) kırmızıya döner: akışın nerede koptuğunu ekrana
+     bakan kişi tek bakışta bulsun. */
+  .storeos-root .so-akis-dusus[data-agir="1"] { color: var(--so-critical); }
+  .storeos-root .so-akis-dipnot {
+    margin: 10px 0 0;
+    padding-top: 8px;
+    border-top: 1px solid var(--so-cizgi-kart);
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--so-metin-silik);
+  }
+
+  /* ══ KAMPANYA UYGULAMA MATRİSİ (19 Ağu 2026) ═══════════════════════════════
+     Izgara şablonu satır satır inline geliyor (sütun sayısı veriden), renk ve
+     ritim burada. Yeni renk token'ı YOK — işaretler mevcut durum renklerini
+     kullanıyor. */
+  .storeos-root .so-mtx { display: flex; flex-direction: column; }
+  .storeos-root .so-mtx-satir {
+    display: grid;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 4px;
+    border-bottom: 1px solid var(--so-cizgi-kart);
+    font-size: 12px;
+  }
+  .storeos-root .so-mtx-satir:last-child { border-bottom: 0; }
+  .storeos-root .so-mtx-bas {
+    padding-bottom: 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--so-metin-silik);
+    border-bottom: 1px solid var(--so-cizgi);
+  }
+  .storeos-root .so-mtx-orta { text-align: center; }
+  .storeos-root .so-mtx-ad-ust { font-weight: 650; color: var(--so-metin); }
+  .storeos-root .so-mtx-ad-alt { margin-top: 2px; font-size: 10.5px; color: var(--so-metin-silik); }
+  /* İşaret: yalnız renk değil ŞEKİL de değişiyor (✓/✗) — renk körlüğünde de
+     okunur kalması için. */
+  .storeos-root .so-mtx-isaret {
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--so-critical);
+  }
+  .storeos-root .so-mtx-isaret[data-tamam="1"] { color: var(--so-low); }
+  .storeos-root .so-mtx-yuzde {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .storeos-root .so-mtx-yuzde[data-vurgu="iyi"] { color: var(--so-low); }
+  .storeos-root .so-mtx-yuzde[data-vurgu="dikkat"] { color: var(--so-medium); }
+  .storeos-root .so-mtx-yuzde[data-vurgu="kritik"] { color: var(--so-critical); }
+  .storeos-root .so-mtx-eylem { display: flex; justify-content: flex-end; }
+  .storeos-root .so-mtx-tam {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--so-metin-silik);
+  }
+
+  /* ══ CANLILIK (19 Ağu 2026) ═════════════════════════════════════════════════
+     Kural: CSS animasyon, JS zamanlayıcı YOK. Hiçbiri yeni istek doğurmaz,
+     anket bütçesine dokunmaz. Hepsi `prefers-reduced-motion` altında susar —
+     blokun sonundaki tek `@media` bunu topluca yapar.
+
+     Neden JS yok: panonun iki kademeli anketi zaten kurulu; ekranı canlı
+     göstermek için ikinci bir zamanlayıcı kurmak, tarayıcı sekmesi arka plana
+     düştüğünde durmayan bir yük bırakırdı. */
+
+  /* 1 · KPI değerleri: kart mount olurken aşağıdan belirir, sırayla.
+        Her kart 60 ms geriden girer — göz sayıları tek tek okur, ekran
+        "yüklendi" değil "doldu" hissi verir. Anket turlarında React aynı DOM
+        düğümünü koruduğu için animasyon TEKRARLAMAZ; yalnız ilk gelişte oynar. */
+  @keyframes so-belir { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+  .storeos-root .so-kpi-deger {
+    animation: so-belir 420ms cubic-bezier(.2, .7, .3, 1) both;
+  }
+  .storeos-root .so-kpi-kart:nth-child(1) .so-kpi-deger { animation-delay: 0ms; }
+  .storeos-root .so-kpi-kart:nth-child(2) .so-kpi-deger { animation-delay: 60ms; }
+  .storeos-root .so-kpi-kart:nth-child(3) .so-kpi-deger { animation-delay: 120ms; }
+  .storeos-root .so-kpi-kart:nth-child(4) .so-kpi-deger { animation-delay: 180ms; }
+  .storeos-root .so-kpi-kart:nth-child(5) .so-kpi-deger { animation-delay: 240ms; }
+  .storeos-root .so-buyuk-sayi {
+    animation: so-belir 480ms cubic-bezier(.2, .7, .3, 1) both;
+  }
+
+  /* 2 · CANLI rozetleri nefes alır. Nokta zaten vardı, duruyordu. */
+  @keyframes so-canli-nabiz { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .35; transform: scale(.8); } }
+  .storeos-root .so-rozet-canli::before,
+  .storeos-root .so-canli-nokta::before {
+    animation: so-canli-nabiz 2.2s ease-in-out infinite;
+  }
+
+  /* 3 · Yeni alarm üstten kayarak girer ve bir an vurgulanır.
+        `key={olayId}` sayesinde YALNIZ yeni satır yeni DOM düğümü alır; eski
+        satırlar yeniden çizilmediği için animasyon onlarda oynamaz. Yani bu
+        efekt "yeni olay geldi" bilgisini taşır, süs değildir. */
+  @keyframes so-alarm-gir { 0% { opacity: 0; transform: translateY(-10px); } 60%, 100% { opacity: 1; transform: translateY(0); } }
+  @keyframes so-alarm-vurgu { 0% { box-shadow: 0 0 0 2px var(--so-marka-zemin); } 100% { box-shadow: 0 0 0 2px transparent; } }
+  .storeos-root .so-oneri {
+    animation:
+      so-alarm-gir 380ms cubic-bezier(.2, .7, .3, 1) both,
+      so-alarm-vurgu 1800ms ease-out 380ms both;
+  }
+
+  /* 4 · Kamera zaman damgası: saniye JS'siz işler.
+        `@property` desteklenmeyen tarayıcıda sayaç 00'da donar — kare kırılmaz,
+        yalnız hareketsiz kalır. Bilinçli bozulma. */
+  @property --so-sn { syntax: '<integer>'; initial-value: 0; inherits: false; }
+  @keyframes so-sn-say { to { --so-sn: 60; } }
+  .storeos-root .so-kamera-saat {
+    position: absolute; top: 8px; right: 10px; z-index: 2;
+    font-size: 10px; font-weight: 700; letter-spacing: .06em;
+    font-variant-numeric: tabular-nums;
+    color: var(--so-kam-hud);
+    background: var(--so-kam-damga-zemin);
+    padding: 2px 7px; border-radius: 4px;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .storeos-root .so-kamera-saat::before {
+    content: ""; width: 5px; height: 5px; border-radius: 50%;
+    background: var(--so-kam-rec);
+    animation: so-rec 1.6s steps(1, end) infinite;
+  }
+  .storeos-root .so-kamera-saat::after {
+    counter-reset: sn var(--so-sn);
+    content: "00:" counter(sn, decimal-leading-zero);
+    animation: so-sn-say 60s steps(60, end) infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .storeos-root .so-kpi-deger,
+    .storeos-root .so-buyuk-sayi,
+    .storeos-root .so-oneri,
+    .storeos-root .so-rozet-canli::before,
+    .storeos-root .so-canli-nokta::before,
+    .storeos-root .so-kamera-saat::before,
+    .storeos-root .so-kamera-saat::after { animation: none; }
+  }

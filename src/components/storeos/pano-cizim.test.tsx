@@ -263,7 +263,12 @@ async function main() {
   // Menüdeki on bir gri madde artık var olan bir ekrana iniyor. Ölü çapa
   // kalırsa jüri tıklar ve hiçbir şey olmaz — bunu burada yakalıyoruz.
   console.log('\n── modül haritası ──')
-  ok('on beş modül tanımlı', MODULLER.length === 15, String(MODULLER.length))
+  // Sayı SABİTLENMİYOR: 19 Ağu'da çok mağazalı görünüm iki modül daha ekledi
+  // ve bu satır kırıldı. Testin derdi "kaç tane" değil, "hepsi eksiksiz mi";
+  // alt sınır bir gerileme (modülün sessizce düşmesi) için duruyor.
+  ok('modül haritası dolu', MODULLER.length >= 15, String(MODULLER.length))
+  ok('her modülün bölüm/ikon/özet alanı dolu',
+    MODULLER.every(m => m.bolum.length > 0 && m.ikon.length > 0))
   ok('slug\'lar benzersiz', new Set(MODULLER.map(m => m.slug)).size === MODULLER.length)
   const canliler = MODULLER.filter(m => m.durum === 'canli')
   ok('dört modülün çalışan ekranı var', canliler.length === 4, String(canliler.length))

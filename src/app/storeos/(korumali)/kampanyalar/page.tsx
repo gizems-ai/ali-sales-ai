@@ -1,8 +1,19 @@
 // ════════════════════════════════════════════════════════════════════════════
-//  /storeos/kampanyalar — KAMPANYALAR (kapsam gösterisi · 18 Ağu 2026)
+//  /storeos/kampanyalar — KAMPANYALAR (derinleştirildi · 19 Ağu 2026)
 //
-//  Aktif kampanyalar, uygulama kontrol listesi, kampanya alanı trafiği
-//  (öncesi/sonrası) ve mağaza karşılaştırması.
+//  Aktif kampanyalar → uygulama matrisi (afiş · stant · fiyat etiketi · ürün
+//  yerleşimi) → kampanya alanı ölçümü (süre + dönüşüm) → öncesi/sonrası
+//  trafik → mağaza karşılaştırması.
+//
+//  ── NEDEN BU EKRAN DERİNLEŞTİ ───────────────────────────────────────────────
+//  Kuyruk, kişi sayımı, raf doluluk rakiplerde de var. Drogeri kampanya yoğun
+//  çalışır: "afiş asıldı mı, fiyat etiketi doğru mu, teşhir kaç mağazada tam"
+//  sorusu Gratis'in kendi dili. Matris bu soruyu tek ekranda cevaplıyor.
+//
+//  ── UYGUNLUK YÜZDESİ TEK KAYNAKTAN ──────────────────────────────────────────
+//  Üstteki "Teşhir uygunluğu" KPI'ı, matrisin yayındaki kampanya ortalaması.
+//  Alttaki mağaza karşılaştırması da aynı sayıyı okur. Üç yerde üç farklı
+//  yüzde çıkmasın diye hepsi `kampanyaModulu()` içinde hesaplanıyor.
 //
 //  ── ÇOK MAĞAZA KARŞILAŞTIRMASI ─────────────────────────────────────────────
 //  Tabloda tek gerçek mağaza var (0178) ve ikinci satır "Diğer mağazalar —
@@ -14,16 +25,19 @@
 
 import { Kabuk } from '@/components/storeos/kabuk'
 import {
-  ModulDagilim, ModulEkrani, ModulIkili, ModulKontrolListesi, ModulTablo,
+  ModulDagilim, ModulEkrani, ModulIkili, ModulTablo, ModulUygunlukMatrisi,
 } from '@/components/storeos/modul-sablonu'
-import { kampanyaModulu } from '@/lib/storeos/depo/demo-metrikler'
+import { KAMPANYA_MADDELERI, kampanyaModulu } from '@/lib/storeos/depo/demo-metrikler'
 
 export const dynamic = 'force-dynamic'
 
 export default function KampanyalarSayfasi() {
   const gun = new Date().toISOString().slice(0, 10)
-  const { kpiler, kampanyalar, kontrolListesi, trafik, magazalar } = kampanyaModulu(gun)
+  const {
+    kpiler, kampanyalar, uygulamalar, alanOlcumleri, trafik, magazalar,
+  } = kampanyaModulu(gun)
   const yayinda = kampanyalar.filter(k => k.durum === 'Yayında').length
+  const eksikli = uygulamalar.filter(u => !u.hazirlikta && u.eksik.length > 0).length
 
   return (
     <Kabuk aktif="/storeos/kampanyalar">
@@ -44,11 +58,35 @@ export default function KampanyalarSayfasi() {
           }))}
         />
 
+        {/* Ekranın omurgası: hangi kampanyada ne eksik. */}
+        <ModulUygunlukMatrisi
+          baslik="Uygulama kontrolü — teşhir uygunluğu"
+          sutunlar={KAMPANYA_MADDELERI}
+          satirlar={uygulamalar.map(u => ({
+            anahtar: u.kampanya,
+            ad: u.kampanya,
+            alt: u.hazirlikta ? `${u.alan} · hazırlıkta` : `${u.alan} · sorumlu ${u.sorumlu}`,
+            isaretler: u.isaretler,
+            uygunluk: u.uygunluk,
+            eksik: u.eksik,
+          }))}
+          not={
+            eksikli > 0
+              ? `${eksikli} yayındaki kampanyada teşhir eksiği var`
+              : 'yayındaki kampanyalarda teşhir tam'
+          }
+          eylemIpucu="görev açma bu ekranda pilotta; bugün görevler kural motorundan ve Görevler ekranından açılıyor"
+        />
+
         <ModulIkili>
-          <ModulKontrolListesi
-            baslik="Uygulama kontrol listesi"
-            maddeler={kontrolListesi.map(m => ({
-              anahtar: m.madde, metin: m.madde, tamam: m.tamam, alt: m.sorumlu,
+          <ModulTablo
+            baslik="Kampanya alanı: süre ve dönüşüm"
+            basliklar={['Ölçü', 'Kampanya alanı', 'Mağaza ort.', 'Fark']}
+            sutunlar="1.5fr .9fr .8fr .8fr"
+            satirlar={alanOlcumleri.map(a => ({
+              anahtar: a.etiket,
+              hucreler: [a.etiket, a.kampanyaAlani, a.magazaOrtalamasi, a.fark],
+              vurgu: a.vurgu,
             }))}
           />
           <ModulDagilim

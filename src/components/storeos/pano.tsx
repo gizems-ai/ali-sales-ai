@@ -26,6 +26,7 @@ import {
   GorevPaneli, HizliIslemler, KameraPaneli, KasaPaneli,
   KuyrukPaneli, OneriPaneli, SatisPaneli, StokPaneli,
 } from './paneller'
+import { KayipKarti } from './kayip'
 import { HataDurumu, Kart, OrnekBant, gecenSure, sayiYaz, tarihUzunYaz } from './temel'
 import { usePano } from './use-pano'
 
@@ -110,6 +111,13 @@ export function Pano() {
         <section className="so-satir-kpi">
           <SkorKart skor={bos?.saglikSkoru ?? null} />
           <KpiSeridi kartlar={bos?.kpiler ?? null} />
+        </section>
+
+        {/* ── 1b · Operasyonel kayıp (19 Ağu) ────────────────────────────
+            Panonun tek MODEL kartı; seed'den beslenir, istek atmaz. Uyarı
+            cümlesi kartın İÇİNDE — bkz. `kayip.tsx`. */}
+        <section className="so-satir-kayip">
+          <KayipKarti />
         </section>
 
         {/* ── 2 · Kamera | anlık durum | öneriler + görevler ──────────────── */}

@@ -423,19 +423,97 @@ export function rafModulu(gun: string): {
 
 // ─── 5 · Mağaza Analizleri ───────────────────────────────────────────────────
 
+/**
+ * Müşteri yolculuğu — mağaza içinde en sık izlenen yol.
+ *
+ * ── "HUNİ" DEĞİL "YOL" ─────────────────────────────────────────────────────
+ * Adımlar bir huni gibi okunuyor ama huni DEĞİL: Makyaj'a girmek Cilt
+ * Bakım'ın ön koşulu değil. Gösterilen şey, gün içinde en çok tekrarlanan
+ * güzergâh ve her adımda o güzergâhı bırakanların oranı. Ekranda da böyle
+ * yazıyor — "en sık izlenen yol". Huni diye sunmak, jürinin ilk teknik
+ * sorusunda çöker.
+ *
+ * ── ANONİMLİK ──────────────────────────────────────────────────────────────
+ * Yol, kişi takibiyle değil bölge geçiş sayımıyla çıkar. Kimlik, yüz eşleşmesi
+ * veya cihaz takibi yok; aynı kişi iki kez geçerse iki geçiş sayılır.
+ */
+export interface YolculukAdimi {
+  ad: string
+  kisi: number
+  /** Önceki adıma göre kayıp yüzdesi. İlk adımda 0. */
+  dusus: number
+}
+
 export function analizModulu(gun: string): {
   kpiler: ModulKpi[]
   ziyaretciBugunDun: ModulSeri
   ziyaretciGecenHafta: ModulSeri
   huni: DagilimDetay[]
+  yolculuk: YolculukAdimi[]
+  kasaOncesiTerk: number
+  alanlar: Array<{ ad: string; ziyaret: number; pay: number; not: string }>
   kalisSuresi: DagilimDetay[]
   izgara: IzgaraDetay
 } {
   const bugun = SAATLER.map(s => sec(`an-b-${gun}-${s}`, 42, 210))
+
+  // ── Tek sayı zinciri ───────────────────────────────────────────────────────
+  // Ziyaretçi sayısı BİR kere üretiliyor; huni, yolculuk, dönüşüm KPI'ı ve
+  // alan payları hepsi bu zincirden türüyor. Eskiden huninin ilk basamağı ile
+  // Ziyaretçi KPI'ı ayrı `sec()` çağrılarıydı — aynı ekranda iki farklı
+  // "kaç kişi girdi" cevabı veriyorlardı.
+  const giris = sec(`an-z-${gun}`, 1150, 1980)
+  const oranla = (anahtar: string, alt: number, ust: number, taban: number) =>
+    Math.round((taban * sec(anahtar, alt, ust)) / 100)
+
+  const makyaj = oranla(`an-y1-${gun}`, 58, 72, giris)
+  const cilt = oranla(`an-y2-${gun}`, 62, 78, makyaj)
+  const parfum = oranla(`an-y3-${gun}`, 55, 72, cilt)
+  const kasa = oranla(`an-y4-${gun}`, 68, 84, parfum)
+  const cikis = oranla(`an-y5-${gun}`, 62, 81, kasa)
+
+  const ham = [
+    { ad: 'Giriş', kisi: giris },
+    { ad: 'Makyaj', kisi: makyaj },
+    { ad: 'Cilt Bakım', kisi: cilt },
+    { ad: 'Parfüm', kisi: parfum },
+    { ad: 'Kasa', kisi: kasa },
+    { ad: 'Çıkış (satın alan)', kisi: cikis },
+  ]
+  const yolculuk: YolculukAdimi[] = ham.map((a, i) => ({
+    ad: a.ad,
+    kisi: a.kisi,
+    dusus: i === 0 ? 0 : Math.round(((ham[i - 1].kisi - a.kisi) / ham[i - 1].kisi) * 100),
+  }))
+
+  // Kasa hattına gelip satın almadan çıkanlar. Kuyruk ekranındaki "terk"
+  // ölçüsüyle aynı tanım: kasa hattına giren − satışa dönen.
+  const kasaOncesiTerk = Math.round(((kasa - cikis) / kasa) * 100)
+
+  // Alan ziyaretleri. Son satır BİLEREK sıfır: "hiç uğranmayan alan" bu
+  // panelin en somut aksiyon önerisi — ölü bölge tespiti. Sıfırı gizlemek,
+  // ekranın en değerli bulgusunu saklamak olurdu.
+  const alanHam: Array<[string, number, string]> = [
+    ['Makyaj', makyaj, 'en yoğun bölge'],
+    ['Cilt Bakım', cilt, 'kampanya alanı burada'],
+    ['Parfüm', parfum, 'kalış süresi kısa'],
+    ['Saç Bakım', oranla(`an-a1-${gun}`, 34, 52, giris), ''],
+    ['Kişisel Bakım', oranla(`an-a2-${gun}`, 26, 44, giris), ''],
+    ['Anne & Bebek', oranla(`an-a3-${gun}`, 6, 14, giris), 'düşük trafik'],
+    ['Aksesuar (arka duvar)', 0, 'gün içinde hiç uğranmadı'],
+  ]
+  const alanlar = alanHam
+    .map(([ad, ziyaret, not]) => ({
+      ad, ziyaret, pay: Math.round((ziyaret / giris) * 100), not,
+    }))
+    .sort((a, b) => b.ziyaret - a.ziyaret)
+
   return {
     kpiler: [
-      mKpi(gun, 'an_ziyaretci', 'Ziyaretçi', sec(`an-z-${gun}`, 1150, 1980), 'kisi', 14),
-      mKpi(gun, 'an_donusum', 'Dönüşüm oranı', secOndalik(`an-d-${gun}`, 18, 34), 'yuzde', 11),
+      mKpi(gun, 'an_ziyaretci', 'Ziyaretçi', giris, 'kisi', 14),
+      // Dönüşüm = satın alan / giren. Yolculuğun iki ucundan hesaplanıyor;
+      // ayrı bir rastgele sayı DEĞİL.
+      mKpi(gun, 'an_donusum', 'Dönüşüm oranı', Math.round((cikis / giris) * 1000) / 10, 'yuzde', 11),
       mKpi(gun, 'an_sepet', 'Ortalama sepet', sec(`an-s-${gun}`, 118, 265), 'TL', 12),
       mKpi(gun, 'an_kalis', 'Ortalama kalış', sec(`an-k-${gun}`, 9, 24), 'dk', 12),
     ],
@@ -453,12 +531,16 @@ export function analizModulu(gun: string): {
         saat: s, birincil: bugun[i], ikincil: sec(`an-gh-${gun}-${s}`, 30, 188),
       })),
     },
+    // Huni artık yolculuk zincirinin dört basamağı — bağımsız sayı üretmiyor.
     huni: [
-      { etiket: 'Mağazaya giriş', deger: sec(`an-h1-${gun}`, 1150, 1980) },
-      { etiket: 'Reyon ziyareti', deger: sec(`an-h2-${gun}`, 780, 1140) },
-      { etiket: 'Kasaya yönelme', deger: sec(`an-h3-${gun}`, 410, 760) },
-      { etiket: 'Satışa dönen', deger: sec(`an-h4-${gun}`, 260, 400) },
+      { etiket: 'Mağazaya giriş', deger: giris },
+      { etiket: 'Reyon ziyareti', deger: makyaj },
+      { etiket: 'Kasaya yönelme', deger: kasa },
+      { etiket: 'Satışa dönen', deger: cikis },
     ],
+    yolculuk,
+    kasaOncesiTerk,
+    alanlar,
     kalisSuresi: [
       { etiket: 'Kozmetik', deger: sec(`an-kal-${gun}-koz`, 6, 19) },
       { etiket: 'Cilt Bakım', deger: sec(`an-kal-${gun}-cil`, 5, 16) },
@@ -532,21 +614,89 @@ export function personelModulu(gun: string): {
 
 // ─── 7 · Raporlar ────────────────────────────────────────────────────────────
 
+/**
+ * Gün sonu raporu — panelden çıkan tek "elle tutulur" belge.
+ *
+ * ── ALİ'NİN NOTU NEREDEN GELİYOR ───────────────────────────────────────────
+ * Cümleler kural motorunun çıktı BİÇİMİNDE (durum → neden → etki → öneri) ama
+ * bu ekranda örnek veriden derleniyor; canlı motora bağlı değil. Bu yüzden
+ * cümlelerin içindeki her sayı `gunluk` tablosundan okunuyor, ayrı bir
+ * `sec()` çağrısından değil: rapor metni ile hemen altındaki tablo birbirini
+ * tutmak zorunda. Serbest metin yazıp tabloya bakmamak, bu ekranı ilk okuyan
+ * kişinin yakalayacağı türden bir çelişki üretirdi.
+ */
+export interface GunSonuRaporu {
+  aliNotu: string[]
+  tamamlanan: Array<{ saat: string; is: string; kisi: string }>
+  kritikOlaylar: Array<{ saat: string; olay: string; sonuc: string }>
+}
+
 export function raporModulu(gun: string): {
   gunluk: Array<{ etiket: string; deger: string; not: string }>
+  gunSonu: GunSonuRaporu
   haftalik: ModulSatir[]
   zamanlanmis: Array<{ ad: string; siklik: string; alici: string; durum: string }>
 } {
   const GUNLER = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar']
+
+  const ziyaretci = sec(`rap-z-${gun}`, 1150, 1980)
+  const donusum = secOndalik(`rap-d-${gun}`, 18, 34)
+  const beklemeSn = sec(`rap-b-${gun}`, 95, 260)
+  const rafYuzde = sec(`rap-r-${gun}`, 74, 96)
+  const acilan = sec(`rap-g-${gun}`, 6, 21)
+  const kapanan = Math.min(acilan, sec(`rap-k-${gun}`, 4, 19))
+  const beklemeYaz = `${Math.floor(beklemeSn / 60)}:${String(beklemeSn % 60).padStart(2, '0')} dk`
+  const zirveSaat = saatDamgasi(`rap-zirve-${gun}`, 17, 19)
+
   return {
     gunluk: [
-      { etiket: 'Ziyaretçi', deger: `${sec(`rap-z-${gun}`, 1150, 1980)}`, not: 'kamera sayımı' },
-      { etiket: 'Dönüşüm oranı', deger: `%${secOndalik(`rap-d-${gun}`, 18, 34)}`, not: 'POS eşleşmesi' },
-      { etiket: 'Ortalama bekleme', deger: `${Math.floor(sec(`rap-b-${gun}`, 95, 260) / 60)}:${String(sec(`rap-b-${gun}`, 95, 260) % 60).padStart(2, '0')} dk`, not: 'kasa hattı' },
-      { etiket: 'Raf bulunurluğu', deger: `%${sec(`rap-r-${gun}`, 74, 96)}`, not: 'reyon taraması' },
-      { etiket: 'Açılan görev', deger: `${sec(`rap-g-${gun}`, 6, 21)}`, not: 'kural motoru' },
-      { etiket: 'Kapanan görev', deger: `${sec(`rap-k-${gun}`, 4, 19)}`, not: 'personel' },
+      { etiket: 'Ziyaretçi', deger: `${ziyaretci}`, not: 'kamera sayımı' },
+      { etiket: 'Dönüşüm oranı', deger: `%${donusum}`, not: 'POS eşleşmesi' },
+      { etiket: 'Ortalama bekleme', deger: beklemeYaz, not: 'kasa hattı' },
+      { etiket: 'Raf bulunurluğu', deger: `%${rafYuzde}`, not: 'reyon taraması' },
+      { etiket: 'Açılan görev', deger: `${acilan}`, not: 'kural motoru' },
+      { etiket: 'Kapanan görev', deger: `${kapanan}`, not: 'personel' },
     ],
+    gunSonu: {
+      // Dört cümle: durum · neden · etki · öneri. Beşinciyi eklemek, gün sonu
+      // raporunu kimsenin okumadığı bir paragrafa çevirir.
+      aliNotu: [
+        `Bugün mağazaya ${ziyaretci} ziyaretçi girdi ve dönüşüm %${donusum} oldu; `
+        + `gün içinde ${acilan} görev açıldı, ${kapanan} tanesi kapandı.`,
+        `Kasa hattında ortalama bekleme ${beklemeYaz} ölçüldü ve en yoğun dakikalar ${zirveSaat} `
+        + `civarında toplandı; raf bulunurluğu %${rafYuzde} seviyesinde kaldı.`,
+        acilan - kapanan > 0
+          ? `Gün sonunda ${acilan - kapanan} görev açık devrediyor — bunların tamamı sabah `
+            + 'vardiyasının ilk turunda kapanabilir kapsamda.'
+          : 'Gün sonunda açık görev devretmiyor; tüm görevler vardiya içinde kapandı.',
+        `Yarın için önerim: ${zirveSaat} öncesinde ikinci kasayı hazır tutmak ve dolum turunu `
+        + 'kampanyalı reyonlardan başlatmak.',
+      ],
+      tamamlanan: [
+        { saat: saatDamgasi(`rap-t1-${gun}`, 9, 11), is: 'Sabah reyon dolum turu', kisi: 'Selin K.' },
+        { saat: saatDamgasi(`rap-t2-${gun}`, 12, 14), is: 'Kasa 2 açıldı — kuyruk eşiği aşıldı', kisi: 'Mert Y.' },
+        { saat: saatDamgasi(`rap-t3-${gun}`, 14, 16), is: 'Cilt bakım reyonu ikmali', kisi: 'Deniz Ö.' },
+        { saat: saatDamgasi(`rap-t4-${gun}`, 16, 18), is: 'Kampanya standı fiyat etiketi kontrolü', kisi: 'Elif A.' },
+        { saat: saatDamgasi(`rap-t5-${gun}`, 19, 21), is: 'Akşam kapanış kontrol listesi', kisi: 'Ayşe D.' },
+      ],
+      kritikOlaylar: [
+        {
+          saat: saatDamgasi(`rap-o1-${gun}`, 12, 14),
+          olay: `Kasa kuyruğu eşiği aştı (${sec(`rap-o1k-${gun}`, 7, 12)} kişi)`,
+          sonuc: 'Görev açıldı · ikinci kasa açıldı · kuyruk normale döndü',
+        },
+        {
+          saat: saatDamgasi(`rap-o2-${gun}`, 15, 17),
+          olay: 'Cilt bakım reyonunda boş yüz oranı arttı',
+          sonuc: 'Görev açıldı · ikmal yapıldı',
+        },
+        {
+          saat: saatDamgasi(`rap-o3-${gun}`, 17, 19),
+          olay: 'Acil çıkış önü geçici olarak kapandı',
+          sonuc: 'İSG uyarısı · 6 dakikada açıldı',
+        },
+      ],
+    },
     haftalik: GUNLER.map((g, i) => ({
       anahtar: g,
       hucreler: [
@@ -670,39 +820,143 @@ export function bakimModulu(gun: string): {
 
 // ─── 10 · Kampanyalar ────────────────────────────────────────────────────────
 
+/**
+ * Kampanya uygulama kontrolü — Gratis'e özgü ekranın veri tarafı.
+ *
+ * ── DÖRT MADDE NEDEN SABİT ─────────────────────────────────────────────────
+ * Her kampanya aynı dört maddeyle ölçülüyor: afiş · stant · fiyat etiketi ·
+ * ürün yerleşimi. Kampanyaya göre değişen bir kontrol listesi, mağazalar
+ * arası karşılaştırmayı imkânsız kılar — "%80 uygun" ancak herkes aynı dört
+ * maddeden geçtiyse bir anlam taşır.
+ *
+ * ── MATRİS NEDEN RASTGELE DEĞİL ────────────────────────────────────────────
+ * `isaretler` elle yazıldı, `sec()` ile üretilmedi. Gerekçe: teşhir uygunluğu
+ * KPI'ı bu matrisin ortalamasıdır (aşağıda hesaplanıyor). Rastgele üretilen
+ * bir matriste KPI ile satırlar günden güne birbirini tutmaz; jüri iki sayıyı
+ * toplayıp çelişkiyi bulur. Sabit matris + hesaplanan KPI = çelişemez.
+ */
+export interface KampanyaUygulamasi {
+  kampanya: string
+  alan: string
+  hazirlikta: boolean
+  /** Sıra `KAMPANYA_MADDELERI` ile birebir. */
+  isaretler: boolean[]
+  /** Yüzde — dört maddenin tamamlananı. Hesaplanır, yazılmaz. */
+  uygunluk: number
+  eksik: string[]
+  sorumlu: string
+}
+
+export const KAMPANYA_MADDELERI = ['Afiş', 'Stant', 'Fiyat etiketi', 'Ürün yerleşimi'] as const
+
+/** Kampanya alanı ile mağaza ortalamasının yan yana ölçümü. */
+export interface KampanyaAlanOlcumu {
+  etiket: string
+  kampanyaAlani: string
+  magazaOrtalamasi: string
+  fark: string
+  vurgu: 'iyi' | 'dikkat' | 'kritik' | undefined
+}
+
 export function kampanyaModulu(gun: string): {
   kpiler: ModulKpi[]
   kampanyalar: Array<{ ad: string; donem: string; alan: string; durum: string; etki: number }>
-  kontrolListesi: Array<{ madde: string; tamam: boolean; sorumlu: string }>
+  uygulamalar: KampanyaUygulamasi[]
+  alanOlcumleri: KampanyaAlanOlcumu[]
   trafik: DagilimDetay[]
   magazalar: Array<{ ad: string; uygulama: number; not: string }>
 } {
+  const kampanyalar = [
+    { ad: '2 Al 1 Öde — Cilt Bakım', donem: '12–25 Ağustos', alan: 'Giriş standı', durum: 'Yayında', etki: sec(`kam-1-${gun}`, 14, 42) },
+    { ad: 'Parfüm Yaz İndirimi', donem: '01–31 Ağustos', alan: 'Parfüm reyonu', durum: 'Yayında', etki: sec(`kam-2-${gun}`, 8, 27) },
+    { ad: 'Saç Bakım Seti', donem: '15–29 Ağustos', alan: 'Orta koridor', durum: 'Yayında', etki: sec(`kam-3-${gun}`, 5, 22) },
+    { ad: 'Okula Dönüş', donem: '25 Ağu – 15 Eyl', alan: 'Kasa önü', durum: 'Hazırlıkta', etki: 0 },
+  ]
+
+  // Sıra: afiş · stant · fiyat etiketi · ürün yerleşimi.
+  const matris: Array<{ isaretler: boolean[]; sorumlu: string }> = [
+    { isaretler: [true, true, false, true], sorumlu: 'Selin K.' },
+    { isaretler: [true, true, true, true], sorumlu: 'Mert Y.' },
+    { isaretler: [true, false, true, false], sorumlu: 'Deniz Ö.' },
+    { isaretler: [false, false, false, false], sorumlu: 'Elif A.' },
+  ]
+
+  const uygulamalar: KampanyaUygulamasi[] = kampanyalar.map((k, i) => {
+    const isaretler = matris[i].isaretler
+    const tamamN = isaretler.filter(Boolean).length
+    return {
+      kampanya: k.ad,
+      alan: k.alan,
+      hazirlikta: k.durum !== 'Yayında',
+      isaretler,
+      uygunluk: Math.round((tamamN / isaretler.length) * 100),
+      eksik: KAMPANYA_MADDELERI.filter((_, j) => !isaretler[j]),
+      sorumlu: matris[i].sorumlu,
+    }
+  })
+
+  // KPI = yayındaki kampanyaların matris ortalaması. Hazırlıktaki kampanya
+  // ortalamaya GİRMEZ: henüz kurulmamış teşhiri "uygun değil" saymak, ekranı
+  // haksız yere kırmızıya çeker.
+  const yayinda = uygulamalar.filter(u => !u.hazirlikta)
+  const uygunlukOrt = Math.round(yayinda.reduce((t, u) => t + u.uygunluk, 0) / yayinda.length)
+
+  // Kampanya alanı: kalış süresi ve dönüşüm, mağaza ortalamasıyla yan yana.
+  // Süreler saniye cinsinden tohumlanır, gösterimde dakikaya çevrilir.
+  const alanSn = sec(`kam-sure-${gun}`, 95, 165)
+  const magazaSn = sec(`kam-sure-m-${gun}`, 55, 90)
+  const alanDonusum = sec(`kam-don-${gun}`, 24, 39)
+  const magazaDonusum = sec(`kam-don-m-${gun}`, 14, 23)
+  const alanZiyaret = sec(`kam-zy-${gun}`, 210, 380)
+  const dakikaYaz = (sn: number) => `${Math.floor(sn / 60)} dk ${String(sn % 60).padStart(2, '0')} sn`
+
   return {
     kpiler: [
-      mKpi(gun, 'kam_aktif', 'Aktif kampanya', 4, 'adet', 10),
-      mKpi(gun, 'kam_uygulama', 'Teşhir uygunluğu', sec(`kam-u-${gun}`, 72, 97), 'yuzde', 8),
+      mKpi(gun, 'kam_aktif', 'Aktif kampanya', kampanyalar.length, 'adet', 10),
+      mKpi(gun, 'kam_uygulama', 'Teşhir uygunluğu', uygunlukOrt, 'yuzde', 8),
       mKpi(gun, 'kam_etki', 'Kampanya alanı trafiği', sec(`kam-e-${gun}`, 12, 38), 'yuzde', 16),
       mKpi(gun, 'kam_sepet', 'Kampanyalı sepet payı', sec(`kam-s-${gun}`, 19, 41), 'yuzde', 12),
     ],
-    kampanyalar: [
-      { ad: '2 Al 1 Öde — Cilt Bakım', donem: '12–25 Ağustos', alan: 'Giriş standı', durum: 'Yayında', etki: sec(`kam-1-${gun}`, 14, 42) },
-      { ad: 'Parfüm Yaz İndirimi', donem: '01–31 Ağustos', alan: 'Parfüm reyonu', durum: 'Yayında', etki: sec(`kam-2-${gun}`, 8, 27) },
-      { ad: 'Saç Bakım Seti', donem: '15–29 Ağustos', alan: 'Orta koridor', durum: 'Yayında', etki: sec(`kam-3-${gun}`, 5, 22) },
-      { ad: 'Okula Dönüş', donem: '25 Ağu – 15 Eyl', alan: 'Kasa önü', durum: 'Hazırlıkta', etki: 0 },
-    ],
-    kontrolListesi: [
-      { madde: 'Giriş standı kurulumu', tamam: true, sorumlu: 'Selin K.' },
-      { madde: 'Fiyat etiketleri güncellendi', tamam: true, sorumlu: 'Mert Y.' },
-      { madde: 'Raf üstü afiş asıldı', tamam: true, sorumlu: 'Deniz Ö.' },
-      { madde: 'Kasa önü teşhir tamam', tamam: false, sorumlu: 'Elif A.' },
-      { madde: 'Personel bilgilendirmesi', tamam: false, sorumlu: 'Ayşe D.' },
+    kampanyalar,
+    uygulamalar,
+    alanOlcumleri: [
+      {
+        etiket: 'Alanda geçirilen süre',
+        kampanyaAlani: dakikaYaz(alanSn),
+        magazaOrtalamasi: dakikaYaz(magazaSn),
+        fark: `+%${Math.round(((alanSn - magazaSn) / magazaSn) * 100)}`,
+        vurgu: 'iyi',
+      },
+      {
+        etiket: 'Alana giren → satın alan',
+        kampanyaAlani: `%${alanDonusum}`,
+        magazaOrtalamasi: `%${magazaDonusum}`,
+        fark: `+${alanDonusum - magazaDonusum} puan`,
+        vurgu: 'iyi',
+      },
+      {
+        etiket: 'Alana giren ziyaretçi',
+        kampanyaAlani: `${alanZiyaret} kişi`,
+        magazaOrtalamasi: '—',
+        fark: 'gün içi toplam',
+        vurgu: undefined,
+      },
+      {
+        etiket: 'Teşhir eksiği olan kampanya',
+        kampanyaAlani: `${yayinda.filter(u => u.eksik.length > 0).length} / ${yayinda.length}`,
+        magazaOrtalamasi: '—',
+        fark: 'yayındaki kampanyalar',
+        vurgu: yayinda.some(u => u.eksik.length > 0) ? 'dikkat' : 'iyi',
+      },
     ],
     trafik: [
       { etiket: 'Kampanya öncesi', deger: sec(`kam-t1-${gun}`, 120, 240) },
       { etiket: 'Kampanya sonrası', deger: sec(`kam-t2-${gun}`, 220, 380) },
     ],
     magazalar: [
-      { ad: 'Mağaza 0178 (bu mağaza)', uygulama: sec(`kam-m1-${gun}`, 82, 98), not: 'Canlı ölçüm' },
+      // Aynı ekranda iki uygunluk yüzdesi olamaz: bu satır KPI ile aynı
+      // hesaptan gelir (matris ortalaması), ayrı bir `sec()` çağrısından değil.
+      { ad: 'Mağaza 0178 (bu mağaza)', uygulama: uygunlukOrt, not: 'Canlı ölçüm' },
       { ad: 'Diğer mağazalar', uygulama: 0, not: 'Çok mağazalı kurulum pilotta' },
     ],
   }
@@ -825,6 +1079,19 @@ export const ALI_SENARYOLARI: AliSenaryosu[] = [
     },
   },
   {
+    // Kayıp rakamları `{kayip*}` jetonlarıyla geliyor (bkz. ali-sohbet.tsx →
+    // `doldur`): cümlede sabit bir tutar yazsaydık, kartla ekran arasında
+    // sessiz bir çelişki doğardı. Tek kaynak `kayipModulu`.
+    soru: 'Bugün ne kadar satış kaybettik?',
+    cevap: {
+      durum: 'Bugünkü tahmini operasyonel kayıp {kayip}; {kayipKisi} ziyaretçi etkilendi. Dün {kayipDun} idi.',
+      neden: 'Kaybın {kayipPay}\'i danışman bulamayan müşteriden geliyor; kalanı raf bulunurluğu ve kasa kuyruğundan. Üçü de bugün açık alarm üreten kalemler.',
+      etki: 'Bu bir ölçüm değil, model çıktısı: etkilenen kişi × o kalemin ortalama sepeti × kaçırma katsayısı. Gerçek rakam POS entegrasyonu ve pilot baseline\'ı ile hesaplanır.',
+      oneri: 'Tepe bantta (17:00–19:00) reyona bir danışman daha alın — kaybın en büyük kalemi orada. Kasadan kaydırmak kaybı yalnızca yer değiştirir.',
+      aksiyonlar: ['Kayıp Ekranını Aç', 'Görev Oluştur'],
+    },
+  },
+  {
     soru: 'Kuyruk neden arttı?',
     cevap: {
       durum: 'Kasa hattında ortalama bekleme gün ortalamasının üzerinde; açık kasa sayısı 4.',
@@ -875,3 +1142,450 @@ export const ALI_SENARYOLARI: AliSenaryosu[] = [
     },
   },
 ]
+
+// ════════════════════════════════════════════════════════════════════════════
+//  13 · ÇOK MAĞAZALI GÖRÜNÜM (19 Ağu 2026)
+//
+//  Gratis'in ~800 mağazası var; tek mağaza göstermek "peki 800'de ne olur"
+//  sorusunu cevapsız bırakıyordu. Bu bölüm 12 mağazalık bir kesit üretir.
+//
+//  TEK KAYNAK: `bolgeModulu` kendi sayılarını UYDURMAZ — `magazaModulu`nun
+//  çıktısını toplar. İki ekran arasında "Ege 78 mi 74 mü" tartışması çıkamaz.
+//
+//  PİLOT SATIRI: 0178 İzmir Forum Bornova gerçek pilot mağazadır ve panosu
+//  canlı zincirden beslenir. Bu tablodaki 0178 satırı da ÖRNEK özettir; ekran
+//  bunu açıkça yazar, çünkü jüri iki ekranı yan yana koyup sayı karşılaştırır.
+// ════════════════════════════════════════════════════════════════════════════
+
+export type BolgeAdi = 'Ege' | 'Marmara' | 'İç Anadolu' | 'Akdeniz'
+
+export const BOLGELER: BolgeAdi[] = ['Marmara', 'Ege', 'İç Anadolu', 'Akdeniz']
+
+export interface MagazaKaydi {
+  kod: string
+  ad: string
+  sehir: string
+  bolge: BolgeAdi
+  /** 0–100. Alt metriklerden HESAPLANIR, ayrıca tohumlanmaz. */
+  skor: number
+  acikAlarm: number
+  kritikAlarm: number
+  acikGorev: number
+  slaIhlal: number
+  ziyaretci: number
+  donusum: number
+  kuyrukSn: number
+  rafUygunluk: number
+  gorevTamamlama: number
+  durum: 'normal' | 'dikkat' | 'kritik'
+  /** Pilot mağaza — canlı panosu olan tek mağaza. */
+  pilot: boolean
+  /** Skoru düşüren baskın sebep; skorun kendisiyle aynı ölçümlerden çıkar. */
+  sebep: string
+}
+
+const MAGAZA_TANIMLARI: Array<[string, string, string, BolgeAdi]> = [
+  ['0178', 'Forum Bornova',     'İzmir',      'Ege'],
+  ['0206', 'Karşıyaka Çarşı',   'İzmir',      'Ege'],
+  ['0311', 'Manisa Merkez',     'Manisa',     'Ege'],
+  ['0102', 'Kadıköy Bahariye',  'İstanbul',   'Marmara'],
+  ['0117', 'Bakırköy Carousel', 'İstanbul',   'Marmara'],
+  ['0148', 'Beşiktaş Çarşı',    'İstanbul',   'Marmara'],
+  ['0135', 'Bursa Zafer Plaza', 'Bursa',      'Marmara'],
+  ['0321', 'Ankara Kızılay',    'Ankara',     'İç Anadolu'],
+  ['0334', 'Ankara Panora',     'Ankara',     'İç Anadolu'],
+  ['0356', 'Konya Kent Plaza',  'Konya',      'İç Anadolu'],
+  ['0401', 'Antalya MarkAntalya', 'Antalya',  'Akdeniz'],
+  ['0418', 'Adana M1',          'Adana',      'Akdeniz'],
+]
+
+/**
+ * Skor formülü ekranda da yazılı: dört alt ölçüğün ağırlıklı ortalaması.
+ * Kural motorunun mağaza skoruyla AYNI mantık (bkz. `dashboard/toplayici.ts`
+ * skor hesabı) — orada canlı ölçümle, burada seed ile.
+ */
+function magazaSkoru(m: {
+  kuyrukSn: number; rafUygunluk: number; gorevTamamlama: number; kritikAlarm: number
+}): number {
+  const kuyrukPuan = Math.max(0, 100 - ((m.kuyrukSn - 90) / 180) * 100)
+  const alarmPuan = Math.max(0, 100 - m.kritikAlarm * 12)
+  const ham = kuyrukPuan * 0.3 + m.rafUygunluk * 0.3 + m.gorevTamamlama * 0.25 + alarmPuan * 0.15
+  return Math.max(0, Math.min(100, Math.round(ham)))
+}
+
+/** Skoru en çok aşağı çeken alt ölçük — "sebep" sütunu buradan doğar. */
+function baskinSebep(m: MagazaKaydi): string {
+  const adaylar: Array<[number, string]> = [
+    [Math.max(0, 100 - ((m.kuyrukSn - 90) / 180) * 100), `Kasa beklemesi ${sureMetni(m.kuyrukSn)} — eşiğin üzerinde`],
+    [m.rafUygunluk, `Raf bulunurluğu %${m.rafUygunluk}`],
+    [m.gorevTamamlama, `Görev tamamlama %${m.gorevTamamlama}`],
+    [Math.max(0, 100 - m.kritikAlarm * 12), `${m.kritikAlarm} kritik alarm açık`],
+  ]
+  adaylar.sort((a, b) => a[0] - b[0])
+  return adaylar[0][1]
+}
+
+function sureMetni(sn: number): string {
+  return `${Math.floor(sn / 60)}:${String(Math.round(sn) % 60).padStart(2, '0')}`
+}
+
+export function magazaModulu(gun: string): {
+  kpiler: ModulKpi[]
+  magazalar: MagazaKaydi[]
+  dikkat: MagazaKaydi[]
+} {
+  const magazalar: MagazaKaydi[] = MAGAZA_TANIMLARI.map(([kod, ad, sehir, bolge]) => {
+    const kuyrukSn = sec(`mg-kuy-${gun}-${kod}`, 96, 268)
+    const rafUygunluk = sec(`mg-raf-${gun}-${kod}`, 58, 97)
+    const gorevTamamlama = sec(`mg-gor-${gun}-${kod}`, 54, 99)
+    const kritikAlarm = sec(`mg-kri-${gun}-${kod}`, 0, 4)
+    const skor = magazaSkoru({ kuyrukSn, rafUygunluk, gorevTamamlama, kritikAlarm })
+    const taban: MagazaKaydi = {
+      kod, ad, sehir, bolge,
+      skor,
+      acikAlarm: kritikAlarm + sec(`mg-ala-${gun}-${kod}`, 0, 7),
+      kritikAlarm,
+      acikGorev: sec(`mg-agr-${gun}-${kod}`, 0, 9),
+      slaIhlal: sec(`mg-sla-${gun}-${kod}`, 0, 3),
+      ziyaretci: sec(`mg-ziy-${gun}-${kod}`, 640, 1980),
+      donusum: secOndalik(`mg-don-${gun}-${kod}`, 16, 33),
+      kuyrukSn, rafUygunluk, gorevTamamlama,
+      durum: skor >= 80 ? 'normal' : skor >= 70 ? 'dikkat' : 'kritik',
+      pilot: kod === '0178',
+      sebep: '',
+    }
+    return { ...taban, sebep: baskinSebep(taban) }
+  }).sort((a, b) => a.skor - b.skor)   // en kritik üstte
+
+  const toplamZiyaretci = magazalar.reduce((t, m) => t + m.ziyaretci, 0)
+  const ortSkor = Math.round(magazalar.reduce((t, m) => t + m.skor, 0) / magazalar.length)
+
+  return {
+    kpiler: [
+      mKpi(gun, 'ag_ziyaretci', 'Toplam ziyaretçi', toplamZiyaretci, 'kisi', 9),
+      mKpi(gun, 'ag_skor', 'Ortalama sağlık skoru', ortSkor, 'yuzde', 5),
+      mKpi(gun, 'ag_kritik', 'Açık kritik alarm', magazalar.reduce((t, m) => t + m.kritikAlarm, 0), 'adet', 22, 'azalis'),
+      mKpi(gun, 'ag_sla', 'SLA ihlali', magazalar.reduce((t, m) => t + m.slaIhlal, 0), 'adet', 26, 'azalis'),
+    ],
+    magazalar,
+    dikkat: magazalar.filter(m => m.skor < 70).slice(0, 3),
+  }
+}
+
+// ─── 14 · Bölge karşılaştırma ────────────────────────────────────────────────
+
+export interface BolgeKaydi {
+  bolge: BolgeAdi
+  magazaSayisi: number
+  skor: number
+  donusum: number
+  kuyrukSn: number
+  rafUygunluk: number
+  gorevTamamlama: number
+  acikAlarm: number
+}
+
+function ort(sayilar: number[], basamak = 0): number {
+  const t = sayilar.reduce((a, b) => a + b, 0) / sayilar.length
+  return basamak === 0 ? Math.round(t) : Math.round(t * 10 ** basamak) / 10 ** basamak
+}
+
+export function bolgeModulu(gun: string): {
+  kpiler: ModulKpi[]
+  bolgeler: BolgeKaydi[]
+  skorCubuklari: DagilimDetay[]
+  enIyi: BolgeKaydi
+  enKotu: BolgeKaydi
+} {
+  const { magazalar } = magazaModulu(gun)
+
+  const bolgeler: BolgeKaydi[] = BOLGELER.map(b => {
+    const uyeler = magazalar.filter(m => m.bolge === b)
+    return {
+      bolge: b,
+      magazaSayisi: uyeler.length,
+      skor: ort(uyeler.map(m => m.skor)),
+      donusum: ort(uyeler.map(m => m.donusum), 1),
+      kuyrukSn: ort(uyeler.map(m => m.kuyrukSn)),
+      rafUygunluk: ort(uyeler.map(m => m.rafUygunluk)),
+      gorevTamamlama: ort(uyeler.map(m => m.gorevTamamlama)),
+      acikAlarm: uyeler.reduce((t, m) => t + m.acikAlarm, 0),
+    }
+  }).sort((a, b) => b.skor - a.skor)
+
+  return {
+    kpiler: [
+      mKpi(gun, 'bl_bolge', 'Bölge', bolgeler.length, 'adet', 0),
+      mKpi(gun, 'bl_magaza', 'Mağaza', magazalar.length, 'adet', 0),
+      mKpi(gun, 'bl_skor', 'Ağ ortalaması', ort(magazalar.map(m => m.skor)), 'yuzde', 4),
+      mKpi(gun, 'bl_fark', 'En iyi–en kötü farkı', bolgeler[0].skor - bolgeler[bolgeler.length - 1].skor, 'adet', 12, 'azalis'),
+    ],
+    bolgeler,
+    skorCubuklari: bolgeler.map(b => ({ etiket: b.bolge, deger: b.skor })),
+    enIyi: bolgeler[0],
+    enKotu: bolgeler[bolgeler.length - 1],
+  }
+}
+
+// ─── 15 · Operasyonel kayıp satış (19 Ağu 2026) ──────────────────────────────
+//
+//  Panelin geri kalanı "ne oldu"yu anlatır; bu bölüm "bunun parası ne" der.
+//  Bu yüzden burada tek bir kural var: TUTAR TOHUMLANMAZ, HESAPLANIR.
+//
+//    kalem tutarı = etkilenen kişi × o kalemin ortalama sepeti × kaçırma katsayısı
+//
+//  Üç girdinin ikisi (kişi, sepet) seed'den gelir; katsayı SABİTTİR ve ekranda
+//  yazılıdır. Sebebi şu: jüri "47 bin lirayı nereden buldunuz" diye sorduğunda
+//  cevap "modelden" olmalı, "tohumdan" değil. Ekrandaki üç çarpanı çarpan biri
+//  aynı sayıya ulaşamıyorsa kart, kartın anlattığı her şeyi götürür.
+//
+//  Katsayı = o olayı yaşayan müşterinin alışverişten TAMAMEN vazgeçme payı.
+//  Ürününü bulamayan en yüksek (yerine koyacak bir şey yok), kuyruktan
+//  vazgeçen en düşük (çoğu bekler) — sıralama sektör sezgisiyle uyumlu.
+//
+//  Saatlik eğri toplamdan TÜRETİLİR (ağırlık dağıtımı), ayrıca tohumlanmaz:
+//  eğrinin altındaki alan ile kartın büyük sayısı ayrışamaz.
+
+/** Kaçırma katsayıları — modelin tek yargı içeren yeri, bu yüzden görünür. */
+export const KACIRMA_KATSAYISI = { hizmet: 0.55, urun: 0.7, kuyruk: 0.45 } as const
+
+export interface KayipKalemi {
+  anahtar: string
+  ad: string
+  kisi: number
+  ortSepet: number
+  katsayi: number
+  tutar: number
+  /** Toplam TUTAR içindeki pay (kişi payı değil — para konuşuyoruz). */
+  yuzde: number
+  aciklama: string
+}
+
+/** Gün anahtarından bir önceki günü verir. Karşılaştırma için. */
+function oncekiGun(gun: string): string {
+  const t = new Date(`${gun}T00:00:00Z`)
+  t.setUTCDate(t.getUTCDate() - 1)
+  return t.toISOString().slice(0, 10)
+}
+
+function kayipKalemleri(gun: string): KayipKalemi[] {
+  const ham: Array<[string, string, number, number, number, string]> = [
+    ['hizmet', 'Hizmet alamayan müşteri',
+      sec(`ky-h-${gun}`, 24, 38), sec(`ky-hs-${gun}`, 205, 290), KACIRMA_KATSAYISI.hizmet,
+      'Reyonda danışman bekleyip bulamayan ziyaretçi. Kamera + personel konum verisinden.'],
+    ['urun', 'Ürün / numara bulunamayan',
+      sec(`ky-u-${gun}`, 16, 28), sec(`ky-us-${gun}`, 150, 220), KACIRMA_KATSAYISI.urun,
+      'Rafta yüzü boş ya da numarası tükenmiş ürünü arayan ziyaretçi. Raf tarama verisinden.'],
+    ['kuyruk', 'Bekleme / kuyruk kaynaklı',
+      sec(`ky-k-${gun}`, 7, 15), sec(`ky-ks-${gun}`, 120, 180), KACIRMA_KATSAYISI.kuyruk,
+      'Kasa kuyruğuna girip sırayı terk eden ziyaretçi. Kuyruk sayımından.'],
+  ]
+  const kalemler = ham.map(([anahtar, ad, kisi, ortSepet, katsayi, aciklama]) => ({
+    anahtar, ad, kisi, ortSepet, katsayi, aciklama,
+    tutar: Math.round((kisi * ortSepet * katsayi) / 10) * 10,
+    yuzde: 0,
+  }))
+  const toplam = kalemler.reduce((t, k) => t + k.tutar, 0)
+  // Yüzdeler toplamdan türetiliyor; 100'e tamamlanması için son kalem artığı alır.
+  let dagitilan = 0
+  kalemler.forEach((k, i) => {
+    k.yuzde = i === kalemler.length - 1
+      ? 100 - dagitilan
+      : Math.round((k.tutar / toplam) * 100)
+    dagitilan += k.yuzde
+  })
+  return kalemler
+}
+
+/** Toplam kayıp — dünü hesaplamak için ucuz yol (kalemleri kurup toplar). */
+function kayipToplami(gun: string): number {
+  return kayipKalemleri(gun).reduce((t, k) => t + k.tutar, 0)
+}
+
+/** Saatlik ağırlık: 10:00–21:00. Tepe 17–19, sabah düşük. */
+const KAYIP_AGIRLIK = [4, 5, 7, 8, 7, 8, 10, 13, 15, 12, 7, 4]
+
+export function kayipModulu(gun: string): {
+  toplam: number
+  dunToplam: number
+  fark: number
+  etkilenenKisi: number
+  kalemler: KayipKalemi[]
+  kpiler: ModulKpi[]
+  saatlik: ModulSeri
+  dagilim: DagilimDetay[]
+  satirlar: ModulSatir[]
+} {
+  const kalemler = kayipKalemleri(gun)
+  const toplam = kalemler.reduce((t, k) => t + k.tutar, 0)
+  const dunToplam = kayipToplami(oncekiGun(gun))
+  const etkilenenKisi = kalemler.reduce((t, k) => t + k.kisi, 0)
+
+  const agirlikToplam = KAYIP_AGIRLIK.reduce((t, a) => t + a, 0)
+  const noktalar: SaatlikNokta[] = SAATLER.map((saat, i) => ({
+    saat,
+    birincil: Math.round((toplam * KAYIP_AGIRLIK[i]) / agirlikToplam),
+    ikincil: 0,
+  }))
+
+  return {
+    toplam,
+    dunToplam,
+    fark: Math.round(((toplam - dunToplam) / dunToplam) * 100),
+    etkilenenKisi,
+    kalemler,
+    kpiler: [
+      mKpi(gun, 'ky_toplam', 'Tahmini kayıp', toplam, 'TL', 14, 'azalis'),
+      mKpi(gun, 'ky_kisi', 'Etkilenen ziyaretçi', etkilenenKisi, 'kisi', 12, 'azalis'),
+      mKpi(gun, 'ky_kisi_basi', 'Kişi başı kayıp', Math.round(toplam / etkilenenKisi), 'TL', 8, 'azalis'),
+      mKpi(gun, 'ky_pay', 'Ciroya oranı (model)', secOndalik(`ky-p-${gun}`, 1.8, 3.4), 'yuzde', 10, 'azalis'),
+    ],
+    saatlik: {
+      baslik: 'Saatlik kayıp eğrisi',
+      birincilAd: 'Tahmini kayıp',
+      ikincilAd: null,
+      birim: 'TL',
+      noktalar,
+    },
+    dagilim: kalemler.map(k => ({ etiket: k.ad, deger: k.tutar })),
+    satirlar: kalemler.map(k => ({
+      anahtar: k.anahtar,
+      hucreler: [
+        k.ad,
+        `${k.kisi} kişi`,
+        `₺${k.ortSepet}`,
+        `×${k.katsayi}`,
+        `₺${k.tutar.toLocaleString('tr-TR')}`,
+        `%${k.yuzde}`,
+      ],
+      vurgu: k.yuzde >= 40 ? 'kritik' : k.yuzde >= 25 ? 'dikkat' : undefined,
+    })),
+  }
+}
+
+// ─── 16 · WhatsApp merkezi (19 Ağu 2026) ─────────────────────────────────────
+
+/**
+ * Panelden çıkan mesajların akışı — telefonu göstermeden anlatılabilsin diye.
+ *
+ * ── GÖVDELER BU DOSYADA YAZILMIYOR ─────────────────────────────────────────
+ * Burada yalnız örnek GÖREVLER duruyor; baloncuk metnini ekran, zincirin
+ * kendi `mesajGovdesi()` fonksiyonuyla üretiyor. Gerekçe iki katlı:
+ *   1) Elle yazılmış "örnek mesaj" metni, şablon değiştiği gün sessizce yalan
+ *      söylemeye başlar. Bu kurulumda şablon değişirse ekran da değişir.
+ *   2) Seed katmanı zincirin fonksiyonlarını çağırmaz — bağımlılık yönü tek
+ *      yönlü kalsın (sunum → zincir; seed hiçbir şeye bağlanmaz).
+ *
+ * ── VERİ SEED ──────────────────────────────────────────────────────────────
+ * Bu ekran Airtable'a sormaz, anket açmaz. Gerçek mesaj trafiği Denetim Kaydı
+ * ekranında canlı görünür; burası onun sunum karşılığı ve ekranda böyle yazar.
+ */
+export interface WaKaydi {
+  anahtar: string
+  /** Mesaj gövdesini üretmek için gereken alanlar — `Gorev` şeklinin alt kümesi. */
+  gorevNo: string
+  baslik: string
+  aciklama: string
+  gerekce: string
+  oncelik: 'kritik' | 'yuksek' | 'normal' | 'dusuk'
+  sonTeslimDk: number
+  kademe: 'ilk' | 'hatirlatma' | 'bolge'
+  saat: string
+  alici: string
+  aliciRol: string
+  /** Değerler zincirin kendi sözlüğünden: `BILDIRIM_DURUMU`. Ekrana özel
+   *  bir "iletildi" kelimesi uydurmuyoruz — panel ile denetim kaydı aynı
+   *  kelimeleri kullanmalı. */
+  durum: 'gonderildi' | 'teslim' | 'okundu'
+  /** Personelin bastığı düğme ve sonucu — yoksa mesaj henüz yanıtlanmadı. */
+  yanit?: { saat: string; aksiyon: 'kabul' | 'devret' | 'ertele'; sonuc: string }
+}
+
+export function whatsappModulu(gun: string): {
+  kpiler: ModulKpi[]
+  kayitlar: WaKaydi[]
+  sablonlar: ModulSatir[]
+} {
+  const kayitlar: WaKaydi[] = [
+    {
+      anahtar: 'w1',
+      gorevNo: 'G-000011',
+      baslik: 'Kasa kuyruğu eşiği aştı — ikinci kasa aç',
+      aciklama: 'Kasa hattında 9 kişi bekliyor ve ortalama bekleme 4 dakikayı geçti. İkinci kasayı açın.',
+      gerekce: 'kural: kuyruk_esigi · 5 dk boyunca ≥ 8 kişi',
+      oncelik: 'kritik',
+      sonTeslimDk: 15,
+      kademe: 'ilk',
+      saat: saatDamgasi(`wa-1-${gun}`, 12, 13),
+      alici: 'Mert Y.',
+      aliciRol: 'Kasa sorumlusu',
+      durum: 'okundu',
+      yanit: { saat: saatDamgasi(`wa-1y-${gun}`, 13, 14), aksiyon: 'kabul', sonuc: 'Görev "Başlandı" durumuna geçti' },
+    },
+    {
+      anahtar: 'w2',
+      gorevNo: 'G-000012',
+      baslik: 'Cilt bakım reyonunda boş yüz arttı',
+      aciklama: 'Reyon doluluğu %62 seviyesine düştü. Dolum turunu kampanyalı raflardan başlatın.',
+      gerekce: 'kural: raf_doluluk · doluluk < %70',
+      oncelik: 'yuksek',
+      sonTeslimDk: 45,
+      kademe: 'ilk',
+      saat: saatDamgasi(`wa-2-${gun}`, 15, 16),
+      alici: 'Deniz Ö.',
+      aliciRol: 'Reyon sorumlusu',
+      durum: 'okundu',
+      yanit: { saat: saatDamgasi(`wa-2y-${gun}`, 16, 17), aksiyon: 'ertele', sonuc: 'Hatırlatma 5 dk sonraya alındı' },
+    },
+    {
+      anahtar: 'w3',
+      gorevNo: 'G-000012',
+      baslik: 'Cilt bakım reyonunda boş yüz arttı',
+      aciklama: 'Reyon doluluğu %62 seviyesine düştü. Dolum turunu kampanyalı raflardan başlatın.',
+      gerekce: 'kural: raf_doluluk · doluluk < %70',
+      oncelik: 'yuksek',
+      sonTeslimDk: 40,
+      kademe: 'hatirlatma',
+      saat: saatDamgasi(`wa-3-${gun}`, 16, 17),
+      alici: 'Deniz Ö.',
+      aliciRol: 'Reyon sorumlusu',
+      durum: 'teslim',
+    },
+    {
+      anahtar: 'w4',
+      gorevNo: 'G-000013',
+      baslik: 'Acil çıkış önü kapalı',
+      aciklama: 'Acil çıkış önünde engel tespit edildi. Alanı hemen açın ve fotoğrafla kanıt bırakın.',
+      gerekce: 'kural: isg_acil_cikis · 60 sn boyunca engel',
+      oncelik: 'kritik',
+      sonTeslimDk: 10,
+      kademe: 'bolge',
+      saat: saatDamgasi(`wa-4-${gun}`, 17, 18),
+      alici: 'Ege Bölge Müdürü',
+      aliciRol: 'Bölge müdürü',
+      durum: 'gonderildi',
+    },
+  ]
+
+  const yanitli = kayitlar.filter(k => k.yanit).length
+  const okunan = kayitlar.filter(k => k.durum === 'okundu').length
+
+  return {
+    kpiler: [
+      mKpi(gun, 'wa_giden', 'Giden mesaj', kayitlar.length, 'adet', 12),
+      mKpi(gun, 'wa_okundu', 'Okunma oranı', Math.round((okunan / kayitlar.length) * 100), 'yuzde', 8),
+      mKpi(gun, 'wa_yanit', 'Düğmeyle yanıtlanan', yanitli, 'adet', 10),
+      mKpi(gun, 'wa_sure', 'Ortalama yanıt süresi', sec(`wa-s-${gun}`, 2, 9), 'dk', 14, 'azalis'),
+    ],
+    kayitlar,
+    // Kademe = bir görev için gönderilebilecek MEŞRU mesaj türü. Tablo bunu
+    // anlatıyor: aynı görev için iki mesaj görmek "tekrar" değil, eskalasyon.
+    sablonlar: [
+      { anahtar: 'ilk', hucreler: ['İlk bildirim', 'Görev doğduğu an', 'Görevin atandığı kişi', 'Aktif'], vurgu: 'iyi' },
+      { anahtar: 'hatirlatma', hucreler: ['Hatırlatma', 'Görülmediyse 5 dk sonra', 'Aynı kişi', 'Aktif'], vurgu: 'iyi' },
+      { anahtar: 'bolge', hucreler: ['Eskalasyon — bölge', 'Süre aşıldıysa', 'Bölge müdürü', 'Aktif'], vurgu: 'iyi' },
+      { anahtar: 'merkez', hucreler: ['Eskalasyon — merkez', 'Bölge de yanıtlamazsa', 'Merkez operasyon', 'Aktif'], vurgu: 'iyi' },
+      { anahtar: 'devir', hucreler: ['Devir bildirimi', '"Başkasına Ata" basılınca', 'Yeni sorumlu', 'Aktif'], vurgu: 'iyi' },
+    ],
+  }
+}

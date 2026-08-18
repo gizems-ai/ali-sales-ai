@@ -89,6 +89,12 @@ export function KameraPaneli({
             ediyoruz. Gerçek Gratis mağazası videosu yok; stok video "bu bizim
             mağazamız değil" tepkisi doğurur. */}
         <span className="so-kamera-etiket">DEMO GÖRÜNÜMÜ · anonim sayım</span>
+        {/* Zaman damgası SAF CSS ile işler (bkz. globals.css → `so-sn-say`).
+            Bilerek JS zamanlayıcı kurulmadı: saniye göstermek için sekme arka
+            plandayken bile dönen bir interval bırakmak, panonun anket
+            disiplinini bozardı. Saniye sayacı `aria-hidden` — ekran okuyucuya
+            saniye saymak bilgi değil gürültüdür. */}
+        <span className="so-kamera-saat" aria-hidden="true" />
         <div className="so-kamera-alt">
           <span>{ana.ad} · {ana.bolgeAdi}</span>
           <span>anonim sayım · yüz tanıma yok</span>

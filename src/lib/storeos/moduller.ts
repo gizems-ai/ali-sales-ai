@@ -60,6 +60,12 @@ export const DURUM_ACIKLAMASI: Record<ModulDurumu, string> = {
  */
 export const MODULLER: Modul[] = [
   {
+    slug: 'magazalar', ad: 'Mağazalar', ikon: '▥', bolum: 'Operasyon',
+    ozet: 'Ağ görünümü: sağlık skoruna göre sıralı mağaza listesi, bölge kırılımı ve dikkat gerektirenler.',
+    hazir: 'Skor formülü, olay–kural–görev zinciri ve rol/yetki modeli mağaza koduna göre çalışıyor — çok mağazalı kurulum için mimarî hazır. Bugün canlı zincire bağlı tek mağaza pilot 0178. Kendi ekranı (12 mağazalık kesit, bölge grupları, dikkat şeridi) yazıldı ve gezilebilir — örnek veriyle.',
+    durum: 'ekran-demo', yol: '/storeos/magazalar',
+  },
+  {
     slug: 'magaza-ozeti', ad: 'Mağaza Özeti', ikon: '◧', bolum: 'Operasyon',
     ozet: 'Sağlık skoru, beş KPI, kamera, kuyruk/raf/satış grafikleri ve Ali\'nin günlük brifingi tek ekranda.',
     hazir: 'Ekranın tamamı. Tek uç noktadan iki kademeli anket (canlı 4 sn · yavaş 30 sn).',
@@ -108,10 +114,22 @@ export const MODULLER: Modul[] = [
     durum: 'canli', yol: '/storeos/alarmlar',
   },
   {
+    slug: 'bolge', ad: 'Bölge Karşılaştırma', ikon: '◭', bolum: 'Yönetim',
+    ozet: 'Bölge bazlı skor karşılaştırması, metrik tablosu ve en iyi/en düşük performans.',
+    hazir: 'Skor ve KPI hesapları mağaza bazında canlı; bölge kırılımı bunların toplamıdır. Kendi ekranı (skor çubukları, metrik karşılaştırma tablosu, uç kartları) yazıldı ve gezilebilir — sayıları Mağazalar ekranından TÜRETİR, ayrıca üretmez; örnek veriyle.',
+    durum: 'ekran-demo', yol: '/storeos/bolge',
+  },
+  {
     slug: 'personel', ad: 'Personel', ikon: '▦', bolum: 'Yönetim',
     ozet: 'Kadro, vardiya, bölge ataması ve kişi başına görev yükü.',
     hazir: 'Kullanıcı/rol modeli ve rol bazlı yetki kontrolü çalışıyor; personel dağılımı panoda görünüyor. Vardiya takvimi Faz 2. Kendi ekranı (vardiya kadrosu, kişi başına görev yükü, bölge dağılımı, kadro önerisi) yazıldı ve gezilebilir — örnek veriyle.',
     durum: 'ekran-demo', yol: '/storeos/personel',
+  },
+  {
+    slug: 'kayip-satis', ad: 'Kayıp Satış', ikon: '◔', bolum: 'Yönetim',
+    ozet: 'Operasyonel aksaklıkların tahmini ciro karşılığı: kişi × ortalama sepet × kaçırma katsayısı.',
+    hazir: 'Modelin girdileri (kuyruk sayımı, raf bulunurluk, personel konumu) bugün canlı zincirden geliyor. Ortalama sepet POS entegrasyonuna bağlı — sözleşme aşamasında; o bağlanana kadar tutar MODEL çıktısıdır, ölçüm değildir. Kendi ekranı (kalem kalem model tablosu, sebep dağılımı, saatlik kayıp eğrisi) yazıldı ve gezilebilir — örnek veriyle.',
+    durum: 'ekran-demo', yol: '/storeos/kayip-satis',
   },
   {
     slug: 'kampanyalar', ad: 'Kampanyalar', ikon: '◍', bolum: 'Yönetim',
@@ -132,6 +150,12 @@ export const MODULLER: Modul[] = [
     durum: 'ekran-demo', yol: '/storeos/isg-guvenlik',
   },
   {
+    slug: 'whatsapp-merkezi', ad: 'WhatsApp Merkezi', ikon: '✉', bolum: 'Yönetim',
+    ozet: 'Panelden çıkan görev mesajları, düğme yanıtları ve iletim durumu tek akışta.',
+    hazir: 'Mesaj gönderimi, düğmeler ve yanıt işleme CANLI çalışıyor (Görevler ve Denetim Kaydı ekranlarında görülüyor). Bu ekran o trafiğin sunum karşılığı: baloncuk metni zincirin kendi şablonundan üretiliyor, görevler ise örnek veri. Ekran sorgu atmaz.',
+    durum: 'ekran-demo', yol: '/storeos/whatsapp',
+  },
+  {
     slug: 'denetim-kaydi', ad: 'Denetim Kaydı', ikon: '▣', bolum: 'Yönetim',
     ozet: 'Zincirin her adımının değiştirilemez kaydı — silme/güncelleme yolu yok.',
     hazir: 'Ekranın tamamı. Depo arayüzünde sil/güncelle metodu yok — kaydı silmek için önce sözleşmeyi değiştirmek gerekir.',
@@ -140,7 +164,7 @@ export const MODULLER: Modul[] = [
   {
     slug: 'raporlar', ad: 'Raporlar', ikon: '◑', bolum: 'Yönetim',
     ozet: 'Günlük/haftalık mağaza karnesi, bölge kırılımı, PDF ve e-posta dağıtımı.',
-    hazir: 'Kapsamda; skor ve KPI hesapları hazır. Zamanlanmış üretim ve dağıtım Faz 2. Kendi ekranı (günlük karne önizlemesi, haftalık karşılaştırma, zamanlanmış rapor listesi) yazıldı ve gezilebilir — örnek veriyle; PDF/Excel/e-posta düğmeleri bilerek devre dışı.',
+    hazir: 'Kapsamda; skor ve KPI hesapları hazır. Zamanlanmış üretim ve dağıtım Faz 2. Kendi ekranı (A4 gün sonu raporu önizlemesi — Ali\'nin notu, günün ölçüleri, tamamlanan görevler, kritik olaylar — haftalık karşılaştırma ve zamanlanmış rapor listesi) yazıldı, gezilebilir ve tarayıcıdan yazdırılabilir — örnek veriyle; PDF/Excel/e-posta düğmeleri bilerek devre dışı.',
     durum: 'ekran-demo', yol: '/storeos/raporlar',
   },
   {

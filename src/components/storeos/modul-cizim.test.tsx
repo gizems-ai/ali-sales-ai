@@ -17,15 +17,18 @@
 import { renderToStaticMarkup } from 'react-dom/server'
 import type { ReactElement } from 'react'
 import {
-  ALI_SENARYOLARI, analizModulu, ayarlarModulu, bakimModulu, isgModulu,
-  kameraModulu, kampanyaModulu, kasaModulu, operasyonModulu, personelModulu,
-  rafModulu, raporModulu,
+  ALI_SENARYOLARI, KAMPANYA_MADDELERI, analizModulu, ayarlarModulu, bakimModulu,
+  isgModulu, kameraModulu, kampanyaModulu, kasaModulu, operasyonModulu,
+  personelModulu, rafModulu, raporModulu, whatsappModulu,
 } from '../../lib/storeos/depo/demo-metrikler'
+import { BUTON_ETIKETLERI } from '../../lib/storeos/kanal/buton'
+import { BUTON_AKSIYONLARI } from '../../lib/storeos/kanal/tipler'
+import { WaAkisi } from './wa-akis'
 import { MODULLER, durumSayimi } from '../../lib/storeos/moduller'
 import {
   ModulDagilim, ModulDonut, ModulEkrani, ModulIkili, ModulIzgara,
   ModulKontrolListesi, ModulListe, ModulOneri, ModulSeriKarti, ModulTablo,
-  ModulYakindaDugmeler,
+  ModulA4Rapor, ModulAkis, ModulUygunlukMatrisi, ModulYakindaDugmeler,
 } from './modul-sablonu'
 
 let fail = 0
@@ -149,7 +152,7 @@ function main(): void {
     && ayr.entegrasyonlar.filter(e => e.durum === 'pilot').length === 3)
 
   console.log('\n── Ali senaryoları ──')
-  ok('altı hazır senaryo', ALI_SENARYOLARI.length === 6)
+  ok('hazır senaryo listesi dolu', ALI_SENARYOLARI.length >= 6, String(ALI_SENARYOLARI.length))
   ok('her cevapta durum/neden/etki/öneri dolu',
     ALI_SENARYOLARI.every(s => s.cevap.durum && s.cevap.neden && s.cevap.etki && s.cevap.oneri))
   ok('her cevapta en az bir aksiyon', ALI_SENARYOLARI.every(s => s.cevap.aksiyonlar.length > 0))
@@ -161,13 +164,165 @@ function main(): void {
       return !/\d+\s+(açık\s+)?(alarm|görev)/i.test(t)
     }))
 
+  // ── Gün sonu raporu ─────────────────────────────────────────────────────
+  // Raporun tek riski şu: Ali'nin serbest metni ile hemen altındaki ölçü
+  // kutuları farklı sayılar söylerse belge güvenilirliğini kaybeder. Test,
+  // metindeki her sayının tablodan geldiğini doğruluyor.
+  console.log('\n── gün sonu raporu ──')
+  const rp = raporModulu(GUN)
+  ok('Ali\'nin notu dört cümle', rp.gunSonu.aliNotu.length === 4, String(rp.gunSonu.aliNotu.length))
+  const notMetni = rp.gunSonu.aliNotu.join(' ')
+  const olcu = (e: string) => rp.gunluk.find(g => g.etiket === e)?.deger ?? '‽'
+  ok('ziyaretçi sayısı metinde ve tabloda aynı', notMetni.includes(olcu('Ziyaretçi')))
+  ok('dönüşüm oranı metinde ve tabloda aynı', notMetni.includes(olcu('Dönüşüm oranı')))
+  ok('bekleme süresi metinde ve tabloda aynı', notMetni.includes(olcu('Ortalama bekleme')))
+  ok('raf bulunurluğu metinde ve tabloda aynı', notMetni.includes(olcu('Raf bulunurluğu')))
+  ok('kapanan görev açılandan fazla değil',
+    Number(olcu('Kapanan görev')) <= Number(olcu('Açılan görev')),
+    `${olcu('Kapanan görev')} > ${olcu('Açılan görev')}`)
+  ok('tamamlanan görevler saat sırasında',
+    rp.gunSonu.tamamlanan.every((t, i) => i === 0 || t.saat >= rp.gunSonu.tamamlanan[i - 1].saat))
+  ok('her kritik olayın bir sonucu yazılı',
+    rp.gunSonu.kritikOlaylar.every(o => o.sonuc.length > 0))
+  const a4 = ciz('ModulA4Rapor', (
+    <ModulA4Rapor
+      baslik="b" ustBilgi="u" gun={GUN} aliNotu={rp.gunSonu.aliNotu} olculer={rp.gunluk}
+      tamamlanan={rp.gunSonu.tamamlanan} kritikOlaylar={rp.gunSonu.kritikOlaylar}
+      altBilgi="örnek (seed) veridir"
+    />
+  ))
+  ok('A4 sayfası çizildi', a4.includes('so-a4-bas') && a4.includes('so-a4-olcu'))
+  ok('altı ölçü kutusu', (a4.match(/so-a4-olcu-deger/g) ?? []).length === rp.gunluk.length)
+  ok('künyede "örnek (seed) veridir" yazıyor — kâğıda çıkan sayfa da dürüst',
+    a4.includes('örnek (seed) veridir'))
+
+  // ── Müşteri yolculuğu ───────────────────────────────────────────────────
+  // Ekranda "kaç kişi girdi" dört yerde geçiyor: KPI · yolculuk · huni ·
+  // alan payları. Dördü tek zincirden gelmezse ekran kendi kendini yalanlar.
+  console.log('\n── müşteri yolculuğu ──')
+  ok('yolculuk altı adım', ana.yolculuk.length === 6, String(ana.yolculuk.length))
+  ok('adımlar tekdüze azalıyor',
+    ana.yolculuk.every((a, i) => i === 0 || a.kisi <= ana.yolculuk[i - 1].kisi))
+  ok('düşüş yüzdeleri bir önceki adımdan hesaplanmış',
+    ana.yolculuk.every((a, i) => i === 0
+      ? a.dusus === 0
+      : a.dusus === Math.round(((ana.yolculuk[i - 1].kisi - a.kisi) / ana.yolculuk[i - 1].kisi) * 100)))
+  const anaGiris = ana.kpiler.find(k => k.anahtar === 'an_ziyaretci')?.deger
+  ok('ziyaretçi KPI = yolculuğun ilk adımı = huninin ilk basamağı',
+    anaGiris === ana.yolculuk[0].kisi && anaGiris === ana.huni[0].deger,
+    `${anaGiris} · ${ana.yolculuk[0].kisi} · ${ana.huni[0].deger}`)
+  ok('huninin son basamağı = satın alan adımı',
+    ana.huni[ana.huni.length - 1].deger === ana.yolculuk[ana.yolculuk.length - 1].kisi)
+  const anaDonusum = ana.kpiler.find(k => k.anahtar === 'an_donusum')?.deger
+  ok('dönüşüm KPI\'ı yolculuğun iki ucundan geliyor',
+    anaDonusum === Math.round((ana.yolculuk[5].kisi / ana.yolculuk[0].kisi) * 1000) / 10,
+    String(anaDonusum))
+  ok('kasa öncesi terk kasa ve çıkış adımlarından hesaplanmış',
+    ana.kasaOncesiTerk
+      === Math.round(((ana.yolculuk[4].kisi - ana.yolculuk[5].kisi) / ana.yolculuk[4].kisi) * 100))
+  ok('alan payları ziyaretçi sayısına göre',
+    ana.alanlar.every(a => a.pay === Math.round((a.ziyaret / ana.yolculuk[0].kisi) * 100)))
+  ok('alanlar çoktan aza sıralı',
+    ana.alanlar.every((a, i) => i === 0 || a.ziyaret <= ana.alanlar[i - 1].ziyaret))
+  ok('hiç uğranmayan alan gizlenmiyor', ana.alanlar.some(a => a.ziyaret === 0))
+  const akis = ciz('ModulAkis', <ModulAkis baslik="y" adimlar={ana.yolculuk} dipnot="anonim" />)
+  ok('akış çizildi — altı kutu, beş ok',
+    (akis.match(/so-akis-adim/g) ?? []).length === 6
+    && (akis.match(/so-akis-ok/g) ?? []).length === 5)
+  ok('akışta anonimlik dipnotu var', akis.includes('so-akis-dipnot'))
+
+  // ── Kampanya uygulama matrisi ───────────────────────────────────────────
+  // Bu ekranın tek iddiası: "hangi kampanyada ne eksik". İddia üç yerde
+  // görünüyor (KPI · matris · mağaza karşılaştırması) ve üçü de tek hesaptan
+  // gelmek zorunda. Test tam olarak bunu ölçüyor — çelişki jüri önünde değil
+  // burada patlasın.
+  console.log('\n── kampanya uygulama matrisi ──')
+  ok('her satır dört maddeyle ölçülmüş',
+    kmp.uygulamalar.every(u => u.isaretler.length === KAMPANYA_MADDELERI.length))
+  ok('uygunluk yüzdesi işaretlerden hesaplanmış',
+    kmp.uygulamalar.every(u =>
+      u.uygunluk === Math.round((u.isaretler.filter(Boolean).length / u.isaretler.length) * 100)))
+  ok('eksik listesi işaretlerle birebir',
+    kmp.uygulamalar.every(u =>
+      u.eksik.join('|') === KAMPANYA_MADDELERI.filter((_, j) => !u.isaretler[j]).join('|')))
+  const kmpYayinda = kmp.uygulamalar.filter(u => !u.hazirlikta)
+  const kmpOrt = Math.round(kmpYayinda.reduce((t, u) => t + u.uygunluk, 0) / kmpYayinda.length)
+  const kmpKpi = kmp.kpiler.find(k => k.anahtar === 'kam_uygulama')
+  ok('teşhir uygunluğu KPI\'ı = yayındaki kampanyaların matris ortalaması',
+    kmpKpi?.deger === kmpOrt, `${kmpKpi?.deger} ≠ ${kmpOrt}`)
+  ok('mağaza karşılaştırması aynı yüzdeyi okuyor',
+    kmp.magazalar[0].uygulama === kmpOrt, `${kmp.magazalar[0].uygulama} ≠ ${kmpOrt}`)
+  ok('hazırlıktaki kampanya ortalamaya girmiyor',
+    kmpYayinda.length === kmp.uygulamalar.length - 1)
+  const mtx = ciz('ModulUygunlukMatrisi', (
+    <ModulUygunlukMatrisi
+      baslik="u" sutunlar={KAMPANYA_MADDELERI} not="n" eylemIpucu="ipucu"
+      satirlar={kmp.uygulamalar.map(u => ({
+        anahtar: u.kampanya, ad: u.kampanya, alt: u.alan,
+        isaretler: u.isaretler, uygunluk: u.uygunluk, eksik: u.eksik,
+      }))}
+    />
+  ))
+  ok('matris çizildi', mtx.includes('so-mtx-satir'))
+  ok('eksik madde ✗ ile görünür — renk tek başına taşımıyor', mtx.includes('✗'))
+  const eksikliN = kmp.uygulamalar.filter(u => u.eksik.length > 0).length
+  ok('eksiği olan her satırda pasif "Görev oluştur" düğmesi',
+    (mtx.match(/Görev oluştur/g) ?? []).length === eksikliN
+    && (mtx.match(/disabled/g) ?? []).length === eksikliN)
+  ok('düğme ipucu eksik maddeleri sayıyor', mtx.includes('Eksik: Fiyat etiketi'))
+  ok('matriste "yakında" rozeti YOK — rozet sayısı ikide kalıyor',
+    !mtx.includes('>yakında<'))
+
+  // ── WhatsApp merkezi ────────────────────────────────────────────────────
+  // Buradaki tek asıl kilit şu: baloncuğun gövdesi ekranda YAZILMIYOR,
+  // zincirin `mesajGovdesi()` şablonundan geliyor. Şablon değişirse ekran
+  // da değişmeli; ikisi ayrışırsa jüriye gösterdiğimiz metin telefondaki
+  // metin olmaktan çıkar.
+  console.log('\n── whatsapp merkezi ──')
+  const wa = whatsappModulu(GUN)
+  ok('mesaj kayıtları dolu', wa.kayitlar.length >= 3, String(wa.kayitlar.length))
+  ok('kademe sözlüğü zincirinkiyle aynı',
+    wa.kayitlar.every(k => ['ilk', 'hatirlatma', 'bolge'].includes(k.kademe)))
+  ok('iletim durumları zincirin sözlüğünden — uydurma kelime yok',
+    wa.kayitlar.every(k => ['gonderildi', 'teslim', 'okundu'].includes(k.durum)))
+  ok('yanıtlı kayıtların düğmesi gerçek aksiyon',
+    wa.kayitlar.every(k => !k.yanit || BUTON_AKSIYONLARI.includes(k.yanit.aksiyon)))
+  ok('en az bir mesaj hâlâ yanıt bekliyor — hepsi mutlu son değil',
+    wa.kayitlar.some(k => !k.yanit))
+  ok('aynı göreve hem ilk bildirim hem üst kademe var — eskalasyon görünüyor',
+    wa.kayitlar.some(k => k.kademe !== 'ilk'))
+
+  const waHtml = ciz('WaAkisi', <WaAkisi kayitlar={wa.kayitlar} gun={GUN} />)
+  ok('baloncuklar çizildi',
+    (waHtml.match(/so-wa-balon/g) ?? []).length
+      === wa.kayitlar.length + wa.kayitlar.filter(k => k.yanit).length)
+  // Gerekçe metninde "<" geçiyor (doluluk < %70); React onu &lt; olarak
+  // basıyor. Karşılaştırmadan önce aynı kaçışı biz de uygulamalıyız, yoksa
+  // test şablonu değil HTML kaçışını ölçer.
+  const kacir = (t: string) => t
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+  ok('gövde şablondan geliyor — görev başlığı ve gerekçesi metinde',
+    wa.kayitlar.every(k => waHtml.includes(kacir(k.baslik)) && waHtml.includes(kacir(k.gerekce))))
+  ok('düğme etiketleri BUTON_ETIKETLERI\'nden',
+    BUTON_AKSIYONLARI.every(a => waHtml.includes(BUTON_ETIKETLERI[a])))
+  ok('her mesajın hangi göreve ait olduğu yazılı',
+    wa.kayitlar.every(k => waHtml.includes(`Görev ${k.gorevNo}`)))
+  ok('iletim durumu ekranda Türkçe karşılığıyla',
+    waHtml.includes('telefona ulaştı') || waHtml.includes('okundu'))
+  ok('dipnot ekranın sorgu atmadığını söylüyor',
+    waHtml.includes('so-wa-dipnot') && waHtml.includes('Denetim Kaydı'))
+  ok('örnek-veri işareti kapatılamıyor', waHtml.includes('so-ornek-nokta'))
+  ok('WhatsApp arayüzü TAKLİT edilmiyor — sahte ekran görüntüsü yok',
+    !waHtml.includes('✓✓') && !/wa-?tik/.test(waHtml))
+  ok('şablon kademeleri tabloda listeli', wa.sablonlar.length >= 3, String(wa.sablonlar.length))
+
   console.log('\n── menü ──')
   const sayim = durumSayimi()
-  ok('on beş modülün on beşinin de ekranı var — gri madde yok',
+  ok('her modülün ekranı var — gri madde yok',
     MODULLER.every(m => m.yol !== undefined), JSON.stringify(MODULLER.filter(m => !m.yol).map(m => m.slug)))
   ok('dört ekran hâlâ gerçek zincirden besleniyor', sayim.canli === 4, String(sayim.canli))
-  ok('kalan on bir ekran "örnek veri" olarak işaretli',
-    sayim['ekran-demo'] === 11, String(sayim['ekran-demo']))
+  ok('kalan ekranların hepsi "örnek veri" olarak işaretli',
+    sayim['ekran-demo'] === MODULLER.length - 4, String(sayim['ekran-demo']))
 
   console.log(fail === 0 ? '\n✓ tüm modül ekranı çizim kontrolleri geçti' : `\n✗ ${fail} kontrol düştü`)
   process.exit(fail === 0 ? 0 : 1)
