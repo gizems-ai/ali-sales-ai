@@ -11,8 +11,8 @@
 //     yeni yanıt eskisinin yerine GEÇER. Filtre değişince eski satırların
 //     kalması yanlış olurdu.
 //
-//   · ARALIK GÖRÜNÜME GÖRE. Alarmlar canlı akış (5 sn), görevler dakikalarca
-//     değişmez (10 sn), denetim append-only bir defterdir (15 sn). Panonun
+//   · ARALIK GÖRÜNÜME GÖRE. Alarmlar canlı akış (5 sn), görevler yazma yolu
+//     taşır (3 sn — Gün 8), denetim append-only bir defterdir (15 sn). Panonun
 //     2 sn'lik canlı kademesi 200 satırlık listeler için gereksiz — Airtable
 //     istek bütçesi (base başına ~5 istek/sn) üç ekran açıkken tükenir.
 //
@@ -22,16 +22,14 @@
 // ════════════════════════════════════════════════════════════════════════════
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { LISTE_ARALIK } from '@/lib/storeos/anket'
 import type {
   Gorunum, ListeFiltresi, ListeHatasi, ListeVerisi,
 } from '@/lib/storeos/liste/tipler'
 
-/** Görünüm başına anket aralığı (ms). Gerekçe dosya başlığında. */
-export const ARALIK: Record<Gorunum, number> = {
-  alarmlar: 5_000,
-  gorevler: 10_000,
-  denetim: 15_000,
-}
+/** Görünüm başına anket aralığı (ms). Tek kaynak: `lib/storeos/anket.ts` —
+ *  ölçüm script'i de aynı sabitleri okur, beyan ile ölçüm ayrışamaz. */
+export const ARALIK = LISTE_ARALIK
 
 /** Ardışık hatada geri çekilme (ms). Son değer tekrarlanır (pano ile aynı). */
 const GERI_CEKILME = [8_000, 20_000, 45_000, 90_000]

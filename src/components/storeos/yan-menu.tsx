@@ -117,6 +117,24 @@ export function YanMenu({ aktif }: { aktif: string }) {
         </div>
       </div>
 
+      {/*
+        Demo kontrol paneli. Ürün modülü DEĞİL — sunum aracı, bu yüzden
+        `moduller.ts` listesinde yok ve menüde de yalnız merkez rolüne
+        görünüyor. Yetkiyi bu link vermez: sayfa ve uçlar `yonetim-kimlik.ts`
+        ile kendi kapılarını tutar (link gizlemek güvenlik değildir).
+      */}
+      {rol === 'merkez' && (
+        <a
+          href="/storeos/demo-kontrol"
+          className="so-nav-oge so-nav-yonetim"
+          aria-current={aktif === '/storeos/demo-kontrol' ? 'page' : undefined}
+          title="Sunum sırasında senaryo tetikleme ve tohum yazma"
+        >
+          <span className="so-nav-ikon" aria-hidden="true">🎛️</span>
+          <span className="so-nav-metin">Demo kontrol</span>
+        </a>
+      )}
+
       <div className="so-kullanici">
         <div className="so-avatar" aria-hidden="true">{bashafler(user?.fullName, eposta)}</div>
         <div>

@@ -37,6 +37,9 @@ function ok(ad: string, cond: boolean, extra = '') {
 }
 
 const MAGAZA = '0178'
+/** Bölüm 9 için sahip numarası — kilit hedefinden BİLEREK farklı. */
+const SAHIP_TELEFONU = '+905321112233'
+
 const T0 = '2026-08-14T14:00:00+03:00'
 const KANAL = konsolKanaliniZorla()
 
@@ -429,10 +432,16 @@ async function main() {
   // tam da kilidi açtığımız gün kırılırdı.
   console.log('\n9) Demo telefon kilidi açıkken zincir kapanıyor')
   const oncekiDemo = process.env.STOREOS_DEMO_TELEFON
-  process.env.STOREOS_DEMO_TELEFON = '+905303227450'
   const T1 = '2026-08-14T14:05:00+03:00'
 
+  // Gün 8: bellek deposunun varsayılan kullanıcıları artık telefonlarını
+  // STOREOS_DEMO_TELEFON'dan alıyor (placeholder `+9000000000X` kaldırıldı).
+  // Bu testin sorusu "kayıttaki sahip numarası ile fiilen gidilen numara
+  // AYRIŞIYOR mu" olduğu için ikisinin farklı olması ŞART. Bu yüzden depo
+  // önce sahip numarasıyla tohumlanır, kilit hedefi SONRA değiştirilir.
+  process.env.STOREOS_DEMO_TELEFON = SAHIP_TELEFONU
   const dk1 = bellekDeposunuZorla(); await dk1.sifirla()
+  process.env.STOREOS_DEMO_TELEFON = '+905303227450'
   const alimK1 = await sessizce(() => olaylariAl({
     depo: dk1, kanal: KANAL, govde: KUYRUK_OLAYI('evt-t-011'), adapterAdi: 'generic',
     aktor: 'test', aktorTipi: 'partner', kaynak: 'simulator', simdi: T0,

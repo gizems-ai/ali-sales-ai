@@ -45,6 +45,32 @@ async function sirala<T>(is: () => Promise<T>): Promise<T> {
   return sonuc
 }
 
+// ─── İstek sayacı (ölçüm) ────────────────────────────────────────────────────
+// Gün 8: "sürekli anket yükü kaç req/sn?" sorusu TAHMİNLE değil SAYIMLA
+// cevaplanacak. Sayaç süreç ömrü boyunca artar; ölçüm ucu iki okuma
+// ARASINDAKİ FARKI kullanır. Yeniden denenen istekler de sayılır — Airtable
+// bütçesinden onlar da düşer, "başarılı istek" saymak yükü küçük gösterirdi.
+//
+// Tek süreç sayar. Vercel'de eşzamanlı lambda örnekleri ayrı sayaç tutar;
+// bu yüzden ölçüm TEK bir uç noktada, tek turda yapılır (bkz. api/olcum).
+
+let toplamIstek = 0
+let toplam429 = 0
+
+export interface IstekSayaci {
+  /** api.airtable.com'a çıkan HTTP isteği sayısı (yeniden denemeler dahil). */
+  istek: number
+  /** Bunların kaçı 429 (hız sınırı) yedi — sıfır değilse marj tükenmiş demektir. */
+  hizSiniri: number
+}
+
+export function istekSayaci(): IstekSayaci {
+  return { istek: toplamIstek, hizSiniri: toplam429 }
+}
+
+/** Ölçüm için beyan edilen tavan — script bunu 5'lik Airtable limitiyle karşılaştırır. */
+export const SANIYEDE_ISTEK_TAVANI = SANIYEDE_ISTEK
+
 // ─── Temel istek ─────────────────────────────────────────────────────────────
 
 const MAX_DENEME = 4
@@ -75,17 +101,21 @@ async function istek<T>(
       await bekle(taban + (deneme * 37) % 120)
     }
 
-    const r = await sirala(() => fetch(url, {
-      ...rest,
-      headers: {
-        Authorization: `Bearer ${env.airtableApiKey}`,
-        'Content-Type': 'application/json',
-        ...(rest.headers ?? {}),
-      },
-      cache: 'no-store',
-    }))
+    const r = await sirala(() => {
+      toplamIstek++
+      return fetch(url, {
+        ...rest,
+        headers: {
+          Authorization: `Bearer ${env.airtableApiKey}`,
+          'Content-Type': 'application/json',
+          ...(rest.headers ?? {}),
+        },
+        cache: 'no-store',
+      })
+    })
 
     if (r.ok) return r.json() as Promise<T>
+    if (r.status === 429) toplam429++
 
     const govde = await r.text().catch(() => '')
     sonHata = new AirtableHatasi(r.status, govde)

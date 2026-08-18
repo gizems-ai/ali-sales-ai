@@ -616,6 +616,34 @@
 .storeos-root .so-bag { color: var(--so-marka); text-decoration: none; font-size: 12.5px; }
 .storeos-root .so-bag:hover { text-decoration: underline; }
 
+/* ── Görev eylemleri (Gün 8 — ekran artık yazma yolu taşıyor) ───────────────
+   Düğme LİSTESİ burada değil: `lib/storeos/gorev-gecis.ts:gorevEylemleri()`
+   üretir, `gorev.test.ts` her düğmenin tabloda karşılığı olduğunu doğrular.
+   Bu blokta yalnız yerleşim var — ölü düğme CSS ile değil testle engellenir. */
+
+.storeos-root .so-eylemler { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+/* Özet satırındaki tek ana düğme sağa yaslanır; detay panelindeki tam takım
+   satır başında kalır. Aynı sınıf, iki yerleşim. */
+.storeos-root .so-eylemler-ozet { margin-left: 4px; }
+
+.storeos-root .so-eylem-mesaj {
+  display: block; margin-top: 5px; padding: 5px 9px;
+  font-size: 11.5px; line-height: 1.5; font-weight: 500;
+  border: 1px solid var(--so-cizgi); border-radius: var(--so-radius-sm);
+  background: var(--so-yuzey); color: var(--so-metin-soluk);
+}
+.storeos-root .so-eylem-mesaj[data-tur="cakisma"] { border-color: var(--so-medium); color: var(--so-medium); }
+.storeos-root .so-eylem-mesaj[data-tur="hata"]    { border-color: var(--so-critical); color: var(--so-critical); }
+.storeos-root .so-eylem-mesaj[data-tur="basari"]  { border-color: var(--so-low); color: var(--so-low); }
+
+/* İYİMSER ROZET: ekranda yazan durum henüz sunucudan onaylanmadı. Nabız bunu
+   söyler — kullanıcı "oldu mu olmadı mı" diye tahmin etmez. */
+.storeos-root .so-rozet-iyimser { animation: so-nabiz-iyimser 1.1s ease-in-out infinite; }
+@keyframes so-nabiz-iyimser { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+@media (prefers-reduced-motion: reduce) {
+  .storeos-root .so-rozet-iyimser { animation: none; opacity: .72; }
+}
+
 .storeos-root .so-altbilgi {
   margin: 0; font-size: 11.5px; color: var(--so-metin-silik); line-height: 1.6; max-width: 84ch;
 }
@@ -1192,4 +1220,34 @@
   .storeos-root .so-satir-kpi  { grid-template-columns: 1fr 1fr; }
   .storeos-root .so-satir-dort { grid-template-columns: 1fr; }
   .storeos-root .so-ikili      { grid-template-columns: 1fr; }
+}
+
+/* ── Demo kontrol paneli (Gün 8) ────────────────────────────────────────────
+   Sunum aracı; ürün ekranı değil. Kendi bileşen ailesi YOK — kart, düğme,
+   tablo satırı hep aynı temel parçalar. Buradaki üç sınıf yalnız yerleşim. */
+
+.storeos-root .so-dk-izgara {
+  display: grid; gap: var(--so-bosluk);
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+.storeos-root .so-dk-onay {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11.5px; font-weight: 500; color: var(--so-metin-soluk);
+}
+.storeos-root .so-dk-sorunlar {
+  margin: 10px 0 0; padding: 8px 10px 8px 26px;
+  border: 1px solid var(--so-medium); border-radius: var(--so-radius-sm);
+  color: var(--so-medium); font-size: 11.5px; line-height: 1.6;
+}
+/* Ham yanıt: jüri sorarsa açılır. Varsayılan kapalı — ekranda JSON durmaz. */
+.storeos-root .so-dk-ham {
+  margin: 0; padding: 12px 14px; max-height: 320px; overflow: auto;
+  background: var(--so-yuzey-2); border-top: 1px solid var(--so-cizgi);
+  font-size: 11px; line-height: 1.5; color: var(--so-metin-soluk);
+  white-space: pre-wrap; overflow-wrap: anywhere;
+}
+/* Menüdeki yönetici bağlantısı — ürün modüllerinden görsel olarak ayrık. */
+.storeos-root .so-nav-yonetim {
+  margin-top: 6px; border-top: 1px dashed var(--so-cizgi); padding-top: 10px;
+  opacity: .85;
 }

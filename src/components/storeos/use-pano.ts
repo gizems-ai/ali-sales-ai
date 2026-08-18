@@ -20,6 +20,7 @@
 // ════════════════════════════════════════════════════════════════════════════
 
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { PANO_ARALIK } from '@/lib/storeos/anket'
 import type { DashboardVerisi, Katman, PanoHatasi } from '@/lib/storeos/dashboard/tipler'
 
 // 2 sn → 4 sn (17 Ağu 2026, ölçümle). Airtable transportu 4 istek/sn ile
@@ -27,7 +28,7 @@ import type { DashboardVerisi, Katman, PanoHatasi } from '@/lib/storeos/dashboar
 // tek başına 2.17 istek/sn yiyordu; olay→telefon gecikmesi ~13 sn'ye çıkıyordu.
 // 4 sn kabul kriterindeki 15 sn tavanının çok altında kalır, bütçeyi zincire
 // bırakır. Ölçüm: `scripts/storeos/istek-butcesi.ts`.
-export const ARALIK = { canli: 4_000, yavas: 30_000 } as const
+export const ARALIK = PANO_ARALIK
 
 /** Ardışık hatada geri çekilme (ms). Son değer tekrarlanır. */
 const GERI_CEKILME = [4_000, 10_000, 30_000, 60_000]

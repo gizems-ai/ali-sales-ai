@@ -28,7 +28,11 @@
 import { bellekDeposunuZorla } from '../../src/lib/storeos/depo'
 import { imzaUret } from '../../src/lib/storeos/imza'
 import { olaylariAl } from '../../src/lib/storeos/olay-alim'
-import { epochtanIso } from '../../src/lib/storeos/adapters/ornek-vendor'
+// Senaryolar TEK kaynaktan gelir; demo kontrol paneli de aynı dosyayı okur.
+import {
+  SENARYOLAR, TANIMLAR, bozukOlay, olayId,
+} from '../../src/lib/storeos/senaryolar'
+import type { Senaryo } from '../../src/lib/storeos/senaryolar'
 
 // ─── Argümanlar ──────────────────────────────────────────────────────────────
 
@@ -38,9 +42,6 @@ const deger = (ad: string): string | undefined => {
   const p = argv.find(a => a.startsWith(`--${ad}=`))
   return p ? p.slice(ad.length + 3) : undefined
 }
-
-const SENARYOLAR = ['kuyruk-artisi', 'raf-stok-dustu', 'kamera-offline', 'isg-islak-zemin'] as const
-type Senaryo = (typeof SENARYOLAR)[number]
 
 const istenen = argv.find(a => !a.startsWith('--')) ?? 'kuyruk-artisi'
 const SIR = deger('sir') ?? process.env.STOREOS_INGEST_SECRET ?? 'demo-sir-degistir'
@@ -57,110 +58,12 @@ if (istenen !== 'hepsi' && !SENARYOLAR.includes(istenen as Senaryo)) {
 
 const KOSU_DAMGASI = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14)
 let sayac = 0
-function olayId(senaryo: string): string {
-  sayac += 1
-  return `evt_${senaryo}_${KOSU_DAMGASI}_${String(sayac).padStart(3, '0')}`
-}
+const yeniOlayId = (senaryo: string) => olayId(senaryo, KOSU_DAMGASI, ++sayac)
 
 // ─── Senaryolar ──────────────────────────────────────────────────────────────
-
-const MAGAZA = '0178'
-/** Kanonik olaylar da vendor hattıyla aynı saat diliminde (+03:00) üretilir. */
-const TR_OFFSET_DK = 180
-const simdi = () => epochtanIso(Date.now(), TR_OFFSET_DK)
-
-interface SenaryoTanimi {
-  ad: Senaryo
-  aciklama: string
-  faz: 1 | 2
-  kanonik(id: string): Record<string, unknown>
-  vendor(id: string): Record<string, unknown>
-}
-
-const TANIMLAR: Record<Senaryo, SenaryoTanimi> = {
-  'kuyruk-artisi': {
-    ad: 'kuyruk-artisi',
-    aciklama: 'Kasa kuyrugu esigi asti (7 kisi, 252 sn bekleme)',
-    faz: 1,
-    kanonik: id => ({
-      id, storeCode: MAGAZA, cameraId: `${MAGAZA}-kasa`,
-      eventType: 'store.queue.threshold_exceeded',
-      occurredAt: simdi(), severity: 'high', confidence: 0.91,
-      metadata: { registerId: 'kasa-2', queueLength: 7, avgWaitSeconds: 252, maxWaitSeconds: 180 },
-    }),
-    vendor: id => ({
-      event_uuid: id, site: { code: MAGAZA, device: `${MAGAZA}-kasa` },
-      kind: 'QUEUE_THRESHOLD', ts_ms: Date.now(), tz_offset_min: 180,
-      level: 4, score: 91,
-      payload: { register: 'kasa-2', people: 7, wait_sec: 252, max_wait_sec: 180 },
-    }),
-  },
-  'raf-stok-dustu': {
-    ad: 'raf-stok-dustu',
-    aciklama: 'Kozmetik reyonunda raf dolulugu %22 (FAZ 2 — kural yok)',
-    faz: 2,
-    kanonik: id => ({
-      id, storeCode: MAGAZA, cameraId: `${MAGAZA}-kozmetik`,
-      eventType: 'store.shelf.stock_low',
-      occurredAt: simdi(), severity: 'medium', confidence: 0.78,
-      // Otoriter tabloda oran DEĞİL yüzde: fillRatePercent (0-100).
-      metadata: { zoneId: 'kozmetik', shelfId: 'KZ-04', fillRatePercent: 22, missingFacings: 9 },
-    }),
-    vendor: id => ({
-      event_uuid: id, site: { code: MAGAZA, device: `${MAGAZA}-kozmetik` },
-      kind: 'SHELF_LOW', ts_ms: Date.now(), tz_offset_min: 180,
-      level: 3, score: 78,
-      payload: { zone: 'kozmetik', shelf: 'KZ-04', fill_rate_pct: 22, missing_facings: 9 },
-    }),
-  },
-  'kamera-offline': {
-    ad: 'kamera-offline',
-    aciklama: 'Depo kamerasi baglantisi koptu',
-    faz: 1,
-    kanonik: id => ({
-      id, storeCode: MAGAZA, cameraId: `${MAGAZA}-depo`,
-      eventType: 'store.camera.offline',
-      occurredAt: simdi(), severity: 'high', confidence: 1,
-      metadata: { reason: 'rtsp_timeout', lastSeenAt: simdi() },
-    }),
-    vendor: id => ({
-      event_uuid: id, site: { code: MAGAZA, device: `${MAGAZA}-depo` },
-      kind: 'CAMERA_DOWN', ts_ms: Date.now(), tz_offset_min: 180,
-      level: 4, score: 100,
-      payload: { reason: 'rtsp_timeout', last_seen: simdi() },
-    }),
-  },
-  'isg-islak-zemin': {
-    ad: 'isg-islak-zemin',
-    aciklama: 'Giris bolgesinde islak zemin (FAZ 2 — kural yok)',
-    faz: 2,
-    kanonik: id => ({
-      id, storeCode: MAGAZA, cameraId: `${MAGAZA}-giris`,
-      eventType: 'store.safety.event_detected',
-      occurredAt: simdi(), severity: 'critical', confidence: 0.84,
-      metadata: { zoneId: 'giris', issueType: 'wet_floor' },
-    }),
-    vendor: id => ({
-      event_uuid: id, site: { code: MAGAZA, device: `${MAGAZA}-giris` },
-      kind: 'SAFETY_ALERT', ts_ms: Date.now(), tz_offset_min: 180,
-      level: 5, score: 84,
-      payload: { zone: 'giris', issue_type: 'wet_floor' },
-    }),
-  },
-}
-
-/** Kasten bozuk olay — 400 + sebep kanıtı. */
-function bozukOlay(): Record<string, unknown> {
-  return {
-    id: 'evt_bozuk_001',
-    storeCode: MAGAZA,
-    eventType: 'STORE.Queue.Threshold',      // biçim hatalı (büyük harf)
-    occurredAt: '2026-08-14T14:35:21',       // offset YOK
-    severity: 'cok_yuksek',                  // listede yok
-    confidence: 1.4,                         // 0-1 dışı
-    metadata: [],                            // dizi, nesne değil
-  }
-}
+// Tanımlar `src/lib/storeos/senaryolar.ts`'te. Buradan silindiler (Gün 8):
+// demo kontrol paneli de aynı senaryoları tetikliyor ve iki kopya, jüri önünde
+// terminalde denenenden BAŞKA bir olay göndermek demekti.
 
 // ─── Gönderim ────────────────────────────────────────────────────────────────
 
@@ -247,8 +150,8 @@ async function main() {
     if (t.faz === 2) {
       console.log('    (Faz 2 tipi: sozlesmede TANIMLI, kural YAZILMADI. Olay kabul edilir, gorev uretmez.)')
     }
-    const id = olayId(ad)
-    const govde = vendorMu ? t.vendor(id) : t.kanonik(id)
+    const id = yeniOlayId(ad)
+    const govde = vendorMu ? t.vendor(id, Date.now()) : t.kanonik(id, Date.now())
     const adapterAdi = vendorMu ? 'ornek-vendor' : 'generic'
 
     await gonder(govde, adapterAdi, vendorMu ? 'vendor-bicimi' : 'kanonik')

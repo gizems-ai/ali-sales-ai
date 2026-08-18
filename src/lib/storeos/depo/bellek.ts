@@ -50,14 +50,33 @@ function varsayilanKameralar(): Kamera[] {
   ]
 }
 
-/** TELEFONLAR PLACEHOLDER — gerçek E.164 numaralar demo öncesi girilecek. */
+/**
+ * TELEFONLAR ARTIK GERÇEK E.164 (Gün 8, madde 5). Placeholder `+9000000000X`
+ * kaldırıldı: WhatsApp sağlayıcısı geçersiz numarayı reddediyordu ve hata
+ * "kanal bozuk" gibi okunuyordu.
+ *
+ * Demoda BÜTÜN roller aynı numaraya düşer — bu bir eksiklik değil, kilidin
+ * kendisidir: `telefon-kilidi.ts` zaten her gidişi STOREOS_DEMO_TELEFON'a
+ * çeviriyor. Seed'de rol başına farklı numara yazmak, kilit açıkken hiçbir
+ * şey değiştirmez ama jüriye "başkasının telefonuna gidiyor" izlenimi verir.
+ * Tek numara yazıp kilidi açık bırakmak dürüst olan.
+ */
+function demoTelefonu(): string {
+  const e = (process.env.STOREOS_DEMO_TELEFON ?? '').trim()
+  return /^\+[1-9]\d{7,14}$/.test(e) ? e : DEMO_TELEFON_YEDEGI
+}
+
+/** Env yoksa (test, CI) kullanılan numara — kilit hedefiyle aynı. */
+const DEMO_TELEFON_YEDEGI = '+905303227450'
+
 function varsayilanKullanicilar(): Kullanici[] {
+  const tel = demoTelefonu()
   const t = (ad: string, rol: Kullanici['Rol'], no: string): Kullanici => ({
     'Kullanici ID': `u-${rol}-${no}`,
     'Ad Soyad': ad,
     'Rol': rol,
     'Magaza Kodu': MAGAZA_KODU,
-    'Telefon': `+90000000000${no}`,
+    'Telefon': tel,
     'Aktif': true,
   })
   return [

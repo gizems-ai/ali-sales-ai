@@ -8,7 +8,7 @@
 
 import { bellekDeposunuZorla } from './depo'
 import { DENETIM_AKSIYONLARI } from './denetim'
-import { GECISLER, gecisGecerliMi, gecisSebebi, gecisYap, nihaiMi, sablonDoldur } from './gorev'
+import { GECISLER, gecisGecerliMi, gecisSebebi, gecisYap, gorevEylemleri, nihaiMi, sablonDoldur } from './gorev'
 import type { Depo } from './depo'
 import type { Gorev, GorevDurumu } from './tipler'
 import type { VisionEvent } from './olay-sozlesmesi'
@@ -125,6 +125,23 @@ async function main() {
   ok('{kamera} kısayolu çalışır', sablonDoldur('{kamera}', olay) === 'cam-kasa-01')
   ok("bulunamayan yer tutucu '—' olur, ham {} EKRANDA GÖRÜNMEZ",
      sablonDoldur('{metadata.yokBoyleBirSey}', olay) === '—')
+
+  console.log('\n[5] EKRAN EYLEMLERİ — ölü düğme olamaz (Gün 8)')
+  // Görev ekranındaki her düğme, durum makinesinde GERÇEKTEN var olan bir
+  // geçişi çağırmalı. Tabloyu daraltan biri sessizce çalışmayan bir düğme
+  // bırakamasın diye kontrol burada: düğme listesi ile tablo tek testte bağlı.
+  for (const durum of TUM_DURUMLAR) {
+    for (const e of gorevEylemleri(durum)) {
+      if (e.hedef === 'ertele') {
+        ok(`'${durum}' → ertele düğmesi yalnız nihai OLMAYAN durumda`, !nihaiMi(durum))
+        continue
+      }
+      ok(`'${durum}' → '${e.hedef}' düğmesi tabloda karşılığı olan bir geçiş`,
+         gecisGecerliMi(durum, e.hedef), gecisSebebi(durum, e.hedef) ?? '')
+    }
+  }
+  ok('nihai durumlarda düğme YOK',
+     gorevEylemleri('tamamlandi').length === 0 && gorevEylemleri('iptal').length === 0)
 
   if (fail) { console.log(`\n✗ ${fail} kontrol BAŞARISIZ\n`); process.exit(1) }
   console.log('\n✓ tüm görev durum makinesi kontrolleri geçti\n')

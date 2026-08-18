@@ -11,11 +11,17 @@
 //  APTAL BİLEŞEN KURALI KORUNUYOR: veri `useListe()`'den TEK yerde gelir,
 //  tablolar prop alır, hiçbiri kendi isteğini atmaz.
 //
-//  ── SALT OKUNUR (Gün 4 sınırı) ─────────────────────────────────────────────
-//  Bu ekranlarda görev durumu değiştiren bir düğme YOKTUR. Görev geçişi
-//  (`gorev.ts:gecisYap`) yazma yolu demektir ve yazma yolu denetim kaydı,
-//  yetki kontrolü ve 409 davranışı ister — kendi başına bir gün. Gri bir
-//  "Tamamla" düğmesi koymaktansa hiç koymamak dürüst.
+//  ── YAZMA YOLU (Gün 8) ─────────────────────────────────────────────────────
+//  Gün 4'te bu ekranlar salt okunurdu: "yazma yolu denetim kaydı, yetki ve 409
+//  davranışı ister — kendi başına bir gün" demiştik. O gün geldi. Alarm ve
+//  denetim ekranları SALT OKUNUR KALIR (denetim defteri append-only, kodda
+//  silme/güncelleme yolu yok); yalnız GÖREV satırı durum değiştirir.
+//
+//  Düğme listesi burada üretilmez — `gorev-gecis.ts:gorevEylemleri()` verir,
+//  aynı dosyanın `GECISLER` tablosundan. Ekranda tabloda karşılığı olmayan bir
+//  düğme çizilemez; `gorev.test.ts` bunu her koşuda doğrular.
+//
+//  İyimser UI ve 409 mesajı `use-gorev-eylem.ts`'te; bu dosya yalnız çizer.
 //
 //  ── ZİNCİR GÖRÜNÜR ─────────────────────────────────────────────────────────
 //  Ekranlar birbirine bağlı: alarm → doğurduğu görev → görevin denetim izi.
@@ -27,15 +33,19 @@ import type {
   AlarmDetayi, DenetimGorunumu, GorevDetayi, Gorunum, ListeFiltresi,
   ListeVerisi, SecenekSayaci,
 } from '@/lib/storeos/liste/tipler'
+import { gorevEylemleri, nihaiMi } from '@/lib/storeos/gorev-gecis'
 import {
   gorevDurumEtiketi, oncelikEtiketi, oncelikSinifi, severityEtiketi,
   severitySinifi,
 } from '@/lib/storeos/tema'
+import type { GorevDurumu } from '@/lib/storeos/tipler'
 import { Kabuk } from './kabuk'
 import {
   BosDurum, HataDurumu, Iskelet, Kart, OrnekVeri, gecenSure, sayiYaz, saatYaz,
   tarihSaatYaz,
 } from './temel'
+import { useGorevEylem } from './use-gorev-eylem'
+import type { GorevEylemDurumu } from './use-gorev-eylem'
 import { useListe } from './use-liste'
 
 // ─── Ekran metinleri ─────────────────────────────────────────────────────────
@@ -262,7 +272,57 @@ function kalanYaz(dk: number): string {
   return dk < 0 ? `${metin} gecikme` : `${metin} kaldı`
 }
 
-function GorevSatiri({ g }: { g: GorevDetayi }) {
+/**
+ * Görev satırındaki düğmeler. İki yerde çizilir, TEK kaynaktan beslenir:
+ * özet satırında yalnız ANA eylem (tek tıkla ilerlesin), detay panelinde
+ * takımın tamamı.
+ *
+ * `mevcutDurum` olarak EKRANDAKİ durum gönderilir — iyimser değer dahil. Bu
+ * bilinçli: kullanıcı ne görüyorsa onu beklediğini söyler; sunucu farklı
+ * düşünüyorsa 409/çakışma döner ve ekran düzelir. Sessizce sunucu durumunu
+ * göndermek, iki kişinin aynı görevi ezmesine izin vermek olurdu.
+ */
+function EylemDugmeleri({
+  g, durum, eylem, yalnizAna,
+}: {
+  g: GorevDetayi; durum: GorevDurumu; eylem: GorevEylemDurumu; yalnizAna?: boolean
+}) {
+  const hepsi = gorevEylemleri(durum)
+  const liste = yalnizAna ? hepsi.filter(e => e.ana) : hepsi
+  if (liste.length === 0) return null
+  const kilitli = eylem.surende(g.gorevNo)
+
+  return (
+    <span className={`so-eylemler${yalnizAna ? ' so-eylemler-ozet' : ''}`}>
+      {liste.map(e => (
+        <button
+          key={e.hedef}
+          type="button"
+          className={`so-dugme so-dugme-kucuk${e.ana ? ' so-dugme-ana' : ''}`}
+          disabled={kilitli}
+          onClick={ev => {
+            // Düğme <summary> içinde: varsayılan tıklama detayı açıp kapatır.
+            ev.preventDefault()
+            ev.stopPropagation()
+            eylem.calistir({
+              gorevNo: g.gorevNo, mevcutDurum: durum, hedef: e.hedef, etiket: e.etiket,
+            })
+          }}
+        >
+          {e.etiket}
+        </button>
+      ))}
+    </span>
+  )
+}
+
+function GorevSatiri({ g, eylem }: { g: GorevDetayi; eylem: GorevEylemDurumu }) {
+  // Ekranda gösterilen durum sunucununkinden FARKLI olabilir: düğmeye basıldı,
+  // yanıt henüz gelmedi. Fark varsa rozet nabız atar.
+  const durum = eylem.iyimserDurum(g.gorevNo, g.durum)
+  const bekliyor = durum !== g.durum
+  const mesaj = eylem.mesaj && eylem.mesaj.gorevNo === g.gorevNo ? eylem.mesaj : null
+
   return (
     <details className="so-tablo-satir">
       <summary>
@@ -273,10 +333,28 @@ function GorevSatiri({ g }: { g: GorevDetayi }) {
             {g.atananAd ?? g.atananRol} · son teslim {tarihSaatYaz(g.sonTeslim)}
             {g.kalanDk !== null && ` · ${kalanYaz(g.kalanDk)}`}
           </span>
+          {mesaj && (
+            <span className="so-eylem-mesaj" data-tur={mesaj.tur}>
+              {mesaj.metin}{' '}
+              <button
+                type="button"
+                className="so-dugme so-dugme-kucuk"
+                onClick={ev => { ev.preventDefault(); ev.stopPropagation(); eylem.mesajiKapat() }}
+              >
+                kapat
+              </button>
+            </span>
+          )}
         </span>
         {g.gecikti && <span className="so-rozet so-sev-critical">gecikti</span>}
-        <span className="so-rozet so-notr">{gorevDurumEtiketi(g.durum)}</span>
+        <span
+          className={`so-rozet so-notr${bekliyor ? ' so-rozet-iyimser' : ''}`}
+          title={bekliyor ? 'Gönderildi — sunucu onayı bekleniyor.' : undefined}
+        >
+          {gorevDurumEtiketi(durum)}
+        </span>
         <OrnekVeri veriTipi={g.veriTipi} />
+        <EylemDugmeleri g={g} durum={durum} eylem={eylem} yalnizAna />
       </summary>
 
       <dl className="so-detay">
@@ -296,6 +374,21 @@ function GorevSatiri({ g }: { g: GorevDetayi }) {
             ? (g.kanitUrl ? <a className="so-bag" href={g.kanitUrl} target="_blank" rel="noreferrer">yüklendi →</a> : <span className="so-ipucu">gerekli, henüz yok</span>)
             : <span className="so-ipucu">gerekmiyor</span>}
         </Alan>
+
+        {/* Tam eylem takımı. Özet satırında yalnız ana eylem vardı. */}
+        <div className="so-alan so-alan-genis">
+          <dt>Eylem</dt>
+          <dd>
+            {nihaiMi(durum) ? (
+              <span className="so-ipucu">
+                Görev kapandı ({gorevDurumEtiketi(durum)}) — durum değiştirilemez. Kayıt denetim
+                defterinde kalır.
+              </span>
+            ) : (
+              <EylemDugmeleri g={g} durum={durum} eylem={eylem} />
+            )}
+          </dd>
+        </div>
 
         {/* Kararın gerekçesi — "bu görev neden açıldı" sorusunun cevabı. */}
         <div className="so-alan so-alan-genis">
@@ -352,14 +445,16 @@ function DenetimSatiri({ s, simdiMs }: { s: DenetimGorunumu; simdiMs: number }) 
 
 // ─── Ekran ───────────────────────────────────────────────────────────────────
 
-function Govde({ veri, simdiMs }: { veri: ListeVerisi; simdiMs: number }) {
+function Govde({ veri, simdiMs, eylem }: {
+  veri: ListeVerisi; simdiMs: number; eylem: GorevEylemDurumu
+}) {
   // `gorunum` ayırt edici alan: TypeScript burada satır tipini daraltıyor,
   // yani yanlış tabloyu yanlış veriyle çizmek DERLEME hatası verir.
   if (veri.gorunum === 'alarmlar') {
     return <>{veri.satirlar.map(a => <AlarmSatiri key={a.olayId} a={a} simdiMs={simdiMs} />)}</>
   }
   if (veri.gorunum === 'gorevler') {
-    return <>{veri.satirlar.map(g => <GorevSatiri key={g.gorevNo} g={g} />)}</>
+    return <>{veri.satirlar.map(g => <GorevSatiri key={g.gorevNo} g={g} eylem={eylem} />)}</>
   }
   return <>{veri.satirlar.map(s => <DenetimSatiri key={s.kayitId} s={s} simdiMs={simdiMs} />)}</>
 }
@@ -374,6 +469,10 @@ export function ListeEkrani({
   const {
     veri, hata, yukleniyor, yenileniyor, duraklatildi, filtre, filtreDegistir, yenile,
   } = useListe(gorunum, baslangic)
+
+  // Görev eylemleri anketle AYNI `yenile`'yi kullanır: bir düğme sonucu
+  // ekrana ancak sunucudan dönerek girer, iyimser değer o ana kadar köprüdür.
+  const eylem = useGorevEylem(yenile)
 
   const m = METIN[gorunum]
   // "Şimdi" sunucunun ürettiği andan gelir — istemci saatinden değil. Pano ile
@@ -445,7 +544,7 @@ export function ListeEkrani({
                 <BosDurum baslik={m.bosBaslik} metin={m.bosMetin} />
               ) : veri ? (
                 <div className="so-tablo">
-                  <Govde veri={veri} simdiMs={simdiMs} />
+                  <Govde veri={veri} simdiMs={simdiMs} eylem={eylem} />
                 </div>
               ) : null}
             </Kart>

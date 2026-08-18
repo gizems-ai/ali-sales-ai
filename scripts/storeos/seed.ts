@@ -63,16 +63,27 @@ const kameraTanimlari: Omit<Kamera, 'Magaza Kodu'>[] = [
 const kameralar: Partial<Kamera>[] = kameraTanimlari.map(k => ({ ...k, 'Magaza Kodu': MAGAZA }))
 
 /**
- * TELEFONLAR PLACEHOLDER'DIR. Demo öncesi gerçek numaralarla değiştirilecek —
- * WhatsApp zinciri yalnız gerçek E.164 numarayla çalışır.
+ * TELEFONLAR GERÇEK E.164 (Gün 8, madde 5). Kaynak: STOREOS_DEMO_TELEFON.
+ * Placeholder `+9000000000X` kaldırıldı — sağlayıcı geçersiz numarayı
+ * reddediyor ve hata "zincir bozuk" gibi okunuyordu.
+ *
+ * Bütün roller aynı numaraya yazılır. Sebep: `telefon-kilidi.ts` açıkken her
+ * gönderim zaten bu numaraya çevrilir; rol başına farklı numara yazmak kilit
+ * açıkken hiçbir şeyi değiştirmez, yalnız "başkasına gidiyor" yanılsaması
+ * üretir. Kilit KAPANDIĞI gün burası rol başına gerçek numarayla doldurulur.
  */
+const DEMO_TELEFONU = (() => {
+  const e = (process.env.STOREOS_DEMO_TELEFON ?? '').trim()
+  return /^\+[1-9]\d{7,14}$/.test(e) ? e : '+905303227450'
+})()
+
 const kullaniciTanimlari: Pick<Kullanici, 'Kullanici ID' | 'Ad Soyad' | 'Rol' | 'Telefon'>[] = [
-  { 'Kullanici ID': 'u-mudur-0178',   'Ad Soyad': 'Mağaza Müdürü',   'Rol': 'magaza_muduru', 'Telefon': '+900000000001' },
-  { 'Kullanici ID': 'u-bolge-ege',    'Ad Soyad': 'Ege Bölge Müdürü','Rol': 'bolge_muduru',  'Telefon': '+900000000002' },
-  { 'Kullanici ID': 'u-personel-1',   'Ad Soyad': 'Reyon Personeli 1','Rol': 'personel',     'Telefon': '+900000000003' },
-  { 'Kullanici ID': 'u-personel-2',   'Ad Soyad': 'Reyon Personeli 2','Rol': 'personel',     'Telefon': '+900000000004' },
-  { 'Kullanici ID': 'u-guvenlik-1',   'Ad Soyad': 'Güvenlik Görevlisi','Rol': 'guvenlik',    'Telefon': '+900000000005' },
-  { 'Kullanici ID': 'u-merkez-1',     'Ad Soyad': 'Merkez Operasyon', 'Rol': 'merkez',       'Telefon': '+900000000006' },
+  { 'Kullanici ID': 'u-mudur-0178',   'Ad Soyad': 'Mağaza Müdürü',   'Rol': 'magaza_muduru', 'Telefon': DEMO_TELEFONU },
+  { 'Kullanici ID': 'u-bolge-ege',    'Ad Soyad': 'Ege Bölge Müdürü','Rol': 'bolge_muduru',  'Telefon': DEMO_TELEFONU },
+  { 'Kullanici ID': 'u-personel-1',   'Ad Soyad': 'Reyon Personeli 1','Rol': 'personel',     'Telefon': DEMO_TELEFONU },
+  { 'Kullanici ID': 'u-personel-2',   'Ad Soyad': 'Reyon Personeli 2','Rol': 'personel',     'Telefon': DEMO_TELEFONU },
+  { 'Kullanici ID': 'u-guvenlik-1',   'Ad Soyad': 'Güvenlik Görevlisi','Rol': 'guvenlik',    'Telefon': DEMO_TELEFONU },
+  { 'Kullanici ID': 'u-merkez-1',     'Ad Soyad': 'Merkez Operasyon', 'Rol': 'merkez',       'Telefon': DEMO_TELEFONU },
 ]
 const kullanicilar: Partial<Kullanici>[] = kullaniciTanimlari.map(u => ({
   ...u, 'Magaza Kodu': MAGAZA, 'Aktif': true,
@@ -218,8 +229,8 @@ async function main() {
 
   console.log(`\nToplam Airtable istegi: ${istekSayaci}`)
   if (!YAZ) console.log('Hicbir sey yazilmadi. Gercekten yazmak icin: --yaz')
-  console.log('\nUYARI: Kullanicilar tablosundaki telefonlar PLACEHOLDER (+9000000000X).')
-  console.log('WhatsApp zinciri icin demo oncesi gercek E.164 numaralarla degistir.')
+  console.log(`\nTelefonlar: ${DEMO_TELEFONU} (tum roller ayni numara).`)
+  console.log('Telefon kilidi ACIK oldugu surece her gonderim zaten bu numaraya duser.')
 }
 
 main().catch(e => { console.error('\nHATA:', e.message); process.exit(1) })

@@ -1,10 +1,13 @@
 // ════════════════════════════════════════════════════════════════════════════
 //  /storeos/gorevler — kural eşleşmesinden doğan işler.
 //
-//  SALT OKUNUR (Gün 4 sınırı). Durum değiştiren düğme yok: geçiş bir yazma
-//  yoludur ve denetim kaydı + yetki + 409 davranışı ister. Çalışmayan gri bir
-//  düğme koymaktansa hiç koymamak dürüst — kabuktaki "yakında" kuralının
-//  aynısı.
+//  YAZMA YOLU (Gün 8). Gün 4'te salt okunurdu; artık durum değiştiren düğmeler
+//  var. Yazma yolunun bedeli ödendi: yetki `yetki.ts`'ten, her geçiş denetim
+//  defterine, çakışan iki tıklamada 409 ve anlaşılır mesaj. Düğmeler
+//  `gorev-gecis.ts` tablosundan üretilir — ölü düğme derlemeden geçmez.
+//
+//  Anket bu ekranda 3 sn (`lib/storeos/anket.ts`): düğmeye basan kişi 10 sn
+//  bekleyemez. Diğer listeler daha yavaş — Airtable bütçesi ortak.
 //
 //  Ön-yükleme ve `searchParams` gerekçeleri için bkz. `alarmlar/page.tsx`.
 // ════════════════════════════════════════════════════════════════════════════

@@ -84,7 +84,11 @@ export function KameraPaneli({
     >
       <div className="so-kamera-ana">
         <KameraKaresi kod={kameraKodu(ana.kameraId)} kuyruk={kuyrukKisi ?? 0} />
-        <span className="so-kamera-etiket">DEMO GÖRÜNTÜ</span>
+        {/* Etiket bilinçli olarak "anonim sayım" der (Gün 8 onayı): kare bir
+            şema olduğu için özür dilemiyoruz, mahremiyet duruşunu ilan
+            ediyoruz. Gerçek Gratis mağazası videosu yok; stok video "bu bizim
+            mağazamız değil" tepkisi doğurur. */}
+        <span className="so-kamera-etiket">DEMO GÖRÜNÜMÜ · anonim sayım</span>
         <div className="so-kamera-alt">
           <span>{ana.ad} · {ana.bolgeAdi}</span>
           <span>anonim sayım · yüz tanıma yok</span>

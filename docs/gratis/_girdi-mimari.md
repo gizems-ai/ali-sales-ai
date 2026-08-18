@@ -87,7 +87,26 @@ POST /api/storeos/olay          /storeos/(korumali)/*
 - Store OS dosyaları yalnız `node_modules`, `src/lib/storeos/*`, `src/components/storeos/*` import eder.
 - Kopyalanan her dosyanın ilk satırı: `// Kaynak: <yol> — Store OS için kopyalandı, senkronize değildir`
 - Denetleyici: `node scripts/storeos/import-denetci.mjs` (günlük koşuda).
-- Ağaç dışında **onaylı** dokunulan dosyalar: `src/app/globals.css` (yalnız `.storeos-root` bloğu) · `src/proxy.ts` (tek satır public route) · `.env.example` · `.gitignore` (`!.env.example`).
+### Ağaç dışında onaylı dokunulan dosyalar (ENVANTER)
+
+Numaralar tarihseldir; boşluk yok, sıra korunuyor.
+
+| # | Dosya | Kapsam | Durum |
+|---|---|---|---|
+| 1 | `src/app/globals.css` | yalnız `.storeos-root` altındaki blok | onaylı · uygulandı |
+| 2 | `.env.example` | Store OS anahtarları | onaylı · uygulandı |
+| 3 | `.gitignore` | `!.env.example` | onaylı · uygulandı |
+| 4 | `src/proxy.ts` | tek satır: `/storeos/giris(.*)` public | onaylı · uygulandı (Gün 3) |
+| 5 | `tsconfig.storeos.json` (yeni dosya) | Store OS'e özel tip kontrolü | onaylı · uygulandı |
+| 6 | `src/proxy.ts` — `loginUrl` | oturumsuz `/storeos` isteğini `/login` yerine `/storeos/giris`'e sürmek | **onay bekliyor · UYGULANMADI** (bkz. `vercel-clerk-kurulum.md`). O güne kadar jüri bağlantısı `/storeos/giris`. |
+| 7 | `public/storeos/ali-avatar.png` (yeni dosya) | Ali kimliği — `public/ali-avatar.png` **kopyalandı**, import edilmedi; `public/` ağaç dışı olduğu için istisna sayılır | **onaylı (Gün 7) · Gün 8'de envantere işlendi** |
+
+`package.json` bu listede DEĞİLDİR ve olmayacak: Store OS için npm script
+eklenmedi, araçlar doğrudan çağrılıyor (`npx -y tsx scripts/storeos/...`).
+
+Kural değişmedi: **kopyala, import etme.** 7. istisnada da kaynak dosyaya
+dokunulmadı; `public/storeos/` altına ayrı bir kopya kondu — iki dosya
+senkronize değildir (md5'leri de farklı: kopya Gün 7'de yeniden ölçeklendi).
 
 ---
 

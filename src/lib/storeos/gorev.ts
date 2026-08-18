@@ -10,49 +10,23 @@
 
 import type { Depo } from './depo'
 import { DENETIM_AKSIYONLARI, denetimYaz } from './denetim'
+import { gecisSebebi, nihaiMi } from './gorev-gecis'
 import type { GorevDurumu, Gorev, Kural, Oncelik, Rol } from './tipler'
 import type { VisionEvent } from './olay-sozlesmesi'
 import type { KuralKarari } from './kural-motoru'
 
 // ─── Geçiş tablosu ───────────────────────────────────────────────────────────
+//
+// Tablo `gorev-gecis.ts`e taşındı (Gün 8): görev ekranı düğme kazandı ve
+// tarayıcı da aynı tabloyu okumak zorunda. Bu dosya depoyu/denetimi import
+// ettiği için istemciye giremezdi. Kopya YOK — buradan yalnız dışa aktarılır,
+// mevcut çağıranlar (`inbound.ts`, `eskalasyon.ts`, `toplayici.ts`, testler)
+// import satırlarını değiştirmeden çalışmaya devam eder.
 
-/**
- * Kaynak durum → izin verilen hedef durumlar.
- * Listede olmayan her geçiş REDDEDİLİR (whitelist, blacklist değil).
- */
-export const GECISLER: Record<GorevDurumu, readonly GorevDurumu[]> = {
-  yeni:          ['atandi', 'iptal', 'suresi_gecti'],
-  atandi:        ['goruldu', 'basladi', 'reddedildi', 'atandi', 'iptal', 'suresi_gecti'],
-  goruldu:       ['basladi', 'reddedildi', 'atandi', 'iptal', 'suresi_gecti'],
-  basladi:       ['beklemede', 'onay_bekliyor', 'tamamlandi', 'iptal', 'suresi_gecti'],
-  beklemede:     ['basladi', 'onay_bekliyor', 'tamamlandi', 'iptal', 'suresi_gecti'],
-  onay_bekliyor: ['tamamlandi', 'reddedildi', 'basladi', 'iptal', 'suresi_gecti'],
-
-  // ── Uç durumlar ──
-  tamamlandi:    [],                     // nihai
-  reddedildi:    ['atandi', 'iptal'],    // başkasına atanabilir
-  suresi_gecti:  ['atandi', 'basladi', 'iptal', 'tamamlandi'],
-  iptal:         [],                     // nihai
-}
-
-export const NIHAI_DURUMLAR: readonly GorevDurumu[] = ['tamamlandi', 'iptal']
-
-export function nihaiMi(durum: GorevDurumu): boolean {
-  return NIHAI_DURUMLAR.includes(durum)
-}
-
-export function gecisGecerliMi(kaynak: GorevDurumu, hedef: GorevDurumu): boolean {
-  return (GECISLER[kaynak] ?? []).includes(hedef)
-}
-
-/** Geçiş reddedilirse insan-okur sebep. API 409 gövdesine bu yazılır. */
-export function gecisSebebi(kaynak: GorevDurumu, hedef: GorevDurumu): string | null {
-  if (gecisGecerliMi(kaynak, hedef)) return null
-  if (kaynak === hedef) return `Görev zaten '${kaynak}' durumunda.`
-  if (nihaiMi(kaynak)) return `'${kaynak}' nihai bir durum; görev artık değiştirilemez.`
-  const izinli = GECISLER[kaynak] ?? []
-  return `'${kaynak}' → '${hedef}' geçişine izin yok. İzin verilenler: ${izinli.join(', ') || '(yok)'}.`
-}
+export {
+  GECISLER, NIHAI_DURUMLAR, gecisGecerliMi, gecisSebebi, gorevEylemleri, nihaiMi,
+} from './gorev-gecis'
+export type { EylemFiili, GorevEylemi } from './gorev-gecis'
 
 // ─── Durum değişimi ──────────────────────────────────────────────────────────
 

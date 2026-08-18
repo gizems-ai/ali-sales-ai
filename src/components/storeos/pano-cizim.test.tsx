@@ -179,10 +179,13 @@ async function main() {
 
   // Kamera karesi ARTIK çizim (Gün 7 · madde C): "GÖRÜNTÜ YOK · YER TUTUCU"
   // jüriye kırık ekran gibi görünüyordu. Dürüstlük kaybolmadı, yer değiştirdi:
-  // kare üstünde "DEMO GÖRÜNTÜ" yazıyor ve yüz tanıma yapılmadığı söyleniyor.
+  // kare üstünde "DEMO GÖRÜNÜMÜ · anonim sayım" yazıyor ve yüz tanıma
+  // yapılmadığı söyleniyor. (Gün 8 onayı: etiket mahremiyet duruşunu ilan
+  // ediyor, kareyi mazur göstermiyor.)
   const kam = html['KameraPaneli'] ?? ''
   ok('kamera karesi "görüntü yok" demiyor', !kam.includes('GÖRÜNTÜ YOK'))
-  ok('kamera karesi demo olduğunu yazıyor', kam.includes('DEMO GÖRÜNTÜ'))
+  ok('kamera karesi demo olduğunu yazıyor', kam.includes('DEMO GÖRÜNÜMÜ'))
+  ok('kamera etiketi anonim sayımı ilan ediyor', kam.includes('DEMO GÖRÜNÜMÜ · anonim sayım'))
   ok('kamera karesi yüz tanıma yapılmadığını yazıyor', kam.includes('yüz tanıma yok'))
 
   // ── 6. Yeni düzenin ASIL vaatleri gerçekten ekranda mı ───────────────────

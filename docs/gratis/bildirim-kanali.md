@@ -273,8 +273,10 @@ Ali production n8n'ine dokunulmadı — onay bekliyor.
    normalize eder, bearer token ile `/api/storeos/wa/inbound`'a POST eder.
 3. `.env`: `STOREOS_KANAL=whatsapp` · `STOREOS_N8N_WA_WEBHOOK_URL` ·
    `STOREOS_WA_INBOUND_TOKEN` · (isteğe bağlı) `STOREOS_CRON_TOKEN`.
-4. Gerçek E.164 telefon numaraları — `Kullanicilar.Telefon` şu an `+9000000000X`
-   placeholder.
+4. ~~Gerçek E.164 telefon numaraları~~ — **Gün 8'de kapandı.** `Kullanicilar.Telefon`
+   artık `STOREOS_DEMO_TELEFON` değerini taşır (tüm roller aynı numara; telefon
+   kilidi açıkken rol başına farklı numara yazmak yanılsama üretirdi). Kilit
+   kapandığı gün `scripts/storeos/seed.ts` rol başına gerçek numarayla doldurulur.
 
 ---
 
