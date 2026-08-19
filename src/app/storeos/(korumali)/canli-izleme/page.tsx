@@ -19,6 +19,8 @@
 import Link from 'next/link'
 import { Kabuk } from '@/components/storeos/kabuk'
 import { KameraKaresi } from '@/components/storeos/kamera-karesi'
+import { GercekGoruntuKare } from '@/components/storeos/gercek-goruntu'
+import { env } from '@/lib/storeos/env'
 import {
   ModulEkrani, ModulIkili, ModulListe, ModulTablo,
 } from '@/components/storeos/modul-sablonu'
@@ -57,22 +59,30 @@ export default async function CanliIzlemeSayfasi({
           </span>
         }
       >
+        {/* Ana karede GERÇEK kayıt oynar (İzmir Forum Bornova); ızgaradaki
+            diğer üç/altı kare şematik SVG olarak kalır. Video düşerse bu kare
+            de sessizce eski SVG sahnesine geri döner. */}
         <Kart
           baslik={`${secili.ad} · ${secili.bolge}`}
-          ornek="demo"
-          sag={<span className="so-kart-not">{secili.cozunurluk} · {secili.fps} fps</span>}
+          sag={<span className="so-gercek-rozet">GERÇEK GÖRÜNTÜ</span>}
         >
-          <div className="so-kamera-ana">
-            <KameraKaresi
-              kod={secili.id.toUpperCase()}
-              kuyruk={secili.kuyruk}
-              varyant={secili.varyant}
-            />
-            <span className="so-kamera-etiket">DEMO GÖRÜNÜMÜ · anonim sayım</span>
-            <div className="so-kamera-alt">
-              <span>Son bağlantı {secili.sonBaglanti} · son olay {secili.sonOlay}</span>
-              <span>anonim sayım · yüz tanıma yok</span>
-            </div>
+          <GercekGoruntuKare
+            videoUrl={(Array.isArray(sp.goruntu) ? sp.goruntu[0] : sp.goruntu) === 'yedek' ? '' : env.kameraVideoUrl}
+            posterUrl={env.kameraPosterUrl}
+            yedek={
+              <div className="so-kamera-ana">
+                <KameraKaresi
+                  kod={secili.id.toUpperCase()}
+                  kuyruk={secili.kuyruk}
+                  varyant={secili.varyant}
+                />
+                <span className="so-kamera-etiket">DEMO GÖRÜNÜMÜ · anonim sayım</span>
+              </div>
+            }
+          />
+          <div className="so-kamera-alt">
+            <span>Son bağlantı {secili.sonBaglanti} · son olay {secili.sonOlay}</span>
+            <span>{secili.cozunurluk} · {secili.fps} fps · anonim sayım · yüz tanıma yok</span>
           </div>
         </Kart>
 

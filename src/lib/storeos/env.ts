@@ -92,6 +92,14 @@ export const env = {
   get magazaKodu() { return istege('STOREOS_MAGAZA_KODU', '0178') },
 
   /**
+   * Gerçek mağaza kaydı (Vercel Blob · storeos-medya). URL KODA YAZILMAZ:
+   * dosya değişirse ortam değişkeni değişir, kod değişmez. Boş bırakılırsa
+   * ekran sessizce SVG sahnesine düşer — hata göstermez.
+   */
+  get kameraVideoUrl() { return istege('STOREOS_KAMERA_VIDEO_URL', '') },
+  get kameraPosterUrl() { return istege('STOREOS_KAMERA_POSTER_URL', '') },
+
+  /**
    * Pano açılış tohumu (madde C: "ekran asla boş açılmasın"). Varsayılan
    * AÇIK ve YALNIZ bellek deposunda etkili — Airtable'a tohum yazılmaz.
    * Kapatmak için STOREOS_DEMO_TOHUMU=kapali. Boş bir pano görmek isteyen

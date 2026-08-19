@@ -213,7 +213,8 @@ export function ModulSeriKarti({
     <Kart
       baslik={seri.baslik}
       ornek="demo"
-      sag={<span className="so-kart-not">{seri.birincilAd}{seri.ikincilAd ? ` · ${seri.ikincilAd}` : ''}</span>}
+      /* Seri adları artık grafiğin kendi efsanesinde yazıyor; başlık satırında
+         ikinci kez yazmak aynı bilgiyi iki yerde tutmak olurdu. */
     >
       <SikisikSeri seri={s} esik={esik ?? null} />
       {esikNotu && <div className="so-kart-not so-vt-esik">{esikNotu}</div>}

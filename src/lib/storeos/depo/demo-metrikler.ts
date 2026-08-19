@@ -40,7 +40,8 @@ export function secOndalik(anahtar: string, alt: number, ust: number): number {
 // ─── Detay JSON şekilleri ────────────────────────────────────────────────────
 // Panel bu şekilleri okur; alan adları burada sabittir.
 
-export interface SaatlikNokta { saat: string; birincil: number; ikincil: number }
+/** `ikincil = null` → karşılaştırma serisi YOK. Grafik o çizgiyi çizmez. */
+export interface SaatlikNokta { saat: string; birincil: number; ikincil: number | null }
 export interface IzgaraDetay { satir: number; sutun: number; hucreler: number[] }
 export interface DagilimDetay { etiket: string; deger: number }
 
@@ -111,7 +112,9 @@ export function varsayilanMetrikler(g: DemoMetrikGirdi): Metrik[] {
     ...(detay ? { 'Detay JSON': JSON.stringify(detay) } : {}),
   })
 
-  const saatler = Array.from({ length: kapanis - acilis }, (_, i) => acilis + i)
+  // +1: kapanış saati de bir nokta. Mağaza 10:00–22:00 açık; eğri 21:00'de
+  // bitince eksen "10:00 … 21:00" diyor ve saat aralığı yalan söylüyordu.
+  const saatler = Array.from({ length: kapanis - acilis + 1 }, (_, i) => acilis + i)
   const ss = (s: number) => `${String(s).padStart(2, '0')}:00`
 
   const kuyrukSaatlik: SaatlikNokta[] = saatler.map(s => ({
@@ -232,7 +235,8 @@ function saatDamgasi(anahtar: string, altSaat: number, ustSaat: number): string 
   return `${String(Math.floor(dk / 60)).padStart(2, '0')}:${String(dk % 60).padStart(2, '0')}`
 }
 
-const SAATLER = Array.from({ length: 12 }, (_, i) => `${String(10 + i).padStart(2, '0')}:00`)
+/** 10:00 … 22:00 — 13 nokta. Kapanış saati dahil (mağaza çalışma saatleri). */
+const SAATLER = Array.from({ length: 13 }, (_, i) => `${String(10 + i).padStart(2, '0')}:00`)
 
 // ─── 1 · Canlı İzleme ────────────────────────────────────────────────────────
 
@@ -1200,6 +1204,16 @@ const MAGAZA_TANIMLARI: Array<[string, string, string, BolgeAdi]> = [
 ]
 
 /**
+ * Mağaza kodundan ad/şehir. Yan menü bunu SUNUCUDA okur: menü mağaza adını
+ * panonun canlı verisi gelmeden de yazabilsin diye. Canlı veri geldiğinde
+ * onun adı üstüne yazar — iki kaynak değil, aynı kodun iki kademesi.
+ */
+export function magazaKimligi(kod: string): { kod: string; ad: string; sehir: string } | null {
+  const t = MAGAZA_TANIMLARI.find(m => m[0] === kod)
+  return t ? { kod: t[0], ad: t[1], sehir: t[2] } : null
+}
+
+/**
  * Skor formülü ekranda da yazılı: dört alt ölçüğün ağırlıklı ortalaması.
  * Kural motorunun mağaza skoruyla AYNI mantık (bkz. `dashboard/toplayici.ts`
  * skor hesabı) — orada canlı ölçümle, burada seed ile.
@@ -1402,8 +1416,8 @@ function kayipToplami(gun: string): number {
   return kayipKalemleri(gun).reduce((t, k) => t + k.tutar, 0)
 }
 
-/** Saatlik ağırlık: 10:00–21:00. Tepe 17–19, sabah düşük. */
-const KAYIP_AGIRLIK = [4, 5, 7, 8, 7, 8, 10, 13, 15, 12, 7, 4]
+/** Saatlik ağırlık: 10:00–22:00 (13 saat). Tepe 17–19, sabah ve kapanış düşük. */
+const KAYIP_AGIRLIK = [4, 5, 7, 8, 7, 8, 10, 13, 15, 12, 7, 4, 3]
 
 export function kayipModulu(gun: string): {
   toplam: number
@@ -1425,7 +1439,9 @@ export function kayipModulu(gun: string): {
   const noktalar: SaatlikNokta[] = SAATLER.map((saat, i) => ({
     saat,
     birincil: Math.round((toplam * KAYIP_AGIRLIK[i]) / agirlikToplam),
-    ikincil: 0,
+    // Kayıp eğrisinin karşılaştırma serisi YOK. Eskiden burada 0 vardı ve
+    // grafiğin dibinde adsız, düz, kesikli gri bir çizgi olarak görünüyordu.
+    ikincil: null,
   }))
 
   return {

@@ -67,58 +67,174 @@ export function YarimGosterge({ deger, renk }: { deger: number; renk: string }) 
   )
 }
 
-// ─── Sıkışık seri (kart içinde, başlıksız) ───────────────────────────────────
+// ─── Çizgi grafik (TEK bileşen — pano da modül ekranları da bunu kullanır) ───
 //
-// `SeriGrafigi` kendi kartını çizer ve 150px yer kaplar. Pano düzeninde grafik
-// bir metin kutusunun yanında 96–108px'lik bir alanda duruyor; aynı bileşeni
-// zorlamak yerine eksensiz, sıkışık bir sürüm.
+//  ── 19 Ağu 2026'da neden yeniden yazıldı ───────────────────────────────────
+//  Eski sürüm her şeyi (metin dahil) tek bir `viewBox` içine koyuyordu. SVG
+//  metni viewBox ile birlikte ölçeklenir: aynı grafik dar panoda 7px, geniş
+//  modül ekranında 16px yazıyordu; son saat etiketi kutunun kenarında yarıdan
+//  kesilip "21:00" yerine "21:0" görünüyordu; çizgi kalınlığı da ekrandan
+//  ekrana değişiyordu.
+//
+//  Çözüm ikiye ayırmak:
+//    · GEOMETRİ  → SVG, `viewBox="0 0 100 100"` + `preserveAspectRatio="none"`.
+//      Yüzde uzayında çalışır, kutu ne şekle girerse girsin nokta yerleri
+//      doğru kalır. Tüm çizgilerde `vector-effect="non-scaling-stroke"` →
+//      kalınlık piksel cinsinden SABİT (2px veri çizgisi, 1px kılavuz).
+//    · METİN     → HTML. Eksen etiketleri, efsane ve eşik kupürü SVG'nin
+//      DIŞINDA, yüzdeyle konumlanmış `<span>`lerdir. Ölçekten etkilenmezler;
+//      punto CSS'te sabit (10.5px). İlk/son etiket kutunun içine yaslanır,
+//      bu yüzden artık kesilmez.
+//
+//  Ayrıca: Y ekseni (3–4 kılavuz + değer), her grafikte efsane, ikincil seri
+//  YALNIZCA adı varsa çizilir (adsız kesikli çizgi kafa karıştırıyordu).
 
-const S_G = 260
-const S_Y = 104
+/** Eksen etiketi — birim başına tek yerde. `degerYaz` uzun biçim, bu kısası. */
+function eksenYaz(v: number, birim: string): string {
+  switch (birim) {
+    case 'sn':    return `${Math.round(v / 60)} dk`
+    case 'dk':    return `${sayiYaz(Math.round(v))} dk`
+    case 'TL':    return `₺${sayiYaz(Math.round(v))}`
+    case 'yuzde': return `%${Math.round(v)}`
+    default:      return sayiYaz(Math.round(v))
+  }
+}
 
 /**
- * @param esik Yatay eşik çizgisi (ör. kuyruk için 180 sn). Verilmezse çizilmez —
- *   panodaki mevcut iki kullanım bu prop'u geçmiyor, davranışları değişmedi.
+ * Tavanı "yuvarlak" bir sayıya çıkarır ki eksen etiketleri 1.487 değil 1.500
+ * yazsın. Adım 1/2/2.5/5'in on kuvvetleriyle katları arasından seçilir.
  */
-export function SikisikSeri({ seri, esik = null }: { seri: Seri | null; esik?: number | null }) {
+function guzelTavan(enB: number, bolme: number): number {
+  if (enB <= 0) return bolme
+  const ham = enB / bolme
+  const us = 10 ** Math.floor(Math.log10(ham))
+  const adim = [1, 2, 2.5, 5, 10].find(k => k * us >= ham) ?? 10
+  return adim * us * bolme
+}
+
+/** Y ekseni: 0'dan tavana dört kılavuz (üstten alta). */
+function yKilavuzlari(enB: number): number[] {
+  const tavan = guzelTavan(enB, 3)
+  return [3, 2, 1, 0].map(i => (tavan / 3) * i)
+}
+
+/**
+ * X ekseninde en fazla beş etiket, EŞİT aralıklı. 13 noktalı (10:00–22:00)
+ * bir seride 0·3·6·9·12 → 10:00 · 13:00 · 16:00 · 19:00 · 22:00.
+ */
+function xIndisleri(n: number): number[] {
+  if (n <= 5) return Array.from({ length: n }, (_, i) => i)
+  const kaba = [0, 1, 2, 3, 4].map(i => Math.round((i * (n - 1)) / 4))
+  return [...new Set(kaba)]
+}
+
+/**
+ * @param esik      Yatay eşik çizgisi (ör. kuyruk için 180 sn).
+ * @param esikAdi   Eşik kupüründe yazan söz — verilmezse "eşik".
+ * @param yukseklik Çizim alanının pikseli. Pano dar, modül ekranı geniş.
+ */
+export function SikisikSeri({
+  seri, esik = null, esikAdi, yukseklik = 108,
+}: {
+  seri: Seri | null
+  esik?: number | null
+  esikAdi?: string
+  yukseklik?: number
+}) {
   if (!seri || seri.noktalar.length < 2) {
-    return <Iskelet yukseklik={S_Y} />
+    return <Iskelet yukseklik={yukseklik + 34} />
   }
   const n = seri.noktalar.length
-  const tumu = seri.noktalar.flatMap(p => [p.birincil, ...(p.ikincil === null ? [] : [p.ikincil])])
-  if (esik !== null) tumu.push(esik)
-  const enB = Math.max(...tumu)
-  const enK = Math.min(...tumu, 0)
-  const aralik = enB - enK || 1
 
-  const x = (i: number) => 6 + (i / (n - 1)) * (S_G - 12)
-  const y = (v: number) => 6 + (1 - (v - enK) / aralik) * (S_Y - 24)
-
-  const ikincil = seri.noktalar.every(p => p.ikincil !== null)
+  // İkincil seri YALNIZCA adı varsa çizilir. Adsız bir kesikli çizgi ekranda
+  // "bu ne?" sorusu doğuruyordu (kayıp eğrisinde tabanda düz duran sıfır
+  // serisi); efsanede yazamıyorsak çizmiyoruz.
+  const ikincil = seri.ikincilAd && seri.noktalar.every(p => p.ikincil !== null)
     ? seri.noktalar.map(p => p.ikincil as number)
     : null
 
-  // En çok dört saat etiketi — 260px'e daha fazlası sığmaz.
-  const adim = Math.max(1, Math.floor((n - 1) / 3))
+  const tumu = [...seri.noktalar.map(p => p.birincil), ...(ikincil ?? [])]
+  if (esik !== null) tumu.push(esik)
+  const kilavuzlar = yKilavuzlari(Math.max(...tumu))
+  const tavan = kilavuzlar[0] || 1
+
+  // Yüzde uzayı: x soldan sağa, y yukarıdan aşağı (SVG yönü).
+  const x = (i: number) => (i / (n - 1)) * 100
+  const y = (v: number) => 100 - (v / tavan) * 100
+
+  const esikYuzde = esik === null ? null : y(esik)
 
   return (
-    <svg viewBox={`0 0 ${S_G} ${S_Y}`} style={{ width: '100%', height: 'auto' }} role="img" aria-label={seri.baslik}>
-      {ikincil && (
-        <path d={yol(ikincil, x, y)} fill="none" stroke={DEGISKEN.metinSilik} strokeWidth="1.6" strokeDasharray="4 4" />
-      )}
-      {esik !== null && (
-        <>
-          <path d={`M6 ${y(esik).toFixed(1)} H${S_G - 6}`} stroke={DEGISKEN.critical} strokeWidth="1.2" strokeDasharray="5 3" fill="none" />
-          <text x={S_G - 6} y={y(esik) - 3} fontSize="7.5" fill={DEGISKEN.critical} textAnchor="end">eşik</text>
-        </>
-      )}
-      <path d={yol(seri.noktalar.map(p => p.birincil), x, y)} fill="none" stroke={DEGISKEN.marka} strokeWidth="2.2" strokeLinejoin="round" />
-      {seri.noktalar.map((p, i) => (
-        i % adim === 0 || i === n - 1
-          ? <text key={p.etiket} x={x(i)} y={S_Y - 2} fontSize="8" fill={DEGISKEN.metinSilik} textAnchor="middle">{p.etiket}</text>
-          : null
-      ))}
-    </svg>
+    <figure className="so-grf" style={{ ['--so-grf-boy' as string]: `${yukseklik}px` }}>
+      <figcaption className="so-grf-efsane">
+        <span className="so-grf-anahtar"><i data-seri="birincil" />{seri.birincilAd}</span>
+        {ikincil && <span className="so-grf-anahtar"><i data-seri="ikincil" />{seri.ikincilAd}</span>}
+        {esik !== null && (
+          <span className="so-grf-anahtar"><i data-seri="esik" />{esikAdi ?? 'eşik'} · {eksenYaz(esik, seri.birim)}</span>
+        )}
+      </figcaption>
+
+      <div className="so-grf-govde">
+        <div className="so-grf-y" aria-hidden="true">
+          {kilavuzlar.map(v => (
+            <span key={v} style={{ top: `${y(v)}%` }}>{eksenYaz(v, seri.birim)}</span>
+          ))}
+        </div>
+
+        <div className="so-grf-alan">
+          <svg
+            viewBox="0 0 100 100" preserveAspectRatio="none"
+            role="img" aria-label={`${seri.baslik} — ${seri.birincilAd}`}
+          >
+            {kilavuzlar.map(v => (
+              <path
+                key={v} d={`M0 ${y(v).toFixed(2)} H100`} fill="none"
+                stroke={DEGISKEN.cizgi} strokeWidth="1" vectorEffect="non-scaling-stroke"
+              />
+            ))}
+            {esikYuzde !== null && (
+              <path
+                d={`M0 ${esikYuzde.toFixed(2)} H100`} fill="none"
+                stroke={DEGISKEN.critical} strokeWidth="1.5" strokeDasharray="5 4"
+                vectorEffect="non-scaling-stroke"
+              />
+            )}
+            {ikincil && (
+              <path
+                d={yol(ikincil, x, y)} fill="none" stroke={DEGISKEN.metinSilik}
+                strokeWidth="2" strokeDasharray="5 4" strokeLinejoin="round"
+                vectorEffect="non-scaling-stroke"
+              />
+            )}
+            <path
+              d={yol(seri.noktalar.map(p => p.birincil), x, y)} fill="none"
+              stroke={DEGISKEN.marka} strokeWidth="2" strokeLinejoin="round" strokeLinecap="round"
+              vectorEffect="non-scaling-stroke"
+            />
+          </svg>
+
+          {/* Eşik kupürü çizginin SOL ucunda ve kutunun İÇİNDE — sağ kenarda
+              yazınca son saat etiketiyle çakışıp kesiliyordu. */}
+          {esikYuzde !== null && (
+            <span className="so-grf-esik" style={{ top: `${esikYuzde}%` }}>
+              {esikAdi ?? 'eşik'} {eksenYaz(esik as number, seri.birim)}
+            </span>
+          )}
+        </div>
+
+        <div className="so-grf-x" aria-hidden="true">
+          {xIndisleri(n).map(i => (
+            <span
+              key={i}
+              style={{ left: `${x(i)}%` }}
+              data-uc={i === 0 ? 'bas' : i === n - 1 ? 'son' : undefined}
+            >
+              {seri.noktalar[i].etiket}
+            </span>
+          ))}
+        </div>
+      </div>
+    </figure>
   )
 }
 

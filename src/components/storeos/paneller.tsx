@@ -348,7 +348,8 @@ export function SatisPaneli({
         <div className="so-mini-kutu">
           <div className="so-mini-etiket">Bugünkü Satış</div>
           <div className="so-mini-deger">{toplam ? degerYaz(toplam.deger, toplam.birim) : '—'}</div>
-          <div className="so-mini-alt">{seri.ikincilAd ? `kesikli çizgi: ${seri.ikincilAd}` : seri.birincilAd}</div>
+          {/* Kesikli çizginin ne olduğu artık grafiğin efsanesinde yazıyor. */}
+          <div className="so-mini-alt">{seri.birincilAd}</div>
         </div>
         <SikisikSeri seri={seri} />
       </div>

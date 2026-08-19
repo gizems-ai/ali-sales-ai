@@ -12,10 +12,16 @@
 import type { ReactNode } from 'react'
 import { MagazaSaglayici } from './magaza-baglami'
 import { YanMenu } from './yan-menu'
+import { env } from '@/lib/storeos/env'
+import { magazaKimligi } from '@/lib/storeos/depo/demo-metrikler'
 
 export function Kabuk({ children, aktif = '/storeos' }: { children: ReactNode; aktif?: string }) {
+  // Mağaza kimliği SUNUCUDA çözülüyor: menü ilk boyamada doğru adı yazsın,
+  // panonun canlı verisini beklemek zorunda kalmasın (bkz. magaza-baglami).
+  const tohum = magazaKimligi(env.magazaKodu)
+
   return (
-    <MagazaSaglayici>
+    <MagazaSaglayici tohum={tohum}>
       <div className="so-kabuk">
         <YanMenu aktif={aktif} />
         <main className="so-ana">{children}</main>

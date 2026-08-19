@@ -27,10 +27,18 @@ import {
   KuyrukPaneli, OneriPaneli, SatisPaneli, StokPaneli,
 } from './paneller'
 import { KayipKarti } from './kayip'
+import { GercekGoruntuKarti } from './gercek-goruntu'
+import { KameraKaresi } from './kamera-karesi'
 import { HataDurumu, Kart, OrnekBant, gecenSure, sayiYaz, tarihUzunYaz } from './temel'
 import { usePano } from './use-pano'
 
-export function Pano() {
+export function Pano({
+  videoUrl = '', posterUrl = '',
+}: {
+  /** Gerçek mağaza kaydı (Vercel Blob). Boşsa kart SVG sahnesine düşer. */
+  videoUrl?: string
+  posterUrl?: string
+} = {}) {
   const { veri, hata, yukleniyor, duraklatildi, sonGuncelleme, yenile } = usePano()
 
   // Yan menüdeki mağaza seçici panonun çektiği veriyi kullanır; ikinci bir
@@ -133,6 +141,23 @@ export function Pano() {
             <OneriPaneli alarmlar={bos?.alarmlar ?? null} simdiMs={simdiMs} />
             <GorevPaneli gorevler={bos?.gorevler ?? null} ozet={veri?.gorevOzeti ?? null} />
           </div>
+        </section>
+
+        {/* ── 2b · Gerçek mağaza görüntüsü (19 Ağu) ───────────────────────
+            Panelin tek gerçek kaydı. Kamera ızgarası YERİNDE DURUYOR: o
+            kameranın sağlığını gösteriyor, bu kart bambaşka bir şey anlatıyor.
+            Video düşerse sessizce aynı SVG sahnesine geçer. */}
+        <section className="so-satir-gercek">
+          <GercekGoruntuKarti
+            videoUrl={videoUrl}
+            posterUrl={posterUrl}
+            yedek={
+              <div className="so-kamera-ana">
+                <KameraKaresi kod="CAM 02" kuyruk={kuyrukKisi ?? 0} varyant={3} />
+                <span className="so-kamera-etiket">DEMO GÖRÜNÜMÜ · anonim sayım</span>
+              </div>
+            }
+          />
         </section>
 
         {/* ── 3 · Kuyruk | raf & stok | yoğunluk ──────────────────────────── */}

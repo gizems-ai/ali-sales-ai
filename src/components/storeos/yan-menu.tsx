@@ -20,7 +20,8 @@ import { useUser } from '@clerk/nextjs'
 import Image from 'next/image'
 import { MODULLER, modulYolu } from '@/lib/storeos/moduller'
 import { rolEtiketi } from '@/lib/storeos/tema'
-import { useMagaza } from './magaza-baglami'
+import { useMagazaBaglami } from './magaza-baglami'
+import { Iskelet } from './temel'
 
 const NAV = (['Operasyon', 'Yönetim'] as const).map(baslik => ({
   baslik,
@@ -38,7 +39,13 @@ function bashafler(ad: string | null | undefined, eposta: string | undefined): s
 
 export function YanMenu({ aktif }: { aktif: string }) {
   const { user, isLoaded } = useUser()
-  const magaza = useMagaza()
+  const { magaza, tohum } = useMagazaBaglami()
+
+  // Ad/kod önce CANLI veriden, o yoksa sunucudan gelen statik kimlikten
+  // okunur. İkisi de yoksa (kod tanınmıyorsa) iskelet gösterilir — "yükleniyor"
+  // yazıp orada kalmak yok: iskelet ya dolar ya da hiç doğmaz.
+  const ad = magaza?.ad ?? tohum?.ad ?? null
+  const kod = magaza?.kod ?? tohum?.kod ?? null
 
   // Rol Clerk `publicMetadata.storeos_rol` alanından okunur; API tarafındaki
   // yetki kontrolüyle AYNI kaynak, böylece ekranda yazan rol ile sunucunun
@@ -63,16 +70,24 @@ export function YanMenu({ aktif }: { aktif: string }) {
       {/*
         Mağaza seçici. Demoda TEK mağaza var; açılır liste yok çünkü açılınca
         boş çıkardı. Yine de kutu duruyor: jüri çok mağazalı mimariyi buradan
-        okuyor. Ad/kod panonun çektiği veriden gelir (`magaza-baglami`), ikinci
-        bir istek atılmaz; veri gelmeden önce yer tutucu yazı görünür.
+        okuyor. Ad/kod sunucudan tohumlanır, panonun çektiği canlı veri gelince
+        onun üstüne yazar (`magaza-baglami`) — ikinci bir istek atılmaz.
+        CANLI rozeti YALNIZ canlı veriden doğar: tohum "çevrimiçi" diyemez.
       */}
       <div className="so-magaza-secici" title="Demo tek mağaza ile çalışıyor; mağaza değiştirme çok mağazalı kurulumda açılır.">
         <div className="so-magaza-ikon" aria-hidden="true">🏬</div>
-        <div>
-          <div className="so-magaza-ad">{magaza?.ad ?? 'Mağaza yükleniyor…'}</div>
-          <div className="so-magaza-kod">{magaza ? `Mağaza ${magaza.kod}` : '—'}</div>
-          {magaza?.durum === 'online' && <div className="so-canli-nokta">CANLI</div>}
-        </div>
+        {ad && kod ? (
+          <div>
+            <div className="so-magaza-ad">{ad}</div>
+            <div className="so-magaza-kod">Mağaza {kod}</div>
+            {magaza?.durum === 'online' && <div className="so-canli-nokta">CANLI</div>}
+          </div>
+        ) : (
+          <div className="so-magaza-iskelet" aria-label="Mağaza bilgisi yükleniyor">
+            <Iskelet yukseklik={11} />
+            <Iskelet yukseklik={9} />
+          </div>
+        )}
       </div>
 
       <div className="so-menu">

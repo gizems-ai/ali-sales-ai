@@ -18,12 +18,13 @@ import { renderToStaticMarkup } from 'react-dom/server'
 import type { ReactElement } from 'react'
 import {
   ALI_SENARYOLARI, KAMPANYA_MADDELERI, analizModulu, ayarlarModulu, bakimModulu,
-  isgModulu, kameraModulu, kampanyaModulu, kasaModulu, operasyonModulu,
+  isgModulu, kameraModulu, kampanyaModulu, kasaModulu, kayipModulu, operasyonModulu,
   personelModulu, rafModulu, raporModulu, whatsappModulu,
 } from '../../lib/storeos/depo/demo-metrikler'
 import { BUTON_ETIKETLERI } from '../../lib/storeos/kanal/buton'
 import { BUTON_AKSIYONLARI } from '../../lib/storeos/kanal/tipler'
 import { WaAkisi } from './wa-akis'
+import { GercekGoruntuKarti } from './gercek-goruntu'
 import { MODULLER, durumSayimi } from '../../lib/storeos/moduller'
 import {
   ModulDagilim, ModulDonut, ModulEkrani, ModulIkili, ModulIzgara,
@@ -60,6 +61,7 @@ function main(): void {
   const bak = bakimModulu(GUN)
   const kmp = kampanyaModulu(GUN)
   const ope = operasyonModulu(GUN)
+  const kyp = kayipModulu(GUN)
   const ayr = ayarlarModulu()
 
   console.log('\n── şablon çerçevesi ──')
@@ -100,6 +102,58 @@ function main(): void {
   ok('eşik çizgisi ve etiketi çizildi', seri.includes('eşik'))
   ok('eşik notu görünüyor', seri.includes('eşik notu'))
   ok('eşiksiz seri de çizilir', ciz('seri (eşiksiz)', <ModulSeriKarti seri={ana.ziyaretciBugunDun} />).length > 0)
+
+  // ── grafik kilitleri (19 Ağu 2026) ────────────────────────────────────────
+  // Grafik bozuktu: viewBox ile kutu oranı tutmadığı için SVG içindeki metin
+  // eziliyor, son saat etiketi ("21:0") kırpılıyor, kalınlık ölçekle oynuyordu.
+  // Çözüm: geometri SVG'de, METİN HTML'de. Aşağıdakiler o çözümü kilitler.
+  ok('çizgi kalınlığı ölçekten bağımsız', seri.includes('vector-effect="non-scaling-stroke"'))
+  ok('efsane çizildi', seri.includes('so-grf-efsane') && seri.includes(kas.seri.birincilAd))
+  ok('ikincil seri efsanede adıyla var', seri.includes('data-seri="ikincil"') && seri.includes(kas.seri.ikincilAd as string))
+  ok('y ekseni kılavuz etiketleri var', seri.includes('so-grf-y'))
+  ok('kuyruk ekseni dakika cinsinden', /so-grf-y[\s\S]*?\d+ dk/.test(seri))
+  ok('eşik kupürü grafiğin içinde', seri.includes('so-grf-esik'))
+  ok('metin SVG dışında — punto viewBox ile ezilmiyor', !/<svg[\s\S]*?<text/.test(seri))
+
+  const iki = ciz('ModulSeriKarti (kayıp)', <ModulSeriKarti seri={kyp.saatlik} />)
+  ok('kayıp eğrisinde adsız kesikli çizgi YOK', !iki.includes('data-seri="ikincil"'))
+  ok('kayıp ekseni ₺ ile yazılı', iki.includes('₺'))
+
+  // Saat aralığı mağaza saatleri: 10:00–22:00. Son etiket TAM yazılır ve
+  // kutunun sağına yaslanır (kırpılma buradan geliyordu).
+  ok('eksen 10:00 ile başlıyor', iki.includes('>10:00<'))
+  ok('eksen 22:00 ile bitiyor — kesik "22:0" yok', iki.includes('>22:00<'))
+  ok('son etiket kutunun içine yaslanmış', iki.includes('data-uc="son"'))
+  ok('saatlik seri 13 nokta (10:00–22:00)', kyp.saatlik.noktalar.length === 13)
+  ok('eksende 4-5 etiket var', (iki.match(/so-grf-x"[\s\S]*?<\/div>/)?.[0].match(/<span/g) ?? []).length <= 5)
+
+  // ── gerçek mağaza görüntüsü (19 Ağu 2026) ─────────────────────────────────
+  console.log('\n── gerçek görüntü kartı ──')
+  const YEDEK = <div className="so-kamera-ana"><span className="so-kamera-etiket">DEMO GÖRÜNÜMÜ · anonim sayım</span></div>
+  const VU = 'https://ornek.public.blob.vercel-storage.com/storeos/x.mp4'
+  const PU = 'https://ornek.public.blob.vercel-storage.com/storeos/x.jpg'
+
+  const gg = ciz('GercekGoruntuKarti', <GercekGoruntuKarti videoUrl={VU} posterUrl={PU} yedek={YEDEK} />)
+  ok('video çizildi', gg.includes('<video') && gg.includes(VU))
+  ok('poster tanımlı — siyah kutu yok', gg.includes(`poster="${PU}"`))
+  // React SSR nitelikleri camelCase basar (autoPlay/playsInline); HTML'de
+  // nitelik adı büyük-küçük harf duyarsızdır, tarayıcı ikisini de okur.
+  ok('sunumda tıklama gerektirmiyor', gg.includes('autoPlay') && gg.includes('loop') && gg.includes('playsInline'))
+  ok('sesi kapalı — otomatik oynatma engellenmesin', gg.includes('muted'))
+  ok('kontroller gizli', !gg.includes('controls'))
+  ok('rozet GERÇEK GÖRÜNTÜ — örnek-veri rozetinden farklı', gg.includes('so-gercek-rozet') && gg.includes('GERÇEK GÖRÜNTÜ'))
+  ok('kart "örnek veri" demiyor — bu kayıt gerçek', !gg.includes('so-ornek-nokta'))
+  ok('köşe etiketi yüz tanıma yapılmadığını söylüyor', gg.includes('yüz tanıma yok') && gg.includes('İZMİR FORUM BORNOVA'))
+  ok('üç adımlık zaman çizgisi var', ['0:07', '0:35', '1:14'].every(s => gg.includes(s)))
+  ok('adımlar ton taşıyor — renk tek başına değil, saat+metin de var', (gg.match(/data-ton="/g) ?? []).length === 3)
+  ok('kapanış cümlesi yerinde', gg.includes('hiçbir sistemde kayıtlı değil'))
+  ok('yedek görünmüyor — video varken SVG çizilmez', !gg.includes('DEMO GÖRÜNÜMÜ'))
+
+  // YEDEK YOL — kasten bozuk/boş URL. `onError` de tam olarak bu dalı çalıştırır.
+  const ggY = ciz('GercekGoruntuKarti (yedek)', <GercekGoruntuKarti videoUrl="" posterUrl={PU} yedek={YEDEK} />)
+  ok('URL yoksa sessizce SVG sahnesine düşüyor', !ggY.includes('<video') && ggY.includes('DEMO GÖRÜNÜMÜ'))
+  ok('yedekte hata metni YOK — ekran boş kalmıyor', !/hata|yüklenemedi|error/i.test(ggY))
+  ok('yedekte de kart başlığı ve rozet duruyor', ggY.includes('Hizmet alamayan müşteri') && ggY.includes('GERÇEK GÖRÜNTÜ'))
 
   ok('dağılım çizildi', ciz('ModulDagilim', <ModulDagilim baslik="d" birim="yuzde" dilimler={raf.dagilim} />).length > 0)
   ok('donut çizildi', ciz('ModulDonut', <ModulDonut baslik="p" dilimler={per.dagilim} />).length > 0)
